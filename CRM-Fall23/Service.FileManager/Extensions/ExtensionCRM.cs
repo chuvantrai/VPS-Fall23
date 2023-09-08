@@ -28,4 +28,58 @@ public class ExtensionCRM : IExtensionCRM
             return null;
         }
     }
+
+    public string? UpdateImage(IFormFile myFile, string oldFile)
+    {
+        try
+        {
+            var fileName = CreateImage(myFile);
+            // delete img 
+            if (!string.IsNullOrEmpty(oldFile) && fileName != null)
+            {
+                var imgPath = Path.Combine(Directory.GetCurrentDirectory(),
+                    "wwwroot", "image", oldFile);
+                var fileDelete = new FileInfo(imgPath);
+                if (fileDelete.Length > 0)
+                {
+                    File.Delete(imgPath);
+                    fileDelete.Delete();
+                }
+
+                return fileName;
+            }
+
+            return null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public bool DeleteImage(string oldFile)
+    {
+        try
+        {
+            // delete img 
+            if (!string.IsNullOrEmpty(oldFile))
+            {
+                var imgPath = Path.Combine(Directory.GetCurrentDirectory(),
+                    "wwwroot", "image", oldFile);
+                var fileDelete = new FileInfo(imgPath);
+                if (fileDelete.Length > 0)
+                {
+                    File.Delete(imgPath);
+                    fileDelete.Delete();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }

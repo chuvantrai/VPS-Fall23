@@ -1,27 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app-clients", "app-clients", "{CC657EA5-883A-40FC-882B-A720DF5750CD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{F179285B-7893-4C8F-9AEF-3FFF1EA42B24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.ManagerCRM", "Service.ManagerCRM\Service.ManagerCRM.csproj", "{6D322F46-DB19-4466-8F01-0E7AB36C71D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.ManagerCRM", "Service.ManagerCRM\Service.ManagerCRM.csproj", "{6D322F46-DB19-4466-8F01-0E7AB36C71D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.Manager", "Client.Manager\Client.Manager.csproj", "{10217955-B76E-495C-9B6D-A7ED1FFFC7DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Manager", "Client.Manager\Client.Manager.csproj", "{10217955-B76E-495C-9B6D-A7ED1FFFC7DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Schedule", "Service.Schedule\Service.Schedule.csproj", "{7D8CECF6-4C16-4EF6-B68F-76813813FCAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.Schedule", "Service.Schedule\Service.Schedule.csproj", "{7D8CECF6-4C16-4EF6-B68F-76813813FCAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.FileManager", "Service.FileManager\Service.FileManager.csproj", "{8439658B-4C0A-4675-8AD8-D14E1D41C190}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.FileManager", "Service.FileManager\Service.FileManager.csproj", "{8439658B-4C0A-4675-8AD8-D14E1D41C190}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{6D322F46-DB19-4466-8F01-0E7AB36C71D6} = {F179285B-7893-4C8F-9AEF-3FFF1EA42B24}
-		{10217955-B76E-495C-9B6D-A7ED1FFFC7DF} = {CC657EA5-883A-40FC-882B-A720DF5750CD}
-		{7D8CECF6-4C16-4EF6-B68F-76813813FCAE} = {F179285B-7893-4C8F-9AEF-3FFF1EA42B24}
-		{8439658B-4C0A-4675-8AD8-D14E1D41C190} = {F179285B-7893-4C8F-9AEF-3FFF1EA42B24}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6D322F46-DB19-4466-8F01-0E7AB36C71D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -40,5 +37,17 @@ Global
 		{8439658B-4C0A-4675-8AD8-D14E1D41C190}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8439658B-4C0A-4675-8AD8-D14E1D41C190}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8439658B-4C0A-4675-8AD8-D14E1D41C190}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6D322F46-DB19-4466-8F01-0E7AB36C71D6} = {F179285B-7893-4C8F-9AEF-3FFF1EA42B24}
+		{10217955-B76E-495C-9B6D-A7ED1FFFC7DF} = {CC657EA5-883A-40FC-882B-A720DF5750CD}
+		{7D8CECF6-4C16-4EF6-B68F-76813813FCAE} = {F179285B-7893-4C8F-9AEF-3FFF1EA42B24}
+		{8439658B-4C0A-4675-8AD8-D14E1D41C190} = {F179285B-7893-4C8F-9AEF-3FFF1EA42B24}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EF6C1E70-3EF5-41EC-880F-71E5AE752D01}
 	EndGlobalSection
 EndGlobal

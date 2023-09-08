@@ -21,18 +21,46 @@ public class CRMFileController : Controller
     {
         try
         {
-            var fileSize = imageFile.Length / (1024 * 1024 * 50);
+            var fileSize = imageFile.Length / (1024f * 1000f);
             if (fileSize < SizeLimitImage)
             {
                 var nameImage = _extension.CreateImage(imageFile);
-                return Ok(new
+                if(nameImage != null)
                 {
-                    success = true,
-                    status = 200,
-                    data = nameImage
-                });
+                    return Ok(new
+                    {
+                        success = true,
+                        status = 200,
+                        data = nameImage
+                    });
+                }
             }
-
+            return NotFound($"{ResponseNotification.OVER_SIZE} ({SizeLimitImage}MB)");
+        }
+        catch
+        {
+            return NotFound(ResponseNotification.SERVER_ERROR);
+        }
+    }
+    [HttpPost("UpdateImage")]
+    public IActionResult UpdateImage(IFormFile imageFile)
+    {
+        try
+        {
+            var fileSize = imageFile.Length / (1024f * 1000f);
+            if (fileSize < SizeLimitImage)
+            {
+                var nameImage = _extension.CreateImage(imageFile);
+                if(nameImage != null)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        status = 200,
+                        data = nameImage
+                    });
+                }
+            }
             return NotFound($"{ResponseNotification.OVER_SIZE} ({SizeLimitImage}MB)");
         }
         catch
