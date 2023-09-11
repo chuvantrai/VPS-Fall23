@@ -42,26 +42,12 @@ public class CRMFileController : Controller
             return NotFound(ResponseNotification.SERVER_ERROR);
         }
     }
-    [HttpPost("UpdateImage")]
-    public IActionResult UpdateImage(IFormFile imageFile)
+    [HttpPost("DeleteImage")]
+    public IActionResult DeleteImage(string fileName)
     {
         try
         {
-            var fileSize = imageFile.Length / (1024f * 1000f);
-            if (fileSize < SizeLimitImage)
-            {
-                var nameImage = _extension.CreateImage(imageFile);
-                if(nameImage != null)
-                {
-                    return Ok(new
-                    {
-                        success = true,
-                        status = 200,
-                        data = nameImage
-                    });
-                }
-            }
-            return NotFound($"{ResponseNotification.OVER_SIZE} ({SizeLimitImage}MB)");
+            return Ok("Done");
         }
         catch
         {
