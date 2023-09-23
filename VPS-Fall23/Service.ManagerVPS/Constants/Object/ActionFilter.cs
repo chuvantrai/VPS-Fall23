@@ -18,6 +18,7 @@ public static class ActionFilter
             UserRole = new[] { UserRoleEnum.ADMIN }
         }
     };
+
     public static ActionModel? GetAllActionModel(ActionFilterEnum action)
     {
         return AllActionModel.Find(x => x.Action == action);

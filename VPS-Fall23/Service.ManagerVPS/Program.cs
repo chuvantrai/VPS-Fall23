@@ -1,5 +1,7 @@
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
+using Service.ManagerVPS.Repositories;
+using Service.ManagerVPS.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +13,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //AddSingleton 
-builder.Services.AddSingleton<IGeneralCRM, GeneralCRM>();
+builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
+
+// Add Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 

@@ -1,6 +1,6 @@
 ﻿namespace Service.ManagerVPS.Extensions.ILogic;
 
-public interface IGeneralCRM
+public interface IGeneralVPS
 {
     Task<bool> SendEmailAsync(string recipient, string subject, string body);
 }

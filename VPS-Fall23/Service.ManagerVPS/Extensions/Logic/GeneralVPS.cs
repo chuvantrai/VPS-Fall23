@@ -1,10 +1,11 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using System.Text;
 using Service.ManagerVPS.Extensions.ILogic;
 
 namespace Service.ManagerVPS.Extensions.Logic;
 
-public class GeneralCRM : IGeneralCRM
+public class GeneralVPS : IGeneralVPS
 {
     public async Task<bool> SendEmailAsync(string recipient, string subject, string body)
     {
@@ -21,8 +22,8 @@ public class GeneralCRM : IGeneralCRM
                 Subject = subject,
                 Body = body
             };
-            message.BodyEncoding = System.Text.Encoding.UTF8;
-            message.SubjectEncoding = System.Text.Encoding.UTF8;
+            message.BodyEncoding = Encoding.UTF8;
+            message.SubjectEncoding = Encoding.UTF8;
             message.IsBodyHtml = true;
             message.ReplyToList.Add(new MailAddress(config["EmailSetting:Email"]));
             message.Sender = new MailAddress(config["EmailSetting:Email"]);
