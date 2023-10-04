@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.Schedule", "Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp", "Client.Manager\WebApp.csproj", "{35B10EAE-C0E1-4A28-B2E8-41AAB208090E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{45BDDD79-A768-4C60-B973-78E91D02FF93}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{45BDDD79-A768-4C60-B973-78E91D02FF93}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.FileManager", "Service.FileManager\Service.FileManager.csproj", "{F725F4FE-1D4C-4D9A-887A-B97BFC2C3843}"
 EndProject
