@@ -1,11 +1,3 @@
-VPS-Fall23/Client.Manager/bin/
-VPS-Fall23/Client.Manager/obj/
-VPS-Fall23/Service.FileManager/bin/
-VPS-Fall23/Service.FileManager/obj/
-VPS-Fall23/Service.ManagerVPS/bin/
-VPS-Fall23/Service.ManagerVPS/obj/
-VPS-Fall23/Service.Schedule/bin/
-VPS-Fall23/Service.Schedule/obj/
 VPS-Fall23/.idea
 VPS-Fall23/.vs
 .idea/

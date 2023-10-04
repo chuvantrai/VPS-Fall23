@@ -1,6 +1,4 @@
-﻿using Service.ManagerVPS.DTO.OtherModels;
-
-namespace Service.ManagerVPS.Extensions.StaticLogic;
+﻿namespace Service.ManagerVPS.Extensions.StaticLogic;
 
 public static class JwtTokenExtension
 {
