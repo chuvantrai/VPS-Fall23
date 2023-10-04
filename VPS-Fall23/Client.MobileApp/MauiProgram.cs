@@ -1,4 +1,6 @@
-﻿namespace Client.MobileApp
+﻿using Microsoft.Extensions.Logging;
+
+namespace Client.MobileApp
 {
     public static class MauiProgram
     {
@@ -12,6 +14,10 @@
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
+
+#if DEBUG
+		builder.Logging.AddDebug();
+#endif
 
             return builder.Build();
         }
