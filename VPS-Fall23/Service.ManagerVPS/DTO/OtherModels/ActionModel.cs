@@ -1,6 +1,6 @@
 ﻿using Service.ManagerVPS.Constants.Enums;
 
-namespace Service.ManagerVPS.ModelsNoneDB.OtherModels;
+namespace Service.ManagerVPS.DTO.OtherModels;
 
 public class ActionModel
 {

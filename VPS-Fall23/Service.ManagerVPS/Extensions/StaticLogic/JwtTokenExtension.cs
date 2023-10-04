@@ -1,4 +1,4 @@
-﻿using Service.ManagerVPS.ModelsNoneDB.OtherModels;
+﻿using Service.ManagerVPS.DTO.OtherModels;
 
 namespace Service.ManagerVPS.Extensions.StaticLogic;
 

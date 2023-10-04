@@ -6,12 +6,12 @@ namespace Service.FileManager.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class CRMFileController : Controller
+public class VPSFileController : Controller
 {
-    private readonly IExtensionCRM _extension;
+    private readonly IExtensionFile _extension;
     private const long SizeLimitImage = 10;
 
-    public CRMFileController(IExtensionCRM extension)
+    public VPSFileController(IExtensionFile extension)
     {
         _extension = extension;
     }

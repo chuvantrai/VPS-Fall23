@@ -9,7 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IExtensionCRM, ExtensionCRM>();
+builder.Services.AddSingleton<IExtensionFile, ExtensionFile>();
 
 var app = builder.Build();
 

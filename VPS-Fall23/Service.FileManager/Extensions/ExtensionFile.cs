@@ -1,6 +1,6 @@
 ﻿namespace Service.FileManager.Extensions;
 
-public class ExtensionCRM : IExtensionCRM
+public class ExtensionFile : IExtensionFile
 {
     public string? CreateImage(IFormFile myFile)
     {

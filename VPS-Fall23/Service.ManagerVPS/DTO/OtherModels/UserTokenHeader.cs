@@ -1,4 +1,4 @@
-﻿namespace Service.ManagerVPS.ModelsNoneDB.OtherModels;
+﻿namespace Service.ManagerVPS.DTO.OtherModels;
 
 public class UserTokenHeader
 {

@@ -1,5 +1,5 @@
 ﻿using Service.ManagerVPS.Constants.Enums;
-using Service.ManagerVPS.ModelsNoneDB.OtherModels;
+using Service.ManagerVPS.DTO.OtherModels;
 
 namespace Service.ManagerVPS.Constants.Object;
 

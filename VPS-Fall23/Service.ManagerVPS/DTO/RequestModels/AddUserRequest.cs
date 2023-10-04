@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Service.ManagerVPS.ModelsNoneDB.RequestModels;
+namespace Service.ManagerVPS.DTO.RequestModels;
 
 public class AddUserRequest
 {

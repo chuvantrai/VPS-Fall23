@@ -19,7 +19,7 @@
 
     <ItemGroup>
       <Folder Include="Constants\ConfigKey\" />
-      <Folder Include="ModelsNoneDB\ResponseModels\" />
+      <Folder Include="DTO\ResponseModels\" />
       <Folder Include="Models\" />
     </ItemGroup>
 

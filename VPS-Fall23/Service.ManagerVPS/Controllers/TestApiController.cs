@@ -2,7 +2,7 @@
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.FilterPermissions;
-using Service.ManagerVPS.ModelsNoneDB.RequestModels;
+using Service.ManagerVPS.DTO.RequestModels;
 using Service.ManagerVPS.Repositories.Interfaces;
 
 namespace Service.ManagerVPS.Controllers;
