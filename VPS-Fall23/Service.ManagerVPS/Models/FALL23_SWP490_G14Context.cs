@@ -37,7 +37,7 @@ namespace Service.ManagerVPS.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid=nghianvho; pwd=Random@11092023#@!;");
+                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!;");
             }
         }
 
@@ -73,6 +73,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.IsBlock).HasColumnName("is_block");
 
+                entity.Property(e => e.IsVerified).HasColumnName("is_verified");
+
                 entity.Property(e => e.LastName)
                     .HasMaxLength(50)
                     .HasColumnName("last_name");
@@ -93,6 +95,8 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.Username)
                     .HasMaxLength(20)
                     .HasColumnName("username");
+
+                entity.Property(e => e.VerifyCode).HasColumnName("verify_code");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.Accounts)
