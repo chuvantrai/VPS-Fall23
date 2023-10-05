@@ -6,6 +6,8 @@ public enum UserRoleEnum
 {
     [Description("Admin")] 
     ADMIN = 1,
-    [Description("Khách hàng")]
-    CUSTUMER = 2
+    [Description("Quản lý bãi đỗ xe")]
+    OWNER = 2,
+    [Description("Bảo vệ")]
+    ATTENDANT = 3
 }

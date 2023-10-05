@@ -20,7 +20,6 @@
     <ItemGroup>
       <Folder Include="Constants\ConfigKey\" />
       <Folder Include="DTO\Output\" />
-      <Folder Include="Models\" />
     </ItemGroup>
 
 </Project>
