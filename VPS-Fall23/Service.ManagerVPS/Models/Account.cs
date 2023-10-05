@@ -30,6 +30,8 @@ namespace Service.ManagerVPS.Models
         public string Email { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;
         public string? Avatar { get; set; }
+        public int? VerifyCode { get; set; }
+        public bool? IsVerified { get; set; }
 
         public virtual Commune? Commune { get; set; }
         public virtual Type Type { get; set; } = null!;
