@@ -21,7 +21,7 @@ public class UserRepository : IUserRepository
     public bool CheckValidVerification(string email, int code)
     {
         var existedAcc = _context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
-        return existedAcc.VerifyCode == code;
+        return existedAcc?.VerifyCode == code;
     }
 
     public string AddUser()
@@ -29,7 +29,7 @@ public class UserRepository : IUserRepository
         return "Done";
     }
 
-    public Account GetAccountByEmail(string email)
+    public Account? GetAccountByEmail(string email)
     {
         var account = _context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
         return account;

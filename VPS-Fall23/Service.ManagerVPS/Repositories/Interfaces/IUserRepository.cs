@@ -10,7 +10,7 @@ public interface IUserRepository
     
     string AddUser();
     
-    Account GetAccountByEmail(string email);
+    Account? GetAccountByEmail(string email);
 
     int RegisterNewAccount(Account newAccount);
     
