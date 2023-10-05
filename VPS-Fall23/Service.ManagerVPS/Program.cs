@@ -1,5 +1,6 @@
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
+using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -14,6 +15,7 @@ builder.Services.AddSwaggerGen();
 
 //AddSingleton 
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
+builder.Services.AddSingleton<FALL23_SWP490_G14Context>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
