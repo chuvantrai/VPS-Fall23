@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.Input;
@@ -6,6 +7,7 @@ using Service.ManagerVPS.DTO.Input.User;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -23,62 +25,143 @@ public class AuthController : Controller
         _userRepository = userRepository;
         _generalVPS = generalVps;
     }
-
+    
     [HttpPost]
     public async Task<IActionResult> AuthLogin(LoginRequest request)
     {
-        var account = await _userRepository.GetAccountByUserNameAsync(request.Username);
+        try
+        {
+            var account = await _userRepository.GetAccountByUserNameAsync(request.Username);
+            if (account == null)
+            {
+                return BadRequest("wrong username!");
+            }
+
+            if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account.Password))
+            {
+                return BadRequest("wrong password!");
+            }
+
+            if (account.IsVerified == false)
+            {
+                return BadRequest("Haven't Verified email yet!");
+            }
+        
+            if (account.IsBlock)
+            {
+                return BadRequest("Account has been locked!");
+            }
+
+            var userToken = new UserTokenHeader
+            {
+                UserId = account.Id.ToString(),
+                Email = account.Email,
+                FirstName = account.FirstName,
+                LastName = account.LastName,
+                Avatar = account.Avatar,
+                RoleId = account.TypeId,
+                RoleName = EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId).ToString(),
+                Expires = DateTime.Now.AddMinutes(30),
+                ModifiedAt = account.ModifiedAt
+            };
+            
+            return Ok(new
+            {
+                AccessToken = JwtTokenExtension.WriteToken(userToken),
+                UserData = userToken
+            });
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.ChangePassword)]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        try
+        {
+            if (request.NewPassword == request.OldPassword)
+            {
+                return BadRequest("New password same old password!");
+            }
+            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+            var account = await _userRepository.GetAccountByIdAsync(Guid.Parse(userToken.UserId));
+            account!.Password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.NewPassword, 13);
+            account.ModifiedAt = DateTime.Now;
+            return Ok();
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.RefreshToken)]
+    public IActionResult RefreshToken()
+    {
+        try
+        {
+            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+            userToken.Expires = DateTime.Now.AddMinutes(30);
+            return Ok(new
+            {
+                AccessToken = JwtTokenExtension.WriteToken(userToken),
+                UserData = userToken
+            });
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+    
+    [HttpPost]
+    [FilterPermission(Action = ActionFilterEnum.CreateAccountDemo)]
+    public IActionResult CreateAccountDemo([FromForm] CreateAccountDemoRequest request)
+    {
+        try
+        {
+            var newAccount = new Account()
+            {
+                TypeId = (int)request.TypeId,
+                Id = Guid.NewGuid(),
+                Username = request.Username,
+                Email = request.Email,
+                Password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password, 13),
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+                IsBlock = false,
+                PhoneNumber = request.PhoneNumber,
+                IsVerified = true,
+                VerifyCode = 0
+            };
+            _userRepository.RegisterNewAccount(newAccount);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> SendCodeForgotPassword(SendCodeForgotPasswordRequest request)
+    {
+        var account = await _userRepository.UpdateVerifyCodeAsync(request.UserName);
         if (account == null)
         {
             return BadRequest("wrong username!");
         }
 
-        if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account.Password))
-        {
-            return BadRequest("wrong password!");
-        }
-
-        if (account.IsVerified == false)
-        {
-            return BadRequest("Haven't Verified email yet!");
-        }
-        
-        if (account.IsBlock)
-        {
-            return BadRequest("Account has been locked!");
-        }
-        
-        return Ok(new UserTokenHeader
-        {
-            UserId = account.Id,
-            Email = account.Email,
-            FirstName = account.FirstName,
-            LastName = account.LastName,
-            Avatar = account.Avatar,
-            RoleId = account.TypeId,
-            RoleName = EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId).ToString()
-        });
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> CreateAccountDemo([FromForm] CreateAccountDemoRequest request)
-    {
-        var newAccount = new Account()
-        {
-            TypeId = (int)request.TypeId,
-            Id = Guid.NewGuid(),
-            Username = request.Username,
-            Password = request.Password,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            CreatedAt = DateTime.Now,
-            ModifiedAt = DateTime.Now,
-            IsBlock = false,
-            PhoneNumber = request.PhoneNumber
-        };
-        // _context.Accounts.Add(newAccount);
-        // await _context.SaveChangesAsync();
-        return Ok();
+        return Ok(account.Email);
     }
 
     [HttpPost]

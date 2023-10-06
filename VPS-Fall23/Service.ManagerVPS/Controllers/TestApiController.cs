@@ -37,4 +37,12 @@ public class TestApiController : Controller
         var t = _userRepository.AddUser();
         return Ok(t);
     }
+    
+    [HttpPost("TestAuthApi")]
+    [FilterPermission(Action = ActionFilterEnum.TestAuthApi)]
+    public IActionResult TestAuthApi()
+    {
+        return Ok("haha");
+    }
+
 }

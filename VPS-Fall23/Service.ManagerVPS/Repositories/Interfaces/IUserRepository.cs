@@ -17,4 +17,8 @@ public interface IUserRepository
     void VerifyAccount(Account account);
     
     Task<Account?> GetAccountByUserNameAsync(string userName);
+    
+    Task<Account?> GetAccountByIdAsync(Guid id);
+    
+    Task<Account?> UpdateVerifyCodeAsync(string userName);
 }

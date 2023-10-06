@@ -28,6 +28,7 @@ namespace Service.ManagerVPS.Models
         public virtual DbSet<ParkingTransactionDetail> ParkingTransactionDetails { get; set; } = null!;
         public virtual DbSet<ParkingZone> ParkingZones { get; set; } = null!;
         public virtual DbSet<ParkingZoneAbsent> ParkingZoneAbsents { get; set; } = null!;
+        public virtual DbSet<ParkingZoneAttendant> ParkingZoneAttendants { get; set; } = null!;
         public virtual DbSet<ParkingZoneOwner> ParkingZoneOwners { get; set; } = null!;
         public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Type> Types { get; set; } = null!;
@@ -36,8 +37,8 @@ namespace Service.ManagerVPS.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!;");
+                var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+                optionsBuilder.UseSqlServer(config.GetConnectionString("ConStr"));
             }
         }
 
@@ -57,6 +58,8 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.Address)
                     .HasColumnType("ntext")
                     .HasColumnName("address");
+
+                entity.Property(e => e.Avatar).HasMaxLength(255);
 
                 entity.Property(e => e.CommuneId).HasColumnName("commune_id");
 
@@ -93,7 +96,7 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.TypeId).HasColumnName("type_id");
 
                 entity.Property(e => e.Username)
-                    .HasMaxLength(20)
+                    .HasMaxLength(255)
                     .HasColumnName("username");
 
                 entity.Property(e => e.VerifyCode).HasColumnName("verify_code");
@@ -601,6 +604,34 @@ namespace Service.ManagerVPS.Models
                     .HasForeignKey(d => d.ParkingZoneId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__parking_z__parki__4316F928");
+            });
+
+            modelBuilder.Entity<ParkingZoneAttendant>(entity =>
+            {
+                entity.ToTable("parking_zone_attendant");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
+
+                entity.HasOne(d => d.IdNavigation)
+                    .WithOne(p => p.ParkingZoneAttendant)
+                    .HasForeignKey<ParkingZoneAttendant>(d => d.Id)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__parking_zone__id__02FC7413");
+
+                entity.HasOne(d => d.ParkingZone)
+                    .WithMany(p => p.ParkingZoneAttendants)
+                    .HasForeignKey(d => d.ParkingZoneId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__parking_z__parki__03F0984C");
             });
 
             modelBuilder.Entity<ParkingZoneOwner>(entity =>

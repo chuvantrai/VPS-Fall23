@@ -35,6 +35,7 @@ namespace Service.ManagerVPS.Models
 
         public virtual Commune? Commune { get; set; }
         public virtual Type Type { get; set; } = null!;
+        public virtual ParkingZoneAttendant? ParkingZoneAttendant { get; set; }
         public virtual ParkingZoneOwner? ParkingZoneOwner { get; set; }
         public virtual ICollection<City> Cities { get; set; }
         public virtual ICollection<Commune> Communes { get; set; }
