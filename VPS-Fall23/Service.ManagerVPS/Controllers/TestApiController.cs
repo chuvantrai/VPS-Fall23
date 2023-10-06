@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
-using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Repositories.Interfaces;
+using Service.ManagerVPS.Attributes;
+using Service.ManagerVPS.Controllers.Base;
 
 namespace Service.ManagerVPS.Controllers;
 
 [ApiController]
-[Route("[controller]")]
-public class TestApiController : Controller
+public class TestApiController : VpsController
 {
     private readonly IUserRepository _userRepository;
 
@@ -31,7 +31,7 @@ public class TestApiController : Controller
     }
 
     [HttpPost("AddUser")]
-    [FilterPermission(Action = ActionFilterEnum.AddUser)]
+    [VpsActionFilter(Action = ActionFilterEnum.AddUser)]
     public IActionResult AddUser([FromForm] AddUserRequest request)
     {
         var t = _userRepository.AddUser();
