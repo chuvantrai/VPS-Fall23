@@ -8,33 +8,33 @@ using Service.ManagerVPS.Controllers.Base;
 
 namespace Service.ManagerVPS.Controllers;
 
-[ApiController]
-public class TestApiController : VpsController
-{
-    private readonly IUserRepository _userRepository;
+//[ApiController]
+//public class TestApiController : VpsController
+//{
+//    private readonly IUserRepository _userRepository;
 
-    public TestApiController(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
+//    public TestApiController(IUserRepository userRepository)
+//    {
+//        _userRepository = userRepository;
+//    }
 
-    [HttpGet("GetBadRequest")]
-    public IActionResult GetBadRequest()
-    {
-        return BadRequest(ResponseNotification.SERVER_ERROR);
-    }
+//    [HttpGet("GetBadRequest")]
+//    public IActionResult GetBadRequest()
+//    {
+//        return BadRequest(ResponseNotification.SERVER_ERROR);
+//    }
 
-    [HttpGet("GetOk")]
-    public IActionResult GetOk()
-    {
-        return Ok(ResponseNotification.ADD_SUCCESS);
-    }
+//    [HttpGet("GetOk")]
+//    public IActionResult GetOk()
+//    {
+//        return Ok(ResponseNotification.ADD_SUCCESS);
+//    }
 
-    [HttpPost("AddUser")]
-    [VpsActionFilter(Action = ActionFilterEnum.AddUser)]
-    public IActionResult AddUser([FromForm] AddUserRequest request)
-    {
-        var t = _userRepository.AddUser();
-        return Ok(t);
-    }
-}
+//    [HttpPost("AddUser")]
+//    [VpsActionFilter(Action = ActionFilterEnum.AddUser)]
+//    public IActionResult AddUser([FromForm] AddUserRequest request)
+//    {
+//        var t = _userRepository.AddUser();
+//        return Ok(t);
+//    }
+//}

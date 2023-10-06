@@ -38,7 +38,7 @@ public class AuthController : VpsController<Account>
     {
         var newAccount = new Account()
         {
-            TypeId = request.TypeId,
+            TypeId = (int)request.TypeId,
         };
         Account account = await this.vpsRepository.Create(newAccount);
         await this.vpsRepository.SaveChange();
@@ -61,7 +61,7 @@ public class AuthController : VpsController<Account>
         //Những thuộc tính mặc định luôn luôn có lúc khởi tạo thì cho vô contructor đi nha
         var newAccount = new Account
         {
-            TypeId = UserRoleEnum.OWNER,
+            TypeId = (int)UserRoleEnum.OWNER,
             Id = Guid.NewGuid(),
             Email = input.Email,
             Username = input.Email,

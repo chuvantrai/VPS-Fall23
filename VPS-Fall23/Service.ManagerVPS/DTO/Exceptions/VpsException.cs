@@ -1,14 +1,27 @@
-﻿namespace Service.ManagerVPS.DTO.Exceptions
+﻿using System.Text.Json;
+
+namespace Service.ManagerVPS.DTO.Exceptions
 {
 
+
     [Serializable]
-    public class VpsException : Exception
+    public abstract class VpsException : Exception
     {
-        public VpsException() { }
-        public VpsException(string message) : base(message) { }
-        public VpsException(string message, Exception? inner = null) : base(message, inner) { }
-        protected VpsException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        public int Code { get; set; }
+        public VpsException(string message, Exception? innerException = null)
+           : base(message, innerException)
+        {
+            Code = 1;
+        }
+        public VpsException(int code, string message, Exception? innerException = null)
+            : base(message, innerException) 
+        {
+            Code = code;
+        }
+        public VpsException(int code, Exception? innerException = null)
+            : this(code, Error.Instance.GetErrorMessage(code), innerException)
+        {
+
+        }
     }
 }

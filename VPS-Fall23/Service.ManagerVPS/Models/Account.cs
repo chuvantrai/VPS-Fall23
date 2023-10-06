@@ -17,7 +17,7 @@ namespace Service.ManagerVPS.Models
             Reports = new HashSet<Report>();
         }
 
-        public UserRoleEnum TypeId { get; set; }
+        public int TypeId { get; set; }
         public Guid Id { get; set; }
         public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;

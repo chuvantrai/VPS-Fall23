@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Service.ManagerVPS.Constants.Enums;
-using Service.ManagerVPS.DTO.OtherModels.Exceptions;
+using Service.ManagerVPS.DTO.Exceptions;
 
 namespace Service.ManagerVPS.Attributes;
 

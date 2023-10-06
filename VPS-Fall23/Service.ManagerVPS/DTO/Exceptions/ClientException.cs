@@ -4,8 +4,20 @@
     [Serializable]
     public class ClientException : VpsException
     {
-        public ClientException() { }
-        public ClientException(string message, Exception? innerException = null) : base(message, innerException) { }
+        public ClientException(int code, Exception? innerException = null)
+            : base(code, innerException)
+        {
+
+        }
+        public ClientException(Exception? innerException = null)
+            : base(3, Error.Instance.GetErrorMessage(3), innerException)
+        {
+
+        }
+        public ClientException(string message, Exception? innerException = null)
+            : base(3, message, innerException)
+        {
+        }
 
     }
 }
