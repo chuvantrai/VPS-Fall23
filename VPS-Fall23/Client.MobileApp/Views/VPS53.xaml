@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Client.MobileApp.Views.VPS53"
+             xmlns:viewmodel="clr-namespace:Client.MobileApp.ViewModels"
+             x:DataType="viewmodel:VPS53ViewModel"
+             xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
+             Title="VPS53">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+
+        <cv:CameraView Grid.Row="1" x:Name="cameraView" WidthRequest="300" HeightRequest="300" CamerasLoaded="cameraView_CamerasLoaded"
+               BarCodeDetectionEnabled="True"/>
+
+
+        <Button Grid.Row="2" WidthRequest="100" HeightRequest="100" Clicked="Button_Clicked"></Button>
+    </Grid>
+
+</ContentPage>
