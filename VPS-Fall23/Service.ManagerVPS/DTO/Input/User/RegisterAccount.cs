@@ -5,6 +5,7 @@ namespace Service.ManagerVPS.DTO.Input.User;
 public class RegisterAccount
 {
     [Required(ErrorMessage = "Email cannot be null!")]
+    [EmailAddress]
     public string Email { get; set; } = null!;
 
     [Required(ErrorMessage = "Password cannot be null!")]

@@ -15,13 +15,13 @@ public class AuthController : Controller
 {
     private readonly FALL23_SWP490_G14Context _context;
     private readonly IUserRepository _userRepository;
-    private readonly IGeneralVPS _generalVPS;
+    private readonly IGeneralVPS _generalVps;
 
     public AuthController(FALL23_SWP490_G14Context context, IUserRepository userRepository, IGeneralVPS generalVps)
     {
         _context = context;
         _userRepository = userRepository;
-        _generalVPS = generalVps;
+        _generalVps = generalVps;
     }
 
     [HttpPost("AuthLogin")]
@@ -53,11 +53,11 @@ public class AuthController : Controller
                 return BadRequest("Email already exists! Try to use another email address!");
             }
 
-            var verifyCode = _generalVPS.GenerateVerificationCode();
+            var verifyCode = _generalVps.GenerateVerificationCode();
             var newAccount = new Account
             {
                 TypeId = (int)UserRoleEnum.OWNER,
-                Id = new Guid(),
+                Id = Guid.NewGuid(),
                 Email = input.Email,
                 Username = input.Email,
                 Password = BCrypt.Net.BCrypt.EnhancedHashPassword(input.Password, 13),
@@ -77,7 +77,7 @@ public class AuthController : Controller
                 return BadRequest(ResponseNotification.ADD_ERROR);
             }
 
-            await _generalVPS.SendEmailAsync(input.Email,
+            await _generalVps.SendEmailAsync(input.Email,
                 "Verify Your Email",
                 $"Your Verification code is: {verifyCode}");
 

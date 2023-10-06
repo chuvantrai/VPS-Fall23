@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
 using Service.ManagerVPS.Models;
@@ -9,13 +10,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+    );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add DBContext
+builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("ConStr")));
+
 //AddSingleton 
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
-builder.Services.AddSingleton<FALL23_SWP490_G14Context>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
