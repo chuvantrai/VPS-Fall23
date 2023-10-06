@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Service.ManagerVPS.Constants.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace Service.ManagerVPS.Models
@@ -16,7 +17,7 @@ namespace Service.ManagerVPS.Models
             Reports = new HashSet<Report>();
         }
 
-        public int TypeId { get; set; }
+        public UserRoleEnum TypeId { get; set; }
         public Guid Id { get; set; }
         public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Service.ManagerVPS.Repositories.Interfaces.Base
+namespace Service.ManagerVPS.Repositories.Interfaces
 {
     public interface IVpsRepository<TEntity>
         where TEntity : class

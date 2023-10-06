@@ -2,7 +2,7 @@
 
 namespace Service.ManagerVPS.Repositories.Interfaces;
 
-public interface IUserRepository
+public interface IUserRepository : IVpsRepository<Account>
 {
     bool CheckEmailExists(string email);
 
