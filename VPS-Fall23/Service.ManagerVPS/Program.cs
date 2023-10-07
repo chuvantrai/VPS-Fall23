@@ -8,7 +8,11 @@ using Service.ManagerVPS.Repositories.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", build => build.AllowAnyMethod()
+        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(hostName => true).Build());
+});
 builder.Services.AddControllers();
 builder.Services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
@@ -36,7 +40,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
