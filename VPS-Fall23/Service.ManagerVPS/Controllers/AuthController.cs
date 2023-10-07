@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
+using Service.ManagerVPS.Controllers.Base;
+using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.Input.User;
 using Service.ManagerVPS.Extensions.ILogic;
@@ -11,13 +13,14 @@ namespace Service.ManagerVPS.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class AuthController : Controller
+public class AuthController : VpsController<Account>
 {
     private readonly FALL23_SWP490_G14Context _context;
     private readonly IUserRepository _userRepository;
     private readonly IGeneralVPS _generalVps;
 
     public AuthController(FALL23_SWP490_G14Context context, IUserRepository userRepository, IGeneralVPS generalVps)
+        : base(userRepository)
     {
         _context = context;
         _userRepository = userRepository;
@@ -37,76 +40,68 @@ public class AuthController : Controller
         {
             TypeId = (int)request.TypeId,
         };
-        _context.Accounts.Add(newAccount);
-        await _context.SaveChangesAsync();
-        return Ok();
+        Account account = await this.vpsRepository.Create(newAccount);
+        await this.vpsRepository.SaveChange();
+        return Ok(account);
     }
 
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] RegisterAccount input)
     {
-        try
+
+        var isExisting = _userRepository.CheckEmailExists(input.Email);
+        if (isExisting)
         {
-            var isExisting = _userRepository.CheckEmailExists(input.Email);
-            if (isExisting)
-            {
-                return BadRequest("Email already exists! Try to use another email address!");
-            }
-
-            var verifyCode = _generalVps.GenerateVerificationCode();
-            var newAccount = new Account
-            {
-                TypeId = (int)UserRoleEnum.OWNER,
-                Id = Guid.NewGuid(),
-                Email = input.Email,
-                Username = input.Email,
-                Password = BCrypt.Net.BCrypt.EnhancedHashPassword(input.Password, 13),
-                FirstName = input.FirstName,
-                LastName = input.LastName,
-                PhoneNumber = input.PhoneNumber,
-                IsBlock = false,
-                IsVerified = false,
-                VerifyCode = verifyCode,
-                CreatedAt = DateTime.Now,
-                ModifiedAt = DateTime.Now,
-            };
-
-            var result = _userRepository.RegisterNewAccount(newAccount);
-            if (result == 0)
-            {
-                return BadRequest(ResponseNotification.ADD_ERROR);
-            }
-
-            await _generalVps.SendEmailAsync(input.Email,
-                "Verify Your Email",
-                $"Your Verification code is: {verifyCode}");
-
-            return Ok(ResponseNotification.ADD_SUCCESS);
+            //Message này cho ra constant nhé
+            throw new ClientException("Email already exists! Try to use another email address!");
         }
-        catch (Exception ex)
+
+        var verifyCode = _generalVps.GenerateVerificationCode();
+
+        //Những thuộc tính mặc định luôn luôn có lúc khởi tạo thì cho vô contructor đi nha
+        var newAccount = new Account
         {
-            return BadRequest(ex);
+            TypeId = (int)UserRoleEnum.OWNER,
+            Id = Guid.NewGuid(),
+            Email = input.Email,
+            Username = input.Email,
+            Password = BCrypt.Net.BCrypt.EnhancedHashPassword(input.Password, 13),
+            FirstName = input.FirstName,
+            LastName = input.LastName,
+            PhoneNumber = input.PhoneNumber,
+            IsBlock = false,
+            IsVerified = false,
+            VerifyCode = verifyCode,
+            CreatedAt = DateTime.Now,
+            ModifiedAt = DateTime.Now,
+        };
+
+        var result = _userRepository.RegisterNewAccount(newAccount);
+        if (result == 0)
+        {
+            throw new ServerException(ResponseNotification.ADD_ERROR);
         }
+
+        //Cái này cho ra 1 function trong user repo nhé
+        await _generalVps.SendEmailAsync(input.Email,
+            "Verify Your Email",
+            $"Your Verification code is: {verifyCode}");
+
+        return Ok(ResponseNotification.ADD_SUCCESS);
+
     }
 
     [HttpPost]
     public IActionResult VerifyNewAccount([FromBody] ValidateNewAccount input)
     {
-        try
-        {
-            var account = _userRepository.GetAccountByEmail(input.Email);
-            if (account is null) return BadRequest("Your Email is not registered!");
+        var account = _userRepository.GetAccountByEmail(input.Email);
+        if (account is null) return BadRequest("Your Email is not registered!");
 
-            var isValidCode = _userRepository.CheckValidVerification(input.Email, input.VerifyCode);
-            if (!isValidCode) return BadRequest("Verify Code is not Valid! Please Try Again!");
+        var isValidCode = _userRepository.CheckValidVerification(input.Email, input.VerifyCode);
+        if (!isValidCode) return BadRequest("Verify Code is not Valid! Please Try Again!");
 
-            _userRepository.VerifyAccount(account);
+        _userRepository.VerifyAccount(account);
 
-            return Ok("Verify success!");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex);
-        }
+        return Ok("Verify success!");
     }
 }

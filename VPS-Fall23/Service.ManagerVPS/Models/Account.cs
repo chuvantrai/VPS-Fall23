@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Service.ManagerVPS.Constants.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace Service.ManagerVPS.Models
