@@ -11,6 +11,7 @@ namespace Service.ManagerVPS.Repositories
     {
         protected DbSet<T> entities;
         protected FALL23_SWP490_G14Context context { get; set; }
+
         public VpsRepository(FALL23_SWP490_G14Context fALL23_SWP490_G14Context)
         {
             context = fALL23_SWP490_G14Context;
@@ -33,10 +34,8 @@ namespace Service.ManagerVPS.Repositories
         public async Task<T> Find(params object[][] keys)
         {
             T entity = await this.entities.FindAsync(keys)
-                ?? throw new ClientException(ResponseNotification.NOT_FOUND);
+                       ?? throw new ClientException(ResponseNotification.NOT_FOUND);
             return entity;
-
-
         }
 
         public async Task<int> SaveChange()

@@ -13,25 +13,25 @@ namespace Service.ManagerVPS.Controllers.Base
         [Route("/error")]
         public IActionResult HandleErrorDevelopment()
         {
-            IExceptionHandlerFeature exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
+            var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
             switch (exceptionHandlerFeature.Error)
             {
                 case ForbidenException forbidenException:
-                    {
-                        return StatusCode(403, forbidenException.Message);
-                    }
+                {
+                    return StatusCode(403, forbidenException.Message);
+                }
                 case ClientException clientException:
-                    {
-                        return BadRequest(clientException.Message);
-                    }
-                case UnAuthorizeException unAuthorizeException:
-                    {
-                        return Unauthorized(unAuthorizeException.Message);
-                    }
+                {
+                    return BadRequest(clientException.Message);
+                }
+                case UnauthorizeException unAuthorizeException:
+                {
+                    return Unauthorized(unAuthorizeException.Message);
+                }
                 default:
-                    {
-                        return StatusCode(500, ResponseNotification.SERVER_ERROR);
-                    }
+                {
+                    return StatusCode(500, ResponseNotification.SERVER_ERROR);
+                }
             }
         }
     }

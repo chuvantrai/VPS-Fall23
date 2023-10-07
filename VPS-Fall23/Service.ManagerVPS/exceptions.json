@@ -18,7 +18,9 @@
   {
     "code": 5,
     "message": "Không có quyền truy cập"
+  },
+  {
+    "code": 6,
+    "message": "Email này đã được đăng ký!"
   }
-
-
 ]

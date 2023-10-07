@@ -11,8 +11,6 @@ public interface IUserRepository : IVpsRepository<Account>
     string AddUser();
     
     Account? GetAccountByEmail(string email);
-
-    int RegisterNewAccount(Account newAccount);
     
     void VerifyAccount(Account account);
 }

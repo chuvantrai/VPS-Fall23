@@ -12,11 +12,9 @@ public class VpsActionFilterAttribute : ActionFilterAttribute
     public override void OnActionExecuting(ActionExecutingContext actionContext)
     {
         //Unauthorize
-        throw new UnAuthorizeException();
+        throw new UnauthorizeException();
 
         // Có lỗi permssion thì throw như sau
         throw new ForbidenException();
-
-
     }
 }

@@ -5,11 +5,9 @@ namespace Service.ManagerVPS.Repositories;
 
 public class UserRepository : VpsRepository<Account>, IUserRepository
 {
-
     public UserRepository(FALL23_SWP490_G14Context context)
         : base(context)
     {
-
     }
 
     public bool CheckEmailExists(string email)
@@ -35,17 +33,9 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return account;
     }
 
-    public int RegisterNewAccount(Account newAccount)
-    {
-        context.Accounts.Add(newAccount);
-        var result = context.SaveChanges();
-        return result;
-    }
-
     public void VerifyAccount(Account account)
     {
         account.IsVerified = true;
-        context.Accounts.Update(account);
-        context.SaveChanges();
+        Update(account);
     }
 }
