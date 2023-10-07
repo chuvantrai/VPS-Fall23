@@ -14,24 +14,35 @@ namespace Service.ManagerVPS.Controllers.Base
         public IActionResult HandleErrorDevelopment()
         {
             var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
+
+
+
+            object responseObject = new { code = 500, message = ResponseNotification.SERVER_ERROR };
+            if (exceptionHandlerFeature.Error is VpsException vpsException)
+            {
+                responseObject = new { code = vpsException.Code, message = vpsException.Message };
+            };
+
+
             switch (exceptionHandlerFeature.Error)
             {
-                case ForbidenException forbidenException:
-                {
-                    return StatusCode(403, forbidenException.Message);
-                }
-                case ClientException clientException:
-                {
-                    return BadRequest(clientException.Message);
-                }
-                case UnauthorizeException unAuthorizeException:
-                {
-                    return Unauthorized(unAuthorizeException.Message);
-                }
+                case ForbidenException:
+                    {
+                        return StatusCode(403, responseObject);
+                    }
+                case ClientException:
+                    {
+                        return BadRequest(responseObject);
+                    }
+                case UnauthorizeException:
+                    {
+                        return Unauthorized(responseObject);
+                    }
+                case ServerException:
                 default:
-                {
-                    return StatusCode(500, ResponseNotification.SERVER_ERROR);
-                }
+                    {
+                        return StatusCode(500, responseObject);
+                    }
             }
         }
     }

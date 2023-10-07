@@ -33,25 +33,13 @@ const formItemLayout = {
 function Register() {
   const [form] = Form.useForm();
   const axios = useAxios();
-  const onFinish = async (values) => {
-    const loading = toast.loading('Yêu cầu của bạn đang được thực hiện...');
-    try {
-      const res = await axios.post('/api/Auth/Register', values);
-      console.log(res);
-      toast.update(loading, {
-        render: res.data,
-        type: toast.TYPE.SUCCESS,
-        isLoading: false,
-        className: 'rotateY animated',
-      });
-    } catch (err) {
-      toast.update(loading, {
-        render: err,
-        type: toast.TYPE.ERROR,
-        isLoading: false,
-        className: 'rotateY animated',
-      });
-    }
+  const onFinish = (values) => {
+    // const loading = toast.loading('Yêu cầu của bạn đang được thực hiện...');
+
+    axios.post('/api/Auth/Register', values)
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
+
   };
 
   return (
