@@ -63,7 +63,7 @@ namespace Service.ManagerVPS.DTO.Exceptions
             bool isContainCode = Errors.Any(predicate);
             if (isContainCode)
             {
-                return Errors.FirstOrDefault(predicate).Message;
+                return Errors.FirstOrDefault(predicate)!.Message;
             }
 
             return ResponseNotification.SERVER_ERROR;

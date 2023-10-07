@@ -1,13 +1,11 @@
 import axios from 'axios';
 import { App } from 'antd';
-import { useState, useEffect } from 'react';
 import store from '../stores/index';
 import { setGlobalState } from '../stores/systems/global.store';
 
 const useAxios = () => {
   const app = App.useApp();
-  const [error, setError] = useState(null);
-  useEffect(() => {
+  const errorHandler = (error) => {
     if (error === null) return;
     /***
      *
@@ -23,7 +21,7 @@ const useAxios = () => {
       return;
     }
     app.message.error(`${error?.response?.data?.message}`);
-  }, [JSON.stringify(error)]);
+  };
   const _axios = axios.create({
     baseURL: import.meta.env.VITE_API_GATEWAY,
     xsrfHeaderName: 'RequestVerificationToken',
@@ -34,16 +32,16 @@ const useAxios = () => {
   });
   _axios.interceptors.response.use(
     (response) => {
-      store.dispatch(setGlobalState({ isLoading: true }));
-      // globalContext.setLoading(false);
+      store.dispatch(setGlobalState({ isLoading: false }));
       return response;
     },
     (error) => {
-      store.dispatch(setGlobalState({ isLoading: true }));
-      // globalContext.setLoading(false);
-      setError(error);
+      store.dispatch(setGlobalState({ isLoading: false }));
+      errorHandler(error);
+      return error;
     },
   );
   return _axios;
 };
+
 export default useAxios;

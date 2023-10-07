@@ -2,7 +2,6 @@ import classNames from 'classnames/bind';
 import { Button, Form, Input, Row, Col } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import 'react-toastify/dist/ReactToastify.css';
 
 import styles from './Register.module.scss';
 import config from '@/config';
@@ -33,10 +32,9 @@ function Register() {
   const [form] = Form.useForm();
   const axios = useAxios();
   const onFinish = (values) => {
-    axios
-      .post('/api/Auth/Register', values)
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
+    axios.post('/api/Auth/Register', values)
+      .then(res => console.log(res))
+      .catch(err => console.log(err));
   };
 
   return (
@@ -50,7 +48,7 @@ function Register() {
       </div>
       <div className={cx('bg-img')}>
         <img
-          src="../src/assets/bg.svg"
+          src="../src/assets/images/bg.png"
           style={{
             width: '1440px',
             position: 'relative',

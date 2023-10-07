@@ -16,6 +16,26 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.AddUser,
             UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel()
+        {
+            Action = ActionFilterEnum.TestAuthApi,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel()
+        {
+            Action = ActionFilterEnum.CreateAccountDemo,
+            UserRole = null
+        },
+        new ActionModel()
+        {
+            Action = ActionFilterEnum.ChangePassword,
+            UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
+        },
+        new ActionModel()
+        {
+            Action = ActionFilterEnum.RefreshToken,
+            UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER, UserRoleEnum.ATTENDANT }
         }
     };
 

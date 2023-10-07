@@ -1,14 +1,16 @@
-﻿namespace Service.ManagerVPS.DTO.OtherModels;
+﻿using Service.ManagerVPS.Constants.Enums;
+
+namespace Service.ManagerVPS.DTO.OtherModels;
 
 public class UserTokenHeader
 {
-    public string? UserId { get; set; }
-
-    public string? UserName { get; set; }
-
-    public string? Email { get; set; }
-
-    public string? Role { get; set; }
-
-    public string? IpAddress { get; set; }
+    public string UserId { get; set; } = null!;
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public int RoleId { get; set; }
+    public string RoleName { get; set; } = null!;
+    public string? Avatar { get; set; }
+    public DateTime Expires { get; set; }
+    public DateTime ModifiedAt { get; set; }
 }
