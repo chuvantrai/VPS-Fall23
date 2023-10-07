@@ -2,7 +2,7 @@
 
 namespace Service.ManagerVPS.Repositories.Interfaces;
 
-public interface IUserRepository
+public interface IUserRepository : IVpsRepository<Account>
 {
     bool CheckEmailExists(string email);
 
@@ -12,8 +12,6 @@ public interface IUserRepository
     
     Account? GetAccountByEmail(string email);
 
-    int RegisterNewAccount(Account newAccount);
-    
     void VerifyAccount(Account account);
     
     Task<Account?> GetAccountByUserNameAsync(string userName);

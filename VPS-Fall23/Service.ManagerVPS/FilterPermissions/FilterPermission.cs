@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Object;
+using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 
@@ -50,22 +51,11 @@ public class FilterPermission : ActionFilterAttribute
             }
 
             // No Permission
-            actionContext.Result = new JsonResult(new
-            {
-                success = false,
-                status = 401,
-                error = "401 Unauthorized",
-                hhh = actionContext.HttpContext.Request.Cookies["ACCESS_TOKEN"]
-            });
+            throw new UnauthorizeException();
         }
         catch
         {
-            actionContext.Result = new JsonResult(new
-            {
-                success = false,
-                status = 401,
-                error = "401 Unauthorized"
-            });
+            throw new UnauthorizeException();
         }
     }
 }
