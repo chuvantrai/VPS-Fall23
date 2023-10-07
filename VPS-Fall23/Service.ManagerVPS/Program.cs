@@ -22,7 +22,7 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add DBContext
+//Add DBContext
 builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("ConStr")));
 

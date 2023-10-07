@@ -33,11 +33,14 @@ namespace Service.ManagerVPS.Models
         public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Type> Types { get; set; } = null!;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {}
-        }
+//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//        {
+//            if (!optionsBuilder.IsConfigured)
+//            {
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+//                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid=nghianvho; pwd=Random@11092023#@!;");
+//            }
+//        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +69,8 @@ namespace Service.ManagerVPS.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Email).HasMaxLength(255);
+
+                entity.Property(e => e.ExpireVerifyCode).HasColumnType("datetime");
 
                 entity.Property(e => e.FirstName)
                     .HasMaxLength(50)

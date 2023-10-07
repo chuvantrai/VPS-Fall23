@@ -9,7 +9,7 @@
         }
 
         public ServerException(Exception? innerException = null)
-            : base(1, Error.Instance.GetErrorMessage(1), innerException)
+            : base(1, innerException)
         {
         }
 

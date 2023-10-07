@@ -8,7 +8,7 @@
         }
 
         public UnauthorizeException(Exception? innerException = null)
-            : base(4, Error.Instance.GetErrorMessage(4), innerException)
+            : base(4, innerException)
         {
         }
 

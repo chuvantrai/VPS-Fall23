@@ -8,7 +8,7 @@
         }
 
         public ForbidenException(Exception? innerException = null)
-            : base(5, Error.Instance.GetErrorMessage(3), innerException)
+            : base(5, innerException)
         {
         }
 

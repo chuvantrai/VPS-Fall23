@@ -2,8 +2,6 @@ import classNames from 'classnames/bind';
 import { Button, Form, Input, Row, Col } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 import styles from './Register.module.scss';
 import config from '@/config';

@@ -6,6 +6,7 @@ import { setGlobalState } from '../stores/systems/global.store';
 
 const useAxios = () => {
   const app = App.useApp();
+  console.log(app);
   const errorHandler = (error) => {
     if (error === null) return;
     /***
@@ -21,7 +22,7 @@ const useAxios = () => {
       app.message.error(`${errorObject.message}`);
       return;
     }
-    app.message.error(`${error?.response?.data}`);
+    app.message.error(`${error?.response?.data?.message}`);
   }
   const _axios = axios.create({
     baseURL: import.meta.env.VITE_API_GATEWAY,
@@ -39,6 +40,7 @@ const useAxios = () => {
     (error) => {
       store.dispatch(setGlobalState({ isLoading: false }));
       errorHandler(error);
+      return error;
     },
   );
   return _axios;

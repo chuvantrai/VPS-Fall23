@@ -3,7 +3,7 @@ using Service.ManagerVPS.Constants.Enums;
 
 namespace Service.ManagerVPS.DTO.Input;
 
-public class CreateAccountDemoRegister
+public class CreateAccountDemoRequest
 {
     [Required] public UserRoleEnum TypeId { get; set; }
     [Required] public string Username { get; set; } = null!;
@@ -11,5 +11,8 @@ public class CreateAccountDemoRegister
     [Required] public string FirstName { get; set; } = null!;
     [Required] public string LastName { get; set; } = null!;
     [Required] public string Email { get; set; } = null!;
-    [Required] public string PhoneNumber { get; set; } = null!;
+    [Required] 
+    [StringLength(10, MinimumLength = 10, ErrorMessage = "sđt sai")]
+    [RegularExpression(@"^[0-9]+$", ErrorMessage = "sđt sai")]
+    public string PhoneNumber { get; set; } = null!;
 }

@@ -11,6 +11,12 @@ public interface IUserRepository : IVpsRepository<Account>
     string AddUser();
     
     Account? GetAccountByEmail(string email);
-    
+
     void VerifyAccount(Account account);
+    
+    Task<Account?> GetAccountByUserNameAsync(string userName);
+    
+    Task<Account?> GetAccountByIdAsync(Guid id);
+    
+    Task<Account?> UpdateVerifyCodeAsync(string userName);
 }

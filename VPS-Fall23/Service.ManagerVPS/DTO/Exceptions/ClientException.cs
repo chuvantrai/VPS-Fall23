@@ -9,7 +9,7 @@
         }
 
         public ClientException(Exception? innerException = null)
-            : base(3, Error.Instance.GetErrorMessage(3), innerException)
+            : base(3, innerException)
         {
         }
 
