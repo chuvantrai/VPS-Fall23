@@ -2,7 +2,6 @@ import classNames from 'classnames/bind';
 import { Button, Form, Input, Row, Col } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import styles from './Register.module.scss';
@@ -33,25 +32,11 @@ const formItemLayout = {
 function Register() {
   const [form] = Form.useForm();
   const axios = useAxios();
-  const onFinish = async (values) => {
-    const loading = toast.loading('Yêu cầu của bạn đang được thực hiện...');
-    try {
-      const res = await axios.post('/api/Auth/Register', values);
-      console.log(res);
-      toast.update(loading, {
-        render: res.data,
-        type: toast.TYPE.SUCCESS,
-        isLoading: false,
-        className: 'rotateY animated',
-      });
-    } catch (err) {
-      toast.update(loading, {
-        render: err,
-        type: toast.TYPE.ERROR,
-        isLoading: false,
-        className: 'rotateY animated',
-      });
-    }
+  const onFinish = (values) => {
+    axios
+      .post('/api/Auth/Register', values)
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -65,7 +50,7 @@ function Register() {
       </div>
       <div className={cx('bg-img')}>
         <img
-          src="../src/assets/images/bg.png"
+          src="../src/assets/bg.svg"
           style={{
             width: '1440px',
             position: 'relative',
@@ -191,7 +176,6 @@ function Register() {
           </Row>
         </Form>
       </div>
-      <ToastContainer />
     </div>
   );
 }

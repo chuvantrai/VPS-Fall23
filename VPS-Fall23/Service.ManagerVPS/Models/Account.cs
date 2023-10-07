@@ -1,5 +1,4 @@
-﻿using Service.ManagerVPS.Constants.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Service.ManagerVPS.Models
@@ -33,6 +32,7 @@ namespace Service.ManagerVPS.Models
         public string? Avatar { get; set; }
         public int? VerifyCode { get; set; }
         public bool? IsVerified { get; set; }
+        public DateTime? ExpireVerifyCode { get; set; }
 
         public virtual Commune? Commune { get; set; }
         public virtual Type Type { get; set; } = null!;
