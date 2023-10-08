@@ -35,8 +35,6 @@ namespace Service.ManagerVPS.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {}
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -66,6 +64,8 @@ namespace Service.ManagerVPS.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Email).HasMaxLength(255);
+
+                entity.Property(e => e.ExpireVerifyCode).HasColumnType("datetime");
 
                 entity.Property(e => e.FirstName)
                     .HasMaxLength(50)

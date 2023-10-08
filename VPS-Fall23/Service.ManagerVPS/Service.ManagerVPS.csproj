@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -21,7 +21,11 @@
 
     <ItemGroup>
       <Folder Include="Constants\ConfigKey\" />
+      <Folder Include="Constants\ConfigKey\" />
       <Folder Include="DTO\Output\" />
+      <Folder Include="DTO\Output\" />
+      <Folder Include="Models\" />
+      <Folder Include="Models\" />
     </ItemGroup>
 
 </Project>
