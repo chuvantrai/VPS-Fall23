@@ -188,6 +188,7 @@ public class AuthController : VpsController<Account>
             VerifyCode = verifyCode,
             CreatedAt = DateTime.Now,
             ModifiedAt = DateTime.Now,
+            ExpireVerifyCode = DateTime.Now.AddHours(1)
         };
 
         var result = await ((IUserRepository)vpsRepository).Create(newAccount);
@@ -209,10 +210,12 @@ public class AuthController : VpsController<Account>
     public async Task<IActionResult> VerifyNewAccount([FromBody] ValidateNewAccount input)
     {
         var account = ((IUserRepository)vpsRepository).GetAccountByEmail(input.Email);
-        if (account is null) return BadRequest("Your Email is not registered!");
+        if (account is null) throw new ClientException("Your Email is not registered!");
+        
+        if(account.ExpireVerifyCode < DateTime.Now) throw new ClientException("Verify Code is expired!");
 
         var isValidCode = ((IUserRepository)vpsRepository).CheckValidVerification(input.Email, input.VerifyCode);
-        if (!isValidCode) return BadRequest("Verify Code is not Valid! Please Try Again!");
+        if (!isValidCode) throw new ClientException("Verify Code is not Valid! Please Try Again!");
 
         ((IUserRepository)vpsRepository).VerifyAccount(account);
         await ((IUserRepository)vpsRepository).SaveChange();

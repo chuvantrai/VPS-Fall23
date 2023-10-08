@@ -1,14 +1,14 @@
 import classNames from 'classnames/bind';
-import { Button, Form, Input, Row, Col } from 'antd';
+import { Button, Form, Input, Row, Col, notification } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
 import styles from './Register.module.scss';
 import config from '@/config';
 import { useAxios } from '@/hooks';
+import { useState } from 'react';
 
 const cx = classNames.bind(styles);
-
 const formItemLayout = {
   labelCol: {
     xs: {
@@ -30,15 +30,27 @@ const formItemLayout = {
 
 function Register() {
   const [form] = Form.useForm();
+  const [api, contextHolder] = notification.useNotification();
   const axios = useAxios();
+  const [account, setAccount] = useState(null);
+
   const onFinish = (values) => {
     axios.post('/api/Auth/Register', values)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
+      .then(res => {
+        if (res.status === 200)
+          setAccount(values)
+      })
+      .catch(err => {
+        api['error']({
+          message: 'Có lỗi xảy ra',
+          description: err,
+        });
+      })
   };
 
   return (
     <div className={cx('wrapper')}>
+      {contextHolder}
       <div className={cx('header')}>
         <div className={cx('header-title')}>
           <div className={cx('header-title-logo')}>
@@ -48,7 +60,7 @@ function Register() {
       </div>
       <div className={cx('bg-img')}>
         <img
-          src="../src/assets/images/bg.png"
+          src="../src/assets/bg.svg"
           style={{
             width: '1440px',
             position: 'relative',
@@ -99,7 +111,6 @@ function Register() {
                 message: 'Mật khẩu tối đa là 12 ký tự',
               },
             ]}
-            hasFeedback
           >
             <Input.Password
               placeholder="Mật khẩu(6 đến 12 ký tự)"
@@ -114,6 +125,10 @@ function Register() {
                 required: true,
                 message: 'Hãy điền tên của bạn!',
               },
+              {
+                max: 20,
+                message: 'Tên tối đa chỉ được 20 ký tự!',
+              },
             ]}
           >
             <Input placeholder="Tên" />
@@ -126,6 +141,10 @@ function Register() {
                 required: true,
                 message: 'Hãy điền họ của bạn!',
               },
+              {
+                max: 20,
+                message: 'Họ tối đa chỉ được 20 ký tự!',
+              },
             ]}
           >
             <Input placeholder="Họ" />
@@ -137,6 +156,14 @@ function Register() {
               {
                 required: true,
                 message: 'Hãy điền số điện thoại của bạn!',
+              },
+              {
+                max: 10,
+                message: 'Số điện thoại tối đa chỉ được 10 ký tự',
+              },
+              {
+                pattern: /(0[3|5|7|8|9])+([0-9]{8})\b/g,
+                message: "Sai định dạng"
               },
             ]}
           >
@@ -174,6 +201,7 @@ function Register() {
           </Row>
         </Form>
       </div>
+      {account && <Navigate to="/verifyEmail" replace={true} state={account} />}
     </div>
   );
 }

@@ -17,10 +17,18 @@ const useAxios = () => {
     //Xử lý khi response trả về là arraybuffer
     if (error.request?.responseType === 'arraybuffer') {
       let errorObject = JSON.parse(new TextDecoder().decode(error?.response?.data));
-      app.message.error(`${errorObject.message}`);
+      app.notification.error({
+        message: 'Error',
+        description: errorObject.message,
+        placement: 'topRight',
+      });
       return;
     }
-    app.message.error(`${error?.response?.data?.message}`);
+    app.notification.error({
+      message: 'Error',
+      description: error?.response?.data?.message,
+      placement: 'topRight',
+    });
   };
   const _axios = axios.create({
     baseURL: import.meta.env.VITE_API_GATEWAY,
@@ -38,7 +46,7 @@ const useAxios = () => {
     (error) => {
       store.dispatch(setGlobalState({ isLoading: false }));
       errorHandler(error);
-      return error;
+      return error?.response?.data?.message;
     },
   );
   return _axios;
