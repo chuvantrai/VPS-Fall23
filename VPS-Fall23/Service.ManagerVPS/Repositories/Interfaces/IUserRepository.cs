@@ -1,4 +1,5 @@
-﻿using Service.ManagerVPS.Models;
+﻿using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.Models;
 
 namespace Service.ManagerVPS.Repositories.Interfaces;
 
@@ -19,4 +20,6 @@ public interface IUserRepository : IVpsRepository<Account>
     Task<Account?> GetAccountByIdAsync(Guid id);
     
     Task<Account?> UpdateVerifyCodeAsync(string userName);
+    
+    Task<Account?> UpdateAccountById(UpdateProfileAccountRequest request);
 }

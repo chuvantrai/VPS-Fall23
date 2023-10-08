@@ -219,4 +219,16 @@ public class AuthController : VpsController<Account>
 
         return Ok("Verify success!");
     }
+
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.UpdateProfileAccount)]
+    public async Task<IActionResult> UpdateProfileAccount(UpdateProfileAccountRequest request)
+    {
+        var account = await ((IUserRepository)vpsRepository).UpdateAccountById(request);
+        if (account == null) throw new ClientException(6);
+        return Ok(new
+        {
+            AccessToken = JwtTokenExtension.WriteTokenByAccount(account)
+        });
+    }
 }

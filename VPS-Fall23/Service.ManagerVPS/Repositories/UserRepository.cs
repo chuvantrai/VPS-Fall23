@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -7,7 +8,8 @@ namespace Service.ManagerVPS.Repositories;
 
 public class UserRepository : VpsRepository<Account>, IUserRepository
 {
-    private readonly IGeneralVPS _generalVPS; 
+    private readonly IGeneralVPS _generalVPS;
+
     public UserRepository(FALL23_SWP490_G14Context context, IGeneralVPS generalVps)
         : base(context)
     {
@@ -64,6 +66,22 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         await _generalVPS.SendEmailAsync(account.Email,
             "Verify Forgot password",
             $"Your Verification code is: {account.VerifyCode}");
+        return account;
+    }
+
+    public async Task<Account?> UpdateAccountById(UpdateProfileAccountRequest request)
+    {
+        var account = await context.Accounts
+            .FirstOrDefaultAsync(x => x.Id.Equals(request.AccountId));
+        if (account == null) return null;
+        if (account.Avatar != null) account.Avatar = request.Avatar;
+        account.FirstName = request.FirstName;
+        account.LastName = request.LastName;
+        account.PhoneNumber = request.PhoneNumber;
+        account.Address = request.Address;
+        account.CommuneId = request.CommuneId;
+        account.ModifiedAt = DateTime.Now;
+        await context.SaveChangesAsync();
         return account;
     }
 }
