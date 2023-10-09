@@ -6,7 +6,9 @@ public static class ResponseNotification
      * Notification Api
      */ 
     public const string SERVER_ERROR = "Lỗi hệ thống";
-    
+    public const string NOT_FOUND = "Không tìm thấy nội dung yêu cầu";
+    public const string CLIENT_ERROR = "Có lỗi xảy ra, vui lòng kiểm tra lại";
+
     /*
      * Notification Api success
      */
