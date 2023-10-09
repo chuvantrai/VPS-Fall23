@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.Input;
@@ -89,9 +88,8 @@ public class AuthController : Controller
             }
             var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
             var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-            var account = await _userRepository.GetAccountByIdAsync(Guid.Parse(userToken.UserId));
-            account!.Password = BCrypt.Net.BCrypt.EnhancedHashPassword(request.NewPassword, 13);
-            account.ModifiedAt = DateTime.Now;
+            var account = await _userRepository.ChangePasswordByUserIdAsync(Guid.Parse(userToken.UserId), request.NewPassword);
+            if (account == null) return BadRequest();
             return Ok();
         }
         catch
@@ -162,6 +160,35 @@ public class AuthController : Controller
         }
 
         return Ok(account.Email);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
+    {
+        try
+        {
+            var account = await _userRepository.GetAccountByUserNameAsync(request.UserName);
+            if (account == null) return BadRequest();
+            if (account.IsBlock)
+            {
+                return BadRequest("Account has been locked!");
+            }
+            if (account.VerifyCode != request.VerifyCode)
+            {
+                return BadRequest("Wrong VerifyCode!");
+            }
+            if (DateTime.Now > account.ExpireVerifyCode)
+            {
+                return BadRequest("VerifyCode expired!");
+            }
+            var accountAfterChange = await _userRepository.ChangePasswordByUserIdAsync(account.Id, request.Password);
+            if (accountAfterChange == null) return BadRequest();
+            return Ok();
+        }
+        catch
+        {
+            return BadRequest();
+        }
     }
 
     [HttpPost]

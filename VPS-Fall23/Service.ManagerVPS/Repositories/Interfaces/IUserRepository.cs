@@ -21,4 +21,6 @@ public interface IUserRepository
     Task<Account?> GetAccountByIdAsync(Guid id);
     
     Task<Account?> UpdateVerifyCodeAsync(string userName);
+    
+    Task<Account?> ChangePasswordByUserIdAsync(Guid id, string password);
 }
