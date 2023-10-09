@@ -1,13 +1,15 @@
-import classNames from 'classnames/bind';
-import style from './Homepage.module.scss'
+// import classNames from 'classnames/bind';
+// import style from './Homepage.module.scss'
+import './Homepage.css'
 import { Input, Button } from 'antd';
 
-const cx = classNames.bind(style);
 
 function Homepage() {
-  return <div className={cx("home-container w-full h-full m-auto bg-slate-500 block")}>
-    <Input className={cx('search-input')} placeholder="Search parking zone" />
-    <Button className={cx('btn')}>Find near parking zone</Button>
+  return <div className="home-container w-full h-full m-auto bg-slate-500 block">
+    <div className='search-container m-auto flex flex-col justify-center content-center'>
+      <Input className='search-input' placeholder="Search parking zone" />
+      <Button type="primary" className='btn'>Find near parking zone</Button>
+    </div>
   </div>;
 }
 
