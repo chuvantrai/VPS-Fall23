@@ -1,6 +1,6 @@
 import styles from './Login.module.scss';
 import classNames from 'classnames/bind.js';
-import { Button, Col, Form, Input, Row } from 'antd';
+import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone, UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import config from '@/config/index.js';
@@ -28,17 +28,26 @@ const formItemLayout = {
 
 
 function Login() {
+  // const [data, setData] = useState(null);
+  let rememberPassword = false;
   const [form] = Form.useForm();
   const axios = useAxios();
   const onFinish = (values) => {
-    axios.post('/api/Auth/Register', values)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
+    axios.post('/api/Auth/AuthLogin', values)
+      .then(res => {
+        console.log(22,res.data.accessToken);
+      })
+      .catch(err => console.log(33,err));
+  };
+
+  const onRememberPassword = (e) => {
+    rememberPassword = e.target.checked;
+    console.log(111, `checked = ${rememberPassword}`);
   };
 
   return (
     <div
-      className={cx('wrapper min-w-[1440px] min-h-[910px] overflow-hidden flex flex-col items-center justify-center')}>
+      className={cx('bg-[#F0F2F5] min-w-[1440px] min-h-[910px] overflow-hidden flex flex-col items-center justify-center')}>
       <div className={cx('inline-flex flex-col items-center gap-3')}>
         <div className={cx('flex justify-center items-center gap-[17.308px] pl-0')}>
           <div className={cx('header-title-logo')}>
@@ -65,7 +74,7 @@ function Login() {
           scrollToFirstError
         >
           <Form.Item
-            name='email'
+            name='username'
             rules={[
               {
                 required: true,
@@ -101,7 +110,20 @@ function Login() {
               iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
             />
           </Form.Item>
-
+          <Row className={'mb-[24px]'}>
+            <Col span={12}>
+              <Checkbox onChange={onRememberPassword}>Nhớ tài khoản</Checkbox>
+            </Col>
+            <Col span={4}>
+              <Link
+                to={config.routes.login}
+                className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
+                  'shrink-0 rounded-sm text-[\'#1677ff\']')}
+              >
+                Quên mật khẩu
+              </Link>
+            </Col>
+          </Row>
           <Row>
             <Col span={12}>
               <Form.Item>
@@ -115,16 +137,14 @@ function Login() {
                 </Button>
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item>
-                <Link
-                  to={config.routes.login}
-                  className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
-                    'shrink-0 rounded-sm text-[\'#1677ff\']')}
-                >
-                  Đăng ký
-                </Link>
-              </Form.Item>
+            <Col span={4} className={'flex justify-center h-[32px] items-center'}>
+              <Link
+                to={config.routes.register}
+                className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
+                  'shrink-0 rounded-sm text-[\'#1677ff\']')}
+              >
+                Đăng ký
+              </Link>
             </Col>
           </Row>
         </Form>
