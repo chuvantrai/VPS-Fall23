@@ -1,32 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
 namespace Service.ManagerVPS.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository : VpsRepository<Account>, IUserRepository
 {
-    private readonly FALL23_SWP490_G14Context _context;
     private readonly IGeneralVPS _generalVPS;
 
-    public UserRepository(FALL23_SWP490_G14Context context, IGeneralVPS generalVPS)
+    public UserRepository(FALL23_SWP490_G14Context context, IGeneralVPS generalVps)
+        : base(context)
     {
-        _context = context;
-        _generalVPS = generalVPS;
+        _generalVPS = generalVps;
     }
 
     public bool CheckEmailExists(string email)
     {
-        var existAccount = _context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
+        var existAccount = context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
         return existAccount is not null;
     }
 
     public bool CheckValidVerification(string email, int code)
     {
-        var existedAcc = _context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
-        return existedAcc.VerifyCode == code;
+        var existedAcc = context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
+        return existedAcc?.VerifyCode == code;
     }
 
     public string AddUser()
@@ -36,46 +36,32 @@ public class UserRepository : IUserRepository
 
     public Account? GetAccountByEmail(string email)
     {
-        var account = _context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
+        var account = context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
         return account;
-    }
-
-    public int RegisterNewAccount(Account newAccount)
-    {
-        _context.Accounts.Add(newAccount);
-        var result = _context.SaveChanges();
-        return result;
     }
 
     public void VerifyAccount(Account account)
     {
         account.IsVerified = true;
-        _context.Accounts.Update(account);
-        _context.SaveChanges();
+        Update(account);
     }
 
     public async Task<Account?> GetAccountByUserNameAsync(string userName)
     {
-        var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Username.Equals(userName));
-        return account;
-    }
-
-    public async Task<Account?> GetAccountByIdAsync(Guid id)
-    {
-        var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.IsBlock);
+        var account = await context.Accounts.FirstOrDefaultAsync(x => x.Username.Equals(userName));
         return account;
     }
 
     public async Task<Account?> UpdateVerifyCodeAsync(string userName)
     {
-        var account = await _context.Accounts.FirstOrDefaultAsync(x
+        var account = await context.Accounts.FirstOrDefaultAsync(x
             => x.Username.Equals(userName) && !x.IsBlock && x.TypeId != (int)UserRoleEnum.ATTENDANT);
         if (account == null) return null;
         if (account.ExpireVerifyCode == null || DateTime.Now > account.ExpireVerifyCode)
         {
             account.VerifyCode = _generalVPS.GenerateVerificationCode();
             account.ExpireVerifyCode = DateTime.Now.AddHours(1);
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
             await _generalVPS.SendEmailAsync(account.Email,
                 "Verify Forgot password",
                 $"Your Verification code is: {account.VerifyCode}");
@@ -86,17 +72,34 @@ public class UserRepository : IUserRepository
                 "Verify Forgot password",
                 $"Your Verification code is: {account.VerifyCode}");
         }
-        
+
         return account;
     }
 
     public async Task<Account?> ChangePasswordByUserIdAsync(Guid id, string password)
     {
-        var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.IsBlock);
+        var account = await context.Accounts
+            .FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.IsBlock && x.IsVerified == true);
         if (account == null) return null;
         account.Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
         account.ModifiedAt = DateTime.Now;
-        await _context.SaveChangesAsync();
+        await context.SaveChangesAsync();
+        return account;
+    }
+
+    public async Task<Account?> UpdateAccountById(UpdateProfileAccountRequest request)
+    {
+        var account = await context.Accounts
+            .FirstOrDefaultAsync(x => x.Id.Equals(request.AccountId));
+        if (account == null) return null;
+        if (account.Avatar != null) account.Avatar = request.Avatar;
+        account.FirstName = request.FirstName;
+        account.LastName = request.LastName;
+        account.PhoneNumber = request.PhoneNumber;
+        account.Address = request.Address;
+        account.CommuneId = request.CommuneId;
+        account.ModifiedAt = DateTime.Now;
+        await context.SaveChangesAsync();
         return account;
     }
 }

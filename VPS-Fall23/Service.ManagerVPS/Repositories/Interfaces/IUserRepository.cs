@@ -1,8 +1,9 @@
-﻿using Service.ManagerVPS.Models;
+﻿using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.Models;
 
 namespace Service.ManagerVPS.Repositories.Interfaces;
 
-public interface IUserRepository
+public interface IUserRepository : IVpsRepository<Account>
 {
     bool CheckEmailExists(string email);
 
@@ -12,15 +13,13 @@ public interface IUserRepository
     
     Account? GetAccountByEmail(string email);
 
-    int RegisterNewAccount(Account newAccount);
-    
     void VerifyAccount(Account account);
     
     Task<Account?> GetAccountByUserNameAsync(string userName);
-    
-    Task<Account?> GetAccountByIdAsync(Guid id);
-    
+
     Task<Account?> UpdateVerifyCodeAsync(string userName);
     
     Task<Account?> ChangePasswordByUserIdAsync(Guid id, string password);
+    
+    Task<Account?> UpdateAccountById(UpdateProfileAccountRequest request);
 }
