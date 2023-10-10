@@ -19,7 +19,7 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
 
     public bool CheckEmailExists(string email)
     {
-        var existAccount = context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
+        var existAccount = context.Accounts.FirstOrDefault(x => x.Email.Equals(email) && x.IsVerified == true);
         return existAccount is not null;
     }
 
@@ -40,6 +40,14 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return account;
     }
 
+    public Account? GetOwnerAccountByEmail(string email)
+    {
+        var account = context.Accounts
+            .Include(x => x.ParkingZoneOwner)
+            .FirstOrDefault(x => x.Email.Equals(email));
+        return account;
+    }
+
     public void VerifyAccount(Account account)
     {
         account.IsVerified = true;
@@ -52,24 +60,28 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return account;
     }
 
-    public async Task<Account?> UpdateVerifyCodeAsync(string userName)
+    public async Task<Account?> UpdateVerifyCodeAsync(string userName, string? emailSubject = null)
     {
+        emailSubject ??= "Verify Forgot password";
+
         var account = await context.Accounts.FirstOrDefaultAsync(x
-            => x.Username.Equals(userName) && !x.IsBlock && x.TypeId != (int)UserRoleEnum.ATTENDANT);
+            => (x.Username.Equals(userName) || x.Email.Equals(userName)) && !x.IsBlock &&
+               x.TypeId != (int)UserRoleEnum.ATTENDANT);
         if (account == null) return null;
+
         if (account.ExpireVerifyCode == null || DateTime.Now > account.ExpireVerifyCode)
         {
             account.VerifyCode = _generalVPS.GenerateVerificationCode();
-            account.ExpireVerifyCode = DateTime.Now.AddHours(1);
+            account.ExpireVerifyCode = DateTime.Now.AddMinutes(30);
             await context.SaveChangesAsync();
             await _generalVPS.SendEmailAsync(account.Email,
-                "Verify Forgot password",
+                emailSubject,
                 $"Your Verification code is: {account.VerifyCode}");
         }
         else
         {
             await _generalVPS.SendEmailAsync(account.Email,
-                "Verify Forgot password",
+                emailSubject,
                 $"Your Verification code is: {account.VerifyCode}");
         }
 

@@ -1,11 +1,12 @@
 import config from '@/config';
+import Login from '@/pages/Login/index.js';
+import { HeaderOnly } from '@/layouts';
 import Homepage from '@/pages/Homepage';
 import Register from '@/pages/Register';
-import { HeaderOnly } from '@/layouts';
-import Login from '@/pages/Login/index.js';
+import VerifyEmail from '@/pages/VerifyEmail';
+import RegisterParkingZone from '@/pages/RegisterParkingZone';
 
-// route can access without login
-const publicRoutes = [
+export const routes = [
   {
     path: config.routes.homepage,
     component: Homepage,
@@ -20,10 +21,15 @@ const publicRoutes = [
     path: config.routes.login,
     component: Login,
     layout: null,
-  }
+  },
+  {
+    path: config.routes.verifyEmail,
+    component: VerifyEmail,
+    layout: null,
+  },
+  {
+    path: config.routes.registerParkingZone,
+    component: RegisterParkingZone,
+    layout: HeaderOnly,
+  },
 ];
-
-// route need login to access
-const privateRoutes = [];
-
-export { publicRoutes, privateRoutes };

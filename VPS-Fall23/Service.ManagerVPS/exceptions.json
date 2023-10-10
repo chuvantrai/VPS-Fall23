@@ -22,5 +22,21 @@
   {
     "code": 6,
     "message": "Email này đã được đăng ký!"
+  },
+  {
+    "code": 2001,
+    "message": "Mã không chính xác! Hãy thử lại!"
+  },
+  {
+    "code": 2002,
+    "message": "Mã đã hết hạn!"
+  },
+  {
+    "code": 2003,
+    "message": "Email của bạn chưa được đăng ký!"
+  },
+  {
+    "code": 1001,
+    "message": "Có lỗi khi lấy vị trí bản đồ"
   }
 ]

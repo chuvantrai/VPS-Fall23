@@ -17,31 +17,39 @@ const useAxios = () => {
      *
      */
     const account = getAccountJwtModel();
-    if(error.status === 401 && account !== null && account.Expires < Date.now()){
+    if (error.status === 401 && account !== null && account.Expires < Date.now()) {
       // token hết hạn
       const _axios = axios.create({
         baseURL: import.meta.env.VITE_API_GATEWAY,
         xsrfHeaderName: 'RequestVerificationToken',
       });
       const accountLogin = getAccountDataByCookie();
-      _axios.post('/api/Auth/AuthLogin',accountLogin)
-      .then(response =>{
-        Cookies.set('ACCESS_TOKEN', response.data.accessToken);
-        app.message.error(`Có lỗi xảy ra vui lòng thử lại`);
-      })
-      .catch(() =>{
+      _axios.post('/api/Auth/AuthLogin', accountLogin)
+        .then(response => {
+          Cookies.set('ACCESS_TOKEN', response.data.accessToken);
+          app.message.error(`Có lỗi xảy ra vui lòng thử lại`);
+        })
+        .catch(() => {
           window.location.href = '/login';
-      });
-    }else if(error.status === 401 ){
+        });
+    } else if (error.status === 401) {
       window.location.href = '/login';
     }
     //Xử lý khi response trả về là arraybuffer
     if (error.request?.responseType === 'arraybuffer') {
       let errorObject = JSON.parse(new TextDecoder().decode(error?.response?.data));
-      app.message.error(`${errorObject.message}`);
+      app.notification.error({
+        message: 'Error',
+        description: errorObject.message,
+        placement: 'topRight',
+      });
       return;
     }
-    app.message.error(`${error?.response?.data?.message}`);
+    app.notification.error({
+      message: 'Error',
+      description: error?.response?.data?.message,
+      placement: 'topRight',
+    });
   };
   const _axios = axios.create({
     baseURL: import.meta.env.VITE_API_GATEWAY,
@@ -59,7 +67,7 @@ const useAxios = () => {
     (error) => {
       store.dispatch(setGlobalState({ isLoading: false }));
       errorHandler(error);
-      return error;
+      return error?.response?.data?.message;
     },
   );
   return _axios;

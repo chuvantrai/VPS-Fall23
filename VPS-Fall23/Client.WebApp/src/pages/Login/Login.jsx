@@ -5,10 +5,10 @@ import { EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined } from '@a
 import { Link } from 'react-router-dom';
 import config from '@/config/index.js';
 import { useAxios } from '@/hooks/index.js';
-import Cookies from 'js-cookie';
-import { convertAccountDataToCode, keyNameCookies } from '@/helpers/index.js';
+import Cookies from 'js-cookie'; 
+import { convertAccountDataToCode, keyNameCookies } from '@/helpers/index.js';   
 
-const cx = classNames.bind(styles);
+const cx = classNames.bind(styles);  
 const formItemLayout = {
   labelCol: {
     xs: {

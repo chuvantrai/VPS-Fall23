@@ -11,14 +11,11 @@ namespace Service.ManagerVPS.Models
         }
 
         public Guid Id { get; set; }
-        public string DetailAddress { get; set; } = null!;
-        public Guid CommuneId { get; set; }
-        public bool IsApproved { get; set; }
-        public string? RejectedReason { get; set; }
         public DateTime ModifiedAt { get; set; }
         public DateTime CreatedAt { get; set; }
-
-        public virtual Commune Commune { get; set; } = null!;
+        public string Phone { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public DateTime? Dob { get; set; }
         public virtual Account IdNavigation { get; set; } = null!;
         public virtual ICollection<ParkingZone> ParkingZones { get; set; }
     }

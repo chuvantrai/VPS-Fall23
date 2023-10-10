@@ -1,14 +1,15 @@
+/* eslint-disable no-unused-vars */
 import classNames from 'classnames/bind';
-import { Button, Form, Input, Row, Col } from 'antd';
+import { Link, Navigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Button, Form, Input, Row, Col, DatePicker } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
 
 import styles from './Register.module.scss';
 import config from '@/config';
-import { useAxios } from '@/hooks';
+import useAuthService from '@/services/authService';
 
 const cx = classNames.bind(styles);
-
 const formItemLayout = {
   labelCol: {
     xs: {
@@ -30,11 +31,13 @@ const formItemLayout = {
 
 function Register() {
   const [form] = Form.useForm();
-  const axios = useAxios();
+  const authService = useAuthService();
+  const [account, setAccount] = useState(null);
+  const [dob, setDob] = useState('');
+
   const onFinish = (values) => {
-    axios.post('/api/Auth/Register', values)
-      .then(res => console.log(res))
-      .catch(err => console.log(err));
+    values = { ...values, dob };
+    authService.register(values, setAccount);
   };
 
   return (
@@ -48,7 +51,7 @@ function Register() {
       </div>
       <div className={cx('bg-img')}>
         <img
-          src="../src/assets/images/bg.png"
+          src="../src/assets/bg.svg"
           style={{
             width: '1440px',
             position: 'relative',
@@ -80,7 +83,7 @@ function Register() {
               },
             ]}
           >
-            <Input placeholder="Email" />
+            <Input placeholder="Email" allowClear />
           </Form.Item>
 
           <Form.Item
@@ -99,11 +102,11 @@ function Register() {
                 message: 'Mật khẩu tối đa là 12 ký tự',
               },
             ]}
-            hasFeedback
           >
             <Input.Password
               placeholder="Mật khẩu(6 đến 12 ký tự)"
               iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              allowClear
             />
           </Form.Item>
 
@@ -114,9 +117,13 @@ function Register() {
                 required: true,
                 message: 'Hãy điền tên của bạn!',
               },
+              {
+                max: 20,
+                message: 'Tên tối đa chỉ được 20 ký tự!',
+              },
             ]}
           >
-            <Input placeholder="Tên" />
+            <Input placeholder="Tên" allowClear />
           </Form.Item>
 
           <Form.Item
@@ -126,9 +133,23 @@ function Register() {
                 required: true,
                 message: 'Hãy điền họ của bạn!',
               },
+              {
+                max: 20,
+                message: 'Họ tối đa chỉ được 20 ký tự!',
+              },
             ]}
           >
-            <Input placeholder="Họ" />
+            <Input placeholder="Họ" allowClear />
+          </Form.Item>
+
+          <Form.Item name="dob">
+            <DatePicker
+              onChange={(_, dateString) => setDob(dateString)}
+              style={{
+                minWidth: '400px',
+              }}
+              placeholder="Ngày sinh"
+            />
           </Form.Item>
 
           <Form.Item
@@ -138,9 +159,17 @@ function Register() {
                 required: true,
                 message: 'Hãy điền số điện thoại của bạn!',
               },
+              {
+                max: 10,
+                message: 'Số điện thoại tối đa chỉ được 10 ký tự',
+              },
+              {
+                pattern: /(0[3|5|7|8|9])+([0-9]{8})\b/g,
+                message: 'Sai định dạng',
+              },
             ]}
           >
-            <Input placeholder="Số điện thoại" />
+            <Input placeholder="Số điện thoại" allowClear />
           </Form.Item>
 
           <Row>
@@ -167,13 +196,14 @@ function Register() {
                     color: '#1677ff',
                   }}
                 >
-                  Đăng nhập
+                  Đã có tài khoản? Đăng nhập
                 </Link>
               </Form.Item>
             </Col>
           </Row>
         </Form>
       </div>
+      {account && <Navigate to={config.routes.verifyEmail} replace={true} state={account} />}
     </div>
   );
 }

@@ -8,7 +8,6 @@ namespace Service.ManagerVPS.Models
         public Commune()
         {
             Accounts = new HashSet<Account>();
-            ParkingZoneOwners = new HashSet<ParkingZoneOwner>();
             ParkingZones = new HashSet<ParkingZone>();
         }
 
@@ -24,7 +23,6 @@ namespace Service.ManagerVPS.Models
         public virtual Account CreatedByNavigation { get; set; } = null!;
         public virtual District District { get; set; } = null!;
         public virtual ICollection<Account> Accounts { get; set; }
-        public virtual ICollection<ParkingZoneOwner> ParkingZoneOwners { get; set; }
         public virtual ICollection<ParkingZone> ParkingZones { get; set; }
     }
 }
