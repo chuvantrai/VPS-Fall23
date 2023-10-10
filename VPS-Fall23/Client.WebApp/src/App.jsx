@@ -14,32 +14,32 @@ function App() {
       <AntdApp className='app'>
         <Spin spinning={isLoading} indicator={antIcon}>
           <Router>
-            <div className="App">
-              <Routes>
-                {routes.map((route, index) => {
-                  const Page = route.component;
-                  let Layout = DefaultLayout;
 
-                  if (route.layout) {
-                    Layout = route.layout;
-                  } else if (route.layout === null) {
-                    Layout = Fragment;
-                  }
+            <Routes>
+              {routes.map((route, index) => {
+                const Page = route.component;
+                let Layout = DefaultLayout;
 
-                  return (
-                    <Route
-                      key={index}
-                      path={route.path}
-                      element={
-                        <Layout>
-                          <Page />
-                        </Layout>
-                      }
-                    />
-                  );
-                })}
-              </Routes>
-            </div>
+                if (route.layout) {
+                  Layout = route.layout;
+                } else if (route.layout === null) {
+                  Layout = Fragment;
+                }
+
+                return (
+                  <Route
+                    key={index}
+                    path={route.path}
+                    element={
+                      <Layout>
+                        <Page />
+                      </Layout>
+                    }
+                  />
+                );
+              })}
+            </Routes>
+
           </Router>
         </Spin>
       </AntdApp>

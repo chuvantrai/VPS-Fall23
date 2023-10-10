@@ -1,15 +1,19 @@
 import PropTypes from 'prop-types';
-
+import Footer from "@/layouts/components/Footer";
 import Header from '@/layouts/components/Header';
+import Layout, { Content } from 'antd/es/layout/layout';
 
 function HeaderOnly({ children }) {
   return (
-    <div>
+
+    <Layout style={{ minHeight: "100vh" }}>
       <Header />
-      <div className="container">
-        <div className="content">{children}</div>
-      </div>
-    </div>
+      <Content style={{ position: "relative" }}>
+        {children}
+      </Content>
+      <Footer></Footer>
+    </Layout>
+
   );
 }
 

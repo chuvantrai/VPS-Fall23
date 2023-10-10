@@ -2,7 +2,7 @@ import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 import { Drawer, Layout } from "antd";
 import { Content } from "antd/es/layout/layout";
 import React, { useState } from "react";
-import Footer from "@/layouts/components/Footer";
+
 import styles from './Homepage.module.scss'
 import classNames from 'classnames/bind';
 
@@ -10,9 +10,9 @@ import classNames from 'classnames/bind';
 const cx = classNames.bind(styles);
 const containerStyle = {
   width: '100vw',
-  height: '50vh',
   maxWidth: '100%',
-  maxHeight: '100%'
+  position: "absolute",
+  height: "100%"
 };
 
 const center = {
@@ -23,7 +23,7 @@ const center = {
 
 const HomePage = () => {
 
-  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [isDrawerOpen, setDrawerOpen] = useState(true);
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -45,42 +45,31 @@ const HomePage = () => {
   }, [])
 
   return (
-    <Layout
-      className={cx('wrapper')}
-    >
-      <div className={cx('content')}>
-        <Content>
+    <>{isLoaded ? (
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={center}
+        zoom={10}
+        onLoad={onLoad}
+        onUnmount={onUnmount}
+      >
+        <></>
+      </GoogleMap>
+    ) : <></>}
+      <Drawer
+        title="Danh sách các nhà xe gần bạn"
+        placement="bottom"
+        closable={true}
+        onClose={() => { setDrawerOpen(!isDrawerOpen) }}
+        open={isDrawerOpen}
+
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Drawer></>
 
 
-
-          {isLoaded ? (
-            <GoogleMap
-              mapContainerStyle={containerStyle}
-              center={center}
-              zoom={10}
-              onLoad={onLoad}
-              onUnmount={onUnmount}
-            >
-              <></>
-            </GoogleMap>
-          ) : <></>}
-          <Drawer
-            title="Danh sách các nhà xe gần bạn"
-            placement="bottom"
-            closable={true}
-            onClose={() => { setDrawerOpen(!isDrawerOpen) }}
-            open={isDrawerOpen}
-
-          >
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-          </Drawer>
-
-        </Content>
-        <Footer></Footer>
-      </div>
-    </Layout>
 
   )
 }
