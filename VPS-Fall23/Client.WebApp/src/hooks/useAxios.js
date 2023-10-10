@@ -5,9 +5,11 @@ import { setGlobalState } from '../stores/systems/global.store';
 import Cookies from 'js-cookie';
 import { getAccountJwtModel } from '@/helpers/index.js';
 import getAccountDataByCookie from '@/helpers/getAccountDataByCookie.js';
+import { useNavigate } from 'react-router-dom';
 
 const useAxios = () => {
   const app = App.useApp();
+  const navigate = useNavigate();
   const errorHandler = (error) => {
     if (error === null) return;
     /***
@@ -30,23 +32,23 @@ const useAxios = () => {
           app.message.error(`Có lỗi xảy ra vui lòng thử lại`);
         })
         .catch(() => {
-          window.location.href = '/login';
+          navigate('/login');
         });
     } else if (error.status === 401) {
-      window.location.href = '/login';
+      navigate('/login');
     }
     //Xử lý khi response trả về là arraybuffer
     if (error.request?.responseType === 'arraybuffer') {
       let errorObject = JSON.parse(new TextDecoder().decode(error?.response?.data));
       app.notification.error({
-        message: 'Error',
+        message: 'Lỗi',
         description: errorObject.message,
         placement: 'topRight',
       });
       return;
     }
     app.notification.error({
-      message: 'Error',
+      message: 'Lỗi',
       description: error?.response?.data?.message,
       placement: 'topRight',
     });

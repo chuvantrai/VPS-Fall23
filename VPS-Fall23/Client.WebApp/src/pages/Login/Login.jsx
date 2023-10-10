@@ -2,13 +2,13 @@ import styles from './Login.module.scss';
 import classNames from 'classnames/bind.js';
 import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import config from '@/config/index.js';
 import { useAxios } from '@/hooks/index.js';
-import Cookies from 'js-cookie'; 
-import { convertAccountDataToCode, keyNameCookies } from '@/helpers/index.js';   
+import Cookies from 'js-cookie';
+import { convertAccountDataToCode, keyNameCookies } from '@/helpers/index.js';
 
-const cx = classNames.bind(styles);  
+const cx = classNames.bind(styles);
 const formItemLayout = {
   labelCol: {
     xs: {
@@ -32,6 +32,7 @@ const formItemLayout = {
 function Login() {
   Cookies.set(keyNameCookies.ACCESS_TOKEN, '');
   Cookies.set(keyNameCookies.ACCOUNT_DATA, '');
+  const navigate = useNavigate();
   let rememberPassword = false;
   const [form] = Form.useForm();
   const axios = useAxios();
@@ -42,13 +43,19 @@ function Login() {
         if (rememberPassword) {
           Cookies.set(keyNameCookies.ACCOUNT_DATA, convertAccountDataToCode(values.username, values.password));
         }
-        window.location.href = '/';
+        navigate('/');
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   const onRememberPassword = (e) => {
     rememberPassword = e.target.checked;
+  };
+
+  const onClickLogo = () => {
+    navigate('/');
   };
 
   return (
@@ -59,13 +66,13 @@ function Login() {
           className={cx('w-[100%] relative')}
           src={'../src/assets/bg.svg'}
           alt={'loading...'}
-           />
+        />
       </div>
       <div className={cx('absolute')}>
         <div className={cx('inline-flex flex-col items-center gap-3 mt-[80px]')}>
           <div className={cx('flex justify-center items-center gap-[17.308px] pl-0')}>
             <div className={cx('header-title-logo')}>
-              <img src={'../src/assets/logo/logo.png'} alt={'loading...'} />
+              <img src={'../src/assets/logo/logo.png'} alt={'loading...'} onClick={onClickLogo} />
             </div>
           </div>
         </div>

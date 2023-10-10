@@ -30,52 +30,45 @@ public class AuthController : VpsController<Account>
     [HttpPost]
     public async Task<IActionResult> AuthLogin(LoginRequest request)
     {
-        try
+        var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
+        if (account == null)
         {
-            var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
-            if (account == null)
-            {
-                return BadRequest("wrong username!");
-            }
-
-            if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account.Password))
-            {
-                return BadRequest("wrong password!");
-            }
-
-            if (account.IsVerified == false)
-            {
-                return BadRequest("Haven't Verified email yet!");
-            }
-
-            if (account.IsBlock)
-            {
-                return BadRequest("Account has been locked!");
-            }
-
-            var userToken = new UserTokenHeader
-            {
-                UserId = account.Id.ToString(),
-                Email = account.Email,
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                Avatar = account.Avatar,
-                RoleId = account.TypeId,
-                RoleName = EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId).ToString(),
-                Expires = DateTime.Now.AddMinutes(30),
-                ModifiedAt = account.ModifiedAt
-            };
-
-            return Ok(new
-            {
-                AccessToken = JwtTokenExtension.WriteToken(userToken),
-                UserData = userToken
-            });
+            throw new ClientException("Tài khoản không tồn tại!");
         }
-        catch
+
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account.Password))
         {
-            return BadRequest();
+            throw new ClientException("Mật khẩu sai!");
         }
+
+        if (account.IsVerified == false)
+        {
+            throw new ClientException("Chưa xác nhận email!");
+        }
+
+        if (account.IsBlock)
+        {
+            throw new ClientException("Tài khoản bị khóa!");
+        }
+
+        var userToken = new UserTokenHeader
+        {
+            UserId = account.Id.ToString(),
+            Email = account.Email,
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            Avatar = account.Avatar,
+            RoleId = account.TypeId,
+            RoleName = EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId).ToString(),
+            Expires = DateTime.Now.AddMinutes(30),
+            ModifiedAt = account.ModifiedAt
+        };
+
+        return Ok(new
+        {
+            AccessToken = JwtTokenExtension.WriteToken(userToken),
+            UserData = userToken
+        });
     }
 
     [HttpPut]
@@ -221,7 +214,7 @@ public class AuthController : VpsController<Account>
             var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner!;
             parkingZoneOwnerExistedAccount.Phone = input.PhoneNumber;
             parkingZoneOwnerExistedAccount.Dob = input.Dob;
-            
+
             await ((IUserRepository)vpsRepository).Update(existingAccount);
             await _parkingZoneOwnerRepository.Update(parkingZoneOwnerExistedAccount);
         }
@@ -269,7 +262,7 @@ public class AuthController : VpsController<Account>
         await ((IUserRepository)vpsRepository).SaveChange();
 
         await _generalVps.SendEmailAsync(input.Email,
-                "Xác thực tài khoản",
+            "Xác thực tài khoản",
             $"Mã xác thực tài khoản của bạn là: {verifyCode}");
 
         return Ok(ResponseNotification.ADD_SUCCESS);
