@@ -5,6 +5,7 @@ import { EyeInvisibleOutlined, EyeTwoTone, UserOutlined, LockOutlined } from '@a
 import { Link } from 'react-router-dom';
 import config from '@/config/index.js';
 import { useAxios } from '@/hooks/index.js';
+import Cookies from 'js-cookie';
 
 const cx = classNames.bind(styles);
 const formItemLayout = {
@@ -34,8 +35,9 @@ function Login() {
   const axios = useAxios();
   const onFinish = (values) => {
     axios.post('/api/Auth/AuthLogin', values)
-      .then(res => {
-        console.log(22,res.data.accessToken);
+      .then((res) => {
+        Cookies.set('ACCESS_TOKEN', res.data.accessToken, { expires: 1 });
+        window.location.href = '/';
       })
       .catch(err => console.log(33,err));
   };
@@ -47,7 +49,7 @@ function Login() {
 
   return (
     <div
-      className={cx('bg-[#F0F2F5] min-w-[1440px] min-h-[910px] overflow-hidden flex flex-col items-center justify-center')}>
+      className={cx('bg-[#F0F2F5] w-full min-h-[calc(100vh)] overflow-hidden flex flex-col items-center justify-center')}>
       <div className={cx('inline-flex flex-col items-center gap-3')}>
         <div className={cx('flex justify-center items-center gap-[17.308px] pl-0')}>
           <div className={cx('header-title-logo')}>
