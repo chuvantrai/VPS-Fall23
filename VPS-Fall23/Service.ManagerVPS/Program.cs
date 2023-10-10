@@ -1,22 +1,37 @@
+using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
+using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", build => build.AllowAnyMethod()
+        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(hostName => true).Build());
+});
 builder.Services.AddControllers();
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+    );
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Add DBContext
+builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("ConStr")));
 
 //AddSingleton 
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IParkingZoneOwnerRepository, ParkingZoneOwnerRepository>();
 
 var app = builder.Build();
 
@@ -26,11 +41,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.UseExceptionHandler("/error");
 app.Run();

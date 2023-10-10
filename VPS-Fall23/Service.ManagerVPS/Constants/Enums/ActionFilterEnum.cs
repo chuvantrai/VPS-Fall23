@@ -3,5 +3,10 @@
 public enum ActionFilterEnum
 {
     GetOk,
-    AddUser
+    AddUser,
+    TestAuthApi,
+    CreateAccountDemo,
+    ChangePassword,
+    RefreshToken,
+    UpdateProfileAccount
 }

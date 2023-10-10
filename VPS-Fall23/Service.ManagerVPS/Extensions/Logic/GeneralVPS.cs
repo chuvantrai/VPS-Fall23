@@ -41,4 +41,10 @@ public class GeneralVPS : IGeneralVPS
             }
         }
     }
+
+    public int GenerateVerificationCode()
+    {
+        var rnd = new Random();
+        return rnd.Next(100000, 999999);
+    }
 }
