@@ -35,6 +35,11 @@ namespace Service.ManagerVPS.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!;");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -639,33 +644,27 @@ namespace Service.ManagerVPS.Models
                     .ValueGeneratedNever()
                     .HasColumnName("id");
 
-                entity.Property(e => e.CommuneId).HasColumnName("commune_id");
-
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.DetailAddress)
-                    .HasColumnType("ntext")
-                    .HasColumnName("detail_address");
+                entity.Property(e => e.Dob)
+                    .HasColumnType("datetime")
+                    .HasColumnName("dob");
 
-                entity.Property(e => e.IsApproved).HasColumnName("is_approved");
+                entity.Property(e => e.Email)
+                    .HasMaxLength(100)
+                    .HasColumnName("email");
 
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.RejectedReason)
-                    .HasColumnType("ntext")
-                    .HasColumnName("rejected_reason");
-
-                entity.HasOne(d => d.Commune)
-                    .WithMany(p => p.ParkingZoneOwners)
-                    .HasForeignKey(d => d.CommuneId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__parking_z__commu__71D1E811");
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(20)
+                    .HasColumnName("phone");
 
                 entity.HasOne(d => d.IdNavigation)
                     .WithOne(p => p.ParkingZoneOwner)

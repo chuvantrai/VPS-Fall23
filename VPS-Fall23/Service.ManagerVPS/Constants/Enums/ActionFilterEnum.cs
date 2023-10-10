@@ -7,5 +7,6 @@ public enum ActionFilterEnum
     TestAuthApi,
     CreateAccountDemo,
     ChangePassword,
-    RefreshToken
+    RefreshToken,
+    UpdateProfileAccount
 }

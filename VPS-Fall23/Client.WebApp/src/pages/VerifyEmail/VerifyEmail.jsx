@@ -1,35 +1,38 @@
-import classNames from "classnames/bind";
-import { Button, Form, Input, Row, Col } from 'antd';
+import classNames from 'classnames/bind';
+import { Button, Form, Input, Row, Col, notification } from 'antd';
 import { useLocation, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
-import styles from './VerifyEmail.module.scss'
-import { useAxios } from '@/hooks';
-import { useState } from "react";
+import styles from './VerifyEmail.module.scss';
+import useAuthService from '@/services/authService';
 
-const cx = classNames.bind(styles)
+const cx = classNames.bind(styles);
 
 function VerifyEmail() {
   const [form] = Form.useForm();
-  const axios = useAxios()
   const location = useLocation();
-  const [verify, setVerify] = useState(false)
+  const authService = useAuthService();
+  const [verify, setVerify] = useState(false);
+  const [api, contextHolder] = notification.useNotification();
 
-  const email = location.state?.email
+  useEffect(() => {
+    api['success']({
+      message: 'Check email của bạn để lấy mã xác thực!',
+    })
+  }, []);
+
+  const email = location.state?.email;
   const onFinish = (values) => {
-    axios.post('api/Auth/VerifyNewAccount', { email, ...values })
-      .then(res => {
-        if (res.status === 200) {
-          setVerify(true)
-        }
-      })
+    authService.verifyAccount({ email, ...values }, setVerify);
   };
 
   const handleResendCode = () => {
-
-  }
+    authService.resendCode({ userName: email })
+  };
 
   return (
     <div className={cx('wrapper')}>
+      {contextHolder}
       <div className={cx('header-title-logo')}>
         <img src="../src/assets/logo/logo.png" />
       </div>
@@ -44,12 +47,7 @@ function VerifyEmail() {
       </div>
       <div className={cx('verify-form')}>
         <h5 className={cx('verify-form-text')}>Xác thực tài khoản</h5>
-        <Form
-          form={form}
-          name="verify-email"
-          onFinish={onFinish}
-          scrollToFirstError
-        >
+        <Form form={form} name="verify-email" onFinish={onFinish} scrollToFirstError>
           <Form.Item
             name="verifyCode"
             rules={[
@@ -59,15 +57,15 @@ function VerifyEmail() {
               },
               {
                 max: 6,
-                message: 'Mã code tối đa gồm 6 số'
+                message: 'Mã code tối đa gồm 6 số',
               },
               {
                 pattern: /^[0-9]+$/,
-                message: 'Sai định dạng'
-              }
+                message: 'Sai định dạng',
+              },
             ]}
             style={{
-              minWidth: '398px'
+              minWidth: '398px',
             }}
           >
             <Input placeholder="Verify Code" />
@@ -94,7 +92,7 @@ function VerifyEmail() {
                   htmlType="button"
                   block
                   style={{
-                    minWidth: '182px'
+                    minWidth: '182px',
                   }}
                   onClick={handleResendCode}
                 >

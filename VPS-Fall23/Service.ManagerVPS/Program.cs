@@ -31,6 +31,7 @@ builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IParkingZoneOwnerRepository, ParkingZoneOwnerRepository>();
 
 var app = builder.Build();
 

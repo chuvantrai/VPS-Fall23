@@ -3,7 +3,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.OtherModels;
+using Service.ManagerVPS.Models;
 
 namespace Service.ManagerVPS.Extensions.StaticLogic;
 
@@ -72,5 +74,22 @@ public static class JwtTokenExtension
         {
             return null;
         }
+    }
+
+    public static string WriteTokenByAccount(Account account)
+    {
+        var userToken = new UserTokenHeader
+        {
+            UserId = account.Id.ToString(),
+            Email = account.Email,
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            Avatar = account.Avatar,
+            RoleId = account.TypeId,
+            RoleName = EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId).ToString(),
+            Expires = DateTime.Now.AddMinutes(30),
+            ModifiedAt = account.ModifiedAt
+        };
+        return WriteToken(userToken);
     }
 }

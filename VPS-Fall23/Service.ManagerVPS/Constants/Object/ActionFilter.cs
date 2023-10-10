@@ -36,6 +36,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.RefreshToken,
             UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER, UserRoleEnum.ATTENDANT }
+        },
+        new ActionModel()
+        {
+            Action = ActionFilterEnum.UpdateProfileAccount,
+            UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
         }
     };
 

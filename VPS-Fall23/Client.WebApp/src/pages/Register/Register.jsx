@@ -1,12 +1,13 @@
+/* eslint-disable no-unused-vars */
 import classNames from 'classnames/bind';
-import { Button, Form, Input, Row, Col, notification } from 'antd';
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Link, Navigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Button, Form, Input, Row, Col, DatePicker } from 'antd';
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 import styles from './Register.module.scss';
 import config from '@/config';
-import { useAxios } from '@/hooks';
-import { useState } from 'react';
+import useAuthService from '@/services/authService';
 
 const cx = classNames.bind(styles);
 const formItemLayout = {
@@ -30,27 +31,17 @@ const formItemLayout = {
 
 function Register() {
   const [form] = Form.useForm();
-  const [api, contextHolder] = notification.useNotification();
-  const axios = useAxios();
+  const authService = useAuthService();
   const [account, setAccount] = useState(null);
+  const [dob, setDob] = useState('');
 
   const onFinish = (values) => {
-    axios.post('/api/Auth/Register', values)
-      .then(res => {
-        if (res.status === 200)
-          setAccount(values)
-      })
-      .catch(err => {
-        api['error']({
-          message: 'Có lỗi xảy ra',
-          description: err,
-        });
-      })
+    values = { ...values, dob };
+    authService.register(values, setAccount);
   };
 
   return (
     <div className={cx('wrapper')}>
-      {contextHolder}
       <div className={cx('header')}>
         <div className={cx('header-title')}>
           <div className={cx('header-title-logo')}>
@@ -92,8 +83,8 @@ function Register() {
               },
             ]}
           >
-            <Input placeholder="Email" />
-          </Form.Item>
+            <Input placeholder="Email" allowClear />
+          </Form.Item >
 
           <Form.Item
             name="password"
@@ -115,6 +106,7 @@ function Register() {
             <Input.Password
               placeholder="Mật khẩu(6 đến 12 ký tự)"
               iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              allowClear
             />
           </Form.Item>
 
@@ -131,8 +123,8 @@ function Register() {
               },
             ]}
           >
-            <Input placeholder="Tên" />
-          </Form.Item>
+            <Input placeholder="Tên" allowClear />
+          </Form.Item >
 
           <Form.Item
             name="lastName"
@@ -147,8 +139,18 @@ function Register() {
               },
             ]}
           >
-            <Input placeholder="Họ" />
+            <Input placeholder="Họ" allowClear />
           </Form.Item>
+
+          <Form.Item name="dob">
+            <DatePicker
+              onChange={(_, dateString) => setDob(dateString)}
+              style={{
+                minWidth: '400px',
+              }}
+              placeholder="Ngày sinh"
+            />
+          </Form.Item >
 
           <Form.Item
             name="phoneNumber"
@@ -163,11 +165,11 @@ function Register() {
               },
               {
                 pattern: /(0[3|5|7|8|9])+([0-9]{8})\b/g,
-                message: "Sai định dạng"
+                message: 'Sai định dạng',
               },
             ]}
           >
-            <Input placeholder="Số điện thoại" />
+            <Input placeholder="Số điện thoại" allowClear />
           </Form.Item>
 
           <Row>
@@ -194,15 +196,15 @@ function Register() {
                     color: '#1677ff',
                   }}
                 >
-                  Đăng nhập
-                </Link>
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </div>
-      {account && <Navigate to="/verifyEmail" replace={true} state={account} />}
-    </div>
+                  Đã có tài khoản? Đăng nhập
+                </Link >
+              </Form.Item >
+            </Col >
+          </Row >
+        </Form >
+      </div >
+      {account && <Navigate to={config.routes.verifyEmail} replace={true} state={account} />}
+    </div >
   );
 }
 

@@ -23,4 +23,6 @@ public class RegisterAccount
     [Required(ErrorMessage = "PhoneNumber cannot be null!")]
     [MaxLength(10, ErrorMessage = "Phone maximum 10 characters!")]
     public string PhoneNumber { get; set; } = null!;
+
+    public DateTime? Dob { get; set; }
 }

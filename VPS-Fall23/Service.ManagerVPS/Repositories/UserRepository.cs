@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -7,7 +9,8 @@ namespace Service.ManagerVPS.Repositories;
 
 public class UserRepository : VpsRepository<Account>, IUserRepository
 {
-    private readonly IGeneralVPS _generalVPS; 
+    private readonly IGeneralVPS _generalVPS;
+
     public UserRepository(FALL23_SWP490_G14Context context, IGeneralVPS generalVps)
         : base(context)
     {
@@ -16,7 +19,7 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
 
     public bool CheckEmailExists(string email)
     {
-        var existAccount = context.Accounts.FirstOrDefault(x => x.Email.Equals(email));
+        var existAccount = context.Accounts.FirstOrDefault(x => x.Email.Equals(email) && x.IsVerified == true);
         return existAccount is not null;
     }
 
@@ -37,6 +40,14 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return account;
     }
 
+    public Account? GetOwnerAccountByEmail(string email)
+    {
+        var account = context.Accounts
+            .Include(x => x.ParkingZoneOwner)
+            .FirstOrDefault(x => x.Email.Equals(email));
+        return account;
+    }
+
     public void VerifyAccount(Account account)
     {
         account.IsVerified = true;
@@ -49,21 +60,58 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return account;
     }
 
-    public async Task<Account?> GetAccountByIdAsync(Guid id)
+    public async Task<Account?> UpdateVerifyCodeAsync(string userName, string? emailSubject = null)
     {
-        var account = await context.Accounts.FirstOrDefaultAsync(x => x.Id.Equals(id));
+        emailSubject ??= "Verify Forgot password";
+
+        var account = await context.Accounts.FirstOrDefaultAsync(x
+            => (x.Username.Equals(userName) || x.Email.Equals(userName)) && !x.IsBlock &&
+               x.TypeId != (int)UserRoleEnum.ATTENDANT);
+        if (account == null) return null;
+        
+        if (account.ExpireVerifyCode == null || DateTime.Now > account.ExpireVerifyCode)
+        {
+            account.VerifyCode = _generalVPS.GenerateVerificationCode();
+            account.ExpireVerifyCode = DateTime.Now.AddMinutes(30);
+            await context.SaveChangesAsync();
+            await _generalVPS.SendEmailAsync(account.Email,
+                emailSubject,
+                $"Your Verification code is: {account.VerifyCode}");
+        }
+        else
+        {
+            await _generalVPS.SendEmailAsync(account.Email,
+                emailSubject,
+                $"Your Verification code is: {account.VerifyCode}");
+        }
+
         return account;
     }
 
-    public async Task<Account?> UpdateVerifyCodeAsync(string userName)
+    public async Task<Account?> ChangePasswordByUserIdAsync(Guid id, string password)
     {
-        var account = await context.Accounts.FirstOrDefaultAsync(x => x.Username.Equals(userName));
+        var account = await context.Accounts
+            .FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.IsBlock && x.IsVerified == true);
         if (account == null) return null;
-        account.VerifyCode = _generalVPS.GenerateVerificationCode();
+        account.Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
+        account.ModifiedAt = DateTime.Now;
         await context.SaveChangesAsync();
-        await _generalVPS.SendEmailAsync(account.Email,
-            "Verify Forgot password",
-            $"Your Verification code is: {account.VerifyCode}");
+        return account;
+    }
+
+    public async Task<Account?> UpdateAccountById(UpdateProfileAccountRequest request)
+    {
+        var account = await context.Accounts
+            .FirstOrDefaultAsync(x => x.Id.Equals(request.AccountId));
+        if (account == null) return null;
+        if (account.Avatar != null) account.Avatar = request.Avatar;
+        account.FirstName = request.FirstName;
+        account.LastName = request.LastName;
+        account.PhoneNumber = request.PhoneNumber;
+        account.Address = request.Address;
+        account.CommuneId = request.CommuneId;
+        account.ModifiedAt = DateTime.Now;
+        await context.SaveChangesAsync();
         return account;
     }
 }
