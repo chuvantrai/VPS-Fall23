@@ -31,6 +31,9 @@ builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICommuneRepository, CommuneRepository>();
+builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
+builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<IParkingZoneOwnerRepository, ParkingZoneOwnerRepository>();
 
 var app = builder.Build();
