@@ -34,5 +34,9 @@
   {
     "code": 2003,
     "message": "Email của bạn chưa được đăng ký!"
+  },
+  {
+    "code": 1001,
+    "message": "Có lỗi khi lấy vị trí bản đồ"
   }
 ]
