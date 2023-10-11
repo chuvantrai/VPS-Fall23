@@ -38,5 +38,21 @@
   {
     "code": 1001,
     "message": "Có lỗi khi lấy vị trí bản đồ"
+  },
+  {
+    "code": 5001,
+    "message": "Tên tài khoản/email sai!"
+  },
+  {
+    "code": 5002,
+    "message": "Tài khoản này đã bị khóa!"
+  },
+  {
+    "code": 5003,
+    "message": "Code xác nhận sai!"
+  },
+  {
+    "code": 5004,
+    "message": "Code xác nhận đã hết hạn!"
   }
 ]

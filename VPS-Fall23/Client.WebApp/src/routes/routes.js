@@ -5,6 +5,7 @@ import Homepage from '@/pages/Homepage';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
 import RegisterParkingZone from '@/pages/RegisterParkingZone';
+import ForgotPassword from '@/pages/ForgotPassword/index.js';
 
 export const routes = [
   {
@@ -31,5 +32,10 @@ export const routes = [
     path: config.routes.registerParkingZone,
     component: RegisterParkingZone,
     layout: HeaderOnly,
+  },
+  {
+    path: config.routes.forgotPassword,
+    component: ForgotPassword,
+    layout: null,
   },
 ];

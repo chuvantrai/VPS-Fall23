@@ -154,7 +154,7 @@ public class AuthController : VpsController<Account>
         var account = await ((IUserRepository)vpsRepository).UpdateVerifyCodeAsync(request.UserName);
         if (account == null)
         {
-            throw new ClientException("Email không chính xác!");
+            throw new ClientException("Tên tài khoản/email không chính xác!");
         }
 
         return Ok(account.Email);
@@ -163,34 +163,27 @@ public class AuthController : VpsController<Account>
     [HttpPut]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
     {
-        try
+        var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.UserName);
+        if (account == null) throw new ClientException(5001);
+        if (account.IsBlock)
         {
-            var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.UserName);
-            if (account == null) return BadRequest();
-            if (account.IsBlock)
-            {
-                return BadRequest("Account has been locked!");
-            }
-
-            if (account.VerifyCode != request.VerifyCode)
-            {
-                return BadRequest("Wrong VerifyCode!");
-            }
-
-            if (DateTime.Now > account.ExpireVerifyCode)
-            {
-                return BadRequest("VerifyCode expired!");
-            }
-
-            var accountAfterChange =
-                await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(account.Id, request.Password);
-            if (accountAfterChange == null) return BadRequest();
-            return Ok();
+            throw new ClientException(5002);
         }
-        catch
+
+        if (account.VerifyCode != request.VerifyCode)
         {
-            return BadRequest();
+            throw new ClientException(5003);
         }
+
+        if (DateTime.Now > account.ExpireVerifyCode)
+        {
+            throw new ClientException(5004);
+        }
+
+        var accountAfterChange =
+            await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(account.Id, request.Password);
+        if (accountAfterChange == null) throw new ClientException();
+        return Ok();
     }
 
     [HttpPost]
