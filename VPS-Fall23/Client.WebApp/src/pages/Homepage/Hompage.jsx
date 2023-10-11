@@ -1,9 +1,11 @@
 
 import { Drawer } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import styles from './Homepage.module.scss'
 import classNames from 'classnames/bind';
+import HomepageAdmin from "./components/HomepageAdmin";
 const cx = classNames.bind(styles);
+
 const HomePage = () => {
   const role = 1;
 
@@ -14,6 +16,7 @@ const HomePage = () => {
 
     initMap();
   }, [])
+
   async function initMap() {
     // The location of Uluru
     const position = { lat: 20.982570, lng: 105.844949 };
