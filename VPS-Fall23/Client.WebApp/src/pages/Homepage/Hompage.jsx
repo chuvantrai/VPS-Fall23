@@ -1,64 +1,62 @@
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import { Drawer, Layout } from "antd";
-import { Content } from "antd/es/layout/layout";
-import React, { useState } from "react";
 
+import { Drawer } from "antd";
+import React, { useEffect, useState } from "react";
 import styles from './Homepage.module.scss'
 import classNames from 'classnames/bind';
-
-
 const cx = classNames.bind(styles);
-const containerStyle = {
-  width: '100vw',
-  maxWidth: '100%',
-  position: "absolute",
-  height: "100%"
-};
-
-const center = {
-  lat: 20.982533,
-  lng: 105.844914
-};
-
-
 const HomePage = () => {
 
   const [isDrawerOpen, setDrawerOpen] = useState(true);
+  // Initialize and add the map
+  let map;
+  useEffect(() => {
 
-  const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: import.meta.env.VITE_MAP_API_KEY
+    initMap();
   })
+  async function initMap() {
+    // The location of Uluru
+    const position = { lat: 20.982570, lng: 105.844949 };
+    // Request needed libraries.
+    //@ts-ignore
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-  const [map, setMap] = React.useState(null)
+    // The map, centered at Uluru
+    map = new Map(document.getElementById("map"), {
+      zoom: 11,
+      center: position,
+      mapId: "DEMO_MAP_ID",
+    });
 
-  const onLoad = React.useCallback(function callback(map) {
-    // This is just an example of getting and using the map instance!!! don't just blindly copy!
-    const bounds = new window.google.maps.LatLngBounds(center);
-    map.fitBounds(bounds);
+    // The marker, positioned at Uluru
+    const marker = new AdvancedMarkerElement({
+      map: map,
+      position: position,
+      title: "Hóa đơn điện tử M-invoice",
 
-    setMap(map)
-  }, [])
+    });
+    const infoWindow = new google.maps.InfoWindow({
+      content: "Hóa đơn điện tử M-invoice",
+      disableAutoPan: true,
+    });
+    marker.addListener("click", () => {
+      infoWindow.open(map, marker);
+    });
+  }
 
-  const onUnmount = React.useCallback(function callback(map) {
-    setMap(null)
-  }, [])
 
   return (
-    <>{isLoaded ? (
-      <GoogleMap
-        mapContainerStyle={containerStyle}
-        center={center}
-        zoom={10}
-        onLoad={onLoad}
-        onUnmount={onUnmount}
-      >
-        <></>
-      </GoogleMap>
-    ) : <></>}
+    <div >
+      <div id="map" style={{
+        width: '100vw',
+        maxWidth: '100%',
+        position: "absolute",
+        height: "100%"
+      }}></div>
+
       <Drawer
         title="Danh sách các nhà xe gần bạn"
-        placement="bottom"
+        placement="left"
         closable={true}
         onClose={() => { setDrawerOpen(!isDrawerOpen) }}
         open={isDrawerOpen}
@@ -67,7 +65,8 @@ const HomePage = () => {
         <p>Some contents...</p>
         <p>Some contents...</p>
         <p>Some contents...</p>
-      </Drawer></>
+      </Drawer>
+    </div>
 
 
 
