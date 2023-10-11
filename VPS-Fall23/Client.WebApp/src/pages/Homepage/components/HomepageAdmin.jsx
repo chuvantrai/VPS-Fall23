@@ -17,9 +17,7 @@ function HomepageAdmin() {
         <div className='m-auto w-full mt-10'>
             <Layout>
                 <Content
-                    style={{
-                        padding: '0 50px',
-                    }}>
+                >
                     <Layout
                         style={{
                             padding: '24px 0',
