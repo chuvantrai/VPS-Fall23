@@ -1,10 +1,9 @@
-import { Layout } from 'antd';
 import Sidebar from '../../../layouts/components/Sidebar/Sidebar';
 import UserProfile from './Content/UserProfile';
-const { Content } = Layout;
-import { theme } from 'antd';
+import { theme, Layout } from 'antd';
 import { useState } from 'react';
 import ViewListParkingZone from './Content/ViewListParkingZone';
+const { Content } = Layout;
 
 function HomepageAdmin() {
     const {
@@ -13,10 +12,6 @@ function HomepageAdmin() {
 
     const [contentState, setContentState] = useState("1");
     const rowData = ["user", "manager"]
-
-    const test = (e) => {
-        setContentState(e);
-    }
 
     return (
         <div className='m-auto w-full mt-10'>
@@ -31,7 +26,7 @@ function HomepageAdmin() {
                             background: colorBgContainer,
                         }}
                     >
-                        <Sidebar rowData={rowData} setContentState={test}></Sidebar>
+                        <Sidebar rowData={rowData} setContentState={setContentState}></Sidebar>
                         <Content
                             style={{
                                 padding: '0 24px',
@@ -40,7 +35,6 @@ function HomepageAdmin() {
                         >
                             {contentState === "1" && <UserProfile></UserProfile>}
                             {contentState === "2" && <ViewListParkingZone></ViewListParkingZone>}
-
                         </Content>
                     </Layout>
                 </Content>
