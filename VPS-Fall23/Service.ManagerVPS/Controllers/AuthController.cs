@@ -4,7 +4,6 @@ using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
-using Service.ManagerVPS.DTO.Input.User;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.StaticLogic;
@@ -215,9 +214,9 @@ public class AuthController : VpsController<Account>
             existingAccount.LastName = input.LastName;
             existingAccount.PhoneNumber = input.PhoneNumber;
 
-            var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner;
-            parkingZoneOwnerExistedAccount!.Phone = input.PhoneNumber;
-            parkingZoneOwnerExistedAccount!.Dob = input.Dob;
+            var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner!;
+            parkingZoneOwnerExistedAccount.Phone = input.PhoneNumber;
+            parkingZoneOwnerExistedAccount.Dob = input.Dob;
             
             await ((IUserRepository)vpsRepository).Update(existingAccount);
             await _parkingZoneOwnerRepository.Update(parkingZoneOwnerExistedAccount);

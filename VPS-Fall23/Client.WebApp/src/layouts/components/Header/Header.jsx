@@ -9,7 +9,7 @@ const cx = classNames.bind(styles);
 
 function Header() {
   return (
-    <AntdHeader className={cx('nav')} >
+    <AntdHeader className={cx('nav')}>
       <Row className={cx('nav-row')}>
         <Col md={8} sm={24} className={cx('nav-left')}>
           <HeaderLeft></HeaderLeft>
@@ -20,9 +20,8 @@ function Header() {
         <Col md={8} sm={24}>
           <HeaderRight></HeaderRight>
         </Col>
-      </Row >
-
-    </AntdHeader >
+      </Row>
+    </AntdHeader>
   );
 }
 
