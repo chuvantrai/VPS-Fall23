@@ -21,31 +21,24 @@ function DefaultLayout() {
   const [contentState, setContentState] = useState("1");
 
   return (
-    <div className={cx('wrapper')}>
+    <div className={cx('wrapper w-full')}>
       <Header />
       <Layout>
+        <Sidebar rowData={rowData} setContentState={setContentState}></Sidebar>
+        <Layout style={{
+          padding: '0 24px 24px',
+        }}>
+
+        </Layout>
+
         <Content
           style={{
-            padding: '0 50px',
-          }}>
-          <Layout
-            style={{
-              padding: '24px 0',
-              background: colorBgContainer,
-            }}
-          >
-            <Sidebar rowData={rowData} setContentState={setContentState}></Sidebar>
-            <Content
-              style={{
-                padding: '0 24px',
-                minHeight: 280,
-              }}
-            >
-              {contentState === "1" && <UserProfile></UserProfile>}
-              {contentState === "2" && <ViewListParkingZone></ViewListParkingZone>}
-
-            </Content>
-          </Layout>
+            padding: '5px 24px',
+            minHeight: 280,
+          }}
+        >
+          {contentState === "1" && <UserProfile></UserProfile>}
+          {contentState === "2" && <ViewListParkingZone></ViewListParkingZone>}
         </Content>
       </Layout>
 

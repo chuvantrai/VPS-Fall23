@@ -14,7 +14,7 @@ function HomepageAdmin() {
     const rowData = ["user", "manager"]
 
     return (
-        <div className='m-auto w-full mt-10'>
+        <div className='m-auto w-full h-full mt-10'>
             <Layout>
                 <Content
                 >
