@@ -12,7 +12,7 @@ const HomePage = () => {
   useEffect(() => {
 
     initMap();
-  })
+  }, [])
   async function initMap() {
     // The location of Uluru
     const position = { lat: 20.982570, lng: 105.844949 };

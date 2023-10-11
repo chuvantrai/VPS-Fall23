@@ -65,8 +65,7 @@ const HeaderCenter = () => {
                     loadData={loadCascaderChildren}
                     onChange={onCascaderChange}
                     fieldNames={fieldNames}
-                    changeOnSelect
-                    showSearch />
+                    changeOnSelect />
 
             </Col>
             <Col md={4}>  <Button>Search</Button></Col>
