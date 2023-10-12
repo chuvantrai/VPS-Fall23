@@ -18,18 +18,17 @@ function Sidebar({ rowData, setContentState }) {
     setContentState(e.key);
   }
 
-  const items2 = rowData.map((data, index) => {
+  const items2 = rowData.map(({ label, options }, index) => {
     const key = String(index + 1);
     return {
       key: `sub${key}`,
       // icon: React.createElement(icon),
-      label: `${data}`,
-      children: new Array(4).fill(null).map((_, j) => {
+      label: `${label}`,
+      children: options.map((opt, j) => {
         const subKey = index * 4 + j + 1;
         return {
           key: subKey,
-          label: `option${subKey}`,
-
+          label: `${opt}`,
         };
       }),
 
@@ -58,10 +57,20 @@ function Sidebar({ rowData, setContentState }) {
 }
 
 Sidebar.propTypes = {
-  rowData: PropTypes.array.isRequired,
+  rowData: PropTypes.arrayOf(
+    PropTypes.shape(
+      {
+        lable: PropTypes.string,
+        options: PropTypes.arrayOf(PropTypes.string)
+      }
+    )),
   // rowData: PropTypes.arrayOf(PropTypes.shape({
   //   name: ""
   // })).isRequired,
 };
+
+// const defaultProps = {
+//   rowData: [{ label: "User", options: ["Profile"] }, { label: "Manage", options: "View Parking Zone List" }],
+// };
 
 export default Sidebar;

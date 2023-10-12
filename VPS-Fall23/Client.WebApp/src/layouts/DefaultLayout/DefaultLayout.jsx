@@ -16,7 +16,15 @@ function DefaultLayout() {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-  const rowData = ["user", "manager"];
+  const rowData = [
+    {
+      label: "User",
+      options: ["Profile", "Test"]
+    },
+    {
+      label: "Manage",
+      options: ["View Parking Zone List"]
+    }];
 
   const [contentState, setContentState] = useState("1");
 
