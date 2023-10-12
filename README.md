@@ -1,3 +1,8 @@
+Server MS SQL:
+server: 210.211.127.85,6666
+user: nghianvho
+password: Random@11092023#@!
+Database: FALL23_SWP490_G14
 
 # Vehicle Parking System(VPS)
 
