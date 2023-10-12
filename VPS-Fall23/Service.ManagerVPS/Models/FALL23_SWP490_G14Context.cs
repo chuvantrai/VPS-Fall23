@@ -533,6 +533,8 @@ namespace Service.ManagerVPS.Models
                     .HasMaxLength(255)
                     .HasColumnName("detail_address");
 
+                entity.Property(e => e.IsApprove).HasColumnName("is_approve");
+
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
@@ -551,6 +553,10 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.PricePerHour)
                     .HasColumnType("decimal(18, 0)")
                     .HasColumnName("price_per_hour");
+
+                entity.Property(e => e.RejectReason)
+                    .HasColumnType("ntext")
+                    .HasColumnName("reject_reason");
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
