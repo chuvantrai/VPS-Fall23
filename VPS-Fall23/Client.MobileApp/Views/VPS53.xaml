@@ -4,35 +4,32 @@
              x:Class="Client.MobileApp.Views.VPS53"
              xmlns:viewmodel="clr-namespace:Client.MobileApp.ViewModels"
              x:DataType="viewmodel:VPS53ViewModel"
-             xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
-             xmlns:lottie="http://schemas.airbnb.io/xaml"
-             Title="VPS53">
+             xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI">
     <ScrollView>
 
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="6*"/>
-                <RowDefinition Height="2*"/>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <BoxView
-                BackgroundColor="Orange"
-                Color="Orange"
-                Grid.Row="0"
-                HorizontalOptions="FillAndExpand"
-                VerticalOptions="FillAndExpand"/>
+            <Grid Grid.Row="0" BackgroundColor="#FF6B00">
+                <Image Source="logo.png"/>
+            </Grid>
 
-            <cv:CameraView Grid.ColumnSpan="3"  Grid.Row="1" x:Name="cameraView" CamerasLoaded="cameraView_CamerasLoaded"/>
+            <cv:CameraView Grid.Row="1" x:Name="cameraView" CamerasLoaded="cameraView_CamerasLoaded"/>
 
-            <Grid  Grid.Row="2" BackgroundColor="Orange">
+            <Grid  Grid.Row="2" BackgroundColor="#FF6B00">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button ImageSource="videocamera.png" MaximumHeightRequest="100" MaximumWidthRequest="100" BackgroundColor="Gray" Grid.Column="1" Clicked="CameraButton_Clicked" CornerRadius="30"></Button>
-                <Button ImageSource="imagegallery.png" MaximumHeightRequest="100" MaximumWidthRequest="100" BackgroundColor="Gray" Grid.Column="2" Clicked="ImageButton_Clicked" CornerRadius="30"></Button>
+
+                <Button ImageSource="licenseplate.png" MaximumHeightRequest="80" MaximumWidthRequest="80" BackgroundColor="#D9D9D9" Grid.Column="0" Clicked="LincenseButton_Clicked" CornerRadius="40"></Button>
+                <Button ImageSource="videocamera.png" MaximumHeightRequest="80" MaximumWidthRequest="80" BackgroundColor="#D9D9D9" Grid.Column="1" Clicked="CameraButton_Clicked" CornerRadius="40"></Button>
+                <Button ImageSource="imagegallery.png" MaximumHeightRequest="80" MaximumWidthRequest="80" BackgroundColor="#D9D9D9" Grid.Column="2" Clicked="ImageButton_Clicked" CornerRadius="40"></Button>
             </Grid>
         </Grid>
 

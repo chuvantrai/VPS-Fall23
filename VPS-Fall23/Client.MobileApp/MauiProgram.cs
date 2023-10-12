@@ -1,6 +1,7 @@
 ﻿using Camera.MAUI;
 using Client.MobileApp.ViewModels;
 using Client.MobileApp.Views;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
 
@@ -16,6 +17,7 @@ namespace Client.MobileApp
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -53,7 +55,6 @@ namespace Client.MobileApp
         public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
         {
             builder.Services.AddTransient<VPS53ViewModel>();
-
 
             return builder;
         }

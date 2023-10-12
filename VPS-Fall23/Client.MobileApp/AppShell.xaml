@@ -7,7 +7,6 @@
     Shell.FlyoutBehavior="Disabled">
 
     <ShellContent
-    Title="Home"
     ContentTemplate="{DataTemplate views:VPS53}"
     Route="VPS53" />
 

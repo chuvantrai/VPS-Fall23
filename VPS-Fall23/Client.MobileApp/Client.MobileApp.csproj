@@ -46,23 +46,19 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-
-		<None Remove="Resources\Raw\googleKey.json" />
+		<None Remove="appsettings.json" />
 
 		<BundleResource Include="Resources\Raw\googleKey.json" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Camera.MAUI" Version="1.4.4" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="6.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="7.0.1" />
 		<PackageReference Include="Google.Cloud.Vision.V1" Version="3.3.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Models\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -72,15 +68,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\LicenseInputPopup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\VPS53.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="googleKey.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
 	  <None Update="Resources\Raw\googleKey.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
@@ -112,15 +108,11 @@
 
 	<ItemGroup>
 	  <None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x64\tesseract50.dll" />
-	  <None Remove="Images\imagegallery.png" />
-	  <None Remove="Images\rotatecamera.png" />
-	  <None Remove="Images\videocamera.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiImage Include="Images\imagegallery.png" />
-	  <MauiImage Include="Images\rotatecamera.png" />
-	  <MauiImage Include="Images\videocamera.png" />
+	  <MauiAsset Include="GoogleAppCredentials.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </MauiAsset>
 	</ItemGroup>
-
 </Project>

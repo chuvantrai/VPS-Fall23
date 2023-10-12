@@ -1,5 +1,4 @@
-﻿using Client.MobileApp.Views;
-
+﻿
 namespace Client.MobileApp
 {
     public partial class App : Application

@@ -1,10 +1,8 @@
-using Client.MobileApp.ViewModels;
-using System.IO;
+﻿using Client.MobileApp.ViewModels;
 using Google.Cloud.Vision.V1;
-using System;
 using Image = Google.Cloud.Vision.V1.Image;
-using Microsoft.Maui.Storage;
-using Microsoft.Maui.Controls.PlatformConfiguration;
+using Client.MobileApp.Models;
+using CommunityToolkit.Maui.Views;
 
 namespace Client.MobileApp.Views;
 
@@ -18,7 +16,6 @@ public partial class VPS53 : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
         _viewModel = viewModel;
-
     }
 
     private void cameraView_CamerasLoaded(object sender, EventArgs e)
@@ -39,40 +36,46 @@ public partial class VPS53 : ContentPage
     {
         try
         {
-            string localFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "imageTest.jpg");
+            string licensePlate = String.Empty;
+            string path = String.Empty;
+
+            string localFilePath = Path.Combine(FileSystem.Current.AppDataDirectory, Constance.ImageName);
             await cameraView.SaveSnapShot(Camera.MAUI.ImageFormat.JPEG, localFilePath);
-
-
-                string imageText = "";
-            string fileName = "googleKey.json";
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName);
-
+#if ANDROID
+            await Constance.CopyFileToAppDataDirectory(Constance.GoogleAppCredentials);
+            path = Path.Combine(FileSystem.Current.AppDataDirectory, Constance.GoogleAppCredentials);
+#elif WINDOWS
+            path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), Constance.GoogleAppCredentials);
+#endif
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", path);
 
             var client = ImageAnnotatorClient.Create();
-            var image = Image.FromFile("C:\\Users\\trank\\OneDrive\\Pictures\\263152245_861121767886264_3984037907517320615_n.jpg");
+            var image = Image.FromFile(localFilePath);
 
             var response = client.DetectText(image);
 
-            foreach (var annotation in response)
+            if (response[0].Description != null)
             {
-                if (annotation.Description != null)
-                {
-                    imageText += annotation.Description;
-                }
+                licensePlate += response[0].Description;
             }
-
-            string ing = imageText.Trim();
-
+            else
+            {
+                await DisplayAlert("ALERT","PLEASE TAKE THE LICENSE PLATE IN TO AREA !!!", "Cancel");
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.ToString());
+            throw new Exception(ex.Message);
         }
     }
 
     private void ImageButton_Clicked(object sender, EventArgs e)
     {
 
+    }
+
+    private void LincenseButton_Clicked(object sender, EventArgs e)
+    {
+        this.ShowPopup(new LicenseInputPopup());
     }
 }
