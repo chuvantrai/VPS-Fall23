@@ -4,7 +4,6 @@ using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
-using Service.ManagerVPS.DTO.Input.User;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.StaticLogic;
@@ -32,7 +31,8 @@ public class AuthController : VpsController<Account>
     {
         try
         {
-            var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
+            var account =
+                await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
             if (account == null)
             {
                 return BadRequest("wrong username!");
@@ -65,7 +65,6 @@ public class AuthController : VpsController<Account>
                 Expires = DateTime.Now.AddMinutes(30),
                 ModifiedAt = account.ModifiedAt
             };
-
             return Ok(new
             {
                 AccessToken = JwtTokenExtension.WriteToken(userToken),
@@ -92,7 +91,8 @@ public class AuthController : VpsController<Account>
             var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
             var userToken = JwtTokenExtension.ReadToken(accessToken)!;
             var account =
-                await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(Guid.Parse(userToken.UserId),
+                await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(
+                    Guid.Parse(userToken.UserId),
                     request.NewPassword);
             if (account == null) return BadRequest();
             return Ok();
@@ -158,10 +158,11 @@ public class AuthController : VpsController<Account>
     [HttpPut]
     public async Task<IActionResult> ResendVerificationCode(SendCodeForgotPasswordRequest request)
     {
-        var account = await ((IUserRepository)vpsRepository).UpdateVerifyCodeAsync(request.UserName);
+        var account =
+            await ((IUserRepository)vpsRepository).UpdateVerifyCodeAsync(request.UserName);
         if (account == null)
         {
-            throw new ClientException("Email không chính xác!");
+            throw new ClientException("Tên tài khoản/email không chính xác!");
         }
 
         return Ok(account.Email);
@@ -170,34 +171,29 @@ public class AuthController : VpsController<Account>
     [HttpPut]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
     {
-        try
+        var account =
+            await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.UserName);
+        if (account == null) throw new ClientException(5001);
+        if (account.IsBlock)
         {
-            var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.UserName);
-            if (account == null) return BadRequest();
-            if (account.IsBlock)
-            {
-                return BadRequest("Account has been locked!");
-            }
-
-            if (account.VerifyCode != request.VerifyCode)
-            {
-                return BadRequest("Wrong VerifyCode!");
-            }
-
-            if (DateTime.Now > account.ExpireVerifyCode)
-            {
-                return BadRequest("VerifyCode expired!");
-            }
-
-            var accountAfterChange =
-                await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(account.Id, request.Password);
-            if (accountAfterChange == null) return BadRequest();
-            return Ok();
+            throw new ClientException(5002);
         }
-        catch
+
+        if (account.VerifyCode != request.VerifyCode)
         {
-            return BadRequest();
+            throw new ClientException(5003);
         }
+
+        if (DateTime.Now > account.ExpireVerifyCode)
+        {
+            throw new ClientException(5004);
+        }
+
+        var accountAfterChange =
+            await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(account.Id,
+                request.Password);
+        if (accountAfterChange == null) throw new ClientException();
+        return Ok();
     }
 
     [HttpPost]
@@ -218,10 +214,9 @@ public class AuthController : VpsController<Account>
             existingAccount.LastName = input.LastName;
             existingAccount.PhoneNumber = input.PhoneNumber;
 
-            var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner;
-            parkingZoneOwnerExistedAccount!.Phone = input.PhoneNumber;
-            parkingZoneOwnerExistedAccount!.Dob = input.Dob;
-            
+            var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner!;
+            parkingZoneOwnerExistedAccount.Phone = input.PhoneNumber;
+            parkingZoneOwnerExistedAccount.Dob = input.Dob;
             await ((IUserRepository)vpsRepository).Update(existingAccount);
             await _parkingZoneOwnerRepository.Update(parkingZoneOwnerExistedAccount);
         }
@@ -259,7 +254,8 @@ public class AuthController : VpsController<Account>
                 Email = input.Email,
                 Dob = input.Dob,
             };
-            var parkingZoneOwnerResult = await _parkingZoneOwnerRepository.Create(parkingZoneOwnerRec);
+            var parkingZoneOwnerResult =
+                await _parkingZoneOwnerRepository.Create(parkingZoneOwnerRec);
             if (parkingZoneOwnerResult is null)
             {
                 throw new ServerException(ResponseNotification.ADD_ERROR);
@@ -283,7 +279,8 @@ public class AuthController : VpsController<Account>
 
         if (account.ExpireVerifyCode < DateTime.Now) throw new ClientException(2002);
 
-        var isValidCode = ((IUserRepository)vpsRepository).CheckValidVerification(input.Email, input.VerifyCode);
+        var isValidCode =
+            ((IUserRepository)vpsRepository).CheckValidVerification(input.Email, input.VerifyCode);
         if (!isValidCode) throw new ClientException(2001);
 
         ((IUserRepository)vpsRepository).VerifyAccount(account);
