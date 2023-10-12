@@ -1,5 +1,5 @@
 import config from '@/config';
-import { HeaderOnly } from '@/layouts';
+import { HeaderOnly, DefaultLayout } from '@/layouts';
 import Homepage from '@/pages/Homepage';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
