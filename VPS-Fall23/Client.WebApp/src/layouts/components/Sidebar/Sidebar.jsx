@@ -16,7 +16,7 @@ function Sidebar({ rowData, setContentState }) {
 
   const handleMenuItem = (e) => {
     setContentState(e.key);
-  }
+  };
 
   const items2 = rowData.map(({ label, options }, index) => {
     const key = String(index + 1);
@@ -31,7 +31,6 @@ function Sidebar({ rowData, setContentState }) {
           label: `${opt}`,
         };
       }),
-
     };
   });
 
@@ -58,12 +57,11 @@ function Sidebar({ rowData, setContentState }) {
 
 Sidebar.propTypes = {
   rowData: PropTypes.arrayOf(
-    PropTypes.shape(
-      {
-        lable: PropTypes.string,
-        options: PropTypes.arrayOf(PropTypes.string)
-      }
-    )),
+    PropTypes.shape({
+      lable: PropTypes.string,
+      options: PropTypes.arrayOf(PropTypes.string),
+    }),
+  ),
   // rowData: PropTypes.arrayOf(PropTypes.shape({
   //   name: ""
   // })).isRequired,

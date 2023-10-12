@@ -558,9 +558,20 @@ namespace Service.ManagerVPS.Models
                     .HasColumnType("ntext")
                     .HasColumnName("reject_reason");
 
+                entity.Property(e => e.Slots).HasColumnName("slots");
+
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+                entity.Property(e => e.Lat)
+                .HasColumnType("decimal")
+                .HasColumnName("lat");
+
+                entity.Property(e => e.Lng)
+               .HasColumnType("decimal")
+               .HasColumnName("lng");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)

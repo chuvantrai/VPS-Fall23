@@ -1,8 +1,9 @@
 import config from '@/config';
-import { HeaderOnly, DefaultLayout } from '@/layouts';
+import { HeaderOnly } from '@/layouts';
 import Homepage from '@/pages/Homepage';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
+
 import RegisterParkingZone from '@/pages/RegisterParkingZone';
 
 export const routes = [
@@ -24,6 +25,5 @@ export const routes = [
   {
     path: config.routes.registerParkingZone,
     component: RegisterParkingZone,
-    layout: HeaderOnly,
   },
 ];
