@@ -2,7 +2,9 @@ import config from '@/config';
 import Homepage from '@/pages/Homepage';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
-import { HeaderOnly, DefaultLayout } from '@/layouts';
+import Login from '@/pages/Login';
+import ForgotPassword from '@/pages/ForgotPassword';
+import { DefaultLayout } from '@/layouts';
 
 export const routes = [
   {
@@ -20,4 +22,14 @@ export const routes = [
     component: VerifyEmail,
     layout: null,
   },
+  {
+    path: config.routes.login,
+    component: Login,
+    layout: null,
+  },
+  {
+    path: config.routes.forgotPassword,
+    component: ForgotPassword,
+    layout: null,
+  }
 ];
