@@ -1,5 +1,10 @@
 using Client.MobileApp.ViewModels;
-using IronOcr;
+using System.IO;
+using Google.Cloud.Vision.V1;
+using System;
+using Image = Google.Cloud.Vision.V1.Image;
+using Microsoft.Maui.Storage;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 
 namespace Client.MobileApp.Views;
 
@@ -13,6 +18,7 @@ public partial class VPS53 : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
         _viewModel = viewModel;
+
     }
 
     private void cameraView_CamerasLoaded(object sender, EventArgs e)
@@ -29,42 +35,44 @@ public partial class VPS53 : ContentPage
         }
     }
 
-    private async void Button_Clicked(object sender, EventArgs e)
+    private async void CameraButton_Clicked(object sender, EventArgs e)
     {
         try
         {
-            var photo = await cameraView.CaptureAsync();
-            string localFilePath = Path.Combine(FileSystem.AppDataDirectory, "imagesTest");
+            string localFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "imageTest.jpg");
+            await cameraView.SaveSnapShot(Camera.MAUI.ImageFormat.JPEG, localFilePath);
 
-            using var sourceStream = await photo.OpenReadAsync();
-            using var memoryStream = new MemoryStream();
-            sourceStream.CopyTo(memoryStream);
 
-            sourceStream.Position = 0;
-            memoryStream.Position = 0;
+                string imageText = "";
+            string fileName = "googleKey.json";
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), fileName);
 
-#if WINDOWS
-            await System.IO.File.WriteAllBytesAsync(@"D:\FULearning\Fall2023\C# Code\repos\VPS-Fall23\Client.MobileApp\Images\Test.png", memoryStream.ToArray());
-#elif ANDROID
-#elif IOS || MACCATALYST
-#endif
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", path);
 
-            //if (!Directory.Exists(localFilePath))
-            //{
-            //    Directory.CreateDirectory(folderPath);
-            //}
-            //using (var destinationStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-            //{
-            //    await photo.CopyToAsync(destinationStream, ScreenshotFormat.Png, 100);
-            //}
-            string imageText = "";
-            imageText = new IronTesseract().Read("D:\\FULearning\\Fall2023\\C# Code\\repos\\VPS-Fall23\\Client.MobileApp\\Images\\Test.png").Text;
+            var client = ImageAnnotatorClient.Create();
+            var image = Image.FromFile("C:\\Users\\trank\\OneDrive\\Pictures\\263152245_861121767886264_3984037907517320615_n.jpg");
+
+            var response = client.DetectText(image);
+
+            foreach (var annotation in response)
+            {
+                if (annotation.Description != null)
+                {
+                    imageText += annotation.Description;
+                }
+            }
 
             string ing = imageText.Trim();
 
-        }catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
         }
+    }
+
+    private void ImageButton_Clicked(object sender, EventArgs e)
+    {
+
     }
 }

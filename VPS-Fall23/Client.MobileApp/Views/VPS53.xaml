@@ -5,21 +5,37 @@
              xmlns:viewmodel="clr-namespace:Client.MobileApp.ViewModels"
              x:DataType="viewmodel:VPS53ViewModel"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
+             xmlns:lottie="http://schemas.airbnb.io/xaml"
              Title="VPS53">
+    <ScrollView>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="2*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="6*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
 
+            <BoxView
+                BackgroundColor="Orange"
+                Color="Orange"
+                Grid.Row="0"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand"/>
 
-        <cv:CameraView Grid.Row="1" x:Name="cameraView" WidthRequest="300" HeightRequest="300" CamerasLoaded="cameraView_CamerasLoaded"
-               BarCodeDetectionEnabled="True"/>
+            <cv:CameraView Grid.ColumnSpan="3"  Grid.Row="1" x:Name="cameraView" CamerasLoaded="cameraView_CamerasLoaded"/>
 
+            <Grid  Grid.Row="2" BackgroundColor="Orange">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button ImageSource="videocamera.png" MaximumHeightRequest="100" MaximumWidthRequest="100" BackgroundColor="Gray" Grid.Column="1" Clicked="CameraButton_Clicked" CornerRadius="30"></Button>
+                <Button ImageSource="imagegallery.png" MaximumHeightRequest="100" MaximumWidthRequest="100" BackgroundColor="Gray" Grid.Column="2" Clicked="ImageButton_Clicked" CornerRadius="30"></Button>
+            </Grid>
+        </Grid>
 
-        <Button Grid.Row="2" WidthRequest="100" HeightRequest="100" Clicked="Button_Clicked"></Button>
-    </Grid>
+    </ScrollView>
 
 </ContentPage>
