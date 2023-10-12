@@ -41,12 +41,12 @@ const useAxios = () => {
   _axios.interceptors.response.use(
     (response) => {
       store.dispatch(setGlobalState({ isLoading: false }));
-      return response;
+      return Promise.resolve(response);
     },
     (error) => {
       store.dispatch(setGlobalState({ isLoading: false }));
       errorHandler(error);
-      return error?.response?.data?.message;
+      return Promise.reject(error)
     },
   );
   return _axios;

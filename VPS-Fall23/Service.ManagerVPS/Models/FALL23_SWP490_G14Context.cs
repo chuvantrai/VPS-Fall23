@@ -562,6 +562,14 @@ namespace Service.ManagerVPS.Models
                     .ValueGeneratedOnAdd()
                     .HasColumnName("sub_id");
 
+                entity.Property(e => e.Lat)
+                .HasColumnType("decimal")
+                .HasColumnName("lat");
+
+                entity.Property(e => e.Lng)
+               .HasColumnType("decimal")
+               .HasColumnName("lng");
+
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
                     .HasForeignKey(d => d.CommuneId)

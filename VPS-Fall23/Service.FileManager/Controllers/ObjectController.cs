@@ -37,11 +37,12 @@ namespace VPS.MinIO.API.Controllers
             }
             files.AsParallel().ForAll(async file =>
                {
+                   using Stream stream = file.OpenReadStream();
                    PutObjectArgs putObjectArgs = new PutObjectArgs()
                        .WithBucket(bucketName)
                        .WithObject($"{folderPath}/{file.FileName}")
                        .WithObjectSize(file.Length)
-                       .WithStreamData(file.OpenReadStream());
+                       .WithStreamData(stream);
                    PutObjectResponse putObjectResponse = await objectRepository.PutObjectAsync(putObjectArgs, cancellationToken);
                });
         }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
 using Service.ManagerVPS.Models;
@@ -22,6 +23,10 @@ builder.Services.AddControllersWithViews()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//Config appsetting to model
+builder.Services.Configure<FileManagementConfig>(builder.Configuration.GetSection("fileManagementAccessKey"));
+builder.Services.AddOptions();
+
 
 //Add DBContext
 builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
