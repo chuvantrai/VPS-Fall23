@@ -1,8 +1,10 @@
 import config from '@/config';
+import { HeaderOnly } from '@/layouts';
 import Homepage from '@/pages/Homepage';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
-import { HeaderOnly } from '@/layouts';
+
+import RegisterParkingZone from '@/pages/RegisterParkingZone';
 
 export const routes = [
   {
@@ -19,5 +21,9 @@ export const routes = [
     path: config.routes.verifyEmail,
     component: VerifyEmail,
     layout: null,
+  },
+  {
+    path: config.routes.registerParkingZone,
+    component: RegisterParkingZone,
   },
 ];

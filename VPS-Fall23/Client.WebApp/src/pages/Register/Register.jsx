@@ -84,7 +84,7 @@ function Register() {
             ]}
           >
             <Input placeholder="Email" allowClear />
-          </Form.Item>
+          </Form.Item >
 
           <Form.Item
             name="password"
@@ -124,7 +124,7 @@ function Register() {
             ]}
           >
             <Input placeholder="Tên" allowClear />
-          </Form.Item>
+          </Form.Item >
 
           <Form.Item
             name="lastName"
@@ -150,7 +150,7 @@ function Register() {
               }}
               placeholder="Ngày sinh"
             />
-          </Form.Item>
+          </Form.Item >
 
           <Form.Item
             name="phoneNumber"
@@ -197,14 +197,14 @@ function Register() {
                   }}
                 >
                   Đã có tài khoản? Đăng nhập
-                </Link>
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </div>
+                </Link >
+              </Form.Item >
+            </Col >
+          </Row >
+        </Form >
+      </div >
       {account && <Navigate to={config.routes.verifyEmail} replace={true} state={account} />}
-    </div>
+    </div >
   );
 }
 
