@@ -5,6 +5,7 @@ import VerifyEmail from '@/pages/VerifyEmail';
 import Login from '@/pages/Login';
 import ForgotPassword from '@/pages/ForgotPassword';
 import { DefaultLayout } from '@/layouts';
+import ChangePassword from '@/pages/ChangePassword/index.js';
 
 export const routes = [
   {
@@ -30,6 +31,11 @@ export const routes = [
   {
     path: config.routes.forgotPassword,
     component: ForgotPassword,
+    layout: null,
+  },
+  {
+    path: config.routes.changePassword,
+    component: ChangePassword,
     layout: null,
   }
 ];
