@@ -18,26 +18,27 @@ function DefaultLayout() {
   } = theme.useToken();
   const rowData = [
     {
-      label: "User",
-      options: ["Profile", "Test"]
+      label: 'User',
+      options: ['Profile', 'Test'],
     },
     {
-      label: "Manage",
-      options: ["View Parking Zone List"]
-    }];
+      label: 'Manage',
+      options: ['View Parking Zone List'],
+    },
+  ];
 
-  const [contentState, setContentState] = useState("1");
+  const [contentState, setContentState] = useState('1');
 
   return (
     <div className={cx('wrapper w-full')}>
       <Header />
       <Layout>
         <Sidebar rowData={rowData} setContentState={setContentState}></Sidebar>
-        <Layout style={{
-          padding: '0 24px 24px',
-        }}>
-
-        </Layout>
+        <Layout
+          style={{
+            padding: '0 24px 24px',
+          }}
+        ></Layout>
 
         <Content
           style={{
@@ -45,11 +46,10 @@ function DefaultLayout() {
             minHeight: 280,
           }}
         >
-          {contentState === "1" && <UserProfile></UserProfile>}
-          {contentState === "2" && <ViewListParkingZone></ViewListParkingZone>}
+          {contentState === '1' && <UserProfile></UserProfile>}
+          {contentState === '2' && <ViewListParkingZone></ViewListParkingZone>}
         </Content>
       </Layout>
-
     </div>
   );
 }
