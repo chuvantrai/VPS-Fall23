@@ -213,7 +213,6 @@ public class AuthController : VpsController<Account>
             existingAccount.FirstName = input.FirstName;
             existingAccount.LastName = input.LastName;
             existingAccount.PhoneNumber = input.PhoneNumber;
-
             var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner!;
             parkingZoneOwnerExistedAccount.Phone = input.PhoneNumber;
             parkingZoneOwnerExistedAccount.Dob = input.Dob;

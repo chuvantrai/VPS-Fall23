@@ -48,6 +48,7 @@ function Register() {
     >
       <div className={cx('bg-img w-full')}>
         <img src="../src/assets/bg.svg" className={cx('w-full relative')} />
+
       </div>
       <div className={cx('absolute')}>
         <div className={cx('inline-flex flex-col items-center gap-3 w-full')}>
@@ -66,6 +67,7 @@ function Register() {
           >
             Đăng ký
           </h5>
+
           <Form
             className={cx('min-w-[600px]')}
             {...formItemLayout}

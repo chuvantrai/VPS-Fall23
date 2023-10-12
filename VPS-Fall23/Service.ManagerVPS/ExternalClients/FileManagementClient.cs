@@ -19,12 +19,11 @@ namespace Service.ManagerVPS.ExternalClients
 
         const string OBJECT_EXIST_URI =
             "api/{0}/object/exist?objectName={1}&eTag={2}&versionId={3}";
-
         public FileManagementClient(string baseUrl)
         {
             restClient = new RestClient(baseUrl);
         }
-
+        
         public FileManagementClient(string baseUrl, string accessKey, string secretKey)
             : this(baseUrl)
         {
@@ -86,7 +85,7 @@ namespace Service.ManagerVPS.ExternalClients
             var response = await GetOne(bucket, objectName, eTag, versionId, false);
             return await response.Content.ReadFromJsonAsync<GetOneDto>();
         }
-
+        
         async Task<HttpResponseMessage> GetOne(string bucket,
             string objectName,
             string eTag = "",
