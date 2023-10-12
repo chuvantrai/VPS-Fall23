@@ -1,14 +1,13 @@
-import styles from './Login.module.scss';
-import classNames from 'classnames/bind';
-import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
-import { EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined } from '@ant-design/icons';
+import { App, Button, Col, Form, Input, Row } from 'antd';
+import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import config from '@/config/index.js';
+import classNames from 'classnames/bind';
+import styles from '@/pages/ForgotPassword/ForgotPassword.module.scss';
 import { useAxios } from '@/hooks/index.js';
-import Cookies from 'js-cookie';
-import { convertAccountDataToCode, keyNameCookies } from '@/helpers/index.js';
 
 const cx = classNames.bind(styles);
+
 const formItemLayout = {
   labelCol: {
     xs: {
@@ -28,34 +27,56 @@ const formItemLayout = {
   },
 };
 
+function convertEmailToStars(inputStr) {
+  if (inputStr.length >= 5) {
+    const stars = Array.from({ length: 5 }, () => '*').join('');
+    return inputStr.slice(0, 1) + stars + inputStr.slice(5);
+  }
+  return inputStr;
+}
 
-function Login() {
-  Cookies.set(keyNameCookies.ACCESS_TOKEN, '');
-  Cookies.set(keyNameCookies.ACCOUNT_DATA, '');
+function ForgotPassword() {
+  const app = App.useApp();
   const navigate = useNavigate();
-  let rememberPassword = false;
   const [form] = Form.useForm();
   const axios = useAxios();
+
+  const validateConfirmPassword = (_, value) => {
+    if (value && value !== form.getFieldValue('password')) {
+      return Promise.reject('Mật khẩu không khớp!');
+    }
+    return Promise.resolve();
+  };
+
   const onFinish = (values) => {
-    axios.post('/api/Auth/AuthLogin', values)
+    axios.put('/api/Auth/ForgotPassword', values)
       .then((res) => {
-        Cookies.set(keyNameCookies.ACCESS_TOKEN, res.data.accessToken);
-        if (rememberPassword) {
-          Cookies.set(keyNameCookies.ACCOUNT_DATA, convertAccountDataToCode(values.username, values.password));
+        if (res.status === 200) {
+          navigate('/login');
+          app.notification.success({
+            message: `Đổi mật khẩu thành công`,
+            placement: 'topRight',
+          });
         }
-        navigate('/');
       })
-      .catch(err => {
-        console.log(err);
+      .catch((error) => {
+        console.log(error);
       });
   };
-
-  const onRememberPassword = (e) => {
-    rememberPassword = e.target.checked;
-  };
-
   const onClickLogo = () => {
     navigate('/');
+  };
+
+  const SendCodeVerify = () => {
+    const usernameValue = form.getFieldValue('username');
+    axios.put('/api/Auth/ResendVerificationCode', { userName: usernameValue })
+      .then((res) => {
+        console.log(res);
+        app.notification.success({
+          message: `Kiểm tra email ${convertEmailToStars(res.data)} của bạn để lấy mã xác thực!`,
+          placement: 'topRight',
+        });
+      });
   };
 
   return (
@@ -63,13 +84,13 @@ function Login() {
       className={cx('bg-[#F0F2F5] w-full min-h-[calc(100vh)] overflow-hidden flex flex-col items-center justify-center')}>
       <div className={cx('bg-img w-full')}>
         <img
-          className={cx('w-full relative')}
+          className={cx('w-[100%] relative')}
           src={'../src/assets/bg.svg'}
           alt={'loading...'}
         />
       </div>
       <div className={cx('absolute')}>
-        <div className={cx('inline-flex flex-col items-center gap-3 mt-[80px] w-full')}>
+        <div className={cx('inline-flex flex-col items-center gap-3 mt-[10px]')}>
           <div className={cx('flex justify-center items-center gap-[17.308px] pl-0')}>
             <div className={cx('header-title-logo')}>
               <img src={'../src/assets/logo/logo.png'} alt={'loading...'} onClick={onClickLogo} />
@@ -79,12 +100,12 @@ function Login() {
         <div className={cx('flex w-[368px] h-[372px] flex-col items-start gap-[22px] mt-10')}>
           <h5 className={cx('register-form-text  flex flex-col justify-center items-start self-stretch ' +
             'text-[color:var(--character-title-85,rgba(0,0,0,0.85))] text-[16px] not-italic font-medium leading-6')}>
-            Đăng Nhập</h5>
+            Quên mật Khẩu</h5>
           <Form
             className={cx('min-w-[600px]')}
             {...formItemLayout}
             form={form}
-            name='register'
+            name='forgotPassword'
             onFinish={onFinish}
             scrollToFirstError
           >
@@ -93,13 +114,39 @@ function Login() {
               rules={[
                 {
                   required: true,
-                  message: 'Hãy nhập tên tài khoản của bạn!',
+                  message: 'Hãy nhập tên tài khoản/email của bạn!',
                 },
               ]}
             >
-              <Input placeholder='Tên tài khoản' prefix={<UserOutlined />} />
+              <Input placeholder='Tên tài khoản/email' value={''} />
             </Form.Item>
+            <div className={cx('flex')}>
+              <Form.Item
+                className={cx('w-[52%] verifyCode-formItem')}
+                name='verifyCode'
+                rules={[
+                  {
+                    required: true,
+                    message: 'Hãy code xác nhận!',
+                  },
+                  {
+                    min: 6,
+                    message: 'Code xác nhận sai!',
+                  },
+                  {
+                    max: 6,
+                    message: 'Code xác nhận sai!',
+                  },
+                ]}
+              >
+                <Input
+                  className={cx('w-[140%]')}
+                  placeholder='Code lấy lại mật khẩu'
+                />
 
+              </Form.Item>
+              <Button onClick={SendCodeVerify}>Gửi code</Button>
+            </div>
             <Form.Item
               name='password'
               rules={[
@@ -119,18 +166,45 @@ function Login() {
               hasFeedback
             >
               <Input.Password
-                prefix={<LockOutlined />}
+                autoComplete='new-password'
                 placeholder='Mật khẩu(6 đến 12 ký tự)'
                 iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
               />
             </Form.Item>
+
+            <Form.Item
+              name='confirmPassword'
+              rules={[
+                {
+                  required: true,
+                  message: 'Hãy nhập Mật khẩu của bạn!',
+                },
+                {
+                  min: 6,
+                  message: 'Mật khẩu tối thiểu phải có 6 ký tự!',
+                },
+                {
+                  max: 12,
+                  message: 'Mật khẩu tối đa là 12 ký tự',
+                },
+                { validator: validateConfirmPassword },
+              ]}
+              hasFeedback
+            >
+              <Input.Password
+                autoComplete='new-password'
+                placeholder='Nhập lại mật khẩu'
+                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              />
+            </Form.Item>
+
             <Row className={'mb-[24px]'}>
               <Col span={12}>
-                <Checkbox onChange={onRememberPassword}>Nhớ tài khoản</Checkbox>
+
               </Col>
               <Col span={4}>
                 <Link
-                  to={config.routes.forgotPassword}
+                  to={config.routes.login}
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >
@@ -168,4 +242,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;
