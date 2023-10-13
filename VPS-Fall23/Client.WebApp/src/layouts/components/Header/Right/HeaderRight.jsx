@@ -26,4 +26,3 @@ const HeaderRight = () => {
   );
 };
 export default HeaderRight;
-

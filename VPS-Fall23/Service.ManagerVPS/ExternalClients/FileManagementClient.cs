@@ -53,7 +53,6 @@ namespace Service.ManagerVPS.ExternalClients
             streamContent.Dispose();
             multipartFormDataContent.Dispose();
         }
-
         public async Task Upload(string bucket, string folderPath,
             MultipartFormDataContent multipartFormDataContent)
         {
@@ -65,7 +64,6 @@ namespace Service.ManagerVPS.ExternalClients
                 throw new Exception(httpResponseMessage.ReasonPhrase);
             }
         }
-
         public async Task<(byte[] respones, MediaTypeHeaderValue contentType)> Download(
             string bucket,
             string objectName,

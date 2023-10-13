@@ -3,7 +3,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 
-
 namespace InvoiceApi.ExternalData
 {
     public class RestClient : HttpClient
@@ -86,7 +85,6 @@ namespace InvoiceApi.ExternalData
                     Content = new StringContent(JsonConvert.SerializeObject(t),
                         Encoding.UTF8, "application/json")
                 };
-
             HttpResponseMessage response = await this.SendAsync(httpRequestMessage);
             // Throw exception if HTTP Status code is not Success (2xx)
             response.EnsureSuccessStatusCode();

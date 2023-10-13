@@ -17,7 +17,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
 {
     private readonly IConfiguration _config;
     readonly FileManagementConfig fileManagementConfig;
-
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config,
         IOptions<FileManagementConfig> options)
@@ -71,6 +70,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return Ok(ResponseNotification.ADD_SUCCESS);
     }
 
+
+
     [HttpPut]
     public async Task<IActionResult> ChangeParkingZoneStat([FromBody] ChangeParkingZoneStat input)
     {
@@ -95,42 +96,42 @@ public class ParkingZoneController : VpsController<ParkingZone>
         switch (addressType)
         {
             case AddressType.Commune:
-            {
-                return ((IParkingZoneRepository)this.vpsRepository).GetByCommuneId(id);
-            }
+                {
+                    return ((IParkingZoneRepository)this.vpsRepository).GetByCommuneId(id);
+                }
             case AddressType.District:
-            {
-                return ((IParkingZoneRepository)this.vpsRepository).GetByDistrictId(id);
-            }
+                {
+                    return ((IParkingZoneRepository)this.vpsRepository).GetByDistrictId(id);
+                }
             case AddressType.City:
-            {
-                return ((IParkingZoneRepository)this.vpsRepository).GetByCityId(id);
-            }
+                {
+                    return ((IParkingZoneRepository)this.vpsRepository).GetByCityId(id);
+                }
             default: throw new ClientException(1002);
         }
     }
 
-    [HttpGet("{parkingZoneId}/GetImageLinks")]
+    [HttpGet("{parkingZoneId}")]
     public async Task<List<string>> GetImageLinks(Guid parkingZoneId)
     {
         var parkingZone = await this.vpsRepository.Find(parkingZoneId);
-        string filePrefix =
-            $"{Constant.PARKING_ZONE_IMG_FOLDER}/{parkingZone.OwnerId}/{parkingZoneId}";
+        string filePrefix = $"{Constants.FileManagement.Constant.PARKING_ZONE_IMG_FOLDER}/{parkingZone.OwnerId}/{parkingZoneId}";
+
         FileManagementClient fileManagementClient = new FileManagementClient(
             fileManagementConfig.BaseUrl,
             fileManagementConfig.AccessKey,
             fileManagementConfig.SecretKey);
 
-        var objectResults =
-            await fileManagementClient.GetObjects(fileManagementConfig.PublicBucket, filePrefix,
-                true);
+        var objectResults = await fileManagementClient.GetObjects(fileManagementConfig.PublicBucket, filePrefix, true);
 
         return objectResults.Select(x => GetImageLink(x.Key)).ToList();
-    }
 
+
+
+    }
     string GetImageLink(string objectPath)
     {
-        return
-            $"{fileManagementConfig.EndPointServer}:{fileManagementConfig.EndPointPort.Api}/{fileManagementConfig.PublicBucket}/{objectPath}";
+        return $"{fileManagementConfig.EndPointServer}:{fileManagementConfig.EndPointPort.Api}/{fileManagementConfig.PublicBucket}/{objectPath}";
     }
+
 }

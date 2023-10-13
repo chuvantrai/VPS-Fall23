@@ -1,9 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-
-
 const initialState = {
-    listFounded: []
+    listFounded: [],
+    isShowBookingForm: false
 };
 
 const parkingZoneSlice = createSlice({
@@ -11,10 +10,13 @@ const parkingZoneSlice = createSlice({
     initialState,
     reducers: {
         setFoundedParkingZones(state, action) {
-            Object.assign(state, action.payload);
+            state.listFounded = action.payload.listFounded
+        },
+        setShowBookingForm(state, action) {
+            state.isShowBookingForm = action.payload.isShowBookingForm
         }
     },
 });
 
-export const { setFoundedParkingZones } = parkingZoneSlice.actions;
+export const { setFoundedParkingZones, setShowBookingForm } = parkingZoneSlice.actions;
 export default parkingZoneSlice.reducer;
