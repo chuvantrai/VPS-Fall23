@@ -66,8 +66,4 @@ Sidebar.propTypes = {
   setContentState: PropTypes.func,
 };
 
-// const defaultProps = {
-//   rowData: [{ label: "User", options: ["Profile"] }, { label: "Manage", options: "View Parking Zone List" }],
-// };
-
 export default Sidebar;
