@@ -5,7 +5,8 @@ const routes = {
   verifyEmail: '/verifyEmail',
   forgotPassword: '/forgotPassword',
   changePassword: '/changePassword',
-  registerParkingZone: '/registerParkingZone'
+  registerParkingZone: '/registerParkingZone',
+  AccountProfile: '/accountProfile'
 };
 
 export default routes;

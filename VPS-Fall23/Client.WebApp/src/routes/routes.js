@@ -8,6 +8,7 @@ import Login from '@/pages/Login';
 import ForgotPassword from '@/pages/ForgotPassword';
 import { DefaultLayout } from '@/layouts';
 import ChangePassword from '@/pages/ChangePassword/index.js';
+import AccountProfile from '@/pages/AccountProfile/index.js';
 
 export const routes = [
   {
@@ -43,5 +44,10 @@ export const routes = [
     path: config.routes.changePassword,
     component: ChangePassword,
     layout: null,
+  },
+  {
+    path: config.routes.AccountProfile,
+    component: AccountProfile,
+    layout: DefaultLayout,
   }
 ];
