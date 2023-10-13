@@ -4,7 +4,6 @@ using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
-using Service.ManagerVPS.DTO.Input.User;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.StaticLogic;
@@ -98,21 +97,14 @@ public class AuthController : VpsController<Account>
     [FilterPermission(Action = ActionFilterEnum.RefreshToken)]
     public IActionResult RefreshToken()
     {
-        try
+        var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+        var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+        userToken.Expires = DateTime.Now.AddMinutes(30);
+        return Ok(new
         {
-            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
-            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-            userToken.Expires = DateTime.Now.AddMinutes(30);
-            return Ok(new
-            {
-                AccessToken = JwtTokenExtension.WriteToken(userToken),
-                UserData = userToken
-            });
-        }
-        catch
-        {
-            return BadRequest();
-        }
+            AccessToken = JwtTokenExtension.WriteToken(userToken),
+            UserData = userToken
+        });
     }
 
     [HttpPost]
@@ -149,7 +141,8 @@ public class AuthController : VpsController<Account>
     [HttpPut]
     public async Task<IActionResult> ResendVerificationCode(SendCodeForgotPasswordRequest request)
     {
-        var account = await ((IUserRepository)vpsRepository).UpdateVerifyCodeAsync(request.UserName);
+        var account =
+            await ((IUserRepository)vpsRepository).UpdateVerifyCodeAsync(request.UserName);
         if (account == null)
         {
             throw new ClientException("Tên tài khoản/email không chính xác!");
@@ -161,7 +154,8 @@ public class AuthController : VpsController<Account>
     [HttpPut]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
     {
-        var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.UserName);
+        var account =
+            await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.UserName);
         if (account == null) throw new ClientException(5001);
         if (account.IsBlock)
         {
@@ -179,7 +173,8 @@ public class AuthController : VpsController<Account>
         }
 
         var accountAfterChange =
-            await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(account.Id, request.Password);
+            await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(account.Id,
+                request.Password);
         if (accountAfterChange == null) throw new ClientException();
         return Ok();
     }
@@ -201,11 +196,9 @@ public class AuthController : VpsController<Account>
             existingAccount.FirstName = input.FirstName;
             existingAccount.LastName = input.LastName;
             existingAccount.PhoneNumber = input.PhoneNumber;
-
-            var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner;
-            parkingZoneOwnerExistedAccount!.Phone = input.PhoneNumber;
-            parkingZoneOwnerExistedAccount!.Dob = input.Dob;
-
+            var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner!;
+            parkingZoneOwnerExistedAccount.Phone = input.PhoneNumber;
+            parkingZoneOwnerExistedAccount.Dob = input.Dob;
             await ((IUserRepository)vpsRepository).Update(existingAccount);
             await _parkingZoneOwnerRepository.Update(parkingZoneOwnerExistedAccount);
         }
@@ -243,7 +236,8 @@ public class AuthController : VpsController<Account>
                 Email = input.Email,
                 Dob = input.Dob,
             };
-            var parkingZoneOwnerResult = await _parkingZoneOwnerRepository.Create(parkingZoneOwnerRec);
+            var parkingZoneOwnerResult =
+                await _parkingZoneOwnerRepository.Create(parkingZoneOwnerRec);
             if (parkingZoneOwnerResult is null)
             {
                 throw new ServerException(ResponseNotification.ADD_ERROR);
@@ -267,7 +261,8 @@ public class AuthController : VpsController<Account>
 
         if (account.ExpireVerifyCode < DateTime.Now) throw new ClientException(2002);
 
-        var isValidCode = ((IUserRepository)vpsRepository).CheckValidVerification(input.Email, input.VerifyCode);
+        var isValidCode =
+            ((IUserRepository)vpsRepository).CheckValidVerification(input.Email, input.VerifyCode);
         if (!isValidCode) throw new ClientException(2001);
 
         ((IUserRepository)vpsRepository).VerifyAccount(account);

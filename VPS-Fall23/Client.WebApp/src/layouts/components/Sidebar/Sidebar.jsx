@@ -1,4 +1,5 @@
-// import React from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import { Layout, Menu, theme } from 'antd';
@@ -16,23 +17,20 @@ function Sidebar({ rowData, setContentState }) {
 
   const handleMenuItem = (e) => {
     setContentState(e.key);
-  }
+  };
 
   const items2 = rowData.map((data, index) => {
     const key = String(index + 1);
     return {
       key: `sub${key}`,
-      // icon: React.createElement(icon),
       label: `${data}`,
       children: new Array(4).fill(null).map((_, j) => {
         const subKey = index * 4 + j + 1;
         return {
           key: subKey,
           label: `option${subKey}`,
-
         };
       }),
-
     };
   });
 
@@ -48,9 +46,6 @@ function Sidebar({ rowData, setContentState }) {
         mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
-        style={{
-          height: '100%',
-        }}
         items={items2}
       />
     </Sider>
@@ -59,9 +54,6 @@ function Sidebar({ rowData, setContentState }) {
 
 Sidebar.propTypes = {
   rowData: PropTypes.array.isRequired,
-  // rowData: PropTypes.arrayOf(PropTypes.shape({
-  //   name: ""
-  // })).isRequired,
 };
 
 export default Sidebar;

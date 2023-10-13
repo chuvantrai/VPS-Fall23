@@ -250,7 +250,7 @@ namespace Service.ManagerVPS.Models
                     .WithMany(p => p.Contracts)
                     .HasForeignKey(d => d.ParkingZoneId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__contract__parkin__36B12243");
+                    .HasConstraintName("FK__contract__parkin__0E6E26BF");
 
                 entity.HasOne(d => d.StatusNavigation)
                     .WithMany(p => p.Contracts)
@@ -379,7 +379,7 @@ namespace Service.ManagerVPS.Models
                     .WithMany(p => p.Feedbacks)
                     .HasForeignKey(d => d.ParkingZoneId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__feedback__parkin__5FB337D6");
+                    .HasConstraintName("FK__feedback__parkin__0B91BA14");
             });
 
             modelBuilder.Entity<GlobalStatus>(entity =>
@@ -431,6 +431,10 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.Email)
+                    .HasMaxLength(50)
+                    .HasColumnName("email");
+
                 entity.Property(e => e.LicensePlate)
                     .HasMaxLength(20)
                     .HasColumnName("license_plate");
@@ -440,6 +444,10 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("paid_transaction_id");
 
                 entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
+
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(15)
+                    .HasColumnName("phone");
 
                 entity.Property(e => e.StatusId).HasColumnName("status_id");
 
@@ -463,7 +471,7 @@ namespace Service.ManagerVPS.Models
                     .WithMany(p => p.ParkingTransactions)
                     .HasForeignKey(d => d.ParkingZoneId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__parking_t__parki__534D60F1");
+                    .HasConstraintName("FK__parking_t__parki__0F624AF8");
 
                 entity.HasOne(d => d.Status)
                     .WithMany(p => p.ParkingTransactions)
@@ -533,6 +541,8 @@ namespace Service.ManagerVPS.Models
                     .HasMaxLength(255)
                     .HasColumnName("detail_address");
 
+                entity.Property(e => e.IsApprove).HasColumnName("is_approve");
+
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
@@ -552,21 +562,36 @@ namespace Service.ManagerVPS.Models
                     .HasColumnType("decimal(18, 0)")
                     .HasColumnName("price_per_hour");
 
+                entity.Property(e => e.RejectReason)
+                    .HasColumnType("ntext")
+                    .HasColumnName("reject_reason");
+
+                entity.Property(e => e.Slots).HasColumnName("slots");
+
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+                entity.Property(e => e.Lat)
+                .HasColumnType("decimal")
+                .HasColumnName("lat");
+
+                entity.Property(e => e.Lng)
+               .HasColumnType("decimal")
+               .HasColumnName("lng");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
                     .HasForeignKey(d => d.CommuneId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__parking_z__commu__403A8C7D");
+                    .HasConstraintName("FK__parking_z__commu__10566F31");
 
                 entity.HasOne(d => d.Owner)
                     .WithMany(p => p.ParkingZones)
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__parking_z__owner__75A278F5");
+                    .HasConstraintName("FK__parking_z__owner__0D7A0286");
             });
 
             modelBuilder.Entity<ParkingZoneAbsent>(entity =>
@@ -605,7 +630,7 @@ namespace Service.ManagerVPS.Models
                     .WithMany(p => p.ParkingZoneAbsents)
                     .HasForeignKey(d => d.ParkingZoneId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__parking_z__parki__4316F928");
+                    .HasConstraintName("FK__parking_z__parki__0C85DE4D");
             });
 
             modelBuilder.Entity<ParkingZoneAttendant>(entity =>
@@ -633,7 +658,7 @@ namespace Service.ManagerVPS.Models
                     .WithMany(p => p.ParkingZoneAttendants)
                     .HasForeignKey(d => d.ParkingZoneId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__parking_z__parki__03F0984C");
+                    .HasConstraintName("FK__parking_z__parki__114A936A");
             });
 
             modelBuilder.Entity<ParkingZoneOwner>(entity =>

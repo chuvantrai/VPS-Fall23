@@ -58,13 +58,6 @@ function ChangePassword() {
           navigate('/login');
         }
       })
-      // .catch((error) => {
-      //   app.notification.success({
-      //     message: 'Lỗi',
-      //     description: error,
-      //     placement: 'topRight',
-      //   });
-      // });
   };
   const onClickLogo = () => {
     navigate('/');
