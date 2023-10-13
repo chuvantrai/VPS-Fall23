@@ -41,12 +41,14 @@ function Register() {
   };
 
   return (
-    <div className={cx('bg-[#F0F2F5] w-full min-h-[calc(100vh)] overflow-hidden flex flex-col items-center justify-center')}>
+    <div
+      className={cx(
+        'bg-[#F0F2F5] w-full min-h-[calc(100vh)] overflow-hidden flex flex-col items-center justify-center',
+      )}
+    >
       <div className={cx('bg-img w-full')}>
-        <img
-          src="../src/assets/bg.svg"
-          className={cx('w-full relative')}
-        />
+        <img src="../src/assets/bg.svg" className={cx('w-full relative')} />
+
       </div>
       <div className={cx('absolute')}>
         <div className={cx('inline-flex flex-col items-center gap-3 w-full')}>
@@ -57,8 +59,15 @@ function Register() {
           </div>
         </div>
         <div className={cx('flex w-[368px] h-[372px] flex-col items-start gap-[22px] mt-10')}>
-          <h5 className={cx('register-form-text  flex flex-col justify-center items-start self-stretch' +
-            'text-[color:var(--character-title-85,rgba(0,0,0,0.85))] text-[16px] not-italic font-medium leading-6')}>Đăng ký</h5>
+          <h5
+            className={cx(
+              'register-form-text  flex flex-col justify-center items-start self-stretch' +
+                'text-[color:var(--character-title-85,rgba(0,0,0,0.85))] text-[16px] not-italic font-medium leading-6',
+            )}
+          >
+            Đăng ký
+          </h5>
+
           <Form
             className={cx('min-w-[600px]')}
             {...formItemLayout}
@@ -203,9 +212,10 @@ function Register() {
             </Row>
           </Form>
         </div>
+
+        {account && <Navigate to={config.routes.verifyEmail} replace={true} state={account} />}
       </div>
-      {account && <Navigate to={config.routes.verifyEmail} replace={true} state={account} />}
-    </div >
+    </div>
   );
 }
 

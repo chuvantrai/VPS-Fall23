@@ -1,8 +1,9 @@
-using Newtonsoft.Json;
-using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
+using Newtonsoft.Json;
+
+
 namespace InvoiceApi.ExternalData
 {
     public class RestClient : HttpClient
@@ -16,9 +17,10 @@ namespace InvoiceApi.ExternalData
 
             this.BaseAddress = new Uri(baseApiUri);
             this.DefaultRequestHeaders.Accept.Clear();
-            this.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            System.Net.ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
-
+            this.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+            ServicePointManager.SecurityProtocol |=
+                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
         }
 
         public async Task<T> Get<T>(string requestUri)
@@ -61,6 +63,7 @@ namespace InvoiceApi.ExternalData
 
             return response.IsSuccessStatusCode;
         }
+        
         public async Task<U> Put<T, U>(string requestUri, T t)
             where T : class
             where U : class
@@ -72,14 +75,18 @@ namespace InvoiceApi.ExternalData
             var resultData = response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<U>();
         }
+
         public async Task<U> Patch<T, U>(string requestUri, T t)
-        where T : class
-        where U : class
+            where T : class
+            where U : class
         {
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), requestUri)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(t), System.Text.Encoding.UTF8, "application/json")
-            };
+            HttpRequestMessage httpRequestMessage =
+                new HttpRequestMessage(new HttpMethod("PATCH"), requestUri)
+                {
+                    Content = new StringContent(JsonConvert.SerializeObject(t),
+                        Encoding.UTF8, "application/json")
+                };
+
             HttpResponseMessage response = await this.SendAsync(httpRequestMessage);
             // Throw exception if HTTP Status code is not Success (2xx)
             response.EnsureSuccessStatusCode();
