@@ -62,9 +62,8 @@ Sidebar.propTypes = {
       options: PropTypes.arrayOf(PropTypes.string),
     }),
   ),
-  // rowData: PropTypes.arrayOf(PropTypes.shape({
-  //   name: ""
-  // })).isRequired,
+
+  setContentState: PropTypes.func,
 };
 
 // const defaultProps = {
