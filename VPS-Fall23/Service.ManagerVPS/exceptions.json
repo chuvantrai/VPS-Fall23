@@ -54,5 +54,17 @@
   {
     "code": 5004,
     "message": "Code xác nhận đã hết hạn!"
+  },
+  {
+    "code": 5005,
+    "message": "Mật khẩu mới không được trùng mật khẩu cũ!"
+  },
+  {
+    "code": 5006,
+    "message": "Mật khẩu sai!"
+  },
+  {
+    "code": 5007,
+    "message": "Email của tài khoản chưa xác nhận!"
   }
 ]

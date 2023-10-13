@@ -52,11 +52,11 @@ function ForgotPassword() {
     axios.put('/api/Auth/ForgotPassword', values)
       .then((res) => {
         if (res.status === 200) {
-          navigate('/login');
           app.notification.success({
             message: `Đổi mật khẩu thành công`,
             placement: 'topRight',
           });
+          navigate(`/login`);
         }
       })
       .catch((error) => {
@@ -90,7 +90,7 @@ function ForgotPassword() {
         />
       </div>
       <div className={cx('absolute')}>
-        <div className={cx('inline-flex flex-col items-center gap-3 mt-[10px]')}>
+        <div className={cx('inline-flex flex-col items-center gap-3 mt-[10px] w-full')}>
           <div className={cx('flex justify-center items-center gap-[17.308px] pl-0')}>
             <div className={cx('header-title-logo')}>
               <img src={'../src/assets/logo/logo.png'} alt={'loading...'} onClick={onClickLogo} />

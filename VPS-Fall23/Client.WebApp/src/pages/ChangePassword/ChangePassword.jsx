@@ -48,19 +48,23 @@ function ChangePassword() {
   };
 
   const onFinish = (values) => {
-    axios.put('/api/Auth/ForgotPassword', values)
+    axios.put('/api/Auth/ChangePassword', values)
       .then((res) => {
         if (res.status === 200) {
-          navigate('/login');
           app.notification.success({
             message: `Đổi mật khẩu thành công`,
             placement: 'topRight',
           });
+          navigate('/login');
         }
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      // .catch((error) => {
+      //   app.notification.success({
+      //     message: 'Lỗi',
+      //     description: error,
+      //     placement: 'topRight',
+      //   });
+      // });
   };
   const onClickLogo = () => {
     navigate('/');
@@ -77,7 +81,7 @@ function ChangePassword() {
         />
       </div>
       <div className={cx('absolute')}>
-        <div className={cx('inline-flex flex-col items-center gap-3 mt-[10px]')}>
+        <div className={cx('inline-flex flex-col items-center gap-3 mt-[10px] w-full')}>
           <div className={cx('flex justify-center items-center gap-[17.308px] pl-0')}>
             <div className={cx('header-title-logo')}>
               <img src={'../src/assets/logo/logo.png'} alt={'loading...'} onClick={onClickLogo} />
@@ -110,7 +114,7 @@ function ChangePassword() {
                 {
                   max: 12,
                   message: 'Mật khẩu tối đa là 12 ký tự',
-                },
+                }
               ]}
               hasFeedback
             >
