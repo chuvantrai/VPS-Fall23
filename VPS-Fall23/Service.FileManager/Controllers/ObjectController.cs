@@ -8,17 +8,17 @@ using VPS.MinIO.Repository.MinIO.Object;
 
 namespace VPS.MinIO.API.Controllers
 {
-
     [Route("api/{bucketName}/object")]
     public class ObjectController : BaseApiController
     {
         private readonly IObjectRepository objectRepository;
         private readonly IMapper mapper;
+
         public ObjectController
-            (
+        (
             IObjectRepository objectRepository,
             IMapper mapper
-            )
+        )
         {
             this.objectRepository = objectRepository;
             this.mapper = mapper;
@@ -26,7 +26,7 @@ namespace VPS.MinIO.API.Controllers
 
         [HttpPost]
         public void PutObject(
-           IFormFileCollection files,
+            IFormFileCollection files,
             string bucketName,
             string? folderPath = null,
             CancellationToken cancellationToken = default)
@@ -35,6 +35,7 @@ namespace VPS.MinIO.API.Controllers
             {
                 throw new ArgumentNullException(nameof(files), "Please send at least one file");
             }
+
             files.AsParallel().ForAll(async file =>
                {
                    using Stream stream = file.OpenReadStream();
@@ -53,8 +54,9 @@ namespace VPS.MinIO.API.Controllers
             string? prefix = null,
             bool recursive = false, CancellationToken cancellationToken = default)
         {
-
-            IList<Item> result = await objectRepository.ListObjects(bucketName, prefix, recursive, cancellationToken);
+            IList<Item> result =
+                await objectRepository.ListObjects(bucketName, prefix, recursive,
+                    cancellationToken);
             return result;
         }
 
@@ -75,14 +77,15 @@ namespace VPS.MinIO.API.Controllers
                 .WithVersionId(versionId)
                 .WithCallbackStream(stream => stream.CopyTo(memoryStream));
 
-            ObjectStat objectStat = await objectRepository.GetObject(getObjectArgs, cancellationToken);
+            ObjectStat objectStat =
+                await objectRepository.GetObject(getObjectArgs, cancellationToken);
             if (download)
             {
                 byte[] bytes = memoryStream.ToArray();
                 return File(bytes, objectStat.ContentType);
             }
-            return Ok(objectStat);
 
+            return Ok(objectStat);
         }
 
         [HttpDelete]
@@ -91,7 +94,7 @@ namespace VPS.MinIO.API.Controllers
             string objectName,
             string? versionId = null,
             CancellationToken cancellationToken = default
-            )
+        )
         {
             RemoveObjectArgs removeObjectArgs = new RemoveObjectArgs()
                 .WithBucket(bucketName)
@@ -100,21 +103,25 @@ namespace VPS.MinIO.API.Controllers
             await objectRepository.RemoveObject(removeObjectArgs, cancellationToken);
             return NoContent();
         }
+
         [HttpDelete("multiple")]
         public async Task<IActionResult> MultipleDelete
-            (
+        (
             string bucketName,
             IList<RemoveObjectsDto> removeObjectsDtos,
             CancellationToken cancellation = default
-            )
+        )
         {
             RemoveObjectsArgs removeObjectsArgs = new RemoveObjectsArgs()
                 .WithBucket(bucketName)
-                .WithObjects(removeObjectsDtos.Where(r => r.VersionsId.Length == 0).Select(r => r.ObjectName).ToArray())
-                .WithObjectsVersions(removeObjectsDtos.Where(r => r.VersionsId.Length > 0).Select(r => r.ToTuple()).ToList());
+                .WithObjects(removeObjectsDtos.Where(r => r.VersionsId.Length == 0)
+                    .Select(r => r.ObjectName).ToArray())
+                .WithObjectsVersions(removeObjectsDtos.Where(r => r.VersionsId.Length > 0)
+                    .Select(r => r.ToTuple()).ToList());
             await objectRepository.RemoveObjects(removeObjectsArgs, cancellation);
             return NoContent();
         }
+
         [HttpGet("exist")]
         public async Task<bool> Exist(
             string bucketName,
@@ -122,7 +129,7 @@ namespace VPS.MinIO.API.Controllers
             string? eTag = null,
             string? versionId = null,
             CancellationToken cancellation = default
-            )
+        )
         {
             StatObjectArgs statObjectArgs = new StatObjectArgs()
                 .WithBucket(bucketName)

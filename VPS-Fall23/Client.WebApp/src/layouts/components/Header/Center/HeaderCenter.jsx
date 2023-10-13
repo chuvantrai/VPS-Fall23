@@ -2,11 +2,29 @@ import { Button, Col, Row, notification } from 'antd';
 import styles from './HeaderCenter.module.scss';
 import classNames from 'classnames/bind';
 import { useCallback, useState } from 'react';
-import useParkingZoneService from '../../../../services/parkingZoneService';
+import useParkingZoneService from '@/services/parkingZoneService';
 import { setFoundedParkingZones } from '@/stores/parkingZones/parkingZone.store';
 import store from '@/stores/index';
-import AddressCascader from '../../../../components/cascader/AddressCascader';
+import AddressCascader from '@/components/cascader/AddressCascader';
+
 const cx = classNames.bind(styles);
+const getDataTypes = {
+    city: {
+        getFuncName: 'getDistricts',
+        childType: 'district',
+        isLeaf: false
+    },
+    district: {
+        getFuncName: 'getCommunes',
+        childType: 'commune',
+        isLeaf: true
+    }
+}
+const fieldNames = {
+    label: "name",
+    value: "id",
+    children: 'children'
+}
 
 
 const HeaderCenter = () => {

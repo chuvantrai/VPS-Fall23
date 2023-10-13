@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using InvoiceApi.ExternalData;
 using Service.ManagerVPS.DTO.FileManagement;
 
@@ -19,12 +19,11 @@ namespace Service.ManagerVPS.ExternalClients
 
         const string OBJECT_EXIST_URI =
             "api/{0}/object/exist?objectName={1}&eTag={2}&versionId={3}";
-
         public FileManagementClient(string baseUrl)
         {
             restClient = new RestClient(baseUrl);
         }
-
+        
         public FileManagementClient(string baseUrl, string accessKey, string secretKey)
             : this(baseUrl)
         {
@@ -54,7 +53,6 @@ namespace Service.ManagerVPS.ExternalClients
             streamContent.Dispose();
             multipartFormDataContent.Dispose();
         }
-        
         public async Task Upload(string bucket, string folderPath,
             MultipartFormDataContent multipartFormDataContent)
         {
@@ -66,7 +64,6 @@ namespace Service.ManagerVPS.ExternalClients
                 throw new Exception(httpResponseMessage.ReasonPhrase);
             }
         }
-        
         public async Task<(byte[] respones, MediaTypeHeaderValue contentType)> Download(
             string bucket,
             string objectName,
@@ -86,7 +83,7 @@ namespace Service.ManagerVPS.ExternalClients
             var response = await GetOne(bucket, objectName, eTag, versionId, false);
             return await response.Content.ReadFromJsonAsync<GetOneDto>();
         }
-
+        
         async Task<HttpResponseMessage> GetOne(string bucket,
             string objectName,
             string eTag = "",

@@ -1,54 +1,50 @@
-import { Layout } from 'antd';
-import Sidebar from '../../../layouts/components/Sidebar/Sidebar';
+import Sidebar from '@/layouts/components/Sidebar/Sidebar';
+import UserProfile from './Content/UserProfile';
+import { Layout, Breadcrumb, theme } from 'antd';
+import { useState } from 'react';
+import ViewListParkingZone from './Content/ViewListParkingZone';
+
 const { Content } = Layout;
 
 function HomepageAdmin() {
-    const rowData = ["user", "manager"]
-    return (
-        <div className='m-auto w-full'>
-            <Layout>
-                <Content
-                    style={{
-                        padding: '0 50px',
-                    }}
-                >
-                    <Sidebar rowData={rowData}></Sidebar>
-                    {/* <Layout
-                        style={{
-                            padding: '24px 0',
-                            background: colorBgContainer,
-                        }}
-                    >
-                        <Sider
-                            style={{
-                                background: colorBgContainer,
-                            }}
-                            width={200}
-                        >
-                            <Menu
-                                mode="inline"
-                                defaultSelectedKeys={['1']}
-                                defaultOpenKeys={['sub1']}
-                                style={{
-                                    height: '100%',
-                                }}
-                                items={items2}
-                            />
-                        </Sider>
-                        <Content
-                            style={{
-                                padding: '0 24px',
-                                minHeight: 280,
-                            }}
-                        >
-                            Content
-                        </Content>
-                    </Layout> */}
-                </Content>
-            </Layout>
+  const [contentState, setContentState] = useState('1');
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+  const rowData = ['user', 'manager'];
 
-        </div>
-    )
+  return (
+    <Layout className="min-h-screen">
+      <Sidebar rowData={rowData} setContentState={setContentState} />
+      <Layout
+        style={{
+          padding: '0 24px 24px',
+        }}
+      >
+        <Breadcrumb
+          style={{
+            margin: '16px 0',
+          }}
+        >
+          <Breadcrumb.Item>Home</Breadcrumb.Item>
+          <Breadcrumb.Item>List</Breadcrumb.Item>
+          <Breadcrumb.Item>App</Breadcrumb.Item>
+        </Breadcrumb>
+        <Content
+          style={{
+            padding: 24,
+            margin: 0,
+            minHeight: 280,
+            background: colorBgContainer,
+          }}
+        >
+          {contentState === '1' && <UserProfile></UserProfile>}
+          {contentState === '2' && <ViewListParkingZone></ViewListParkingZone>}
+        </Content>
+      </Layout>
+    </Layout>
+  );
 }
 
-export default HomepageAdmin
+export default HomepageAdmin;
+

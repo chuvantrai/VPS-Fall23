@@ -1,23 +1,28 @@
-// import React from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import { Layout, Menu, theme } from 'antd';
-const { Content, Sider } = Layout;
+const { Sider } = Layout;
 
 import styles from './Sidebar.module.scss';
 
+// eslint-disable-next-line no-unused-vars
 const cx = classNames.bind(styles);
 
-function Sidebar(props) {
+function Sidebar({ rowData, setContentState }) {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const items2 = props.rowData.map((data, index) => {
+  const handleMenuItem = (e) => {
+    setContentState(e.key);
+  };
+
+  const items2 = rowData.map((data, index) => {
     const key = String(index + 1);
     return {
       key: `sub${key}`,
-      // icon: React.createElement(icon),
       label: `${data}`,
       children: new Array(4).fill(null).map((_, j) => {
         const subKey = index * 4 + j + 1;
@@ -30,47 +35,25 @@ function Sidebar(props) {
   });
 
   return (
-    <aside className={cx('wrapper w-full')}>
-      <Layout
-        style={{
-          padding: '24px 0',
-          background: colorBgContainer,
-        }}
-      >
-        <Sider
-          style={{
-            background: colorBgContainer,
-          }}
-          width={200}
-        >
-          <Menu
-            mode="inline"
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
-            style={{
-              height: '100%',
-            }}
-            items={items2}
-          />
-        </Sider>
-        <Content
-          style={{
-            padding: '0 24px',
-            minHeight: 280,
-          }}
-        >
-          Content
-        </Content>
-      </Layout>
-    </aside>
+    <Sider
+      style={{
+        background: colorBgContainer,
+      }}
+      width={200}
+    >
+      <Menu
+        onClick={handleMenuItem}
+        mode="inline"
+        defaultSelectedKeys={['1']}
+        defaultOpenKeys={['sub1']}
+        items={items2}
+      />
+    </Sider>
   );
 }
 
 Sidebar.propTypes = {
   rowData: PropTypes.array.isRequired,
-  // rowData: PropTypes.arrayOf(PropTypes.shape({
-  //   name: ""
-  // })).isRequired,
 };
 
 export default Sidebar;

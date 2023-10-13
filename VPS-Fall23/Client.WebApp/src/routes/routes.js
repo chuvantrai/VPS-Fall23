@@ -4,12 +4,15 @@ import Homepage from '@/pages/Homepage';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
 import RegisterParkingZone from '@/pages/RegisterParkingZone';
+import Login from '@/pages/Login';
+import ForgotPassword from '@/pages/ForgotPassword';
+import { DefaultLayout } from '@/layouts';
 
 export const routes = [
   {
     path: config.routes.homepage,
     component: Homepage,
-    layout: HeaderOnly,
+    layout: DefaultLayout,
   },
   {
     path: config.routes.register,
@@ -24,6 +27,15 @@ export const routes = [
   {
     path: config.routes.registerParkingZone,
     component: RegisterParkingZone,
-    layout: HeaderOnly,
+  },
+  {
+    path: config.routes.login,
+    component: Login,
+    layout: null,
+  },
+  {
+    path: config.routes.forgotPassword,
+    component: ForgotPassword,
+    layout: null,
   },
 ];

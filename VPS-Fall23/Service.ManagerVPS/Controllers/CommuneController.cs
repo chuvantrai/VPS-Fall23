@@ -7,7 +7,10 @@ namespace Service.ManagerVPS.Controllers
 {
     public class CommuneController : VpsCRUDController<Commune>
     {
-        public CommuneController(ICommuneRepository communeRepository) : base(communeRepository) { }
+        public CommuneController(ICommuneRepository communeRepository) : base(communeRepository)
+        {
+        }
+
         [HttpGet("GetByDistrict/{districtId}")]
         public async Task<IEnumerable<Commune>> GetCommuneByDistrict(Guid districtId)
         {

@@ -62,7 +62,7 @@ namespace InvoiceApi.ExternalData
 
             return response.IsSuccessStatusCode;
         }
-
+        
         public async Task<U> Put<T, U>(string requestUri, T t)
             where T : class
             where U : class

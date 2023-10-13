@@ -10,6 +10,12 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
     }
 
+    public ParkingZone? GetParkingZoneById(Guid id)
+    {
+        var parkingZone = context.ParkingZones.FirstOrDefault(x => x.Id.Equals(id));
+        return parkingZone;
+    }
+
     public IQueryable<ParkingZone> GetByCityId(Guid cityId)
     {
         return entities
@@ -36,5 +42,4 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City).Where(p => p.Commune.DistrictId == districtId);
     }
-
 }

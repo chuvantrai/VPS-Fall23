@@ -543,14 +543,6 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
 
-                entity.Property(e => e.Lat)
-                    .HasColumnType("decimal(18, 10)")
-                    .HasColumnName("lat");
-
-                entity.Property(e => e.Lng)
-                    .HasColumnType("decimal(18, 10)")
-                    .HasColumnName("lng");
-
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
@@ -578,7 +570,16 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+                entity.Property(e => e.Lat)
+                .HasColumnType("decimal")
+                .HasColumnName("lat");
+
+                entity.Property(e => e.Lng)
+               .HasColumnType("decimal")
+               .HasColumnName("lng");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
