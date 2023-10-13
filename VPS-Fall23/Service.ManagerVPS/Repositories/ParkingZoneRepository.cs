@@ -36,4 +36,5 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City).Where(p => p.Commune.DistrictId == districtId);
     }
+
 }

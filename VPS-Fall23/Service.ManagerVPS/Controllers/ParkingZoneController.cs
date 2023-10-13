@@ -88,7 +88,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
             default: throw new ClientException(1002);
         }
     }
-    [HttpGet("{parkingZoneId}/GetImageLinks")]
+    [HttpGet("{parkingZoneId}")]
     public async Task<List<string>> GetImageLinks(Guid parkingZoneId)
     {
         var parkingZone = await this.vpsRepository.Find(parkingZoneId);

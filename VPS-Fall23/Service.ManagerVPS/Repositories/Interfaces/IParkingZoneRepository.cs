@@ -7,4 +7,5 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
     IQueryable<ParkingZone> GetByCommuneId(Guid communeId);
     IQueryable<ParkingZone> GetByCityId(Guid cityId);
     IQueryable<ParkingZone> GetByDistrictId(Guid districtId);
+
 }

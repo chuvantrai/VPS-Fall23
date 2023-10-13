@@ -42,5 +42,9 @@
   {
     "code": 1002,
     "message": "Yêu cầu không hợp lệ, không thể tìm nhà xe"
+  },
+  {
+    "code": 1003,
+    "message": "Biển số này đã được đặt trước đó vào khoảng thời gian này, vui lòng kiểm tra lại"
   }
 ]

@@ -26,6 +26,7 @@ namespace Service.ManagerVPS.Models
         public decimal PriceOverTimePerHour { get; set; }
         public bool? IsApprove { get; set; }
         public string? RejectReason { get; set; }
+        public int? Slots { get; set; }
         public decimal? Lat { get; set; }
         public decimal? Lng { get; set; }
 

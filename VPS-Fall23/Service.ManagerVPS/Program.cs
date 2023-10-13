@@ -42,6 +42,7 @@ builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
 builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<IParkingZoneOwnerRepository, ParkingZoneOwnerRepository>();
 builder.Services.AddScoped<IParkingZoneRepository, ParkingZoneRepository>();
+builder.Services.AddScoped<IParkingTransactionRepository, ParkingTransactionRepository>();
 
 var app = builder.Build();
 
