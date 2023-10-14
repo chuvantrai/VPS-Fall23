@@ -42,5 +42,25 @@
   {
     "code": 1002,
     "message": "Yêu cầu không hợp lệ, không thể tìm nhà xe"
+  },
+  {
+    "code": 1003,
+    "message": "Biển số này đã được đặt trước đó vào khoảng thời gian này, vui lòng kiểm tra lại"
+  },
+  {
+    "code": 5001,
+    "message": "Tên tài khoản/email sai!"
+  },
+  {
+    "code": 5002,
+    "message": "Tài khoản này đã bị khóa!"
+  },
+  {
+    "code": 5003,
+    "message": "Code xác nhận sai!"
+  },
+  {
+    "code": 5004,
+    "message": "Code xác nhận đã hết hạn!"
   }
 ]

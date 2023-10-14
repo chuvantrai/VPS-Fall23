@@ -29,6 +29,11 @@ const useParkingZoneService = () => {
         });
       });
   };
+  const getImageLink = (id) => {
+    return axios.get(`${BASE_URI}/GetImageLinks/${id}`);
+  };
+  const getFullAddress = (parkingZone) =>
+    `${parkingZone.detailAddress}, ${parkingZone.commune.name}, ${parkingZone.commune.district.name}, ${parkingZone.commune.district.city.name}`;
 
   const getByAddress = (id, addressType) => {
     return axios.get(GET_BY_ADDRESS_URI, {
@@ -42,6 +47,8 @@ const useParkingZoneService = () => {
   return {
     getByAddress,
     register,
+    getImageLink,
+    getFullAddress,
   };
 };
 

@@ -8,5 +8,6 @@ public enum ActionFilterEnum
     CreateAccountDemo,
     ChangePassword,
     RefreshToken,
-    UpdateProfileAccount
+    UpdateProfileAccount,
+    GetRequestedParkingZones
 }

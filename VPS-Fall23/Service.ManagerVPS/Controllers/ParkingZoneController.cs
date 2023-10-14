@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.FileManagement;
@@ -7,7 +8,10 @@ using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.OtherModels;
+using Service.ManagerVPS.DTO.Ouput;
 using Service.ManagerVPS.ExternalClients;
+using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -16,15 +20,14 @@ namespace Service.ManagerVPS.Controllers;
 public class ParkingZoneController : VpsController<ParkingZone>
 {
     private readonly IConfiguration _config;
-    readonly FileManagementConfig fileManagementConfig;
+    private readonly FileManagementConfig _fileManagementConfig;
 
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
-        IConfiguration config,
-        IOptions<FileManagementConfig> options)
+        IConfiguration config, IOptions<FileManagementConfig> options)
         : base(parkingZoneRepository)
     {
         _config = config;
-        this.fileManagementConfig = options.Value;
+        _fileManagementConfig = options.Value;
     }
 
     [HttpPost]
@@ -71,6 +74,53 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return Ok(ResponseNotification.ADD_SUCCESS);
     }
 
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    public async Task<IActionResult> GetRequestedParkingZones([FromQuery] QueryStringParameters parameters)
+    {
+        var requestedParkingZones =
+            ((IParkingZoneRepository)vpsRepository).GetRequestedParkingZones(parameters);
+
+        var result = new List<RequestedParkingZoneItemOutput>();
+
+        foreach (var item in requestedParkingZones)
+        {
+            var itemImgs = await GetImageLinks(item.OwnerId, item.Id);
+
+            result.Add(new RequestedParkingZoneItemOutput
+            {
+                Id = item.Id,
+                SubId = item.SubId,
+                CommuneId = item.CommuneId,
+                Name = item.Name,
+                CreatedAt = item.CreatedAt,
+                ModifiedAt = item.ModifiedAt,
+                OwnerId = item.OwnerId,
+                DetailAddress = item.DetailAddress,
+                PricePerHour = string.Format(new CultureInfo("vi-VN"), "{0:C}", item.PricePerHour),
+                PriceOverTimePerHour =
+                    string.Format(new CultureInfo("vi-VN"), "{0:C}", item.PriceOverTimePerHour),
+                Slots = item.Slots,
+                Lat = item.Lat,
+                Lng = item.Lng,
+                ParkingZoneImages = itemImgs
+            });
+        }
+
+        var metadata = new
+        {
+            requestedParkingZones.TotalCount,
+            requestedParkingZones.PageSize,
+            requestedParkingZones.CurrentPage,
+            requestedParkingZones.TotalPages,
+            requestedParkingZones.HasNext,
+            requestedParkingZones.HasPrev,
+            Data = result
+        };
+
+        return Ok(metadata);
+    }
+
     [HttpPut]
     public async Task<IActionResult> ChangeParkingZoneStat([FromBody] ChangeParkingZoneStat input)
     {
@@ -82,6 +132,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
         parkingZone.IsApprove = input.IsApprove;
         parkingZone.RejectReason = input.RejectReason;
+        parkingZone.ModifiedAt = DateTime.Now;
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
 
@@ -92,45 +143,43 @@ public class ParkingZoneController : VpsController<ParkingZone>
     public IEnumerable<ParkingZone> GetByAddress(Guid id,
         AddressType addressType = AddressType.Commune)
     {
-        switch (addressType)
+        return addressType switch
         {
-            case AddressType.Commune:
-            {
-                return ((IParkingZoneRepository)this.vpsRepository).GetByCommuneId(id);
-            }
-            case AddressType.District:
-            {
-                return ((IParkingZoneRepository)this.vpsRepository).GetByDistrictId(id);
-            }
-            case AddressType.City:
-            {
-                return ((IParkingZoneRepository)this.vpsRepository).GetByCityId(id);
-            }
-            default: throw new ClientException(1002);
-        }
+            AddressType.Commune => ((IParkingZoneRepository)vpsRepository).GetByCommuneId(id),
+            AddressType.District => ((IParkingZoneRepository)vpsRepository).GetByDistrictId(id),
+            AddressType.City => ((IParkingZoneRepository)vpsRepository).GetByCityId(id),
+            _ => throw new ClientException(1002)
+        };
     }
 
-    [HttpGet("{parkingZoneId}/GetImageLinks")]
+    [HttpGet("{parkingZoneId}")]
     public async Task<List<string>> GetImageLinks(Guid parkingZoneId)
     {
-        var parkingZone = await this.vpsRepository.Find(parkingZoneId);
-        string filePrefix =
-            $"{Constant.PARKING_ZONE_IMG_FOLDER}/{parkingZone.OwnerId}/{parkingZoneId}";
-        FileManagementClient fileManagementClient = new FileManagementClient(
-            fileManagementConfig.BaseUrl,
-            fileManagementConfig.AccessKey,
-            fileManagementConfig.SecretKey);
+        var parkingZone = await vpsRepository.Find(parkingZoneId);
+        var result = await GetImageLinks(parkingZone.OwnerId, parkingZoneId);
+        return result;
+    }
+
+    private string GetImageLink(string objectPath)
+    {
+        return
+            $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}/{_fileManagementConfig.PublicBucket}/{objectPath}";
+    }
+
+    private async Task<List<string>> GetImageLinks(Guid parkingZoneOwnerId, Guid parkingZoneId)
+    {
+        var filePrefix =
+            $"{Constant.PARKING_ZONE_IMG_FOLDER}/{parkingZoneOwnerId}/{parkingZoneId}";
+
+        var fileManagementClient = new FileManagementClient(
+            _fileManagementConfig.BaseUrl,
+            _fileManagementConfig.AccessKey,
+            _fileManagementConfig.SecretKey);
 
         var objectResults =
-            await fileManagementClient.GetObjects(fileManagementConfig.PublicBucket, filePrefix,
+            await fileManagementClient.GetObjects(_fileManagementConfig.PublicBucket, filePrefix,
                 true);
 
         return objectResults.Select(x => GetImageLink(x.Key)).ToList();
-    }
-
-    string GetImageLink(string objectPath)
-    {
-        return
-            $"{fileManagementConfig.EndPointServer}:{fileManagementConfig.EndPointPort.Api}/{fileManagementConfig.PublicBucket}/{objectPath}";
     }
 }
