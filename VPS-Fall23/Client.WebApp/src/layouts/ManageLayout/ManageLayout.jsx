@@ -8,11 +8,17 @@ function ManageLayout() {
   const rowData = [
     {
       label: 'User',
-      options: ['Profile', 'Test'],
+      options: [
+        { label: 'Profile', url: '/profile' },
+        { label: 'test', url: '/' },
+      ],
     },
     {
       label: 'Manage',
-      options: ['View Parking Zone List'],
+      options: [
+        { label: 'View Parking Zone List', url: '/listParkingZone' },
+        { label: 'Register Parking Zone', url: '/registerParkingZone' },
+      ],
     },
   ];
 

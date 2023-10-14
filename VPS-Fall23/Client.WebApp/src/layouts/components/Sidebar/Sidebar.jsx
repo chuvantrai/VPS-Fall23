@@ -1,4 +1,4 @@
-// import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import { Layout, Menu, theme } from 'antd';
@@ -10,12 +10,14 @@ import styles from './Sidebar.module.scss';
 const cx = classNames.bind(styles);
 
 function Sidebar({ rowData, setContentState }) {
+  const navigate = useNavigate();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
   const handleMenuItem = (e) => {
     setContentState(e.key);
+    navigate(e.key);
   };
 
   const items2 = rowData.map(({ label, options }, index) => {
@@ -24,11 +26,10 @@ function Sidebar({ rowData, setContentState }) {
       key: `sub${key}`,
       // icon: React.createElement(icon),
       label: `${label}`,
-      children: options.map((opt, j) => {
-        const subKey = index * 4 + j + 1;
+      children: options.map(({ label, url }) => {
         return {
-          key: subKey,
-          label: `${opt}`,
+          key: `${url}`,
+          label: `${label}`,
         };
       }),
     };
@@ -59,7 +60,12 @@ Sidebar.propTypes = {
   rowData: PropTypes.arrayOf(
     PropTypes.shape({
       lable: PropTypes.string,
-      options: PropTypes.arrayOf(PropTypes.string),
+      options: PropTypes.arrayOf(
+        PropTypes.shape({
+          label: PropTypes.string,
+          url: PropTypes.string,
+        }),
+      ),
     }),
   ),
 
