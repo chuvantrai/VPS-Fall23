@@ -1,1 +1,1 @@
-export { default } from './AccountProfile.jsx';
+export { default } from './AccountProfile';

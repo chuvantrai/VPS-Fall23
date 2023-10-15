@@ -1,5 +1,5 @@
 import classNames from 'classnames/bind';
-import styles from '@/pages/ForgotPassword/ForgotPassword.module.scss';
+import styles from './AccountProfile.module.scss';
 import { Button, Form, Input } from 'antd';
 import TextArea from 'antd/es/input/TextArea.js';
 import { useRef, useState, useEffect, useCallback } from 'react';
@@ -19,6 +19,7 @@ function AccountProfile() {
     style: { width: '100%' },
     placeholder: 'Chọn địa chỉ',
   };
+  const [stringArray,setstringArray] = useState([]);
   const onCascaderChange = useCallback((value, selectedOptions) => {
     setSelectedAddress(selectedOptions ? selectedOptions[selectedOptions.length - 1] : null);
     setValidateStatus('');
@@ -27,11 +28,12 @@ function AccountProfile() {
   const accountProfile = AccountServices();
 
   const onFinish = (values) => {
-    console.log(values, selectedAddress?.id);
+    console.log(values, selectedAddress?.id, fileImage);
+    accountProfile.updateAccountProfile(values,selectedAddress?.id, fileImage);
   };
   useEffect(() => {
     const handleLoad = () => {
-      accountProfile.getAccountProfile(form);
+      accountProfile.getAccountProfile(form,callbackAddress);
     };
     handleLoad();
     window.addEventListener('load', handleLoad);
@@ -40,8 +42,14 @@ function AccountProfile() {
     };
   }, []);
 
+  const callbackAddress = (value) => {
+      setstringArray(value);
+      console.log(stringArray);
+  }
+
   // avartar update
   const [selectedImage, setSelectedImage] = useState(null);
+  const [fileImage, setFileImage] = useState(null);
   const inputFileRef = useRef();
   const handleButtonUpload = () => {
     inputFileRef.current.click();
@@ -49,6 +57,7 @@ function AccountProfile() {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file !== undefined) {
+      setFileImage(file);
       const reader = new FileReader();
       reader.onload = (upload) => {
         setSelectedImage(upload.target.result);
@@ -159,15 +168,18 @@ function AccountProfile() {
               <div className={cx('grid-rows-2 gap-4')}>
                 <div className={cx('row-span-1 ')}>
                   <Form.Item
-                    name='communeId'
+                    name='commune'
                     label='Địa chỉ'
                     className='pb-[24px] m-0'
                     validateStatus={validateStatus}
                     help={help}
                   >
                     <div className='w-full'>
-                      <AddressCascader cascaderProps={addressCascaderProps}
-                                       onCascaderChangeCallback={onCascaderChange} />
+                      <AddressCascader
+                        cascaderProps={addressCascaderProps}
+                        onCascaderChangeCallback={onCascaderChange}
+                        defaultAddress={stringArray}
+                        />
                     </div>
                   </Form.Item>
                 </div>
