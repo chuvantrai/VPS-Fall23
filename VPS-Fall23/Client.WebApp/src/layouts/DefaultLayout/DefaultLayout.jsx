@@ -9,6 +9,7 @@ import Sidebar from '@/layouts/components/Sidebar';
 import UserProfile from '@/pages/Homepage/components/Content/UserProfile';
 import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
 import RegisterParkingZone from '@/pages/RegisterParkingZone/RegisterParkingZone';
+import AccountProfile from '@/pages/AccountProfile/index.js';
 
 const { Content } = Layout;
 
@@ -62,6 +63,7 @@ function DefaultLayout() {
               {contentState === '1' && <UserProfile></UserProfile>}
               {contentState === '2' && <ViewListParkingZone></ViewListParkingZone>}
               {contentState === '3' && <RegisterParkingZone />}
+              {contentState === '4' && <AccountProfile />}
             </Content>
           </div>
         </Layout>

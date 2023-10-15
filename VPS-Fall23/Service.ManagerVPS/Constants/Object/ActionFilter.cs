@@ -41,6 +41,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.UpdateProfileAccount,
             UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
+        },
+        new ActionModel()
+        {
+            Action = ActionFilterEnum.GetAccountProfile,
+            UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
         }
     };
 

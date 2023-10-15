@@ -19,7 +19,6 @@ const HomePage = () => {
         role == "3" && < div> Owner
         </div>
       }
-
     </Fragment >
   )
 }

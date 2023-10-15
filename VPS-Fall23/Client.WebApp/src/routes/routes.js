@@ -9,6 +9,7 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import { DefaultLayout } from '@/layouts';
 import ChangePassword from '@/pages/ChangePassword/index.js';
 import AccountProfile from '@/pages/AccountProfile/index.js';
+import UserProfile from '@/pages/Homepage/components/Content/UserProfile.jsx';
 
 export const routes = [
   {

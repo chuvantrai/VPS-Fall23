@@ -5,6 +5,7 @@ using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.FilterPermissions;
@@ -280,6 +281,30 @@ public class AuthController : VpsController<Account>
         return Ok(new
         {
             AccessToken = JwtTokenExtension.WriteTokenByAccount(account)
+        });
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetAccountProfile)]
+    public async Task<IActionResult> GetAccountProfile()
+    {
+        var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+        var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+        var account = await ((IUserRepository)vpsRepository).GetAccountByIdAsync(Guid.Parse(userToken.UserId));
+        if (account == null) throw new ClientException();
+        return Ok(new GetAccountProfileResponse()
+        {
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            Email = account.Email,
+            Phone = account.PhoneNumber,
+            City = account.Commune?.District.City.Code,
+            District = account.Commune?.District.Code,
+            Commune = account.Commune?.Id,
+            Address =account.Address,
+            Role = EnumExtension.GetEnumDescription(EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId)),
+            Dob = account.ParkingZoneOwner?.Dob,
+            Avatar = account.Avatar
         });
     }
 }

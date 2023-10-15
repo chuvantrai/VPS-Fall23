@@ -69,9 +69,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
         return Ok(ResponseNotification.ADD_SUCCESS);
     }
-
-
-
+    
     [HttpPut]
     public async Task<IActionResult> ChangeParkingZoneStat([FromBody] ChangeParkingZoneStat input)
     {
@@ -125,9 +123,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
         var objectResults = await fileManagementClient.GetObjects(fileManagementConfig.PublicBucket, filePrefix, true);
 
         return objectResults.Select(x => GetImageLink(x.Key)).ToList();
-
-
-
     }
     string GetImageLink(string objectPath)
     {

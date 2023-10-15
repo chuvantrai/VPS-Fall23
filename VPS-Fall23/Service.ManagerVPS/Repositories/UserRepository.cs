@@ -68,7 +68,7 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
             => (x.Username.Equals(userName) || x.Email.Equals(userName)) && !x.IsBlock &&
                x.TypeId != (int)UserRoleEnum.ATTENDANT);
         if (account == null) return null;
-        
+
         if (account.ExpireVerifyCode == null || DateTime.Now > account.ExpireVerifyCode)
         {
             account.VerifyCode = _generalVPS.GenerateVerificationCode();
@@ -118,7 +118,12 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
     public async Task<Account?> GetAccountByIdAsync(Guid id)
     {
         var account = await context.Accounts
+            .Include(x => x.Commune)
+            .ThenInclude(x => x!.District)
+            .ThenInclude(x => x.City)
+            .Include(x=>x.ParkingZoneOwner)
             .FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.IsBlock && x.IsVerified == true);
+        
         return account;
     }
 }

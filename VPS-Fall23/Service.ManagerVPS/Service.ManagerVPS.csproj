@@ -22,8 +22,6 @@
     <ItemGroup>
       <Folder Include="Constants\ConfigKey\" />
       <Folder Include="Constants\ConfigKey\" />
-      <Folder Include="DTO\Output\" />
-      <Folder Include="DTO\Output\" />
       <Folder Include="Models\" />
       <Folder Include="Models\" />
     </ItemGroup>
