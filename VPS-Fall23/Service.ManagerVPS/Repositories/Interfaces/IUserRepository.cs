@@ -25,4 +25,6 @@ public interface IUserRepository : IVpsRepository<Account>
     Task<Account?> ChangePasswordByUserIdAsync(Guid id, string password);
     
     Task<Account?> UpdateAccountById(UpdateProfileAccountRequest request);
+    
+    Task<Account?> GetAccountByIdAsync(Guid id);
 }
