@@ -2,9 +2,14 @@ import axios from 'axios';
 import { App } from 'antd';
 import store from '../stores/index';
 import { setGlobalState } from '../stores/systems/global.store';
+import { useNavigate } from 'react-router-dom';
+import { getAccountJwtModel } from '@/helpers/index.js';
+import getAccountDataByCookie from '@/helpers/getAccountDataByCookie.js';
+import Cookies from 'js-cookie';
 
 const useAxios = () => {
   const app = App.useApp();
+  const navigate = useNavigate();
   const errorHandler = (error) => {
     if (error === null) return;
     /***
@@ -13,19 +18,47 @@ const useAxios = () => {
      * Xử lý khi lỗi 401 (token hết hạn)
      *
      */
-
+    const account
+      = getAccountJwtModel();
+    if (error.request?.status === 401 && account !== null && account.Expires < Date.now()) {
+      // token hết hạn
+      const _axios = axios.create({
+        baseURL: import.meta.env.VITE_API_GATEWAY,
+        xsrfHeaderName: 'RequestVerificationToken'
+      });
+      const accountLogin = getAccountDataByCookie();
+      _axios.post('/api/Auth/AuthLogin', accountLogin)
+        .then(response => {
+          Cookies.set('ACCESS_TOKEN', response.data.accessToken);
+          app.notification.error({
+            message: 'Lỗi',
+            placement: 'topRight',
+          });
+        })
+        .catch(() => {
+          navigate('/login');
+        });
+    } else if (error.request?.status === 401) {
+      app.notification.error({
+        message: 'Lỗi',
+        description: error.response?.data?.message,
+        placement: 'topRight',
+      });
+      navigate('/login');
+      return;
+    }
     //Xử lý khi response trả về là arraybuffer
     if (error.request?.responseType === 'arraybuffer') {
       let errorObject = JSON.parse(new TextDecoder().decode(error?.response?.data));
       app.notification.error({
-        message: 'Error',
+        message: 'Lỗi',
         description: errorObject.message,
         placement: 'topRight',
       });
       return;
     }
     app.notification.error({
-      message: 'Error',
+      message: 'Lỗi',
       description: error?.response?.data?.message,
       placement: 'topRight',
     });
@@ -33,6 +66,7 @@ const useAxios = () => {
   const _axios = axios.create({
     baseURL: import.meta.env.VITE_API_GATEWAY,
     xsrfHeaderName: 'RequestVerificationToken',
+    withCredentials: true
   });
   _axios.interceptors.request.use((config) => {
     store.dispatch(setGlobalState({ isLoading: true }));
@@ -41,12 +75,12 @@ const useAxios = () => {
   _axios.interceptors.response.use(
     (response) => {
       store.dispatch(setGlobalState({ isLoading: false }));
-      return response;
+      return Promise.resolve(response);
     },
     (error) => {
       store.dispatch(setGlobalState({ isLoading: false }));
       errorHandler(error);
-      return error?.response?.data?.message;
+      return Promise.reject(error?.response?.data);
     },
   );
   return _axios;

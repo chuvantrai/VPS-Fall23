@@ -4,7 +4,6 @@ using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
-using Service.ManagerVPS.DTO.Input.User;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.StaticLogic;
@@ -30,97 +29,84 @@ public class AuthController : VpsController<Account>
     [HttpPost]
     public async Task<IActionResult> AuthLogin(LoginRequest request)
     {
-        try
+        var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
+        if (account == null)
         {
-            var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
-            if (account == null)
-            {
-                return BadRequest("wrong username!");
-            }
-
-            if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account.Password))
-            {
-                return BadRequest("wrong password!");
-            }
-
-            if (account.IsVerified == false)
-            {
-                return BadRequest("Haven't Verified email yet!");
-            }
-            if (account.IsBlock)
-            {
-                return BadRequest("Account has been locked!");
-            }
-
-            var userToken = new UserTokenHeader
-            {
-                UserId = account.Id.ToString(),
-                Email = account.Email,
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                Avatar = account.Avatar,
-                RoleId = account.TypeId,
-                RoleName = EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId).ToString(),
-                Expires = DateTime.Now.AddMinutes(30),
-                ModifiedAt = account.ModifiedAt
-            };
-            return Ok(new
-            {
-                AccessToken = JwtTokenExtension.WriteToken(userToken),
-                UserData = userToken
-            });
+            throw new ClientException(5001);
         }
-        catch
+
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account.Password))
         {
-            return BadRequest();
+            throw new ClientException(5006);
         }
+
+        if (account.IsVerified == false)
+        {
+            throw new ClientException(5007);
+        }
+
+        if (account.IsBlock)
+        {
+            throw new ClientException(5002);
+        }
+
+        var userToken = new UserTokenHeader
+        {
+            UserId = account.Id.ToString(),
+            Email = account.Email,
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            Avatar = account.Avatar,
+            RoleId = account.TypeId,
+            RoleName = EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId).ToString(),
+            Expires = DateTime.Now.AddMinutes(30),
+            ModifiedAt = account.ModifiedAt
+        };
+        return Ok(new
+        {
+            AccessToken = JwtTokenExtension.WriteToken(userToken),
+            UserData = userToken
+        });
     }
 
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.ChangePassword)]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
     {
-        try
+        if (request.NewPassword == request.OldPassword)
         {
-            if (request.NewPassword == request.OldPassword)
-            {
-                return BadRequest("New password same old password!");
-            }
+            throw new ClientException(5005);
+        }
 
-            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
-            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-            var account =
-                await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(Guid.Parse(userToken.UserId),
-                    request.NewPassword);
-            if (account == null) return BadRequest();
-            return Ok();
-        }
-        catch
+        var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+        var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+        var oldAccount = await ((IUserRepository)vpsRepository).GetAccountByIdAsync(Guid.Parse(userToken.UserId));
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(request.OldPassword, oldAccount?.Password))
         {
-            return BadRequest();
+            throw new ClientException(5006);
         }
+
+        var account =
+            await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(Guid.Parse(userToken.UserId),
+                request.NewPassword);
+        if (account == null) throw new ClientException();
+        return Ok();
     }
 
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.RefreshToken)]
     public IActionResult RefreshToken()
     {
-        try
+        var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+        var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+        userToken.Expires = DateTime.Now.AddMinutes(30);
+        return Ok(new
         {
-            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
-            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-            userToken.Expires = DateTime.Now.AddMinutes(30);
-            return Ok(new
-            {
-                AccessToken = JwtTokenExtension.WriteToken(userToken),
-                UserData = userToken
-            });
-        }
-        catch
-        {
-            return BadRequest();
-        }
+            AccessToken = JwtTokenExtension.WriteToken(userToken),
+            UserData = userToken
+        });
     }
+
     [HttpPost]
     [FilterPermission(Action = ActionFilterEnum.CreateAccountDemo)]
     public IActionResult CreateAccountDemo([FromForm] CreateAccountDemoRequest request)
@@ -155,10 +141,11 @@ public class AuthController : VpsController<Account>
     [HttpPut]
     public async Task<IActionResult> ResendVerificationCode(SendCodeForgotPasswordRequest request)
     {
-        var account = await ((IUserRepository)vpsRepository).UpdateVerifyCodeAsync(request.UserName);
+        var account =
+            await ((IUserRepository)vpsRepository).UpdateVerifyCodeAsync(request.UserName);
         if (account == null)
         {
-            throw new ClientException("Email không chính xác!");
+            throw new ClientException("Tên tài khoản/email không chính xác!");
         }
 
         return Ok(account.Email);
@@ -167,34 +154,29 @@ public class AuthController : VpsController<Account>
     [HttpPut]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
     {
-        try
+        var account =
+            await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.UserName);
+        if (account == null) throw new ClientException(5001);
+        if (account.IsBlock)
         {
-            var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.UserName);
-            if (account == null) return BadRequest();
-            if (account.IsBlock)
-            {
-                return BadRequest("Account has been locked!");
-            }
-
-            if (account.VerifyCode != request.VerifyCode)
-            {
-                return BadRequest("Wrong VerifyCode!");
-            }
-
-            if (DateTime.Now > account.ExpireVerifyCode)
-            {
-                return BadRequest("VerifyCode expired!");
-            }
-
-            var accountAfterChange =
-                await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(account.Id, request.Password);
-            if (accountAfterChange == null) return BadRequest();
-            return Ok();
+            throw new ClientException(5002);
         }
-        catch
+
+        if (account.VerifyCode != request.VerifyCode)
         {
-            return BadRequest();
+            throw new ClientException(5003);
         }
+
+        if (DateTime.Now > account.ExpireVerifyCode)
+        {
+            throw new ClientException(5004);
+        }
+
+        var accountAfterChange =
+            await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(account.Id,
+                request.Password);
+        if (accountAfterChange == null) throw new ClientException();
+        return Ok();
     }
 
     [HttpPost]
@@ -214,11 +196,9 @@ public class AuthController : VpsController<Account>
             existingAccount.FirstName = input.FirstName;
             existingAccount.LastName = input.LastName;
             existingAccount.PhoneNumber = input.PhoneNumber;
-
-            var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner;
-            parkingZoneOwnerExistedAccount!.Phone = input.PhoneNumber;
-            parkingZoneOwnerExistedAccount!.Dob = input.Dob;
-            
+            var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner!;
+            parkingZoneOwnerExistedAccount.Phone = input.PhoneNumber;
+            parkingZoneOwnerExistedAccount.Dob = input.Dob;
             await ((IUserRepository)vpsRepository).Update(existingAccount);
             await _parkingZoneOwnerRepository.Update(parkingZoneOwnerExistedAccount);
         }
@@ -256,7 +236,8 @@ public class AuthController : VpsController<Account>
                 Email = input.Email,
                 Dob = input.Dob,
             };
-            var parkingZoneOwnerResult = await _parkingZoneOwnerRepository.Create(parkingZoneOwnerRec);
+            var parkingZoneOwnerResult =
+                await _parkingZoneOwnerRepository.Create(parkingZoneOwnerRec);
             if (parkingZoneOwnerResult is null)
             {
                 throw new ServerException(ResponseNotification.ADD_ERROR);
@@ -280,7 +261,8 @@ public class AuthController : VpsController<Account>
 
         if (account.ExpireVerifyCode < DateTime.Now) throw new ClientException(2002);
 
-        var isValidCode = ((IUserRepository)vpsRepository).CheckValidVerification(input.Email, input.VerifyCode);
+        var isValidCode =
+            ((IUserRepository)vpsRepository).CheckValidVerification(input.Email, input.VerifyCode);
         if (!isValidCode) throw new ClientException(2001);
 
         ((IUserRepository)vpsRepository).VerifyAccount(account);
