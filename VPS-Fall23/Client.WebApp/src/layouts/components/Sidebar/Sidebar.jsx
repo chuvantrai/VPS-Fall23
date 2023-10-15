@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import { Layout, Menu, theme } from 'antd';
@@ -11,24 +10,26 @@ import styles from './Sidebar.module.scss';
 const cx = classNames.bind(styles);
 
 function Sidebar({ rowData, setContentState }) {
+  const navigate = useNavigate();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
   const handleMenuItem = (e) => {
     setContentState(e.key);
+    navigate(e.key);
   };
 
-  const items2 = rowData.map((data, index) => {
+  const items2 = rowData.map(({ label, options }, index) => {
     const key = String(index + 1);
     return {
       key: `sub${key}`,
-      label: `${data}`,
-      children: new Array(4).fill(null).map((_, j) => {
-        const subKey = index * 4 + j + 1;
+      // icon: React.createElement(icon),
+      label: `${label}`,
+      children: options.map(({ label, url }) => {
         return {
-          key: subKey,
-          label: `option${subKey}`,
+          key: `${url}`,
+          label: `${label}`,
         };
       }),
     };
@@ -53,7 +54,19 @@ function Sidebar({ rowData, setContentState }) {
 }
 
 Sidebar.propTypes = {
-  rowData: PropTypes.array.isRequired,
+  rowData: PropTypes.arrayOf(
+    PropTypes.shape({
+      lable: PropTypes.string,
+      options: PropTypes.arrayOf(
+        PropTypes.shape({
+          label: PropTypes.string,
+          url: PropTypes.string,
+        }),
+      ),
+    }),
+  ),
+
+  setContentState: PropTypes.func,
 };
 
 export default Sidebar;

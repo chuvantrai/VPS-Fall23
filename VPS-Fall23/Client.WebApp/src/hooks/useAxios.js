@@ -18,8 +18,7 @@ const useAxios = () => {
      * Xử lý khi lỗi 401 (token hết hạn)
      *
      */
-    const account
-      = getAccountJwtModel();
+    const account = getAccountJwtModel();
     if (error.status === 401 && account !== null && account.Expires < Date.now()) {
       // token hết hạn
       const _axios = axios.create({
@@ -27,8 +26,9 @@ const useAxios = () => {
         xsrfHeaderName: 'RequestVerificationToken',
       });
       const accountLogin = getAccountDataByCookie();
-      _axios.post('/api/Auth/AuthLogin', accountLogin)
-        .then(response => {
+      _axios
+        .post('/api/Auth/AuthLogin', accountLogin)
+        .then((response) => {
           Cookies.set('ACCESS_TOKEN', response.data.accessToken);
           app.message.error(`Có lỗi xảy ra vui lòng thử lại`);
         })
