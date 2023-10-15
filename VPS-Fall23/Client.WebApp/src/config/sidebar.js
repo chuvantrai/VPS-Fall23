@@ -22,8 +22,18 @@ export const adminSidebar = [
         title: 'Danh sách bãi gửi xe',
         desc: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
       },
-      { label: 'Register Parking Zone', url: routes.registerParkingZone },
-      { label: 'Requested Parking Zone', url: routes.viewRequestedParkingZones },
+      {
+        label: 'Register Parking Zone',
+        url: routes.registerParkingZone,
+        title: 'Form đăng ký bãi gửi xe',
+        desc: 'Điền form dưới đây để đăng ký bãi gửi xe mới',
+      },
+      {
+        label: 'Requested Parking Zone',
+        url: routes.viewRequestedParkingZones,
+        title: 'Danh sách yêu cầu đăng ký bãi gửi xe',
+        desc: 'Toàn bộ danh sách yêu cầu bãi gửi xe hiển thị dưới đây',
+      },
     ],
   },
 ];

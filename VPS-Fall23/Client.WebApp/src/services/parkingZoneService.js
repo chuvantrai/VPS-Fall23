@@ -1,4 +1,5 @@
 import { notification } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 import { useAxios } from '@/hooks';
 
@@ -8,6 +9,7 @@ const REGISTER = `${BASE_URI}/Register`;
 
 const useParkingZoneService = () => {
   const axios = useAxios();
+  const navigate = useNavigate();
 
   const register = (values) => {
     axios
@@ -17,10 +19,12 @@ const useParkingZoneService = () => {
         },
       })
       .then((res) => {
-        console.log(res);
-        // notification.success({
-        //   description: res,
-        // });
+        notification.success({
+          message: res?.data,
+        });
+        setTimeout(() => {
+          navigate('/');
+        }, 1000);
       })
       .catch((err) => {
         notification.error({
@@ -29,9 +33,11 @@ const useParkingZoneService = () => {
         });
       });
   };
+
   const getImageLink = (id) => {
     return axios.get(`${BASE_URI}/GetImageLinks/${id}`);
   };
+
   const getFullAddress = (parkingZone) =>
     `${parkingZone.detailAddress}, ${parkingZone.commune.name}, ${parkingZone.commune.district.name}, ${parkingZone.commune.district.city.name}`;
 
@@ -44,11 +50,26 @@ const useParkingZoneService = () => {
     });
   };
 
+  const getRequestParkingZones = ({ pageNumber, pageSize }) => {
+    return axios.get(`${BASE_URI}/GetRequestedParkingZones`, {
+      params: {
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+      },
+    });
+  };
+
+  const changeParkingZoneStat = (params) => {
+    return axios.put(`${BASE_URI}/ChangeParkingZoneStat`, params);
+  };
+
   return {
     getByAddress,
     register,
     getImageLink,
     getFullAddress,
+    getRequestParkingZones,
+    changeParkingZoneStat,
   };
 };
 

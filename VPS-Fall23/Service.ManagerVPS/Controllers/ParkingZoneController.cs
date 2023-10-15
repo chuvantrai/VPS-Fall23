@@ -75,6 +75,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
     public IActionResult GetAll()
     {
         try
@@ -114,11 +115,11 @@ public class ParkingZoneController : VpsController<ParkingZone>
             result.Add(new RequestedParkingZoneItemOutput
             {
                 Id = item.Id,
-                SubId = item.SubId,
+                Key = item.SubId,
                 CommuneId = item.CommuneId,
                 Name = item.Name,
-                CreatedAt = item.CreatedAt,
-                ModifiedAt = item.ModifiedAt,
+                CreatedAt = $"{item.CreatedAt:dd-MM-yyyy}",
+                ModifiedAt = $"{item.ModifiedAt:dd-MM-yyyy}",
                 OwnerId = item.OwnerId,
                 DetailAddress = item.DetailAddress,
                 PricePerHour = string.Format(new CultureInfo("vi-VN"), "{0:C}", item.PricePerHour),
