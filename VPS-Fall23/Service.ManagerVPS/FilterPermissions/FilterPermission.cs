@@ -51,11 +51,11 @@ public class FilterPermission : ActionFilterAttribute
             }
 
             // No Permission
-            throw new UnauthorizeException();
+            throw new UnauthorizeException(5);
         }
         catch
         {
-            throw new UnauthorizeException();
+            throw new UnauthorizeException(5);
         }
     }
 }
