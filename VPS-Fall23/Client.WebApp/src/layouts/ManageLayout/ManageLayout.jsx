@@ -2,25 +2,11 @@ import { useState } from 'react';
 import { Layout } from 'antd';
 
 import Sidebar from '@/layouts/components/Sidebar';
-import ContentLayout from '../components/Content/ContentLayout';
+import ContentLayout from '@/layouts/components/Content/ContentLayout';
+import config from '@/config';
 
 function ManageLayout() {
-  const rowData = [
-    {
-      label: 'User',
-      options: [
-        { label: 'Profile', url: '/profile' },
-        { label: 'test', url: '/' },
-      ],
-    },
-    {
-      label: 'Manage',
-      options: [
-        { label: 'View Parking Zone List', url: '/listParkingZone' },
-        { label: 'Register Parking Zone', url: '/registerParkingZone' },
-      ],
-    },
-  ];
+  const rowData = config.adminSidebar;
 
   const [contentState, setContentState] = useState('1');
 

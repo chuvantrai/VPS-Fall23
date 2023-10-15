@@ -7,10 +7,6 @@ import { ConfigProvider } from 'antd';
 import { useSelector } from 'react-redux';
 import { LoadingOutlined } from '@ant-design/icons';
 
-import Homepage from '@/pages/Homepage';
-import UserProfile from './pages/Homepage/components/Content/UserProfile';
-import ViewListParkingZone from './pages/Homepage/components/Content/ViewListParkingZone';
-
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 function App() {
   const { isLoading } = useSelector((state) => state.global);
@@ -25,7 +21,6 @@ function App() {
                 let Layout = DefaultLayout;
                 let subRoutes = [{ url: '', component: null }];
                 subRoutes = route.subRoutes;
-                console.log();
                 if (route.layout) {
                   Layout = route.layout;
                 } else if (route.layout === null) {
