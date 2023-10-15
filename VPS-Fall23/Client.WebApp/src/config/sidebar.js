@@ -4,7 +4,12 @@ export const adminSidebar = [
   {
     label: 'User',
     options: [
-      { label: 'Profile', url: '/profile' },
+      {
+        label: 'Profile',
+        url: '/profile',
+        title: 'Thông tin tài khoản',
+        desc: 'Mọi thông tin về tài khoản được hiển thị dưới đây',
+      },
       { label: 'test', url: '/' },
     ],
   },

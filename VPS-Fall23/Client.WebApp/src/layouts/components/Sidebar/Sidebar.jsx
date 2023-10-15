@@ -9,21 +9,20 @@ import styles from './Sidebar.module.scss';
 // eslint-disable-next-line no-unused-vars
 const cx = classNames.bind(styles);
 
-function Sidebar({ rowData, setContentState }) {
+function Sidebar({ rowData, setSelectedKey }) {
   const navigate = useNavigate();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
   const handleMenuItem = (e) => {
-    setContentState(e.key);
+    setSelectedKey({ label: e.keyPath[1], url: e.keyPath[0] });
     navigate(e.key);
   };
 
-  const items2 = rowData.map(({ label, options }, index) => {
-    const key = String(index + 1);
+  const items2 = rowData.map(({ label, options }) => {
     return {
-      key: `sub${key}`,
+      key: `${label}`,
       // icon: React.createElement(icon),
       label: `${label}`,
       children: options.map(({ label, url }) => {
@@ -66,7 +65,7 @@ Sidebar.propTypes = {
     }),
   ),
 
-  setContentState: PropTypes.func,
+  setSelectedKey: PropTypes.func,
 };
 
 export default Sidebar;
