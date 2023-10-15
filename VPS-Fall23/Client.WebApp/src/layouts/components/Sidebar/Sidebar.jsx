@@ -39,7 +39,7 @@ function Sidebar({ rowData, setContentState }) {
       style={{
         background: colorBgContainer,
       }}
-      width={200}
+      width={246}
     >
       <Menu
         onClick={handleMenuItem}
