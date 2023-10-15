@@ -32,7 +32,7 @@ function ContentLayout({ title, desc }) {
         <Content
           className="flex justify-center items-center"
           style={{
-            padding: '24px 0px',
+            padding: 0,
             margin: 0,
             background: colorBgContainer,
           }}
