@@ -3,10 +3,10 @@ const routes = {
   register: '/register',
   login: '/login',
   verifyEmail: '/verifyEmail',
+  registerParkingZone: '/registerParkingZone',
   forgotPassword: '/forgotPassword',
   changePassword: '/changePassword',
-  registerParkingZone: '/registerParkingZone',
-  AccountProfile: '/accountProfile'
+  viewRequestedParkingZones: '/viewRequestedParkingZones',
 };
 
 export default routes;

@@ -1,21 +1,30 @@
 import config from '@/config';
-import { HeaderOnly } from '@/layouts';
+import { DefaultLayout } from '@/layouts';
 import Homepage from '@/pages/Homepage';
 import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
 import RegisterParkingZone from '@/pages/RegisterParkingZone';
+import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
+import ViewRequestedParkingZones from '@/pages/ViewRequestedParkingZones';
 import Login from '@/pages/Login';
 import ForgotPassword from '@/pages/ForgotPassword';
-import { DefaultLayout } from '@/layouts';
 import ChangePassword from '@/pages/ChangePassword/index.js';
 import AccountProfile from '@/pages/AccountProfile/index.js';
-import UserProfile from '@/pages/Homepage/components/Content/UserProfile.jsx';
 
 export const routes = [
   {
     path: config.routes.homepage,
     component: Homepage,
     layout: DefaultLayout,
+    subRoutes: [
+      { url: 'profile', component: AccountProfile },
+      { url: 'listParkingZone', component: ViewListParkingZone },
+      { url: 'registerParkingZone', component: RegisterParkingZone },
+      {
+        url: 'viewRequestedParkingZones',
+        component: ViewRequestedParkingZones,
+      },
+    ],
   },
   {
     path: config.routes.register,
@@ -45,10 +54,5 @@ export const routes = [
     path: config.routes.changePassword,
     component: ChangePassword,
     layout: null,
-  },
-  {
-    path: config.routes.AccountProfile,
-    component: AccountProfile,
-    layout: DefaultLayout,
   }
 ];
