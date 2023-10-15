@@ -5,6 +5,7 @@ namespace Service.ManagerVPS.Repositories.Interfaces;
 
 public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
 {
+    List<ParkingZone> GetAllParkingZone();
     ParkingZone? GetParkingZoneById(Guid id);
     
     IQueryable<ParkingZone> GetByCommuneId(Guid communeId);

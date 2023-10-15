@@ -75,6 +75,30 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
+    public IActionResult GetAll()
+    {
+        try
+        {
+            List<ParkingZone> list = ((IParkingZoneRepository)vpsRepository).GetAllParkingZone();
+            List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
+            foreach (ParkingZone item in list)
+            {
+                res.Add(new ParkingZoneItemOutput
+                {
+                    Name = item.Name,
+                    Owner = item.Owner.Email,
+                    Created = item.CreatedAt
+                });
+            }
+            return Ok(res);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex);
+        }
+    }
+
+    [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
     public async Task<IActionResult> GetRequestedParkingZones([FromQuery] QueryStringParameters parameters)
     {
@@ -182,4 +206,5 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
         return objectResults.Select(x => GetImageLink(x.Key)).ToList();
     }
+
 }
