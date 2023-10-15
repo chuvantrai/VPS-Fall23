@@ -114,4 +114,11 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         await context.SaveChangesAsync();
         return account;
     }
+
+    public async Task<Account?> GetAccountByIdAsync(Guid id)
+    {
+        var account = await context.Accounts
+            .FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.IsBlock && x.IsVerified == true);
+        return account;
+    }
 }

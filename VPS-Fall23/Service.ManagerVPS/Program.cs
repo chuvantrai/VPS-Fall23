@@ -44,6 +44,15 @@ builder.Services.AddScoped<IParkingZoneOwnerRepository, ParkingZoneOwnerReposito
 builder.Services.AddScoped<IParkingZoneRepository, ParkingZoneRepository>();
 builder.Services.AddScoped<IParkingTransactionRepository, ParkingTransactionRepository>();
 
+//Session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromSeconds(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,13 +60,14 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseHsts();
 }
 
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 app.UseExceptionHandler("/error");
+app.UseSession();
+
 app.Run();

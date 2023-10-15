@@ -3,7 +3,7 @@ import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import config from '@/config/index.js';
 import classNames from 'classnames/bind';
-import styles from '@/pages/ForgotPassword/ForgotPassword.module.scss';
+import styles from '@/pages/ChangePassword/ChangePassword.module.scss';
 import { useAxios } from '@/hooks/index.js';
 
 const cx = classNames.bind(styles);
@@ -27,56 +27,40 @@ const formItemLayout = {
   },
 };
 
-function convertEmailToStars(inputStr) {
-  if (inputStr.length >= 5) {
-    const stars = Array.from({ length: 5 }, () => '*').join('');
-    return inputStr.slice(0, 1) + stars + inputStr.slice(5);
-  }
-  return inputStr;
-}
-
-function ForgotPassword() {
+function ChangePassword() {
   const app = App.useApp();
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const axios = useAxios();
 
   const validateConfirmPassword = (_, value) => {
-    if (value && value !== form.getFieldValue('password')) {
+    if (value && value !== form.getFieldValue('newPassword')) {
       return Promise.reject('Mật khẩu không khớp!');
     }
     return Promise.resolve();
   };
 
+  const validateNewPassword = (_, value) => {
+    if (value && value === form.getFieldValue('oldPassword')) {
+      return Promise.reject('Mật khẩu mới không được giống mật khẩu cũ!');
+    }
+    return Promise.resolve();
+  };
+
   const onFinish = (values) => {
-    axios.put('/api/Auth/ForgotPassword', values)
+    axios.put('/api/Auth/ChangePassword', values)
       .then((res) => {
         if (res.status === 200) {
           app.notification.success({
             message: `Đổi mật khẩu thành công`,
             placement: 'topRight',
           });
-          navigate(`/login`);
+          navigate('/login');
         }
       })
-      .catch((error) => {
-        console.log(error);
-      });
   };
   const onClickLogo = () => {
     navigate('/');
-  };
-
-  const SendCodeVerify = () => {
-    const usernameValue = form.getFieldValue('username');
-    axios.put('/api/Auth/ResendVerificationCode', { userName: usernameValue })
-      .then((res) => {
-        console.log(res);
-        app.notification.success({
-          message: `Kiểm tra email ${convertEmailToStars(res.data)} của bạn để lấy mã xác thực!`,
-          placement: 'topRight',
-        });
-      });
   };
 
   return (
@@ -100,55 +84,42 @@ function ForgotPassword() {
         <div className={cx('flex w-[368px] h-[372px] flex-col items-start gap-[22px] mt-10')}>
           <h5 className={cx('register-form-text  flex flex-col justify-center items-start self-stretch ' +
             'text-[color:var(--character-title-85,rgba(0,0,0,0.85))] text-[16px] not-italic font-medium leading-6')}>
-            Quên mật Khẩu</h5>
+            Đôi mật Khẩu</h5>
           <Form
             className={cx('min-w-[600px]')}
             {...formItemLayout}
             form={form}
-            name='forgotPassword'
+            name='changePassword'
             onFinish={onFinish}
             scrollToFirstError
           >
             <Form.Item
-              name='username'
+              name='oldPassword'
               rules={[
                 {
                   required: true,
-                  message: 'Hãy nhập tên tài khoản/email của bạn!',
+                  message: 'Hãy nhập Mật khẩu của bạn!',
                 },
+                {
+                  min: 6,
+                  message: 'Mật khẩu tối thiểu phải có 6 ký tự!',
+                },
+                {
+                  max: 12,
+                  message: 'Mật khẩu tối đa là 12 ký tự',
+                }
               ]}
+              hasFeedback
             >
-              <Input placeholder='Tên tài khoản/email' value={''} />
+              <Input.Password
+                autoComplete='new-password'
+                placeholder='Mật khẩu(6 đến 12 ký tự)'
+                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+              />
             </Form.Item>
-            <div className={cx('flex')}>
-              <Form.Item
-                className={cx('w-[52%] verifyCode-formItem')}
-                name='verifyCode'
-                rules={[
-                  {
-                    required: true,
-                    message: 'Hãy code xác nhận!',
-                  },
-                  {
-                    min: 6,
-                    message: 'Code xác nhận sai!',
-                  },
-                  {
-                    max: 6,
-                    message: 'Code xác nhận sai!',
-                  },
-                ]}
-              >
-                <Input
-                  className={cx('w-[140%]')}
-                  placeholder='Code lấy lại mật khẩu'
-                />
 
-              </Form.Item>
-              <Button onClick={SendCodeVerify}>Gửi code</Button>
-            </div>
             <Form.Item
-              name='password'
+              name='newPassword'
               rules={[
                 {
                   required: true,
@@ -162,16 +133,16 @@ function ForgotPassword() {
                   max: 12,
                   message: 'Mật khẩu tối đa là 12 ký tự',
                 },
+                { validator: validateNewPassword },
               ]}
               hasFeedback
             >
               <Input.Password
                 autoComplete='new-password'
-                placeholder='Mật khẩu(6 đến 12 ký tự)'
+                placeholder='Nhập lại mật khẩu'
                 iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
               />
             </Form.Item>
-
             <Form.Item
               name='confirmPassword'
               rules={[
@@ -197,21 +168,6 @@ function ForgotPassword() {
                 iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
               />
             </Form.Item>
-
-            <Row className={'mb-[24px]'}>
-              <Col span={12}>
-
-              </Col>
-              <Col span={4}>
-                <Link
-                  to={config.routes.login}
-                  className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
-                    'shrink-0 rounded-sm text-[\'#1677ff\']')}
-                >
-                  Quên mật khẩu
-                </Link>
-              </Col>
-            </Row>
             <Row>
               <Col span={12}>
                 <Form.Item>
@@ -221,17 +177,17 @@ function ForgotPassword() {
                     htmlType='submit'
                     block
                   >
-                    Đăng nhập
+                    Lưu
                   </Button>
                 </Form.Item>
               </Col>
               <Col span={4} className={'flex justify-center h-[32px] items-center'}>
                 <Link
-                  to={config.routes.register}
+                  to={config.routes.login}
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >
-                  Đăng ký
+                  Đăng Nhập
                 </Link>
               </Col>
             </Row>
@@ -242,4 +198,4 @@ function ForgotPassword() {
   );
 }
 
-export default ForgotPassword;
+export default ChangePassword;

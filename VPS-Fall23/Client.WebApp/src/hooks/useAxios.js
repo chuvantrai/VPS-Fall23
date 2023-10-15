@@ -20,7 +20,7 @@ const useAxios = () => {
      *
      */
     const account = getAccountJwtModel();
-    if (error.status === 401 && account !== null && account.Expires < Date.now()) {
+    if (error.request?.status === 401 && account !== null && account.Expires < Date.now()) {
       // token hết hạn
       const _axios = axios.create({
         baseURL: import.meta.env.VITE_API_GATEWAY,
@@ -36,8 +36,14 @@ const useAxios = () => {
         .catch(() => {
           navigate('/login');
         });
-    } else if (error.status === 401) {
+    } else if (error.request?.status === 401) {
+      app.notification.error({
+        message: 'Lỗi',
+        description: error.response?.data?.message,
+        placement: 'topRight',
+      });
       navigate('/login');
+      return;
     }
     //Xử lý khi response trả về là arraybuffer
     if (error.request?.responseType === 'arraybuffer') {
@@ -58,6 +64,7 @@ const useAxios = () => {
   const _axios = axios.create({
     baseURL: import.meta.env.VITE_API_GATEWAY,
     xsrfHeaderName: 'RequestVerificationToken',
+    withCredentials: true,
   });
   _axios.interceptors.request.use((config) => {
     store.dispatch(setGlobalState({ isLoading: true }));

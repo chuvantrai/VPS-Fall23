@@ -11,6 +11,12 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
     }
 
+    public List<ParkingZone> GetAllParkingZone()
+    {
+        var parkingZone = context.ParkingZones.Include(o => o.Owner).ToList();
+        return parkingZone;
+    }
+
     public ParkingZone? GetParkingZoneById(Guid id)
     {
         var parkingZone = context.ParkingZones.FirstOrDefault(x => x.Id.Equals(id));
