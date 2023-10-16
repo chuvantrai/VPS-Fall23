@@ -104,7 +104,7 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         var account = await context.Accounts
             .FirstOrDefaultAsync(x => x.Id.Equals(request.AccountId));
         if (account == null) return null;
-        if (account.Avatar != null) account.Avatar = request.PathImage;
+        if (request.PathImage != null) account.Avatar = request.PathImage;
         account.FirstName = request.FirstName;
         account.LastName = request.LastName;
         account.PhoneNumber = request.PhoneNumber;

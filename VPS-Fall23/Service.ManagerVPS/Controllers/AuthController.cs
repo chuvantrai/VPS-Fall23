@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
+using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
@@ -20,14 +22,17 @@ public class AuthController : VpsController<Account>
     private readonly IGeneralVPS _generalVps;
     private readonly IParkingZoneOwnerRepository _parkingZoneOwnerRepository;
     private readonly IConfiguration _config;
+    private readonly FileManagementConfig _fileManagementConfig;
 
     public AuthController(IUserRepository userRepository, IGeneralVPS generalVps,
-        IParkingZoneOwnerRepository parkingZoneOwnerRepository, IConfiguration config)
+        IParkingZoneOwnerRepository parkingZoneOwnerRepository, IConfiguration config,
+        IOptions<FileManagementConfig> options)
         : base(userRepository)
     {
         _generalVps = generalVps;
         _parkingZoneOwnerRepository = parkingZoneOwnerRepository;
         _config = config;
+        _fileManagementConfig = options.Value;
     }
 
     [HttpPost]
@@ -282,32 +287,33 @@ public class AuthController : VpsController<Account>
         var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
         var userToken = JwtTokenExtension.ReadToken(accessToken)!;
         request.AccountId = Guid.Parse(userToken.UserId);
-        var pathFileName = string.Empty;
         // saveFile 
-        // if (request.AvatarImages?[0] != null)
-        // {
-        //     var fileManager =
-        //         new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
-        //             _config.GetValue<string>("fileManagementAccessKey:accessKey"),
-        //             _config.GetValue<string>("fileManagementAccessKey:secretKey"));
-        //     var avatarImg = new MultipartFormDataContent();
-        //     
-        //     var streamContent = new StreamContent(request.AvatarImages[0].OpenReadStream());
-        //     avatarImg.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
-        //         $"{Guid.Parse(userToken.UserId)}-{0}.{Path.GetExtension(request.AvatarImages[0].FileName)}");
-        //     await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
-        //         $"account-images/avatar-account/{Guid.Parse(userToken.UserId)}", avatarImg);
-        //     pathFileName =
-        //         $"{_config.GetValue<string>("fileManagementAccessKey:publicBucket")}account-images/avatar-account/" +
-        //         $"{Guid.Parse(userToken.UserId)}/{Guid.Parse(userToken.UserId)}-{0}.{Path.GetExtension(request.AvatarImages[0].FileName)}";
-        // }
-        
-        // saveFile
+        if (request.AvatarImages?[0] != null)
+        {
+            var fileManager =
+                new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                    _config.GetValue<string>("fileManagementAccessKey:accessKey"),
+                    _config.GetValue<string>("fileManagementAccessKey:secretKey"));
+            var avatarImg = new MultipartFormDataContent();
 
-        request.PathImage = pathFileName != string.Empty ? pathFileName : null;
+            var streamContent = new StreamContent(request.AvatarImages[0].OpenReadStream());
+            avatarImg.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
+                $"{Guid.Parse(userToken.UserId)}-{0}{Path.GetExtension(request.AvatarImages[0].FileName)}");
+
+            request.PathImage =
+                $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}/" +
+                $"{_config.GetValue<string>("fileManagementAccessKey:publicBucket")}" +
+                $"/account-images/avatar-account/{Guid.Parse(userToken.UserId)}/" +
+                $"{Guid.Parse(userToken.UserId)}-{0}{Path.GetExtension(request.AvatarImages[0].FileName)}";
+
+            await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+                $"account-images/avatar-account/{Guid.Parse(userToken.UserId)}", avatarImg);
+        }
+
+        // saveFile
         var account = await ((IUserRepository)vpsRepository).UpdateAccountById(request);
         if (account == null) throw new ClientException(6);
-        
+
         return Ok(new
         {
             AccessToken = JwtTokenExtension.WriteTokenByAccount(account)

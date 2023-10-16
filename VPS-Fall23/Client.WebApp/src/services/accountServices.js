@@ -7,15 +7,13 @@ import { useNavigate } from 'react-router-dom';
 
 
 const AccountServices = () => {
-  const navigate = useNavigate();
   const axios = useAxios();
   const getAccountProfile = (form, test123) => {
     axios.get('/api/Auth/GetAccountProfile')
       .then((res) => {
         if (res.status === 200) {
-          console.log(123);
           const profile = res.data;
-          test123(profile.addressArray);
+          test123(profile.addressArray, profile.commune);
           form.setFieldsValue({
             firstName: profile.firstName,
             lastName: profile.lastName,
@@ -25,8 +23,8 @@ const AccountServices = () => {
             address: profile.address,
             role: profile.role,
             dob: moment(profile.dob).format('DD-MM-YYYY'),
-            roleId: profile.roleId
-            // avatar: profile.avatar,
+            roleId: profile.roleId,
+            avatar: profile.avatar
           });
         }
       })
@@ -54,6 +52,7 @@ const AccountServices = () => {
           notification.success({
             message: 'Cập nhật thành công',
           });
+          window.location.reload();
         }
       })
       .catch((error) => {

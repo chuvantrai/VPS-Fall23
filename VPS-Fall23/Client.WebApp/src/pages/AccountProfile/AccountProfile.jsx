@@ -29,7 +29,6 @@ function AccountProfile() {
   const accountProfile = AccountServices();
 
   const onFinish = (values) => {
-    console.log(values, selectedAddress?.id, fileImage);
     accountProfile.updateAccountProfile(values,selectedAddress?.id, fileImage);
   };
   useEffect(() => {
@@ -43,9 +42,11 @@ function AccountProfile() {
     };
   }, []);
 
-  const callbackAddress = (value) => {
+  const callbackAddress = (value,idCommune) => {
       setstringArray(value);
-      console.log(stringArray);
+      if(idCommune!==''){
+        setSelectedAddress({...selectedAddress,id: idCommune});
+      }
   }
 
   // avartar update
@@ -248,7 +249,7 @@ function AccountProfile() {
                 ) :
                 <div className={cx('flex justify-center ')}>
                   <img
-                    src={'../src/assets/images/AvatarDefault.png'}
+                    src={form.getFieldValue('avatar')??'../src/assets/images/AvatarDefault.png'}
                     alt='Selected Image'
                     className={cx('object-cover rounded-[15px] w-3/5 aspect-[1] overflow-hidden')}
                   />

@@ -32,7 +32,7 @@ const AddressCascader = ({ cascaderProps, onCascaderChangeCallback, defaultAddre
                 }
             }))
         })
-    }, [defaultAddress])
+    }, [])
     const getChildCallback = (targetOption, childData, type, isLeaf) => {
         targetOption.children = childData.map((val) => ({ ...val, type: type, isLeaf: isLeaf }))
         setCities([...cities])
@@ -48,7 +48,7 @@ const AddressCascader = ({ cascaderProps, onCascaderChangeCallback, defaultAddre
     return (<Cascader
         {...cascaderProps}
         options={cities}
-        defaultValue={defaultAddress}
+        value={defaultAddress}
         loadData={loadCascaderChildren}
         onChange={onCascaderChangeCallback}
         fieldNames={fieldNames}
