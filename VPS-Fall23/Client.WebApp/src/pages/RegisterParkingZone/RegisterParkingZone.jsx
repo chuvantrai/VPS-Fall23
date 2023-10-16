@@ -108,7 +108,7 @@ const RegisterParkingZone = () => {
     <>
       <Form
         {...layout}
-        className=""
+        className="pt-[24px] pb-[24px]"
         name="nest-messages"
         onFinish={onFinish}
         style={{

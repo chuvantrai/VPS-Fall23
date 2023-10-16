@@ -5,42 +5,47 @@ namespace Service.ManagerVPS.Constants.Object;
 
 public static class ActionFilter
 {
-    private static List<ActionModel> AllActionModel { get; } = new List<ActionModel>()
+    private static List<ActionModel> AllActionModel { get; } = new()
     {
-        new ActionModel()
+        new ActionModel
         {
             Action = ActionFilterEnum.GetOk,
             UserRole = null
         },
-        new ActionModel()
+        new ActionModel
         {
             Action = ActionFilterEnum.AddUser,
             UserRole = new[] { UserRoleEnum.ADMIN }
         },
-        new ActionModel()
+        new ActionModel
         {
             Action = ActionFilterEnum.TestAuthApi,
             UserRole = new[] { UserRoleEnum.ADMIN }
         },
-        new ActionModel()
+        new ActionModel
         {
             Action = ActionFilterEnum.CreateAccountDemo,
             UserRole = null
         },
-        new ActionModel()
+        new ActionModel
         {
             Action = ActionFilterEnum.ChangePassword,
             UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
         },
-        new ActionModel()
+        new ActionModel
         {
             Action = ActionFilterEnum.RefreshToken,
             UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER, UserRoleEnum.ATTENDANT }
         },
-        new ActionModel()
+        new ActionModel
         {
             Action = ActionFilterEnum.UpdateProfileAccount,
             UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetRequestedParkingZones,
+            UserRole = new[] { UserRoleEnum.ADMIN }
         }
     };
 

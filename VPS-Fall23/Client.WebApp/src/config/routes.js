@@ -3,9 +3,9 @@ const routes = {
   register: '/register',
   login: '/login',
   verifyEmail: '/verifyEmail',
+  registerParkingZone: '/registerParkingZone',
   forgotPassword: '/forgotPassword',
-  changePassword: '/changePassword',
-  registerParkingZone: '/registerParkingZone'
+  viewRequestedParkingZones: '/viewRequestedParkingZones',
 };
 
 export default routes;
