@@ -6,7 +6,6 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { UploadOutlined } from '@ant-design/icons';
 import AddressCascader from '@/components/cascader/AddressCascader.jsx';
 import AccountServices from '@/services/accountServices.js';
-import getAccountJwtModel from '../../helpers/getAccountJwtModel.js';
 
 
 const cx = classNames.bind(styles);
