@@ -6,6 +6,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { UploadOutlined } from '@ant-design/icons';
 import AddressCascader from '@/components/cascader/AddressCascader.jsx';
 import AccountServices from '@/services/accountServices.js';
+import getAccountJwtModel from '../../helpers/getAccountJwtModel.js';
 
 
 const cx = classNames.bind(styles);
@@ -198,7 +199,7 @@ function AccountProfile() {
             </div>
             {/* END Row 3 (City, District, Commune)*/}
 
-            {/* START Row 4 (Address, RoleName)*/}
+            {/* START Row 4 (Address, DOB)*/}
             <div className={cx('t grid grid-cols-2 gap-4')}>
               <div className={cx('grid-rows-2 gap-4')}>
                 <div className={cx('row-span-1 ')}>
@@ -216,19 +217,22 @@ function AccountProfile() {
                   </Form.Item>
                 </div>
               </div>
-              <div className={cx('grid-rows-2 gap-4')}>
-                <div className={cx('row-span-1 ')}>
-                  <Form.Item
-                    name='dob'
-                    className={cx('mb-[15px]')}
-                    label='Ngày sinh'
-                  >
-                    <Input value='dateDob' disabled />
-                  </Form.Item>
-                </div>
-              </div>
+              {form.getFieldValue('roleId')===2?
+                <div className={cx('grid-rows-2 gap-4')}>
+                  <div className={cx('row-span-1 ')}>
+                    <Form.Item
+                      name='dob'
+                      className={cx('mb-[15px]')}
+                      label='Ngày sinh'
+                    >
+                      <Input value='dateDob' disabled />
+                    </Form.Item>
+                  </div>
+                </div>:<span></span>
+              }
+
             </div>
-            {/* START Row 4 (Address, RoleName)*/}
+            {/* START Row 4 (Address, DOB)*/}
           </div>
           <div className={cx('col-span-1 grid-rows-2')}>
             {/* START Row 1 (IMG)*/}

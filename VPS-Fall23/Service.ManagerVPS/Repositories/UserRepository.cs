@@ -104,12 +104,12 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         var account = await context.Accounts
             .FirstOrDefaultAsync(x => x.Id.Equals(request.AccountId));
         if (account == null) return null;
-        if (account.Avatar != null) account.Avatar = request.Avatar;
+        if (account.Avatar != null) account.Avatar = request.PathImage;
         account.FirstName = request.FirstName;
         account.LastName = request.LastName;
         account.PhoneNumber = request.PhoneNumber;
-        account.Address = request.Address;
-        account.CommuneId = request.CommuneId;
+        if (request.Address != null) account.Address = request.Address;
+        if (request.CommuneId is not null) account.CommuneId = request.CommuneId;
         account.ModifiedAt = DateTime.Now;
         await context.SaveChangesAsync();
         return account;

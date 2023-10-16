@@ -1,10 +1,13 @@
 import { useAxios } from '@/hooks/index.js';
 import moment from 'moment';
 import Cookies from 'js-cookie';
-import { convertAccountDataToCode, keyNameCookies } from '@/helpers/index.js';
+import { keyNameCookies } from '@/helpers/index.js';
 import { notification } from 'antd';
+import { useNavigate } from 'react-router-dom';
+
 
 const AccountServices = () => {
+  const navigate = useNavigate();
   const axios = useAxios();
   const getAccountProfile = (form, test123) => {
     axios.get('/api/Auth/GetAccountProfile')
@@ -22,6 +25,7 @@ const AccountServices = () => {
             address: profile.address,
             role: profile.role,
             dob: moment(profile.dob).format('DD-MM-YYYY'),
+            roleId: profile.roleId
             // avatar: profile.avatar,
           });
         }
@@ -32,13 +36,18 @@ const AccountServices = () => {
   };
 
   const updateAccountProfile = (values, communeId, fileImg) => {
-    values = {
-      ...values,
-      phoneNumber: values.phone,
-      avatarImages: fileImg,
-      communeId: communeId,
-    };
-    axios.put('/api/Auth/UpdateProfileAccount', values)
+    const formData = new FormData();
+    formData.append('firstName', values.firstName);
+    formData.append('lastName', values.lastName);
+    formData.append('phoneNumber', values.phone);
+    formData.append('address', values.address);
+    if (communeId !== undefined) formData.append('communeId', communeId);
+    formData.append('avatarImages', fileImg);
+    axios.put('/api/Auth/UpdateProfileAccount', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
       .then((res) => {
         if (res.status === 200) {
           Cookies.set(keyNameCookies.ACCESS_TOKEN, res.data.accessToken);

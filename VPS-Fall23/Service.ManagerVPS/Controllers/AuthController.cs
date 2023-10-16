@@ -277,26 +277,34 @@ public class AuthController : VpsController<Account>
 
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.UpdateProfileAccount)]
-    public async Task<IActionResult> UpdateProfileAccount(UpdateProfileAccountRequest request)
+    public async Task<IActionResult> UpdateProfileAccount([FromForm] UpdateProfileAccountRequest request)
     {
         var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
         var userToken = JwtTokenExtension.ReadToken(accessToken)!;
         request.AccountId = Guid.Parse(userToken.UserId);
-        
+        var pathFileName = string.Empty;
         // saveFile 
-        var fileManager =
-            new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
-                _config.GetValue<string>("fileManagementAccessKey:accessKey"),
-                _config.GetValue<string>("fileManagementAccessKey:secretKey"));
-        var parkingZoneImgs = new MultipartFormDataContent();
-
-        var streamContent = new StreamContent(request.AvatarImages[0].OpenReadStream());
-        parkingZoneImgs.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
-            $"{Guid.Parse(userToken.UserId)}-{0}.{Path.GetExtension(request.AvatarImages[0].FileName)}");
-        await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
-            $"parking-zone-images/{Guid.Parse(userToken.UserId)}", parkingZoneImgs);
-        // saveFile
+        // if (request.AvatarImages?[0] != null)
+        // {
+        //     var fileManager =
+        //         new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
+        //             _config.GetValue<string>("fileManagementAccessKey:accessKey"),
+        //             _config.GetValue<string>("fileManagementAccessKey:secretKey"));
+        //     var avatarImg = new MultipartFormDataContent();
+        //     
+        //     var streamContent = new StreamContent(request.AvatarImages[0].OpenReadStream());
+        //     avatarImg.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
+        //         $"{Guid.Parse(userToken.UserId)}-{0}.{Path.GetExtension(request.AvatarImages[0].FileName)}");
+        //     await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+        //         $"account-images/avatar-account/{Guid.Parse(userToken.UserId)}", avatarImg);
+        //     pathFileName =
+        //         $"{_config.GetValue<string>("fileManagementAccessKey:publicBucket")}account-images/avatar-account/" +
+        //         $"{Guid.Parse(userToken.UserId)}/{Guid.Parse(userToken.UserId)}-{0}.{Path.GetExtension(request.AvatarImages[0].FileName)}";
+        // }
         
+        // saveFile
+
+        request.PathImage = pathFileName != string.Empty ? pathFileName : null;
         var account = await ((IUserRepository)vpsRepository).UpdateAccountById(request);
         if (account == null) throw new ClientException(6);
         
@@ -330,7 +338,8 @@ public class AuthController : VpsController<Account>
             Role = EnumExtension.GetEnumDescription(EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId)),
             Dob = account.ParkingZoneOwner?.Dob,
             Avatar = account.Avatar,
-            AddressArray = commune == null ? null : new[] { city!.Name, district!.Name, commune.Name }
+            AddressArray = commune == null ? null : new[] { city!.Name, district!.Name, commune.Name },
+            RoleId = account.TypeId
         });
     }
 }

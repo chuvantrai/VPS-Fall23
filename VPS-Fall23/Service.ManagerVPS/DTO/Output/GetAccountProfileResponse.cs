@@ -14,4 +14,5 @@ public class GetAccountProfileResponse
     public DateTime? Dob { get; set; }
     public string? Avatar  { get; set; }
     public string[]? AddressArray  { get; set; }
+    public int RoleId { get; set; }
 }
