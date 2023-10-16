@@ -4,15 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Client.MobileApp.Models
+namespace Client.MobileApp.Extensions
 {
-    public static class Constance
+    public static class Logic
     {
-        public static string GoogleAppCredentials = "GoogleAppCredentials.json";
-        public static string ImageName = "Image " + DateTime.Now.ToString();
         public static async Task CopyFileToAppDataDirectory(string filename)
         {
-            if (!String.IsNullOrEmpty(filename))
+            if (!string.IsNullOrEmpty(filename))
             {
                 using Stream inputStream = await FileSystem.Current.OpenAppPackageFileAsync(filename);
                 StreamReader streamReader = new StreamReader(inputStream);

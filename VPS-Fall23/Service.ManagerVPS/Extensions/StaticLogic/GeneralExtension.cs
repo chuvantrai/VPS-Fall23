@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Service.ManagerVPS.DTO.OtherModels;
 
 namespace Service.ManagerVPS.Extensions.StaticLogic;
@@ -50,5 +51,11 @@ public static class GeneralExtension
         {
             return false;
         }
+    }
+
+    public static bool IsLicensePlateValid(string licensePlate)
+    {
+        string pattern = @"^[A-Za-z0-9\-\.]+$";
+        return Regex.IsMatch(licensePlate, pattern);
     }
 }
