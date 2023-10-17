@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
+using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -17,13 +21,18 @@ public class AuthController : VpsController<Account>
 {
     private readonly IGeneralVPS _generalVps;
     private readonly IParkingZoneOwnerRepository _parkingZoneOwnerRepository;
+    private readonly IConfiguration _config;
+    private readonly FileManagementConfig _fileManagementConfig;
 
     public AuthController(IUserRepository userRepository, IGeneralVPS generalVps,
-        IParkingZoneOwnerRepository parkingZoneOwnerRepository)
+        IParkingZoneOwnerRepository parkingZoneOwnerRepository, IConfiguration config,
+        IOptions<FileManagementConfig> options)
         : base(userRepository)
     {
         _generalVps = generalVps;
         _parkingZoneOwnerRepository = parkingZoneOwnerRepository;
+        _config = config;
+        _fileManagementConfig = options.Value;
     }
 
     [HttpPost]
@@ -273,13 +282,70 @@ public class AuthController : VpsController<Account>
 
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.UpdateProfileAccount)]
-    public async Task<IActionResult> UpdateProfileAccount(UpdateProfileAccountRequest request)
+    public async Task<IActionResult> UpdateProfileAccount([FromForm] UpdateProfileAccountRequest request)
     {
+        var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+        var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+        request.AccountId = Guid.Parse(userToken.UserId);
+        // saveFile 
+        if (request.AvatarImages?[0] != null)
+        {
+            var fileManager =
+                new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                    _config.GetValue<string>("fileManagementAccessKey:accessKey"),
+                    _config.GetValue<string>("fileManagementAccessKey:secretKey"));
+            var avatarImg = new MultipartFormDataContent();
+
+            var streamContent = new StreamContent(request.AvatarImages[0].OpenReadStream());
+            avatarImg.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
+                $"{Guid.Parse(userToken.UserId)}-{0}{Path.GetExtension(request.AvatarImages[0].FileName)}");
+
+            request.PathImage =
+                $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}/" +
+                $"{_config.GetValue<string>("fileManagementAccessKey:publicBucket")}" +
+                $"/account-images/avatar-account/{Guid.Parse(userToken.UserId)}/" +
+                $"{Guid.Parse(userToken.UserId)}-{0}{Path.GetExtension(request.AvatarImages[0].FileName)}";
+
+            await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+                $"account-images/avatar-account/{Guid.Parse(userToken.UserId)}", avatarImg);
+        }
+
+        // saveFile
         var account = await ((IUserRepository)vpsRepository).UpdateAccountById(request);
         if (account == null) throw new ClientException(6);
+
         return Ok(new
         {
             AccessToken = JwtTokenExtension.WriteTokenByAccount(account)
+        });
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetAccountProfile)]
+    public async Task<IActionResult> GetAccountProfile()
+    {
+        var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+        var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+        var account = await ((IUserRepository)vpsRepository).GetAccountByIdAsync(Guid.Parse(userToken.UserId));
+        if (account == null) throw new ClientException();
+        var commune = account.Commune;
+        var district = commune?.District;
+        var city = district?.City;
+        return Ok(new GetAccountProfileResponse()
+        {
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            Email = account.Email,
+            Phone = account.PhoneNumber,
+            City = city?.Id,
+            District = district?.Id,
+            Commune = commune?.Id,
+            Address = account.Address,
+            Role = EnumExtension.GetEnumDescription(EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId)),
+            Dob = account.ParkingZoneOwner?.Dob,
+            Avatar = account.Avatar,
+            AddressArray = commune == null ? null : new[] { city!.Name, district!.Name, commune.Name },
+            RoleId = account.TypeId
         });
     }
 }

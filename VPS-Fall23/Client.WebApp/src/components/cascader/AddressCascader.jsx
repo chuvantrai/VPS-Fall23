@@ -19,7 +19,7 @@ const fieldNames = {
     children: 'children'
 }
 
-const AddressCascader = ({ cascaderProps, onCascaderChangeCallback }) => {
+const AddressCascader = ({ cascaderProps, onCascaderChangeCallback, defaultAddress }) => {
     const [cities, setCities] = useState([]);
     const addressService = useAddressServices();
     useEffect(() => {
@@ -48,6 +48,7 @@ const AddressCascader = ({ cascaderProps, onCascaderChangeCallback }) => {
     return (<Cascader
         {...cascaderProps}
         options={cities}
+        value={defaultAddress}
         loadData={loadCascaderChildren}
         onChange={onCascaderChangeCallback}
         fieldNames={fieldNames}

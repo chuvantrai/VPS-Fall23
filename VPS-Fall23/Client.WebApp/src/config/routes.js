@@ -5,6 +5,7 @@ const routes = {
   verifyEmail: '/verifyEmail',
   registerParkingZone: '/registerParkingZone',
   forgotPassword: '/forgotPassword',
+  changePassword: '/changePassword',
   viewRequestedParkingZones: '/viewRequestedParkingZones',
 };
 
