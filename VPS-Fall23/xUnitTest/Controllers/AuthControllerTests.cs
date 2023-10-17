@@ -1,0 +1,41 @@
+﻿using FakeItEasy;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Service.ManagerVPS.Controllers;
+using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.Extensions.ILogic;
+using Service.ManagerVPS.Models;
+using Service.ManagerVPS.Repositories.Interfaces;
+
+namespace xUnitTest.Controllers;
+
+public class AuthControllerTests
+{
+    private readonly IUserRepository _userRepository = A.Fake<IUserRepository>();
+    private readonly IGeneralVPS _generalVps = A.Fake<IGeneralVPS>();
+    private readonly IParkingZoneOwnerRepository _ownerRepository = A.Fake<IParkingZoneOwnerRepository>();
+
+    [Fact]
+    public void AuthController_Register_ReturnOK()
+    {
+        var verifyCode = 123456;
+        var input = A.Fake<RegisterAccount>();
+        var existedAccount = A.Fake<Account>();
+        var parkingZoneOwnerExistedAccount = existedAccount.ParkingZoneOwner!;
+        var newAccount = A.Fake<Account>();
+        var parkingZoneOwner = A.Fake<ParkingZoneOwner>();
+
+        A.CallTo(() => _userRepository.GetOwnerAccountByEmail(input.Email)).Returns(existedAccount);
+        A.CallTo(() => _generalVps.GenerateVerificationCode()).Returns(verifyCode);
+        A.CallTo(() => _userRepository.Update(existedAccount));
+        A.CallTo(() => _ownerRepository.Update(parkingZoneOwnerExistedAccount));
+        A.CallTo(() => _userRepository.Create(newAccount));
+        A.CallTo(() => _ownerRepository.Create(parkingZoneOwner));
+
+        var controller = new AuthController(_userRepository, _generalVps, _ownerRepository);
+
+        var result = controller.Register(input);
+
+        result.Should().BeOfType(typeof(Task<IActionResult>));
+    }
+}
