@@ -68,7 +68,7 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
             => (x.Username.Equals(userName) || x.Email.Equals(userName)) && !x.IsBlock &&
                x.TypeId != (int)UserRoleEnum.ATTENDANT);
         if (account == null) return null;
-        
+
         if (account.ExpireVerifyCode == null || DateTime.Now > account.ExpireVerifyCode)
         {
             account.VerifyCode = _generalVPS.GenerateVerificationCode();
@@ -104,12 +104,12 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         var account = await context.Accounts
             .FirstOrDefaultAsync(x => x.Id.Equals(request.AccountId));
         if (account == null) return null;
-        if (account.Avatar != null) account.Avatar = request.Avatar;
+        if (request.PathImage != null) account.Avatar = request.PathImage;
         account.FirstName = request.FirstName;
         account.LastName = request.LastName;
         account.PhoneNumber = request.PhoneNumber;
-        account.Address = request.Address;
-        account.CommuneId = request.CommuneId;
+        if (request.Address != null) account.Address = request.Address;
+        if (request.CommuneId is not null) account.CommuneId = request.CommuneId;
         account.ModifiedAt = DateTime.Now;
         await context.SaveChangesAsync();
         return account;
@@ -118,7 +118,12 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
     public async Task<Account?> GetAccountByIdAsync(Guid id)
     {
         var account = await context.Accounts
+            .Include(x => x.Commune)
+            .ThenInclude(x => x!.District)
+            .ThenInclude(x => x.City)
+            .Include(x=>x.ParkingZoneOwner)
             .FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.IsBlock && x.IsVerified == true);
+        
         return account;
     }
 }
