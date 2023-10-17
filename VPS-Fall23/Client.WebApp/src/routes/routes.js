@@ -10,6 +10,7 @@ import Login from '@/pages/Login';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ChangePassword from '@/pages/ChangePassword/index.js';
 import AccountProfile from '@/pages/AccountProfile/index.js';
+import userRoleEnum from '@/helpers/userRoleEnum.js';
 
 export const routes = [
   {
@@ -17,9 +18,19 @@ export const routes = [
     component: Homepage,
     layout: DefaultLayout,
     subRoutes: [
-      { url: 'profile', component: AccountProfile },
-      { url: 'listParkingZone', component: ViewListParkingZone },
-      { url: 'registerParkingZone', component: RegisterParkingZone },
+      {
+        url: 'profile',
+        component: AccountProfile
+      },
+      {
+        url: 'listParkingZone',
+        component: ViewListParkingZone
+      },
+      {
+        url: 'registerParkingZone',
+        component: RegisterParkingZone,
+        userRole: [userRoleEnum.OWNER]
+      },
       {
         url: 'viewRequestedParkingZones',
         component: ViewRequestedParkingZones,
@@ -54,5 +65,6 @@ export const routes = [
     path: config.routes.changePassword,
     component: ChangePassword,
     layout: null,
-  }
+    userRole: [userRoleEnum.OWNER]
+  },
 ];

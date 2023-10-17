@@ -10,5 +10,6 @@ public enum ActionFilterEnum
     RefreshToken,
     UpdateProfileAccount,
     GetAccountProfile,
-    GetRequestedParkingZones
+    GetRequestedParkingZones,
+    CreatApiBankingDemo
 }

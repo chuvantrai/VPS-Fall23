@@ -34,6 +34,7 @@ builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
 
 //AddSingleton 
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
+builder.Services.AddSingleton<IVnPayLibrary, VnPayLibrary>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -52,6 +53,9 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+// orther
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

@@ -51,6 +51,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.GetRequestedParkingZones,
             UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CreatApiBankingDemo,
+            UserRole = null
         }
     };
 
