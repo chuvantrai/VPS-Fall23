@@ -24,4 +24,12 @@ public static class ResponseNotification
     public const string UPDATE_ERROR = "Cập nhật thất bại";
     public const string DELETE_ERROR = "Xóa thất bại";
     public const string GET_ERROR = "Lấy thất bại";
+
+    /*
+     * Notification License Plate error
+     */
+    public const string CHECKIN_SUCCESS = "Checkin thành công";
+    public const string CHECKIN_ERROR = "Checkin thất bại";
+    public const string CHECKOUT_SUCCESS = "Checkout thành công";
+    public const string CHECKOUT_ERROR = "Checkout thất bại";
 }

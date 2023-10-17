@@ -207,5 +207,4 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
         return objectResults.Select(x => GetImageLink(x.Key)).ToList();
     }
-
 }

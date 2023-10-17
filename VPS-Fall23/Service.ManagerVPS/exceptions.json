@@ -48,6 +48,18 @@
     "message": "Biển số này đã được đặt trước đó vào khoảng thời gian này, vui lòng kiểm tra lại"
   },
   {
+    "code": 3000,
+    "message": "Biển số xe chưa có!"
+  },
+  {
+    "code": 3001,
+    "message": "Biển số xe không hợp lệ!"
+  },
+  {
+    "code": 3002,
+    "message": "Không tìm thấy biển số xe!"
+  },
+  {
     "code": 5001,
     "message": "Tên tài khoản/email sai!"
   },
