@@ -42,26 +42,15 @@ public partial class VPS53 : ContentPage
             string path = String.Empty;
 
             string localFilePath = Path.Combine(FileSystem.Current.AppDataDirectory, Constant.ImageName);
-            await cameraView.SaveSnapShot(Camera.MAUI.ImageFormat.JPEG, localFilePath);
-#if ANDROID
-            await Logic.CopyFileToAppDataDirectory(Constant.GoogleAppCredentials);
-            path = Path.Combine(FileSystem.Current.AppDataDirectory, Constant.GoogleAppCredentials);
-#elif WINDOWS
-            path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), Constant.GoogleAppCredentials);
-#endif
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", path);
+            var imageSource = cameraView.GetSnapShot();
+            Stream imageSourceStream = await ((StreamImageSource)imageSource).Stream.Invoke(CancellationToken.None);
+            var image = Image.FromStream(imageSourceStream);
 
-            var client = ImageAnnotatorClient.Create();
-            var image = Image.FromFile(localFilePath);
-
-            var response = client.DetectText(image);
-
-            if (response[0].Description != null)
+            if (image != null)
             {
-                licensePlate += response[0].Description;
-                var checkLicensePlate = new CheckLicensePlate
+                var checkLicensePlate = new LicensePlateInfo
                 {
-                    LicensePlate = licensePlate,
+                    LicensePlate = image,
                     CheckAt = DateTime.Now,
                     CheckBy = new Guid()
                 };

@@ -2,10 +2,10 @@
 
 namespace Client.MobileApp.Models
 {
-    public class CheckLicensePlate
+    public class LicensePlateInfo
     {
         [Required]
-        public string LicensePlate { get; set; } = null!;
+        public Google.Cloud.Vision.V1.Image LicensePlate { get; set; }
 
         [Required]
         public DateTime CheckAt { get; set; }

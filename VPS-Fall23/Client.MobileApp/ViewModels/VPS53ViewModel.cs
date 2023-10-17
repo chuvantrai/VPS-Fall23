@@ -13,11 +13,11 @@ namespace Client.MobileApp.ViewModels
         {
             _client = new HttpClient
             {
-                BaseAddress = new Uri("http://localhost:5001")
+                BaseAddress = new Uri("http://10.0.2.2:5001")
             };
         }
 
-        public async Task<string> CheckLicensePLate(CheckLicensePlate checkLicensePlate)
+        public async Task<string> CheckLicensePLate(LicensePlateInfo checkLicensePlate)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace Client.MobileApp.ViewModels
                     return $"Yêu cầu không thành công, mã trạng thái: {response.StatusCode}";
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
                 return ex.Message;
             }

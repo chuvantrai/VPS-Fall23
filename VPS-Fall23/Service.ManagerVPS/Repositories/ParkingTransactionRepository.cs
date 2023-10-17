@@ -38,12 +38,12 @@ namespace Service.ManagerVPS.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<string> CheckLicesePlate(CheckLicensePlate checkLicensePlate)
+        public async Task<string> CheckLicesePlate(string licenseplate, LicensePlateInfo checkLicensePlate)
         {
             var transaction = await entities
                 .FirstOrDefaultAsync(pt => pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
                 || pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
-                && pt.LicensePlate.Equals(checkLicensePlate.LicensePlate));
+                && pt.LicensePlate.Equals(licenseplate));
 
             if (transaction != null)
             {
@@ -51,8 +51,8 @@ namespace Service.ManagerVPS.Repositories
 
                 return transCount switch
                 {
-                    0 => await CanLicensePlateCheckin(checkLicensePlate),
-                    _ => await CanLicensePlateCheckout(checkLicensePlate),
+                    0 => await CanLicensePlateCheckin(licenseplate, checkLicensePlate),
+                    _ => await CanLicensePlateCheckout(licenseplate, checkLicensePlate),
                 };
             }
             else
@@ -62,14 +62,14 @@ namespace Service.ManagerVPS.Repositories
 
         }
 
-        public async Task<string> CanLicensePlateCheckin(CheckLicensePlate? licensePlateCheckIn)
+        public async Task<string> CanLicensePlateCheckin(string licenseplate, LicensePlateInfo? licensePlateCheckIn)
         {
             if (licensePlateCheckIn != null)
             {
                 var transaction = await entities
                     .FirstOrDefaultAsync(pt => pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
                     || pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
-                    && pt.LicensePlate.Equals(licensePlateCheckIn.LicensePlate));
+                    && pt.LicensePlate.Equals(licenseplate));
 
                 if (transaction != null)
                 {
@@ -102,14 +102,14 @@ namespace Service.ManagerVPS.Repositories
             }
         }
 
-        public async Task <string> CanLicensePlateCheckout(CheckLicensePlate? licensePlateCheckOut)
+        public async Task<string> CanLicensePlateCheckout(string licenseplate, LicensePlateInfo? licensePlateCheckOut)
         {
             if (licensePlateCheckOut != null)
             {
                 var transaction = await entities
                     .FirstOrDefaultAsync(pt => pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
                     || pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
-                    && pt.LicensePlate.Equals(licensePlateCheckOut.LicensePlate));
+                    && pt.LicensePlate.Equals(licenseplate));
 
                 if (transaction != null)
                 {
