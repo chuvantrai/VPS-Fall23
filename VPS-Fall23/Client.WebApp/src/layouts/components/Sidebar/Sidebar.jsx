@@ -1,13 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import classNames from 'classnames/bind';
 import { Layout, Menu, theme } from 'antd';
 const { Sider } = Layout;
-
-import styles from './Sidebar.module.scss';
-
-// eslint-disable-next-line no-unused-vars
-const cx = classNames.bind(styles);
 
 function Sidebar({ rowData, setSelectedKey }) {
   const navigate = useNavigate();
@@ -20,7 +14,7 @@ function Sidebar({ rowData, setSelectedKey }) {
     navigate(e.key);
   };
 
-  const items2 = rowData.map(({ label, options }) => {
+  const items = rowData.map(({ label, options }) => {
     return {
       key: `${label}`,
       // icon: React.createElement(icon),
@@ -39,14 +33,14 @@ function Sidebar({ rowData, setSelectedKey }) {
       style={{
         background: colorBgContainer,
       }}
-      width={246}
+
     >
       <Menu
         onClick={handleMenuItem}
         mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
-        items={items2}
+        items={items}
       />
     </Sider>
   );
