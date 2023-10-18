@@ -7,7 +7,7 @@ function ManageLayout({ isShow, contentItem }) {
   return (
     <Layout>
       <ContentHeader title={contentItem.title} desc={contentItem.desc} />
-      <div className="h-fit bg-[#f0f2f5] px-[24px]">
+      <div className="h-fit bg-[#f0f2f5] px-[24px] mb-[20px]">
         {isShow && <ContentLayout></ContentLayout>}
       </div>
     </Layout>
