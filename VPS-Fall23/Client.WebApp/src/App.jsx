@@ -33,7 +33,6 @@ function App() {
         return { ...subRoute, component: Login };
       }):undefined,
   }));
-  console.log(filteredRoutes);
   return (
     <ConfigProvider>
       <AntdApp className='app'>
