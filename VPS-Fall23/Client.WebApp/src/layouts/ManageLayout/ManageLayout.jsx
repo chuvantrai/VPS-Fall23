@@ -1,22 +1,16 @@
-import { Breadcrumb } from 'antd';
+import { Layout } from 'antd';
+
+import ContentHeader from '@/layouts/components/ContentHeader/ContentHeader';
 import ContentLayout from '@/layouts/components/Content/ContentLayout';
-import { Content } from 'antd/es/layout/layout';
 
 function ManageLayout({ isShow, contentItem }) {
   return (
-    <Content
-      style={{
-        // background: colorBgContainer,
-        overflow: 'initial',
-        height: "100%",
-        padding: '1%'
-      }}>
-      <Breadcrumb>
-        <Breadcrumb.Item>{contentItem.title}</Breadcrumb.Item>
-        <Breadcrumb.Item>{contentItem.desc}</Breadcrumb.Item>
-      </Breadcrumb>
-      {isShow && <ContentLayout></ContentLayout>}
-    </Content>
+    <Layout>
+      <ContentHeader title={contentItem.title} desc={contentItem.desc} />
+      <div className="h-fit bg-[#f0f2f5] px-[24px]">
+        {isShow && <ContentLayout></ContentLayout>}
+      </div>
+    </Layout>
   );
 }
 export default ManageLayout;

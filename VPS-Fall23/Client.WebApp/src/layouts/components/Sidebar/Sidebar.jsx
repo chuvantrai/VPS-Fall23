@@ -32,8 +32,9 @@ function Sidebar({ rowData, setSelectedKey }) {
     <Sider
       style={{
         background: colorBgContainer,
+        minWidth: '246px!important',
       }}
-
+      width={246}
     >
       <Menu
         onClick={handleMenuItem}

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
@@ -31,19 +32,20 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpPost]
+    [FilterPermission(Action = ActionFilterEnum.RegisterNewParkingZone)]
     public async Task<IActionResult> Register([FromForm] RegisterParkingZone input)
     {
         var newParkingZone = new ParkingZone
         {
             Id = Guid.NewGuid(),
-            CommuneId = input.CommuneId,
+            CommuneId = (Guid)input.CommuneId!,
             Name = input.Name,
             CreatedAt = DateTime.Now,
             ModifiedAt = DateTime.Now,
-            OwnerId = input.OwnerId,
+            OwnerId = (Guid)input.OwnerId!,
             DetailAddress = input.DetailAddress,
-            PricePerHour = input.PricePerHour,
-            PriceOverTimePerHour = input.PriceOverTimePerHour,
+            PricePerHour = (decimal)input.PricePerHour!,
+            PriceOverTimePerHour = (decimal)input.PriceOverTimePerHour!,
             Slots = input.Slots
         };
 
@@ -91,6 +93,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     Created = item.CreatedAt
                 });
             }
+
             return Ok(res);
         }
         catch (Exception ex)
@@ -101,7 +104,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
-    public async Task<IActionResult> GetRequestedParkingZones([FromQuery] QueryStringParameters parameters)
+    public async Task<IActionResult> GetRequestedParkingZones(
+        [FromQuery] QueryStringParameters parameters)
     {
         var requestedParkingZones =
             ((IParkingZoneRepository)vpsRepository).GetRequestedParkingZones(parameters);
@@ -149,7 +153,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
     [HttpPut]
     public async Task<IActionResult> ChangeParkingZoneStat([FromBody] ChangeParkingZoneStat input)
     {
-        var parkingZone = ((IParkingZoneRepository)vpsRepository).GetParkingZoneById(input.Id);
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneById((Guid)input.Id!);
         if (parkingZone is null)
         {
             throw new ServerException(2);
@@ -162,6 +167,40 @@ public class ParkingZoneController : VpsController<ParkingZone>
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
 
         return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetParkingZoneInfoByOwner([FromBody] GetParkingZoneInfoInput input)
+    {
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneById((Guid)input.ParkingZoneId!);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        var parkingZoneImages = await GetImageLinks(parkingZone.OwnerId, parkingZone.Id);
+
+        var result = new
+        {
+            parkingZone.Id,
+            Key = parkingZone.SubId,
+            parkingZone.CommuneId,
+            parkingZone.Name,
+            CreatedAt = $"{parkingZone.CreatedAt:dd-MM-yyyy}",
+            ModifiedAt = $"{parkingZone.ModifiedAt:dd-MM-yyyy}",
+            parkingZone.OwnerId,
+            parkingZone.DetailAddress,
+            PricePerHour =
+                string.Format(new CultureInfo("vi-VN"), "{0:C}", parkingZone.PricePerHour),
+            PriceOverTimePerHour =
+                string.Format(new CultureInfo("vi-VN"), "{0:C}", parkingZone.PriceOverTimePerHour),
+            parkingZone.Slots,
+            parkingZone.Lat,
+            parkingZone.Lng,
+            ParkingZoneImages = parkingZoneImages
+        };
+        return Ok(result);
     }
 
     [HttpGet]

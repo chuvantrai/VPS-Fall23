@@ -42,7 +42,6 @@ function DefaultLayout() {
   const [contentItem, setContentItem] = useState(defaultContentItem);
 
   return (
-
     <Layout className={cx('wrapper w-full min-h-screen')}>
       <Header />
       <Layout style={{ position: 'relative' }}>
