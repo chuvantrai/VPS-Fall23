@@ -11,6 +11,6 @@ namespace Service.ManagerVPS.DTO.Input
         [Required]
         public Guid CheckBy { get; set; }
 
-        public Image? Image { get; set; }
+        public byte[]? Image { get; set; }
     }
 }

@@ -26,10 +26,11 @@ public static class ResponseNotification
     public const string GET_ERROR = "Lấy thất bại";
 
     /*
-     * Notification License Plate error
+     * Notification License Plate
      */
     public const string CHECKIN_SUCCESS = "Checkin thành công";
     public const string CHECKIN_ERROR = "Checkin thất bại";
     public const string CHECKOUT_SUCCESS = "Checkout thành công";
     public const string CHECKOUT_ERROR = "Checkout thất bại";
+    public const string NO_DATA = "Không có dữ liệu";
 }

@@ -40,9 +40,9 @@ namespace Service.ManagerVPS.Repositories
 
         public async Task<string> CheckLicesePlate(string licenseplate, LicensePlateInfo checkLicensePlate)
         {
-            var transaction = await entities
-                .FirstOrDefaultAsync(pt => pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
-                || pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
+            var transaction = await entities.Include(t => t.ParkingTransactionDetails)
+                .FirstOrDefaultAsync(pt => pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
+                || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT
                 && pt.LicensePlate.Equals(licenseplate));
 
             if (transaction != null)
@@ -57,24 +57,26 @@ namespace Service.ManagerVPS.Repositories
             }
             else
             {
-                throw new NotImplementedException();
+                return ResponseNotification.NO_DATA;
             }
 
         }
 
         public async Task<string> CanLicensePlateCheckin(string licenseplate, LicensePlateInfo? licensePlateCheckIn)
         {
+
             if (licensePlateCheckIn != null)
             {
-                var transaction = await entities
-                    .FirstOrDefaultAsync(pt => pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
-                    || pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
+                var transaction = await entities.Include(t => t.ParkingZone).Include(t => t.ParkingTransactionDetails)
+                    .FirstOrDefaultAsync(pt => pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
+                    || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT
                     && pt.LicensePlate.Equals(licenseplate));
 
                 if (transaction != null)
                 {
                     var transactionDetail = new ParkingTransactionDetail
                     {
+                        Id = Guid.NewGuid(),
                         From = licensePlateCheckIn.CheckAt,
                         To = transaction.CheckoutAt ?? DateTime.Now,
                         ParkingTransaction = transaction,
@@ -87,7 +89,7 @@ namespace Service.ManagerVPS.Repositories
                     context.ParkingTransactionDetails.Add(transactionDetail);
                     transaction.CheckinBy = licensePlateCheckIn.CheckBy;
                     await Update(transaction);
-                    context.SaveChanges();
+                    await SaveChange();
 
                     return ResponseNotification.CHECKIN_SUCCESS;
                 }
@@ -106,9 +108,9 @@ namespace Service.ManagerVPS.Repositories
         {
             if (licensePlateCheckOut != null)
             {
-                var transaction = await entities
-                    .FirstOrDefaultAsync(pt => pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
-                    || pt.StatusId.Equals(ParkingTransactionStatusEnum.BOOKED)
+                var transaction = await entities.Include(t => t.ParkingZone).Include(t => t.ParkingTransactionDetails)
+                    .FirstOrDefaultAsync(pt => pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
+                    || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT
                     && pt.LicensePlate.Equals(licenseplate));
 
                 if (transaction != null)
@@ -123,6 +125,7 @@ namespace Service.ManagerVPS.Repositories
                         {
                             var newTransactionDetail = new ParkingTransactionDetail
                             {
+                                Id = Guid.NewGuid(),
                                 From = transactionDetail.To,
                                 To = licensePlateCheckOut.CheckAt,
                                 ParkingTransaction = transaction,
@@ -132,7 +135,7 @@ namespace Service.ManagerVPS.Repositories
                                 Detail = "CHECK OUT AT " + licensePlateCheckOut.CheckAt
                             };
 
-                            context.ParkingTransactionDetails.Add(transactionDetail);
+                            context.ParkingTransactionDetails.Add(newTransactionDetail);
                             transaction.CheckoutBy = licensePlateCheckOut.CheckBy;
                             await Update(transaction);
                         }
@@ -144,8 +147,7 @@ namespace Service.ManagerVPS.Repositories
                         }
                     }
 
-                    context.SaveChanges();
-
+                    await SaveChange();
                     return ResponseNotification.CHECKOUT_SUCCESS;
                 }
                 else

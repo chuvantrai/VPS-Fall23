@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Google.Cloud.Vision.V1;
+using Microsoft.AspNetCore.Mvc;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
@@ -48,17 +49,9 @@ namespace Service.ManagerVPS.Controllers
         [HttpPost]
         public async Task<string> CheckLicensePlate(LicensePlateInfo licensePlateInfo)
         {
-            if (licensePlateInfo.Image == null)
-            {
-                throw new ClientException(3003);
-            }
+            var image = Image.FromBytes(licensePlateInfo.Image) ?? throw new ClientException(3003);
 
-            var licensePlate = await _googleApiService.GetLicensePlateFromImage(licensePlateInfo.Image);
-
-            if (licensePlate == null)
-            {
-                throw new ClientException(3000);
-            }
+            var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);
 
             if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {

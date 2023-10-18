@@ -1,5 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-using System.IO;
+﻿using Service.ManagerVPS.Constants.FileManagement;
 using Google.Cloud.Vision.V1;
 
 namespace Service.ManagerVPS.ExternalClients
@@ -16,7 +15,8 @@ namespace Service.ManagerVPS.ExternalClients
         public async Task<string> GetLicensePlateFromImage(Google.Cloud.Vision.V1.Image image)
         {
             string licensePlate = String.Empty;
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", _config.GetValue<string>("GoogleAppCredentials"));
+            string GoogleAppCredentials = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constant.GOOGLEAPPCREDENTIALS);
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", GoogleAppCredentials);
             var client = ImageAnnotatorClient.Create();
             var response = await client.DetectTextAsync(image);
 
