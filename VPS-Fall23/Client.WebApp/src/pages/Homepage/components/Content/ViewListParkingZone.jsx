@@ -1,6 +1,6 @@
-import { Table } from 'antd';
-import axios from 'axios';
+import { Table, Space } from 'antd';
 import { useEffect, useState } from 'react';
+import useParkingZoneService from '@/services/parkingZoneService.js'
 
 const columns = [
   {
@@ -15,6 +15,15 @@ const columns = [
     title: 'Created',
     dataIndex: 'created',
   },
+  {
+    title: '',
+    key: 'action',
+    render: () => (
+      <Space size="middle">
+        <a>Detail</a>
+      </Space>
+    ),
+  },
 ];
 
 const onChange = (pagination, filters, sorter, extra) => {
@@ -22,6 +31,8 @@ const onChange = (pagination, filters, sorter, extra) => {
 };
 
 function ViewListParkingZone() {
+  const parkingZoneService = useParkingZoneService();
+
   const [data, setData] = useState([{ name: '', owner: '', created: Date }]);
   let dataShow = [{ key: '', name: '', owner: '', created: Date }];
 
@@ -30,11 +41,9 @@ function ViewListParkingZone() {
   }, []);
 
   const getData = async () => {
-    await axios
-      .get('http://localhost:5001/api/ParkingZone/GetAll')
-      .then((res) => {
-        setData(res.data);
-      })
+    await parkingZoneService.getAllParkingZone().then((res) => {
+      setData(res.data);
+    })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
@@ -42,7 +51,7 @@ function ViewListParkingZone() {
 
   return (
     <div className="w-full px-4">
-      {data !== undefined && //console.log(data)
+      {data !== undefined &&
         data.map((val, index) => {
           const item = { key: index, name: val.name, owner: val.owner, created: val.created };
           dataShow.push(item);
