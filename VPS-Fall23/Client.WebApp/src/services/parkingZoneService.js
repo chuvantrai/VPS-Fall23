@@ -12,7 +12,7 @@ const useParkingZoneService = () => {
   const navigate = useNavigate();
 
   const getAllParkingZone = () => {
-    return axios.get(`${BASE_URI}/api/ParkingZone/GetAll`);
+    return axios.get(`${BASE_URI}/GetAll`);
   };
 
   const register = (values) => {
