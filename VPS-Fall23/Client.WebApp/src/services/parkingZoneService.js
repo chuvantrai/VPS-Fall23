@@ -11,6 +11,10 @@ const useParkingZoneService = () => {
   const axios = useAxios();
   const navigate = useNavigate();
 
+  const getAllParkingZone = () => {
+    return axios.get(`${BASE_URI}/api/ParkingZone/GetAll`);
+  };
+
   const register = (values) => {
     axios
       .post(REGISTER, values, {
@@ -70,6 +74,7 @@ const useParkingZoneService = () => {
     getFullAddress,
     getRequestParkingZones,
     changeParkingZoneStat,
+    getAllParkingZone,
   };
 };
 

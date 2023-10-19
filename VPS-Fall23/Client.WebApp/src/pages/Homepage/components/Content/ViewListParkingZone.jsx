@@ -1,6 +1,6 @@
 import { Table } from 'antd';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
+import service from '@/services/parkingZoneService.js'
 
 const columns = [
   {
@@ -30,14 +30,20 @@ function ViewListParkingZone() {
   }, []);
 
   const getData = async () => {
-    await axios
-      .get('http://localhost:5001/api/ParkingZone/GetAll')
-      .then((res) => {
-        setData(res.data);
-      })
+    await service.getAllParkingZone().then((res) => {
+      setData(res.data);
+    })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
+    // await axios
+    //   .get('api/ParkingZone/GetAll')
+    //   .then((res) => {
+    //     setData(res.data);
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error fetching data:', error);
+    //   });
   };
 
   return (
