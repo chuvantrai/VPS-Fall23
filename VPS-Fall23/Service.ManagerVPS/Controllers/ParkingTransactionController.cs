@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Google.Cloud.Vision.V1;
+using Microsoft.AspNetCore.Mvc;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -11,10 +13,12 @@ namespace Service.ManagerVPS.Controllers
 {
     public class ParkingTransactionController : VpsController<ParkingTransaction>
     {
-        public ParkingTransactionController(IParkingTransactionRepository parkingTransactionRepository)
+        private readonly GoogleApiService _googleApiService;
+
+        public ParkingTransactionController(IParkingTransactionRepository parkingTransactionRepository, GoogleApiService googleApiService)
             : base(parkingTransactionRepository)
         {
-
+            _googleApiService = googleApiService;
         }
 
         [HttpPost]
@@ -43,19 +47,18 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPost]
-        public async Task<string> CheckLicensePlate(CheckLicensePlate checkLicensePlate)
+        public async Task<string> CheckLicensePlate(LicensePlateInfo licensePlateInfo)
         {
-            if (checkLicensePlate.LicensePlate == null)
-            {
-                throw new ClientException(3000);
-            }
+            var image = Image.FromBytes(licensePlateInfo.Image) ?? throw new ClientException(3003);
 
-            if (GeneralExtension.IsLicensePlateValid(checkLicensePlate.LicensePlate))
+            var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);
+
+            if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {
                 throw new ClientException(3001);
             }
 
-            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(checkLicensePlate) ?? throw new ClientException(3002);
+            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate,licensePlateInfo) ?? throw new ClientException(3002);
         }
     }
 }

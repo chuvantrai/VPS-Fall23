@@ -110,10 +110,4 @@
 	<ItemGroup>
 	  <None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x64\tesseract50.dll" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiAsset Include="GoogleAppCredentials.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </MauiAsset>
-	</ItemGroup>
 </Project>

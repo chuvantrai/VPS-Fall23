@@ -1,16 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Google.Cloud.Vision.V1;
+using System.ComponentModel.DataAnnotations;
 
 namespace Service.ManagerVPS.DTO.Input
 {
-    public class CheckLicensePlate
+    public class LicensePlateInfo
     {
-        [Required]
-        public string LicensePlate { get; set; } = null!;
-
         [Required]
         public DateTime CheckAt { get; set; }
 
         [Required]
         public Guid CheckBy { get; set; }
+
+        public byte[]? Image { get; set; }
     }
 }
