@@ -27,6 +27,7 @@ namespace Client.MobileApp
                 .RegisterViews()
                 .UseMauiCameraView()
                 .RegisterAppServices()
+                
                 ;
 
             builder.Services.AddSingleton<IBrowser>(Browser.Default);

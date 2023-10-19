@@ -10,5 +10,12 @@ namespace Client.MobileApp.Constants
     {
         public static string GoogleAppCredentials = "GoogleAppCredentials.json";
         public static string ImageName = "Image " + DateTime.Now.ToString();
+        public static string API_PATH = "api/ParkingTransaction/CheckLicensePlate";
+
+
+        public static string NOTIFICATION = "NOTIFICATION";
+        public static string ALERT = "ALERT";
+        public static string CANCEL = "CANCEL";
+        public static string ALERT_ERROR = "PLEASE TAKE THE LICENSE PLATE IN TO AREA !!!";
     }
 }
