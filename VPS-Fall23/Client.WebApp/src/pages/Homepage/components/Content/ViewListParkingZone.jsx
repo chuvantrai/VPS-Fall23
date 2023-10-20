@@ -33,7 +33,7 @@ const onChange = (pagination, filters, sorter, extra) => {
 function ViewListParkingZone() {
   const parkingZoneService = useParkingZoneService();
 
-  const [data, setData] = useState([{ name: '', owner: '', created: Date }]);
+  const [data, setData] = useState([{ id: '', name: '', owner: '', created: Date }]);
   let dataShow = [{ key: '', name: '', owner: '', created: Date }];
 
   useEffect(() => {
@@ -51,9 +51,10 @@ function ViewListParkingZone() {
 
   return (
     <div className="w-full px-4">
+      {console.log(data)}
       {data !== undefined &&
-        data.map((val, index) => {
-          const item = { key: index, name: val.name, owner: val.owner, created: val.created };
+        data.map((val) => {
+          const item = { key: val.id, name: val.name, owner: val.owner, created: val.created };
           dataShow.push(item);
         })}
       {dataShow.shift() && console.log(dataShow)}

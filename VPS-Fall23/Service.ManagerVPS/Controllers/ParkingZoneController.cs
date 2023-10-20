@@ -86,6 +86,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
             {
                 res.Add(new ParkingZoneItemOutput
                 {
+                    Id = item.Id,
                     Name = item.Name,
                     Owner = item.Owner.Email,
                     Created = item.CreatedAt
