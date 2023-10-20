@@ -1,5 +1,5 @@
-﻿using Service.ManagerVPS.DTO.Input;
-using Service.ManagerVPS.DTO.OtherModels;
+﻿using Service.ManagerVPS.DTO.OtherModels;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
 
 namespace Service.ManagerVPS.Repositories.Interfaces;
@@ -9,6 +9,8 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
     List<ParkingZone> GetAllParkingZone();
     
     ParkingZone? GetParkingZoneById(Guid id);
+
+    ParkingZoneAndOwnerOutput? GetParkingZoneAndOwnerByParkingZoneId(Guid id);
     
     IQueryable<ParkingZone> GetByCommuneId(Guid communeId);
     

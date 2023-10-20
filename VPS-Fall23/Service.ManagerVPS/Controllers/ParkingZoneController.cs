@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Globalization;
+﻿using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
@@ -22,13 +21,16 @@ public class ParkingZoneController : VpsController<ParkingZone>
 {
     private readonly IConfiguration _config;
     private readonly FileManagementConfig _fileManagementConfig;
+    private readonly IContractRepository _contractRepository;
 
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
-        IConfiguration config, IOptions<FileManagementConfig> options)
+        IConfiguration config, IOptions<FileManagementConfig> options,
+        IContractRepository contractRepository)
         : base(parkingZoneRepository)
     {
         _config = config;
         _fileManagementConfig = options.Value;
+        _contractRepository = contractRepository;
     }
 
     [HttpPost]
@@ -151,26 +153,51 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
     public async Task<IActionResult> ChangeParkingZoneStat([FromBody] ChangeParkingZoneStat input)
     {
-        var parkingZone =
-            ((IParkingZoneRepository)vpsRepository).GetParkingZoneById((Guid)input.Id!);
-        if (parkingZone is null)
+        var output =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneAndOwnerByParkingZoneId(
+                (Guid)input.Id!);
+        if (output is null)
         {
             throw new ServerException(2);
         }
 
+        var parkingZone = output.ParkingZone;
         parkingZone.IsApprove = input.IsApprove;
         parkingZone.RejectReason = input.RejectReason;
         parkingZone.ModifiedAt = DateTime.Now;
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
+
+        if (input.IsApprove == true)
+        {
+            var contract = new Contract
+            {
+                Id = Guid.NewGuid(),
+                ParkingZoneId = (Guid)input.Id,
+                ContractCode = $"VPS/{output.Owner.Email}/{output.NumberOfParkingZones}",
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+                Status = 1,
+                PdfSavedAt = DateTime.Now
+            };
+            var contractAddedResult = await _contractRepository.Create(contract);
+            if (contractAddedResult is null)
+            {
+                throw new ServerException(ResponseNotification.ADD_ERROR);
+            }
+        }
+
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
 
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetParkingZoneInfoByOwner([FromBody] GetParkingZoneInfoInput input)
+    [FilterPermission(Action = ActionFilterEnum.GetParkingZoneInfoByOwner)]
+    public async Task<IActionResult> GetParkingZoneInfoById(
+        [FromBody] GetParkingZoneInfoInput input)
     {
         var parkingZone =
             ((IParkingZoneRepository)vpsRepository).GetParkingZoneById((Guid)input.ParkingZoneId!);

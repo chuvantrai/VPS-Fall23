@@ -1,4 +1,5 @@
 import { Breadcrumb } from "antd";
+import PropTypes from 'prop-types'
 
 function ContentHeader({ title, desc }) {
   return (
@@ -15,6 +16,11 @@ function ContentHeader({ title, desc }) {
       <div className="w-[1146px] text-zinc-800 text-[13px] font-normal font-['Roboto'] leading-[17.03px]">{desc}</div>
     </div>
   );
+}
+
+ContentHeader.propTypes = {
+  title: PropTypes.string,
+  desc: PropTypes.string
 }
 
 export default ContentHeader;

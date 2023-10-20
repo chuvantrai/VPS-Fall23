@@ -1,27 +1,27 @@
-import { Table, Space } from 'antd';
+import { Table } from 'antd';
+import { FormOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
+
 import useParkingZoneService from '@/services/parkingZoneService.js'
 
 const columns = [
   {
-    title: 'Name',
+    title: 'Tên',
     dataIndex: 'name',
   },
   {
-    title: 'Owner',
+    title: 'Chủ sở hữu',
     dataIndex: 'owner',
   },
   {
-    title: 'Created',
+    title: 'Ngày tạo',
     dataIndex: 'created',
   },
   {
-    title: '',
+    title: 'Action',
     key: 'action',
     render: () => (
-      <Space size="middle">
-        <a>Detail</a>
-      </Space>
+      <a><FormOutlined /></a>
     ),
   },
 ];

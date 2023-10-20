@@ -1,4 +1,5 @@
 import { Layout } from 'antd';
+import PropTypes from 'prop-types';
 
 import ContentHeader from '@/layouts/components/ContentHeader/ContentHeader';
 import ContentLayout from '@/layouts/components/Content/ContentLayout';
@@ -13,4 +14,9 @@ function ManageLayout({ isShow, contentItem }) {
     </Layout>
   );
 }
+
+ManageLayout.propTypes = {
+  contentItem: PropTypes.object
+}
+
 export default ManageLayout;

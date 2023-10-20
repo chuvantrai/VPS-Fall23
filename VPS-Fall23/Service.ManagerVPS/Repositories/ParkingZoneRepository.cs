@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.OtherModels;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -22,6 +23,26 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
         var parkingZone = context.ParkingZones.FirstOrDefault(x => x.Id.Equals(id));
         return parkingZone;
+    }
+
+    public ParkingZoneAndOwnerOutput? GetParkingZoneAndOwnerByParkingZoneId(Guid id)
+    {
+        var parkingZone = context.ParkingZones
+            .Include(x => x.Owner)
+            .FirstOrDefault(x => x.Id.Equals(id));
+        if (parkingZone == null) return null;
+
+        var numberOfParkingZone =
+            context.ParkingZones.Count(x => x.OwnerId.Equals(parkingZone.OwnerId));
+
+        var result = new ParkingZoneAndOwnerOutput
+        {
+            ParkingZone = parkingZone,
+            Owner = parkingZone.Owner,
+            NumberOfParkingZones = numberOfParkingZone
+        };
+        
+        return result;
     }
 
     public IQueryable<ParkingZone> GetByCityId(Guid cityId)
