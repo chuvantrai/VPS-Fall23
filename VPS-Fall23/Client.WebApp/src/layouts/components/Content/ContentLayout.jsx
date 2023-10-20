@@ -1,4 +1,4 @@
-import { Layout, theme, Breadcrumb } from 'antd';
+import { Layout, theme } from 'antd';
 import PropTypes from 'prop-types';
 import { Outlet } from 'react-router-dom';
 
@@ -13,6 +13,7 @@ function ContentLayout() {
     <Content style={{
       backgroundColor: colorBgContainer,
     }}>
+
       <Outlet></Outlet>
     </Content>
   );
