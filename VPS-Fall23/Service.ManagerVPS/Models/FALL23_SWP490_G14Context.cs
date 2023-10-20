@@ -38,7 +38,7 @@ namespace Service.ManagerVPS.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!;");
+                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid=nghianvho; pwd=Random@11092023#@!;");
             }
         }
 
@@ -212,7 +212,7 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("id");
 
                 entity.Property(e => e.ContractCode)
-                    .HasMaxLength(20)
+                    .HasMaxLength(255)
                     .HasColumnName("contract_code");
 
                 entity.Property(e => e.CreatedAt)
@@ -458,13 +458,11 @@ namespace Service.ManagerVPS.Models
                 entity.HasOne(d => d.CheckinByNavigation)
                     .WithMany(p => p.ParkingTransactionCheckinByNavigations)
                     .HasForeignKey(d => d.CheckinBy)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__parking_t__check__5629CD9C");
 
                 entity.HasOne(d => d.CheckoutByNavigation)
                     .WithMany(p => p.ParkingTransactionCheckoutByNavigations)
                     .HasForeignKey(d => d.CheckoutBy)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__parking_t__check__571DF1D5");
 
                 entity.HasOne(d => d.ParkingZone)
@@ -543,6 +541,14 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
 
+                entity.Property(e => e.Lat)
+                    .HasColumnType("decimal(18, 10)")
+                    .HasColumnName("lat");
+
+                entity.Property(e => e.Lng)
+                    .HasColumnType("decimal(18, 10)")
+                    .HasColumnName("lng");
+
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
@@ -570,16 +576,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id")
-                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
-
-                entity.Property(e => e.Lat)
-                .HasColumnType("decimal")
-                .HasColumnName("lat");
-
-                entity.Property(e => e.Lng)
-               .HasColumnType("decimal")
-               .HasColumnName("lng");
+                    .HasColumnName("sub_id");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
@@ -717,14 +714,30 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
+                entity.Property(e => e.Status).HasColumnName("status");
+
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("sub_id");
+
+                entity.Property(e => e.Type).HasColumnName("type");
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Reports)
                     .HasForeignKey(d => d.CreatedBy)
                     .HasConstraintName("FK__report__created___5CD6CB2B");
+
+                entity.HasOne(d => d.StatusNavigation)
+                    .WithMany(p => p.ReportStatusNavigations)
+                    .HasForeignKey(d => d.Status)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_report_global_status1");
+
+                entity.HasOne(d => d.TypeNavigation)
+                    .WithMany(p => p.ReportTypeNavigations)
+                    .HasForeignKey(d => d.Type)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_report_global_status");
             });
 
             modelBuilder.Entity<Type>(entity =>

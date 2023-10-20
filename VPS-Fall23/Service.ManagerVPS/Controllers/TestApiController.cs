@@ -1,12 +1,15 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.Controllers.Base;
+using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
+using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 
@@ -17,13 +20,16 @@ public class TestApiController : VpsController<Account>
     private readonly IConfiguration _config;
     private readonly IVnPayLibrary _vnPayLibrary;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly FileManagementConfig _fileManagementConfig;
 
     public TestApiController(IUserRepository userRepository, IConfiguration config,
-        IVnPayLibrary vnPayLibrary, IHttpContextAccessor httpContextAccessor) : base(userRepository)
+        IVnPayLibrary vnPayLibrary, IHttpContextAccessor httpContextAccessor,
+        IOptions<FileManagementConfig> options) : base(userRepository)
     {
         _config = config;
         _vnPayLibrary = vnPayLibrary;
         _httpContextAccessor = httpContextAccessor;
+        _fileManagementConfig = options.Value;
     }
 
     [HttpPost]
@@ -93,7 +99,7 @@ public class TestApiController : VpsController<Account>
 
         //Mã hệ thống merchant tự sinh ứng với mỗi yêu cầu truy vấn giao dịch.
         //Mã này là duy nhất dùng để phân biệt các yêu cầu truy vấn giao dịch. Không được trùng lặp trong ngày.
-        var vnp_RequestId = DateTime.Now.Ticks.ToString(); 
+        var vnp_RequestId = DateTime.Now.Ticks.ToString();
         var vnp_Version = _vnPayLibrary.GetVersionVnPay(); //2.1.0
         var vnp_Command = "querydr";
         var vnp_TxnRef = vnpTxnRef; // Mã giao dịch thanh toán tham chiếu
@@ -140,6 +146,31 @@ public class TestApiController : VpsController<Account>
         return Ok(strData);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> CreateImageDemo([FromForm] IFormFileCollection imgFile)
+    {
+        var guidImg = Guid.NewGuid();
+        var fileManager =
+            new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                _config.GetValue<string>("fileManagementAccessKey:accessKey"),
+                _config.GetValue<string>("fileManagementAccessKey:secretKey"));
+        var avatarImg = new MultipartFormDataContent();
+
+        var streamContent = new StreamContent(imgFile[0].OpenReadStream());
+        avatarImg.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
+            $"{guidImg}{Path.GetExtension(imgFile[0].FileName)}");
+
+        var fileNameImg =
+            $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}" +
+            $"/{_config.GetValue<string>("fileManagementAccessKey:publicBucket")}" +
+            $"/img-vps-public" +
+            $"/{guidImg}{Path.GetExtension(imgFile[0].FileName)}";
+
+        await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+            $"img-vps-public", avatarImg);
+        return Ok(fileNameImg);
+    }
+
     private string GetIpAddress()
     {
         string? ipAddress;
@@ -156,6 +187,6 @@ public class TestApiController : VpsController<Account>
             ipAddress = "Invalid IP:" + ex.Message;
         }
 
-        return ipAddress??"::1";
+        return ipAddress ?? "::1";
     }
 }
