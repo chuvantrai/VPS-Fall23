@@ -1,16 +1,6 @@
 import PropTypes from 'prop-types';
 import { Cascader } from 'antd';
 
-const options = [
-  {
-    value: 'zhejiang',
-    label: 'Zhejiang',
-  },
-  {
-    value: 'jiangsu',
-    label: 'Jiangsu',
-  },
-];
 const onChange = (value, selectedOptions) => {
   console.log(value, selectedOptions);
 };

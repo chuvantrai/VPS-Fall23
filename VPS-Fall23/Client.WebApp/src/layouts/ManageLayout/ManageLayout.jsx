@@ -2,7 +2,6 @@ import { Breadcrumb } from 'antd';
 import ContentLayout from '@/layouts/components/Content/ContentLayout';
 import { Content } from 'antd/es/layout/layout';
 import { Link, useLocation } from 'react-router-dom';
-import SearchBar from '@/components/searchbar/SearchBar';
 
 // eslint-disable-next-line react/prop-types, no-unused-vars
 function ManageLayout({ isShow, contentItem }) {
