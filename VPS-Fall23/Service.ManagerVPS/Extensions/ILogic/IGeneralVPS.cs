@@ -10,5 +10,5 @@ public interface IGeneralVPS
 
     Task<bool> SendListEmailAsync(IEnumerable<string> recipients, string subject, string body);
 
-    string CreateTemplateEmail(List<KeyValue> keyValues);
+    string CreateTemplateEmail(IEnumerable<KeyValue> keyValues);
 }

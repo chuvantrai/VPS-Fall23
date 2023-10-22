@@ -2,9 +2,11 @@
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.KeyValue;
 using Service.ManagerVPS.Controllers.Base;
+using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
+using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -20,13 +22,26 @@ public class ReportController : VpsController<Report>
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateReport([FromForm]CreateReportRequest request)
+    public async Task<IActionResult> CreateReport([FromForm] CreateReportRequest request)
     {
+        var accessToken = Request.Cookies["ACCESS_TOKEN"];
+        if (accessToken != null)
+        {
+            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+            request.UserId = Guid.Parse(userToken.UserId);
+        }
+
+        if ((request.UserId is null && request.Email == null && request.Phone == null)
+            || (request.UserId is not null && request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND))
+        {
+            throw new ClientException();
+        }
+
         var report = await ((IReportRepository)vpsRepository).CreateReport(request);
 
         // send mail to admin about report
         // Content email
-        var templateEmail = _generalVps.CreateTemplateEmail(new List<KeyValue>
+        var keyValuesTemplate = new List<KeyValue>
         {
             new KeyValue
             {
@@ -36,7 +51,7 @@ public class ReportController : VpsController<Report>
             new KeyValue
             {
                 Key = KeyHtmlEmail.DATE_SEND,
-                Value = report.CreatedAt.ToString("dd-MM-YYYY hh:mm:ss")
+                Value = report.CreatedAt.ToString("dd-MM-yyyy hh:mm:ss")
             },
             new KeyValue
             {
@@ -47,28 +62,30 @@ public class ReportController : VpsController<Report>
             {
                 Key = KeyHtmlEmail.USER_SEND,
                 Value = report.CreatedByNavigation != null
-                    ? report.CreatedByNavigation.FirstName + " " + report.CreatedByNavigation.FirstName
+                    ? report.CreatedByNavigation.FirstName + " " + report.CreatedByNavigation.LastName
                     : string.Empty
             },
             new KeyValue
             {
                 Key = KeyHtmlEmail.EMAIL_USER,
-                Value = report.CreatedByNavigation != null ? report.CreatedByNavigation.Email : request.Email
+                Value = report.CreatedByNavigation != null ? report.CreatedByNavigation.Email : report.Email
             },
             new KeyValue
             {
                 Key = KeyHtmlEmail.PHONE_USER,
-                Value = report.CreatedByNavigation != null ? report.CreatedByNavigation.PhoneNumber : request.Phone
+                Value = report.CreatedByNavigation != null ? report.CreatedByNavigation.PhoneNumber : report.Phone
             },
             new KeyValue
             {
                 Key = KeyHtmlEmail.DESCRIPTRION,
                 Value = report.Content
             }
-        });
+        };
+        var templateEmail = _generalVps.CreateTemplateEmail(keyValuesTemplate);
         var toEmail = new[] { "traicvhe153014@fpt.edu.vn", "0362351671trai@gmail.com" };
+        var titleEmail = $"Thông báo người dùng gửi báo cáo về {report.TypeNavigation.Description}";
+        await _generalVps.SendListEmailAsync(toEmail, titleEmail, templateEmail);
 
-        // await _generalVps.SendListEmailAsync(toEmail, titleEmail, templateEmail);
-        return Ok(templateEmail);
+        return Ok();
     }
 }

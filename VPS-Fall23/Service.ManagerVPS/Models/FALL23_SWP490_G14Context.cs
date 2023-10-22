@@ -30,6 +30,7 @@ namespace Service.ManagerVPS.Models
         public virtual DbSet<ParkingZoneAbsent> ParkingZoneAbsents { get; set; } = null!;
         public virtual DbSet<ParkingZoneAttendant> ParkingZoneAttendants { get; set; } = null!;
         public virtual DbSet<ParkingZoneOwner> ParkingZoneOwners { get; set; } = null!;
+        public virtual DbSet<PaymentTransaction> PaymentTransactions { get; set; } = null!;
         public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Type> Types { get; set; } = null!;
 
@@ -439,10 +440,6 @@ namespace Service.ManagerVPS.Models
                     .HasMaxLength(20)
                     .HasColumnName("license_plate");
 
-                entity.Property(e => e.PaidTransactionId)
-                    .HasMaxLength(100)
-                    .HasColumnName("paid_transaction_id");
-
                 entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
 
                 entity.Property(e => e.Phone)
@@ -450,10 +447,6 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("phone");
 
                 entity.Property(e => e.StatusId).HasColumnName("status_id");
-
-                entity.Property(e => e.SubId)
-                    .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
 
                 entity.HasOne(d => d.CheckinByNavigation)
                     .WithMany(p => p.ParkingTransactionCheckinByNavigations)
@@ -541,6 +534,10 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
 
+                entity.Property(e => e.IsFull)
+                    .HasColumnName("is_full")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.Lat)
                     .HasColumnType("decimal(18, 10)")
                     .HasColumnName("lat");
@@ -577,6 +574,14 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("sub_id");
+
+                entity.Property(e => e.WorkFrom)
+                    .HasColumnName("work_from")
+                    .HasDefaultValueSql("('06:00:00')");
+
+                entity.Property(e => e.WorkTo)
+                    .HasColumnName("work_to")
+                    .HasDefaultValueSql("('23:00:00')");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
@@ -695,6 +700,68 @@ namespace Service.ManagerVPS.Models
                     .HasConstraintName("FK__parking_zone__id__70DDC3D8");
             });
 
+            modelBuilder.Entity<PaymentTransaction>(entity =>
+            {
+                entity.HasKey(e => e.TxnRef)
+                    .HasName("PK__payment___B914BF1A850DE58C");
+
+                entity.ToTable("payment_transaction");
+
+                entity.Property(e => e.TxnRef)
+                    .HasMaxLength(100)
+                    .HasColumnName("txn_ref");
+
+                entity.Property(e => e.Amount)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasColumnName("amount");
+
+                entity.Property(e => e.BankCode)
+                    .HasMaxLength(20)
+                    .HasColumnName("bank_code");
+
+                entity.Property(e => e.BankTranNo)
+                    .HasMaxLength(255)
+                    .HasColumnName("bank_tran_no");
+
+                entity.Property(e => e.BookingId).HasColumnName("booking_id");
+
+                entity.Property(e => e.CardType)
+                    .HasMaxLength(20)
+                    .HasColumnName("card_type");
+
+                entity.Property(e => e.ConnectionId)
+                    .HasMaxLength(255)
+                    .HasColumnName("connection_id");
+
+                entity.Property(e => e.OrderInfo)
+                    .HasMaxLength(255)
+                    .HasColumnName("order_info");
+
+                entity.Property(e => e.PayDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("pay_date");
+
+                entity.Property(e => e.ResponseCode).HasColumnName("response_code");
+
+                entity.Property(e => e.SecureHash)
+                    .HasMaxLength(256)
+                    .HasColumnName("secure_hash");
+
+                entity.Property(e => e.SecureHashType)
+                    .HasMaxLength(10)
+                    .HasColumnName("secure_hash_type");
+
+                entity.Property(e => e.TransactionNo).HasColumnName("transaction_no");
+
+                entity.Property(e => e.TransactionStatus).HasColumnName("transaction_status");
+
+                entity.HasOne(d => d.Booking)
+                    .WithMany(p => p.PaymentTransactions)
+                    .HasForeignKey(d => d.BookingId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__payment_t__booki__1F98B2C1");
+            });
+
             modelBuilder.Entity<Report>(entity =>
             {
                 entity.ToTable("report");
@@ -713,6 +780,14 @@ namespace Service.ManagerVPS.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(1)
+                    .HasColumnName("email");
+
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(1)
+                    .HasColumnName("phone");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 

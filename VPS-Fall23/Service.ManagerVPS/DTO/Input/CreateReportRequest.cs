@@ -10,6 +10,9 @@ public class CreateReportRequest
     [Required]
     public ReportTypeEnum Type { get; set; }
     public Guid? UserId { get; set; }
+    [RegularExpression("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")]
     public string? Email { get; set; } = string.Empty;
+    [StringLength(10, MinimumLength = 10)]
+    [RegularExpression("^[0-9]+$")]
     public string? Phone { get; set; } = string.Empty;
 }

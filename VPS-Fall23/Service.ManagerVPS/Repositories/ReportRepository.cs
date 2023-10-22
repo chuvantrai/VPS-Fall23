@@ -14,6 +14,9 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
 
     public async Task<Report> CreateReport(CreateReportRequest request)
     {
+        request.Email ??= string.Empty;
+        request.Phone ??= string.Empty;
+        
         var report = new Report
         {
             Id = Guid.NewGuid(),
@@ -21,13 +24,16 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
             CreatedAt = DateTime.Now,
             Status = (int)ReportStatusEnum.PROCESSING,
             Type = (int)request.Type,
-            CreatedBy = request.UserId
+            CreatedBy = request.UserId,
+            Email = request.Email,
+            Phone = request.Phone
         };
         context.Reports.Add(report);
         await context.SaveChangesAsync();
-        if (request.UserId is null) return report;
         var reportResult = await context.Reports
             .Include(x => x.CreatedByNavigation)
+            .Include(x => x.TypeNavigation)
+            .Include(x => x.StatusNavigation)
             .FirstOrDefaultAsync(x => x.Id.Equals(report.Id));
         return reportResult!;
     }
