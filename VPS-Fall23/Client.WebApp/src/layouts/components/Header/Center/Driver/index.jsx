@@ -13,6 +13,7 @@ const DriverCenterHeader = () => {
         style: { width: '100%' },
         placeholder: 'Chọn địa điểm bạn muốn đến',
     };
+
     const onCascaderChange = useCallback((value, selectedOptions) => {
         setSelectedAddress(selectedOptions ? selectedOptions[selectedOptions.length - 1] : null);
     }, []);
@@ -26,6 +27,10 @@ const DriverCenterHeader = () => {
         }
         parkingZoneService.getByAddress(selectedAddress.id, selectedAddress.type).then((res) => {
             store.dispatch(setFoundedParkingZones({ listFounded: res?.data ?? [] }));
+            notification.success({
+                message: `Đã tìm thấy ${res?.data?.length ?? 0} nhà xe theo vị trí bạn chọn`,
+                description: "Mở danh sách đã tìm được bằng nút bấm góc trái của bản đồ để xem chi tiết."
+            })
         });
     };
 

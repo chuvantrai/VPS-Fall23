@@ -48,6 +48,14 @@
     "message": "Biển số này đã được đặt trước đó vào khoảng thời gian này, vui lòng kiểm tra lại"
   },
   {
+    "code": 1004,
+    "message": "Nhà xe không còn chỗ trống trong khoảng thời gian vào bạn đã chọn, vui lòng chọn khoảng thời gian khác"
+  },
+  {
+    "code": 1005,
+    "message": "Nhà xe không còn chỗ trống trong khoảng thời gian ra bạn đã chọn, vui lòng chọn khoảng thời gian khác"
+  },
+  {
     "code": 3000,
     "message": "Biển số xe chưa có!"
   },

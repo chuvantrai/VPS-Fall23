@@ -2,7 +2,6 @@ import { Alert, Badge, Carousel, Descriptions, Image, Modal, Typography, notific
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
-import useParkingTransactionService from '../../../../services/parkingTransactionSerivce';
 import { useSelector } from 'react-redux';
 import { setShowBookingForm } from '../../../../stores/parkingZones/parkingZone.store';
 import store from '../../../../stores';
@@ -10,10 +9,9 @@ const { Text } = Typography;
 
 const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
   const parkingZoneService = useParkingZoneService();
-  const parkingTransactionService = useParkingTransactionService();
+
   const [imageLinks, setImageLinks] = useState([]);
   const { isShowBookingForm } = useSelector((store) => store.parkingZone);
-  console.log(isShowBookingForm);
   useEffect(() => {
     if (!parkingZone) return;
     parkingZoneService.getImageLink(parkingZone.id).then((res) => setImageLinks(res?.data));
@@ -77,15 +75,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
     store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
     store.dispatch(setShowBookingForm({ isShowBookingForm: true }));
   };
-  const closeBookingForm = () => {
-    store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
-  };
-  const onConfirmBooking = (parkingTransaction) => {
-    parkingTransactionService.bookingSlot(parkingTransaction).then((res) => {
-      notification.success('Đặt chỗ thành công');
-      store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
-    });
-  };
+
   return (
     <>
       <Modal
@@ -121,8 +111,6 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
       <BookingForm
         isShow={isShowBookingForm}
         parkingZone={parkingZone}
-        onCloseCallback={closeBookingForm}
-        onSubmitCallback={onConfirmBooking}
       ></BookingForm>
     </>
   );

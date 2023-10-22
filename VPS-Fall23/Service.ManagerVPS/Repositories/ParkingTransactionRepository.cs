@@ -15,28 +15,27 @@ namespace Service.ManagerVPS.Repositories
 
         }
 
-        public async Task<int> GetRemainingSlot(Guid parkingZoneId)
+        public async Task<int> GetBookedSlot(Guid parkingZoneId)
         {
-            return await GetRemainingSlot(parkingZoneId, DateTime.Now);
+            return await GetBookedSlot(parkingZoneId, DateTime.Now);
         }
 
-        public async Task<int> GetRemainingSlot(Guid parkingZoneId, DateTime checkAt)
+        public async Task<int> GetBookedSlot(Guid parkingZoneId, DateTime checkAt)
         {
             return await this.entities
                  .Where(p => p.ParkingZoneId == parkingZoneId
-                 && p.CheckinAt <= checkAt && p.CheckoutAt >= checkAt)
+                 && p.CheckinAt <= checkAt
+                 && p.CheckoutAt >= checkAt
+                 && p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
+                 && (!p.ParkingTransactionDetails.Any()
+                 || p.ParkingTransactionDetails.OrderByDescending(pt => pt.CreatedAt).First().To >= checkAt
+                 ))
                  .CountAsync();
         }
+        /*  public async Task<int?> GetAvailableTime(Guid parkingZoneId)
+          {
 
-        public bool IsAlreadyBooking(ParkingTransaction parkingTransaction)
-        {
-            var transFound = this.entities
-                .FirstOrDefault(pt => pt.ParkingZoneId == parkingTransaction.ParkingZoneId
-                && pt.LicensePlate.Equals(parkingTransaction.LicensePlate)
-                );
-
-            throw new NotImplementedException();
-        }
+          }*/
 
         public async Task<string> CheckLicesePlate(CheckLicensePlate checkLicensePlate)
         {
@@ -102,7 +101,7 @@ namespace Service.ManagerVPS.Repositories
             }
         }
 
-        public async Task <string> CanLicensePlateCheckout(CheckLicensePlate? licensePlateCheckOut)
+        public async Task<string> CanLicensePlateCheckout(CheckLicensePlate? licensePlateCheckOut)
         {
             if (licensePlateCheckOut != null)
             {
@@ -157,6 +156,14 @@ namespace Service.ManagerVPS.Repositories
             {
                 return ResponseNotification.CHECKOUT_ERROR;
             }
+        }
+
+        public Task<bool> IsAlreadyBooking(BookingSlot bookingSlot)
+        {
+            return this.entities.AnyAsync(p => p.ParkingZoneId == bookingSlot.ParkingZoneId
+            && p.LicensePlate == bookingSlot.LicensePlate
+            && p.CheckinAt == bookingSlot.CheckinAt
+            && p.CheckoutAt == bookingSlot.CheckoutAt);
         }
     }
 }

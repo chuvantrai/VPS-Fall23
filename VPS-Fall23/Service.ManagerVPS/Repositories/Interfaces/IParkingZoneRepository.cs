@@ -16,4 +16,5 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
     IQueryable<ParkingZone> GetByDistrictId(Guid districtId);
 
     PagedList<ParkingZone> GetRequestedParkingZones(QueryStringParameters parameters);
+
 }

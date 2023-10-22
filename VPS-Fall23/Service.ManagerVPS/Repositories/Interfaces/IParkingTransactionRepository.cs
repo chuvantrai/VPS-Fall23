@@ -7,9 +7,9 @@ namespace Service.ManagerVPS.Repositories.Interfaces
     {
         Task<string> CanLicensePlateCheckin(CheckLicensePlate? licensePlateCheckIn);
         Task<string> CanLicensePlateCheckout(CheckLicensePlate? licensePlateCheckOut);
-        Task<int> GetRemainingSlot(Guid parkingZoneId);
-        Task<int> GetRemainingSlot(Guid parkingZoneId, DateTime checkAt);
-        bool IsAlreadyBooking(ParkingTransaction parkingTransaction);
+        Task<int> GetBookedSlot(Guid parkingZoneId);
+        Task<int> GetBookedSlot(Guid parkingZoneId, DateTime checkAt);
         Task<string> CheckLicesePlate(CheckLicensePlate checkLicensePlate);
+        Task<bool> IsAlreadyBooking(BookingSlot bookingSlot);
     }
 }

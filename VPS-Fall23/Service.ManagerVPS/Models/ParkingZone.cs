@@ -29,6 +29,9 @@ namespace Service.ManagerVPS.Models
         public int? Slots { get; set; }
         public decimal? Lat { get; set; }
         public decimal? Lng { get; set; }
+        public TimeSpan WorkFrom { get; set; }
+        public TimeSpan WorkTo { get; set; }
+        public bool? IsFull { get; set; }
 
         public virtual Commune Commune { get; set; } = null!;
         public virtual ParkingZoneOwner Owner { get; set; } = null!;

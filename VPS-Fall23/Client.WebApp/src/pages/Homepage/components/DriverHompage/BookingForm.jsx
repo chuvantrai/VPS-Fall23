@@ -1,56 +1,95 @@
-import { DatePicker, Form, Input, Modal, Space } from "antd"
-import dayjs from "dayjs"
-
-const range = (start, end) => {
-    const result = [];
-    for (let i = start; i < end; i++) {
-        result.push(i);
-    }
-    return result;
-};
-
-const BookingForm = ({ isShow, parkingZone, onSubmitCallback, onCloseCallback }) => {
+import { Button, Form, Input, Modal, Result, Slider, Space } from "antd"
+import { useState } from "react";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+import useParkingTransactionService from "../../../../services/parkingTransactionSerivce";
+import store from "../../../../stores";
+import { setShowBookingForm } from "../../../../stores/parkingZones/parkingZone.store";
+const TIME_STEP_IN_HOUR = 1
+const BookingForm = ({ isShow, parkingZone }) => {
 
     const [form] = Form.useForm();
-
-    const getDateFromNow = (current) => {
-        return current && current < dayjs().startOf('day')
-    }
-    const getDisabledTime = (current, type) => {
-        return {
-            disabledHours: () => range(0, 24).splice(0, dayjs().hour() + 1),
-        }
-    }
+    const [paymentResult, setPaymentResult] = useState({ isPaymentRequested: false, isShow: false, paymentTransaction: {}, parkingTransaction: {} });
+    const parkingTransactionService = useParkingTransactionService();
     const onSubmitClick = () => {
         form.validateFields().then(form => {
+
             let parkingTransaction = {
                 ...form,
                 parkingZoneId: parkingZone.id,
-                checkinAt: form.checkinTime[0],
-                checkoutAt: form.checkinTime[1],
-                licensePlate: `${form.licensePlatePre.trim()}-${form.licensePlateMid.trim()}\n${form.licensePlateEnd.trim()}`.toUpperCase()
+                checkinAt: `${bookingTime[0]}:00:00`,
+                checkoutAt: `${bookingTime[1]}:00:00`,
+                licensePlate: `${form.licensePlatePre.trim()}-${form.licensePlateMid.trim()}${form.licensePlateEnd.trim()}`.toUpperCase()
             }
-            onSubmitCallback(parkingTransaction);
+            book(parkingTransaction);
         });
+    }
+    const onClose = () => {
+        form.resetFields();
+        store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
+    }
+    let connection = new HubConnectionBuilder()
+        .withUrl(import.meta.env.VITE_API_GATEWAY + "/payment")
+        .withAutomaticReconnect()
+        .build();
+    const requestPayment = (parkingTransaction) => {
+        parkingTransactionService
+            .getPaymentUrl(parkingTransaction.id)
+            .then(res => {
+                var url = new URL(res.data);
+                var txnRef = url.searchParams.get("vnp_TxnRef");
+                connection.start().then(() => {
+                    connection.invoke("RegisterPayment", connection.connectionId, txnRef)
+                });
+                connection.on("ReceivePaidStatus", (paymentTransaction) => {
+                    setPaymentResult({ ...paymentResult, isPaymentRequested: true, isShow: true, paymentTransaction: paymentTransaction, parkingTransaction: parkingTransaction })
+                })
+                window.open(res.data, "_blank")
+            })
+    }
+    const book = (parkingTransaction) => {
+        if (paymentResult.isPaymentRequested) {
+            requestPayment(paymentResult.parkingTransaction)
+            return;
+        }
+        parkingTransactionService
+            .bookingSlot(parkingTransaction)
+            .then((res) => {
+                setPaymentResult({ ...paymentResult, parkingTransaction: res.data })
+                requestPayment(res.data)
+            })
+    };
+    const [bookingTime, setBookingTime] = useState()
+    const getPaymentResultProps = () => {
+        const success = paymentResult?.paymentTransaction.responseCode == "00" && paymentResult?.paymentTransaction.transactionStatus == "00"
+        return {
+            status: (success) ? "success" : "error",
+            title: `Thanh toán đặt lịch gửi xe ${success ? "thành công" : "thất bại"}`,
+            subTitle: (<>
+                <p>Số đơn hàng: {paymentResult?.paymentTransaction.txnRef}</p>
+                <p>Mã giao dịch: {paymentResult?.paymentTransaction.transactionNo}</p>
+            </>)
+        }
     }
     return (<Modal
         title={`Đặt chỗ gửi xe tại ${parkingZone?.name}`}
         open={isShow}
-        onCancel={onCloseCallback}
+        onCancel={onClose}
         destroyOnClose={true}
         onOk={onSubmitClick}
         okText="Thanh toán"
-        cancelText="Hủy"
+        cancelText="Đóng"
         okButtonProps={{
             style: {
                 backgroundColor: '#1677ff',
-            }
+            },
+            disabled: paymentResult?.paymentTransaction.responseCode == "00" && paymentResult?.paymentTransaction.transactionStatus == "00"
         }}
     >
         <Form
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
             form={form}
+            hidden={paymentResult.isShow}
         >
             <Form.Item
                 label="Email của bạn"
@@ -119,19 +158,38 @@ const BookingForm = ({ isShow, parkingZone, onSubmitCallback, onCloseCallback })
                 </Space.Compact>
             </Form.Item>
             <Form.Item
-                label="Thời gian ra/vào"
+                label="Thời gian vào/ra"
                 name="checkinTime"
-                rules={[{ required: true, message: "Vui lòng chọn thời gian ra vào" }]}
+                rules={[{ required: true, message: "Vui lòng chọn thời gian vào/ra" }]}
             >
-                <DatePicker.RangePicker
-                    disabledDate={getDateFromNow}
-                    disabledTime={getDisabledTime}
-                    showTime={true}
-                    format="YYYY-MM-DD HH:mm"
-                    name="checkinTime"
-                />
+                <Slider
+                    range={{ draggableTrack: true }}
+                    min={Number(parkingZone?.workFrom.split(":")[0]) ?? 6}
+                    max={Number(parkingZone?.workTo.split(":")[0]) ?? 23}
+                    step={TIME_STEP_IN_HOUR}
+                    tooltip={{
+                        autoAdjustOverflow: true,
+                        formatter: (val) => `${val}h`,
+                        placement: "bottom"
+                    }}
+                    value={[bookingTime]}
+                    onChange={setBookingTime}
+                >
+
+                </Slider>
+
             </Form.Item>
         </Form>
+        {paymentResult.isShow === true && <Result
+            {...getPaymentResultProps()}
+        // extra={[
+        //     <Button type="primary" key="console">
+        //         Go Console
+        //     </Button>,
+        //     <Button key="buy">Buy Again</Button>,
+        // ]}
+        />}
+
     </Modal >)
 }
 

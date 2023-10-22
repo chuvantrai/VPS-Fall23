@@ -1,30 +1,52 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.ExternalClients.VNPay;
 using Service.ManagerVPS.Models;
-using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
 
 namespace Service.ManagerVPS.Controllers
 {
     public class ParkingTransactionController : VpsController<ParkingTransaction>
     {
-        public ParkingTransactionController(IParkingTransactionRepository parkingTransactionRepository)
+        private readonly VnPayConfig vnPayConfig;
+        private readonly IParkingZoneRepository parkingZoneRepository;
+        private readonly IPaymentTransactionRepository paymentTransactionRepository;
+        public ParkingTransactionController(
+            IParkingTransactionRepository parkingTransactionRepository,
+            IOptions<VnPayConfig> vnPayConfig,
+            IParkingZoneRepository parkingZoneRepository,
+            IPaymentTransactionRepository paymentTransaction)
             : base(parkingTransactionRepository)
         {
-
+            this.vnPayConfig = vnPayConfig.Value;
+            this.parkingZoneRepository = parkingZoneRepository;
+            paymentTransactionRepository = paymentTransaction;
         }
-
         [HttpPost]
         public async Task<ParkingTransaction> Booking(BookingSlot bookingSlot)
         {
-            //if (((IParkingTransactionRepository)vpsRepository).IsAlreadyBooking(parkingTransaction))
-            //{
-            //    throw new ClientException(1003);
-            //}
-            ParkingTransaction parkingTransaction = new ParkingTransaction()
+            if (await ((IParkingTransactionRepository)vpsRepository).IsAlreadyBooking(bookingSlot))
+            {
+                throw new ClientException(1003);
+            }
+            ParkingZone parkingZone = await parkingZoneRepository.Find(bookingSlot.ParkingZoneId);
+            int bookedSlotAtCheckinTime = await ((IParkingTransactionRepository)vpsRepository).GetBookedSlot(parkingZone.Id, bookingSlot.CheckinAt);
+            if (parkingZone.Slots - bookedSlotAtCheckinTime <= 0)
+            {
+                throw new ClientException(1004);
+            }
+            int bookedSlotAtCheckoutTime = await ((IParkingTransactionRepository)vpsRepository).GetBookedSlot(parkingZone.Id, bookingSlot.CheckoutAt);
+            if (parkingZone.Slots - bookedSlotAtCheckoutTime <= 0)
+            {
+                throw new ClientException(1005);
+            }
+
+            ParkingTransaction parkingTransaction = new()
             {
                 Id = Guid.NewGuid(),
                 ParkingZoneId = bookingSlot.ParkingZoneId,
@@ -37,8 +59,8 @@ namespace Service.ManagerVPS.Controllers
             };
             parkingTransaction.Id = Guid.NewGuid();
             parkingTransaction.CreatedAt = DateTime.Now;
-            var response = await this.vpsRepository.Create(parkingTransaction);
-            await this.vpsRepository.SaveChange();
+            ParkingTransaction response = await vpsRepository.Create(parkingTransaction);
+            _ = await vpsRepository.SaveChange();
             return response;
         }
 
@@ -50,12 +72,36 @@ namespace Service.ManagerVPS.Controllers
                 throw new ClientException(3000);
             }
 
-            if (GeneralExtension.IsLicensePlateValid(checkLicensePlate.LicensePlate))
+            return GeneralExtension.IsLicensePlateValid(checkLicensePlate.LicensePlate)
+                ? throw new ClientException(3001)
+                : await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(checkLicensePlate) ?? throw new ClientException(3002);
+        }
+        [HttpGet("{parkingTransactionId}")]
+        public async Task<string> GetPayUrl(Guid parkingTransactionId)
+        {
+            ParkingTransaction transaction = await vpsRepository.Find(parkingTransactionId);
+            _ = await parkingZoneRepository.Find(transaction.ParkingZoneId);
+            decimal totalMoney = (decimal)(transaction.CheckoutAt - transaction.CheckinAt).Value.TotalHours * transaction.ParkingZone.PricePerHour;
+            string orderInfo = $"Thanh toan gui xe bien so {transaction.LicensePlate} tu {transaction.CheckinAt} den {transaction.CheckoutAt}";
+            string url = new VNPayClient(vnPayConfig)
+                .InitRequestParams(GetIpAddress(),
+                out string txnRef)
+                .CreateRequestUrl(vnPayConfig.Url,
+                totalMoney,
+                vnPayConfig.ExpireMinutes,
+                out string secureHash,
+             orderInfo);
+            PaymentTransaction paymentTransaction = new()
             {
-                throw new ClientException(3001);
-            }
-
-            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(checkLicensePlate) ?? throw new ClientException(3002);
+                BookingId = parkingTransactionId,
+                TxnRef = txnRef,
+                Amount = totalMoney,
+                OrderInfo = orderInfo,
+                SecureHash = secureHash,
+            };
+            _ = await paymentTransactionRepository.Create(paymentTransaction);
+            _ = await paymentTransactionRepository.SaveChange();
+            return url;
         }
     }
 }
