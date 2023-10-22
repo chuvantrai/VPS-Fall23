@@ -212,16 +212,16 @@ public class ParkingZoneController : VpsController<ParkingZone>
         {
             parkingZone.Id,
             Key = parkingZone.SubId,
-            parkingZone.CommuneId,
+            Commune = parkingZone.Commune.Name,
+            District = parkingZone.Commune.District.Name,
+            City = parkingZone.Commune.District.City.Name,
             parkingZone.Name,
             CreatedAt = $"{parkingZone.CreatedAt:dd-MM-yyyy}",
             ModifiedAt = $"{parkingZone.ModifiedAt:dd-MM-yyyy}",
             parkingZone.OwnerId,
-            parkingZone.DetailAddress,
-            PricePerHour =
-                string.Format(new CultureInfo("vi-VN"), "{0:C}", parkingZone.PricePerHour),
-            PriceOverTimePerHour =
-                string.Format(new CultureInfo("vi-VN"), "{0:C}", parkingZone.PriceOverTimePerHour),
+            parkingZone.DetailAddress, 
+            parkingZone.PricePerHour, 
+            parkingZone.PriceOverTimePerHour,
             parkingZone.Slots,
             parkingZone.Lat,
             parkingZone.Lng,

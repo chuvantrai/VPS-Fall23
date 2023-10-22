@@ -23,6 +23,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
         var parkingZone = context.ParkingZones
             .Include(x => x.ParkingZoneAbsents)
+            .Include(x => x.Commune)
+            .ThenInclude(x => x.District)
+            .ThenInclude(x => x.City)
             .FirstOrDefault(x => x.Id.Equals(id));
         return parkingZone;
     }

@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Table,
   Modal,
@@ -14,11 +15,13 @@ import {
   Form,
   Input,
   InputNumber,
+  Upload,
 } from 'antd';
-import { FormOutlined } from '@ant-design/icons';
+import { FormOutlined, UploadOutlined } from '@ant-design/icons';
 
 import useParkingZoneService from '@/services/parkingZoneService.js';
 import { getAccountJwtModel } from '@/helpers';
+import AddressCascader from '@/components/cascader/AddressCascader';
 
 const onChange = (pagination, filters, sorter, extra) => {
   console.log('params', pagination, filters, sorter, extra);
@@ -63,14 +66,31 @@ function ViewListParkingZone() {
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalViewOpen, setIsModalViewOpen] = useState(false);
   const [parkingZoneDetail, setParkingZoneDetail] = useState({});
+  const [fileList, setFileList] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [validateStatus, setValidateStatus] = useState('null');
+  const [help, setHelp] = useState('');
+  const [address, setAddress] = useState([]);
 
-  const handleGetParkingZoneDetail = useCallback((parkingZoneId, isApprove) => {
-    parkingZoneService.getParkingZoneDetail(parkingZoneId).then((res) => {
-      setParkingZoneDetail(res.data);
-      console.log('data: ');
-      console.log(res.data);
-      console.log('detail 1: ');
-      console.log(parkingZoneDetail);
+  const handleGetParkingZoneDetail = async (parkingZoneId, isApprove) => {
+    await parkingZoneService.getParkingZoneDetail(parkingZoneId).then((res) => {
+      const data = res.data;
+      setParkingZoneDetail(data);
+      form.setFieldsValue(data);
+      setAddress([data.city, data.district, data.commune]);
+
+      let files = [];
+      for (let i = 0; i < data.parkingZoneImages.length; i++) {
+        files.push({
+          uid: i,
+          name: 'img-' + i,
+          status: 'done',
+          url: data.parkingZoneImages[i],
+          thumbUrl: data.parkingZoneImages[i],
+        });
+      }
+      setFileList(files);
+      console.log(files);
     });
 
     if (account.RoleId === '1' || (account.RoleId === '2' && isApprove === true)) {
@@ -78,9 +98,7 @@ function ViewListParkingZone() {
     } else if (account.RoleId === '2') {
       setIsModalEditOpen(true);
     }
-  });
-  console.log('detail 2: ');
-  console.log(parkingZoneDetail);
+  };
 
   const handleCancel = () => {
     form.resetFields();
@@ -124,6 +142,11 @@ function ViewListParkingZone() {
     }
   };
 
+  const formatter = new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  });
+
   const descItems = [
     {
       key: '1',
@@ -138,12 +161,12 @@ function ViewListParkingZone() {
     {
       key: '3',
       label: 'Giá tiền (mỗi tiếng)',
-      children: parkingZoneDetail.pricePerHour,
+      children: formatter.format(parkingZoneDetail.pricePerHour),
     },
     {
       key: '4',
       label: 'Giá tiền quá giờ (mỗi tiếng)',
-      children: parkingZoneDetail.priceOverTimePerHour,
+      children: formatter.format(parkingZoneDetail.priceOverTimePerHour),
     },
     {
       key: '5',
@@ -161,6 +184,19 @@ function ViewListParkingZone() {
       children: parkingZoneDetail.detailAddress,
     },
   ];
+
+  const addressCascaderProps = {
+    style: { width: '100%' },
+    placeholder: 'Chọn địa chỉ',
+  };
+
+  const onCascaderChange = useCallback((value, selectedOptions) => {
+    setSelectedAddress(selectedOptions ? selectedOptions[selectedOptions.length - 1] : null);
+    setValidateStatus('');
+    setHelp('');
+  }, []);
+
+  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
   const formItemLayout = {
     labelCol: {
@@ -182,6 +218,27 @@ function ViewListParkingZone() {
   };
 
   const handleSubmitForm = (values) => {
+    // if (!selectedAddress) {
+    //   setValidateStatus('error');
+    //   setHelp('Vui lòng chọn địa chỉ của bãi đỗ xe');
+    // } else {
+    //   // values = { ...values, parkingZoneImages: fileList, communeId: selectedAddress?.id };
+
+    //   // const formData = new FormData();
+    //   // formData.append('ownerId', account.UserId);
+    //   // formData.append('name', values.name);
+    //   // formData.append('pricePerHour', values.pricePerHour);
+    //   // formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
+    //   // formData.append('slots', values.slots);
+    //   // formData.append('communeId', values.communeId);
+    //   // formData.append('detailAddress', values.detailAddress);
+    //   // values.parkingZoneImages.forEach((item) => {
+    //   //   formData.append('parkingZoneImages', item.originFileObj);
+    //   // });
+
+    //   // parkingZoneService.register(formData);
+    //   console.log(values);
+    // }
     console.log(values);
   };
 
@@ -209,26 +266,25 @@ function ViewListParkingZone() {
         title="Thông tin bãi đỗ xe"
         open={isModalEditOpen}
         onCancel={handleCancel}
-        footer={() => (
+        footer={(_, { CancelBtn }) => (
           <Space>
             <Switch checkedChildren="Full" unCheckedChildren="Available" />
-            <Button className="bg-[#1677ff] text-white" onClick={() => formRef.current.submit()}>
+            <CancelBtn />
+            <Button
+              className="bg-[#1677ff] text-white"
+              onClick={() => {
+                form.validateFields().then((values) => {
+                  handleSubmitForm(values);
+                });
+              }}
+            >
               Lưu
             </Button>
           </Space>
         )}
         width={600}
       >
-        <Form
-          {...formItemLayout}
-          form={form}
-          ref={formRef}
-          name="editForm"
-          onFinish={handleSubmitForm}
-          style={{ maxWidth: '600px' }}
-          labelWrap
-          initialValues={parkingZoneDetail}
-        >
+        <Form {...formItemLayout} form={form} name="editForm" style={{ maxWidth: '600px' }} labelWrap>
           <Form.Item className="hidden" name="id">
             <Input type="hidden" />
           </Form.Item>
@@ -267,6 +323,73 @@ function ViewListParkingZone() {
             ]}
           >
             <InputNumber className="w-[100%]" prefix="VND" />
+          </Form.Item>
+          <Form.Item
+            name="slots"
+            label="Số chỗ"
+            rules={[
+              {
+                required: true,
+                message: 'Không thể để trống',
+              },
+            ]}
+          >
+            <InputNumber className="w-[100%]" />
+          </Form.Item>
+          <Form.Item
+            name="communeId"
+            label="Địa chỉ"
+            validateStatus={validateStatus}
+            help={help}
+            rules={[
+              {
+                required: true,
+                message: 'Không thể để trống',
+              },
+            ]}
+          >
+            <AddressCascader
+              cascaderProps={addressCascaderProps}
+              onCascaderChangeCallback={onCascaderChange}
+              defaultAddress={address}
+            />
+          </Form.Item>
+          <Form.Item
+            name="detailAddress"
+            label="Địa chỉ cụ thể"
+            rules={[
+              {
+                required: true,
+                message: 'Không thể để trống',
+              },
+            ]}
+          >
+            <Input.TextArea
+              placeholder="Địa chỉ cụ thể"
+              style={{
+                height: '76px',
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="parkingZoneImages"
+            label="Ảnh bãi đỗ xe"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Upload
+              className="upload-list-inline"
+              accept="image/*"
+              listType="picture"
+              fileList={fileList}
+              onChange={handleChange}
+              beforeUpload={() => false}
+            >
+              {fileList.length >= 8 ? null : <Button icon={<UploadOutlined />}>Upload</Button>}
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>
