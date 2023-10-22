@@ -25,3 +25,7 @@ body {
 .swal2-container {
   zoom: 1.5;
 }
+
+button[aria-checked='false'] {
+  background-color: #8c8c8c;
+}

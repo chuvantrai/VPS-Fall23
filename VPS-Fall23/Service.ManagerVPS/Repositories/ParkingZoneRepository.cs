@@ -21,7 +21,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
 
     public ParkingZone? GetParkingZoneById(Guid id)
     {
-        var parkingZone = context.ParkingZones.FirstOrDefault(x => x.Id.Equals(id));
+        var parkingZone = context.ParkingZones
+            .Include(x => x.ParkingZoneAbsents)
+            .FirstOrDefault(x => x.Id.Equals(id));
         return parkingZone;
     }
 

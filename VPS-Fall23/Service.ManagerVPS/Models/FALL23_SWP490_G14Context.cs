@@ -212,7 +212,7 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("id");
 
                 entity.Property(e => e.ContractCode)
-                    .HasMaxLength(20)
+                    .HasMaxLength(255)
                     .HasColumnName("contract_code");
 
                 entity.Property(e => e.CreatedAt)
@@ -459,13 +459,11 @@ namespace Service.ManagerVPS.Models
                 entity.HasOne(d => d.CheckinByNavigation)
                     .WithMany(p => p.ParkingTransactionCheckinByNavigations)
                     .HasForeignKey(d => d.CheckinBy)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__parking_t__check__5629CD9C");
 
                 entity.HasOne(d => d.CheckoutByNavigation)
                     .WithMany(p => p.ParkingTransactionCheckoutByNavigations)
                     .HasForeignKey(d => d.CheckoutBy)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__parking_t__check__571DF1D5");
 
                 entity.HasOne(d => d.ParkingZone)
@@ -545,6 +543,18 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
 
+                entity.Property(e => e.IsFull)
+                    .HasColumnName("is_full")
+                    .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.Lat)
+                    .HasColumnType("decimal(18, 10)")
+                    .HasColumnName("lat");
+
+                entity.Property(e => e.Lng)
+                    .HasColumnType("decimal(18, 10)")
+                    .HasColumnName("lng");
+
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
@@ -572,16 +582,15 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id")
-                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id");
 
-                entity.Property(e => e.Lat)
-                .HasColumnType("decimal")
-                .HasColumnName("lat");
+                entity.Property(e => e.WorkFrom)
+                    .HasColumnName("work_from")
+                    .HasDefaultValueSql("('06:00:00')");
 
-                entity.Property(e => e.Lng)
-               .HasColumnType("decimal")
-               .HasColumnName("lng");
+                entity.Property(e => e.WorkTo)
+                    .HasColumnName("work_to")
+                    .HasDefaultValueSql("('23:00:00')");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
@@ -719,14 +728,30 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
+                entity.Property(e => e.Status).HasColumnName("status");
+
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
                     .HasColumnName("sub_id");
+
+                entity.Property(e => e.Type).HasColumnName("type");
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Reports)
                     .HasForeignKey(d => d.CreatedBy)
                     .HasConstraintName("FK__report__created___5CD6CB2B");
+
+                entity.HasOne(d => d.StatusNavigation)
+                    .WithMany(p => p.ReportStatusNavigations)
+                    .HasForeignKey(d => d.Status)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_report_global_status1");
+
+                entity.HasOne(d => d.TypeNavigation)
+                    .WithMany(p => p.ReportTypeNavigations)
+                    .HasForeignKey(d => d.Type)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_report_global_status");
             });
 
             modelBuilder.Entity<Type>(entity =>

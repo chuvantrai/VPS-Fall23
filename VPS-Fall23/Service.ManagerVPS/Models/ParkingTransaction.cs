@@ -24,8 +24,8 @@ namespace Service.ManagerVPS.Models
         public string Email { get; set; } = null!;
         public string Phone { get; set; } = null!;
 
-        public virtual Account CheckinByNavigation { get; set; } = null!;
-        public virtual Account CheckoutByNavigation { get; set; } = null!;
+        public virtual Account? CheckinByNavigation { get; set; }
+        public virtual Account? CheckoutByNavigation { get; set; }
         public virtual ParkingZone ParkingZone { get; set; } = null!;
         public virtual GlobalStatus? Status { get; set; }
         public virtual ICollection<ParkingTransactionDetail> ParkingTransactionDetails { get; set; }

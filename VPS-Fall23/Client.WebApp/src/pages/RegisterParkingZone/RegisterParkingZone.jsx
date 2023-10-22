@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 
 import AddressCascader from '@/components/cascader/AddressCascader';
 import useParkingZoneService from '@/services/parkingZoneService';
+import { getAccountJwtModel } from '@/helpers';
 
 const layout = {
   labelCol: {
@@ -35,6 +36,7 @@ const getBase64 = (file) =>
 
 const RegisterParkingZone = () => {
   const parkingZoneService = useParkingZoneService();
+  const account = getAccountJwtModel();
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
@@ -89,7 +91,7 @@ const RegisterParkingZone = () => {
       values = { ...values, parkingZoneImages: fileList, communeId: selectedAddress?.id };
 
       const formData = new FormData();
-      formData.append('ownerId', '290E1476-AA4F-4BD6-8A23-E7167E1D0417');
+      formData.append('ownerId', account.UserId);
       formData.append('name', values.name);
       formData.append('pricePerHour', values.pricePerHour);
       formData.append('priceOverTimePerHour', values.priceOverTimePerHour);

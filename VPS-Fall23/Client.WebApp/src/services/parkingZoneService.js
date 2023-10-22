@@ -67,6 +67,14 @@ const useParkingZoneService = () => {
     return axios.put(`${BASE_URI}/ChangeParkingZoneStat`, params);
   };
 
+  const getParkingZoneDetail = async (parkingZoneId) => {
+    return axios.get(`${BASE_URI}/GetParkingZoneInfoById`, {
+      params: {
+        parkingZoneId: parkingZoneId,
+      },
+    });
+  };
+
   return {
     getByAddress,
     register,
@@ -75,6 +83,7 @@ const useParkingZoneService = () => {
     getRequestParkingZones,
     changeParkingZoneStat,
     getAllParkingZone,
+    getParkingZoneDetail,
   };
 };
 

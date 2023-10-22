@@ -79,7 +79,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
     public IActionResult GetAll()
     {
         try
@@ -93,7 +93,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     Id = item.Id,
                     Name = item.Name,
                     Owner = item.Owner.Email,
-                    Created = item.CreatedAt
+                    Created = item.CreatedAt,
+                    IsApprove = item.IsApprove
                 });
             }
 
@@ -196,12 +197,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetParkingZoneInfoByOwner)]
-    public async Task<IActionResult> GetParkingZoneInfoById(
-        [FromBody] GetParkingZoneInfoInput input)
+    [FilterPermission(Action = ActionFilterEnum.GetParkingZoneInfoById)]
+    public async Task<IActionResult> GetParkingZoneInfoById(Guid parkingZoneId)
     {
-        var parkingZone =
-            ((IParkingZoneRepository)vpsRepository).GetParkingZoneById((Guid)input.ParkingZoneId!);
+        var parkingZone = ((IParkingZoneRepository)vpsRepository).GetParkingZoneById(parkingZoneId);
         if (parkingZone is null)
         {
             throw new ServerException(2);
@@ -226,6 +225,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
             parkingZone.Slots,
             parkingZone.Lat,
             parkingZone.Lng,
+            parkingZone.WorkFrom,
+            parkingZone.WorkTo,
+            parkingZone.IsFull,
+            parkingZone.ParkingZoneAbsents,
             ParkingZoneImages = parkingZoneImages
         };
         return Ok(result);

@@ -12,6 +12,7 @@ public enum ActionFilterEnum
     GetAccountProfile,
     GetRequestedParkingZones,
     RegisterNewParkingZone,
-    GetParkingZoneInfoByOwner,
-    ChangeParkingZoneStat
+    GetParkingZoneInfoById,
+    ChangeParkingZoneStat,
+    GetAllParkingZones
 }
