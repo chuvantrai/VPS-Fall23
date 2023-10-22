@@ -1,21 +1,46 @@
-import { Layout, theme } from 'antd';
+import { Layout, theme, Breadcrumb } from 'antd';
 import PropTypes from 'prop-types';
 import { Outlet } from 'react-router-dom';
 
 const { Content } = Layout;
 
-function ContentLayout() {
+function ContentLayout({ title, desc }) {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
   return (
-    <Content style={{
-      backgroundColor: colorBgContainer,
-    }}>
-
-      <Outlet></Outlet>
-    </Content>
+    <Layout className="bg-[#f0f2f5]">
+      <div className="w-full bg-white py-[16px] px-[24px] mb-[20px]">
+        <Breadcrumb>
+          <Breadcrumb.Item>Home</Breadcrumb.Item>
+          <Breadcrumb.Item>App</Breadcrumb.Item>
+        </Breadcrumb>
+        <div className="w-[808px] h-11 justify-start items-center gap-4 inline-flex mt-[8px] mb-[8px]">
+          <div className="justify-start items-center gap-3 flex">
+            <div className="text-black text-opacity-90 text-[22px] font-medium font-['Roboto'] leading-7">{title}</div>
+          </div>
+        </div>
+        <div className="w-[1146px] text-zinc-800 text-[13px] font-normal font-['Roboto'] leading-[17.03px]">{desc}</div>
+      </div>
+      <div
+        className="h-fit bg-[#f0f2f5]"
+        style={{
+          padding: '0 24px',
+        }}
+      >
+        <Content
+          className="flex justify-center items-center"
+          style={{
+            padding: 0,
+            margin: 0,
+            background: colorBgContainer,
+          }}
+        >
+          <Outlet></Outlet>
+        </Content>
+      </div>
+    </Layout>
   );
 }
 
