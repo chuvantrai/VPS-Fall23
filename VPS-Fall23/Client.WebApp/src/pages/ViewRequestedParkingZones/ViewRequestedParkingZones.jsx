@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 import { Table, Divider, Button, Image, Pagination, notification } from 'antd';
@@ -62,7 +63,6 @@ function ViewRequestedParkingZones() {
   const service = useParkingZoneService();
   const [dataSrc, setDataSrc] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState();
 
   const getRequestParkingZones = (currentPage) => {

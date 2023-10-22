@@ -1,7 +1,10 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Controllers;
+using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Models;
@@ -14,6 +17,8 @@ public class AuthControllerTests
     private readonly IUserRepository _userRepository = A.Fake<IUserRepository>();
     private readonly IGeneralVPS _generalVps = A.Fake<IGeneralVPS>();
     private readonly IParkingZoneOwnerRepository _ownerRepository = A.Fake<IParkingZoneOwnerRepository>();
+    private readonly IConfiguration _config = A.Fake<IConfiguration>();
+    private readonly IOptions<FileManagementConfig> options = A.Fake<IOptions<FileManagementConfig>>();
 
     [Fact]
     public void AuthController_Register_ReturnOK()
@@ -32,7 +37,7 @@ public class AuthControllerTests
         A.CallTo(() => _userRepository.Create(newAccount));
         A.CallTo(() => _ownerRepository.Create(parkingZoneOwner));
 
-        var controller = new AuthController(_userRepository, _generalVps, _ownerRepository);
+        var controller = new AuthController(_userRepository, _generalVps, _ownerRepository, _config, options);
 
         var result = controller.Register(input);
 

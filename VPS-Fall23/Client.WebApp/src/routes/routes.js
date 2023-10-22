@@ -37,10 +37,6 @@ export const routes = [
     layout: null,
   },
   {
-    path: config.routes.registerParkingZone,
-    component: RegisterParkingZone,
-  },
-  {
     path: config.routes.login,
     component: Login,
     layout: null,
@@ -54,5 +50,5 @@ export const routes = [
     path: config.routes.changePassword,
     component: ChangePassword,
     layout: null,
-  }
+  },
 ];

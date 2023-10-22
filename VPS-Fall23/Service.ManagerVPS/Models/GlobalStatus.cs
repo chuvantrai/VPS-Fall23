@@ -10,6 +10,8 @@ namespace Service.ManagerVPS.Models
             ContractLogs = new HashSet<ContractLog>();
             Contracts = new HashSet<Contract>();
             ParkingTransactions = new HashSet<ParkingTransaction>();
+            ReportStatusNavigations = new HashSet<Report>();
+            ReportTypeNavigations = new HashSet<Report>();
         }
 
         public int TypeId { get; set; }
@@ -21,5 +23,7 @@ namespace Service.ManagerVPS.Models
         public virtual ICollection<ContractLog> ContractLogs { get; set; }
         public virtual ICollection<Contract> Contracts { get; set; }
         public virtual ICollection<ParkingTransaction> ParkingTransactions { get; set; }
+        public virtual ICollection<Report> ReportStatusNavigations { get; set; }
+        public virtual ICollection<Report> ReportTypeNavigations { get; set; }
     }
 }
