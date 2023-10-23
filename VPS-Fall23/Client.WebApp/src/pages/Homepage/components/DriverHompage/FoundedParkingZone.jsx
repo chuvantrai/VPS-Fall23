@@ -1,4 +1,4 @@
-import { PicCenterOutlined } from '@ant-design/icons';
+import { PicCenterOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Button, Descriptions, List, Popover, notification } from 'antd';
 import { useSelector } from 'react-redux';
 import ButtonGroup from 'antd/es/button/button-group';
@@ -23,6 +23,16 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
 
   const getDescriptionItem = (parkingZone) => [
     {
+      key: 1,
+      span: 2,
+      label: <Button onClick={() => bookingCallback(parkingZone)} type="primary" danger>Đặt vé</Button>,
+      children: (<ButtonGroup>
+        <Button onClick={() => viewDetailInfo(parkingZone)}>{parkingZone.name}</Button>
+
+      </ButtonGroup>
+      )
+    },
+    {
       key: 2,
       label: 'Số lượng trống',
       children: parkingZone.slots ?? 0,
@@ -34,21 +44,19 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
     },
     {
       key: 4,
-      label: 'Địa chỉ',
-      children: parkingZoneService.getFullAddress(parkingZone),
+
+      label: <>Địa chỉ    <Button onClick={() => viewOnThisMapCallback(parkingZone)} icon={<EnvironmentOutlined />}></Button></>,
+      children: <Button onClick={() => viewOnGoogleMapCallback(parkingZone)}> {parkingZone.detailAddress}</Button>,
     },
   ];
   const getDesciptionTitle = (parkingZone) => (
     <>
-      <span>{parkingZone.name}: </span>
-      <ButtonGroup>
-        <Button onClick={() => viewOnThisMapCallback(parkingZone)}>Xem địa điểm</Button>
-        <Button onClick={() => viewDetailInfo(parkingZone)}>Chi tiết nhà xe</Button>
-        <Button onClick={() => viewOnGoogleMapCallback(parkingZone)}>Xem trên google maps</Button>
+      {/* <ButtonGroup>
+        <Button onClick={() => viewDetailInfo(parkingZone)}>{parkingZone.name}</Button>
         <Button onClick={() => bookingCallback(parkingZone)} type="primary" danger>
           Đặt vé
         </Button>
-      </ButtonGroup>
+      </ButtonGroup> */}
     </>
   );
   const getFoundedParkingZonePopupContent = () => {

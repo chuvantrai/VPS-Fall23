@@ -1,4 +1,4 @@
-import { Alert, Badge, Carousel, Descriptions, Image, Modal, Typography, notification } from 'antd';
+import { Alert, Badge, Carousel, Descriptions, Image, Modal, Tag, Typography, notification } from 'antd';
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
@@ -52,21 +52,13 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
       {
         key: 4,
         label: 'Tình trạng hoạt động',
-        children: <Badge status="processing" text="Đang hoạt động" />,
+        children: <Badge status="success" text="Đang hoạt động" />,
       },
       {
         key: 5,
         label: 'Số chỗ trống',
         children: (
-          <Alert
-            style={{ padding: 0, textAlign: 'center' }}
-            type="error"
-            description={
-              <Text type="danger" style={{}}>
-                {50}
-              </Text>
-            }
-          />
+          <Tag color="processing">{parkingZone.slots}</Tag>
         ),
       },
     ];
@@ -91,7 +83,6 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
         }}
         closable={true}
         title={parkingZone?.name}
-        width={'40vw'}
       >
         <Image.PreviewGroup>
           <Carousel autoplay dotPosition="top" style={{}}>

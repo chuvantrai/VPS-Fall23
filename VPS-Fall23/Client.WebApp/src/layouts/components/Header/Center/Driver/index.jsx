@@ -36,10 +36,10 @@ const DriverCenterHeader = () => {
 
     return (
         <Row gutter={2}>
-            <Col md={20} sm={24}>
+            <Col span={20}>
                 <AddressCascader cascaderProps={addressCascaderProps} onCascaderChangeCallback={onCascaderChange} />
             </Col>
-            <Col md={4}>
+            <Col span={4}>
                 <Button onClick={onSearch}>Tìm kiếm</Button>
             </Col>
         </Row>

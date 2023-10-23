@@ -24,6 +24,9 @@ const DriverHompage = () => {
   useEffect(() => {
     initMap(focusPosition);
     listFounded.map((parkingZone, index) => {
+      if (!parkingZone.lat || !parkingZone.lng) {
+        return;
+      }
       const marker = new AdvancedMarkerElement({
         map: map,
         position: {
