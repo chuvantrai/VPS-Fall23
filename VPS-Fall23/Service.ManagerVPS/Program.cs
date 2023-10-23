@@ -44,6 +44,7 @@ builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<IParkingZoneOwnerRepository, ParkingZoneOwnerRepository>();
 builder.Services.AddScoped<IParkingZoneRepository, ParkingZoneRepository>();
 builder.Services.AddScoped<IParkingTransactionRepository, ParkingTransactionRepository>();
+builder.Services.AddScoped<IContractRepository, ContractRepository>();
 
 //Session
 builder.Services.AddDistributedMemoryCache();

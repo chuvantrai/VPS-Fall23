@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Layout, Menu, theme } from 'antd';
+
 const { Sider } = Layout;
 
 function Sidebar({ rowData, setSelectedKey }) {
@@ -33,7 +34,7 @@ function Sidebar({ rowData, setSelectedKey }) {
       style={{
         background: colorBgContainer,
       }}
-
+      width={246}
     >
       <Menu
         onClick={handleMenuItem}

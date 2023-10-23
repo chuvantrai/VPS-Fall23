@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
 import { Alert, Badge, Carousel, Descriptions, Image, Modal, Typography, notification } from 'antd';
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';

@@ -21,29 +21,33 @@ public class ParkingZoneController : VpsController<ParkingZone>
 {
     private readonly IConfiguration _config;
     private readonly FileManagementConfig _fileManagementConfig;
+    private readonly IContractRepository _contractRepository;
 
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
-        IConfiguration config, IOptions<FileManagementConfig> options)
+        IConfiguration config, IOptions<FileManagementConfig> options,
+        IContractRepository contractRepository)
         : base(parkingZoneRepository)
     {
         _config = config;
         _fileManagementConfig = options.Value;
+        _contractRepository = contractRepository;
     }
 
     [HttpPost]
+    [FilterPermission(Action = ActionFilterEnum.RegisterNewParkingZone)]
     public async Task<IActionResult> Register([FromForm] RegisterParkingZone input)
     {
         var newParkingZone = new ParkingZone
         {
             Id = Guid.NewGuid(),
-            CommuneId = input.CommuneId,
+            CommuneId = (Guid)input.CommuneId!,
             Name = input.Name,
             CreatedAt = DateTime.Now,
             ModifiedAt = DateTime.Now,
-            OwnerId = input.OwnerId,
+            OwnerId = (Guid)input.OwnerId!,
             DetailAddress = input.DetailAddress,
-            PricePerHour = input.PricePerHour,
-            PriceOverTimePerHour = input.PriceOverTimePerHour,
+            PricePerHour = (decimal)input.PricePerHour!,
+            PriceOverTimePerHour = (decimal)input.PriceOverTimePerHour!,
             Slots = input.Slots
         };
 
@@ -75,7 +79,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
     public IActionResult GetAll()
     {
         try
@@ -86,11 +90,14 @@ public class ParkingZoneController : VpsController<ParkingZone>
             {
                 res.Add(new ParkingZoneItemOutput
                 {
+                    Id = item.Id,
                     Name = item.Name,
                     Owner = item.Owner.Email,
-                    Created = item.CreatedAt
+                    Created = item.CreatedAt,
+                    IsApprove = item.IsApprove
                 });
             }
+
             return Ok(res);
         }
         catch (Exception ex)
@@ -101,7 +108,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
-    public async Task<IActionResult> GetRequestedParkingZones([FromQuery] QueryStringParameters parameters)
+    public async Task<IActionResult> GetRequestedParkingZones(
+        [FromQuery] QueryStringParameters parameters)
     {
         var requestedParkingZones =
             ((IParkingZoneRepository)vpsRepository).GetRequestedParkingZones(parameters);
@@ -147,21 +155,83 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
     public async Task<IActionResult> ChangeParkingZoneStat([FromBody] ChangeParkingZoneStat input)
     {
-        var parkingZone = ((IParkingZoneRepository)vpsRepository).GetParkingZoneById(input.Id);
+        var output =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneAndOwnerByParkingZoneId(
+                (Guid)input.Id!);
+        if (output is null)
+        {
+            throw new ServerException(2);
+        }
+
+        var parkingZone = output.ParkingZone;
+        parkingZone.IsApprove = input.IsApprove;
+        parkingZone.RejectReason = input.RejectReason;
+        parkingZone.ModifiedAt = DateTime.Now;
+        await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
+
+        if (input.IsApprove == true)
+        {
+            var contract = new Contract
+            {
+                Id = Guid.NewGuid(),
+                ParkingZoneId = (Guid)input.Id,
+                ContractCode = $"VPS/{output.Owner.Email}/{output.NumberOfParkingZones}",
+                CreatedAt = DateTime.Now,
+                ModifiedAt = DateTime.Now,
+                Status = 1,
+                PdfSavedAt = DateTime.Now
+            };
+            var contractAddedResult = await _contractRepository.Create(contract);
+            if (contractAddedResult is null)
+            {
+                throw new ServerException(ResponseNotification.ADD_ERROR);
+            }
+        }
+
+        await ((IParkingZoneRepository)vpsRepository).SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetParkingZoneInfoById)]
+    public async Task<IActionResult> GetParkingZoneInfoById(Guid parkingZoneId)
+    {
+        var parkingZone = ((IParkingZoneRepository)vpsRepository).GetParkingZoneById(parkingZoneId);
         if (parkingZone is null)
         {
             throw new ServerException(2);
         }
 
-        parkingZone.IsApprove = input.IsApprove;
-        parkingZone.RejectReason = input.RejectReason;
-        parkingZone.ModifiedAt = DateTime.Now;
-        await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
-        await ((IParkingZoneRepository)vpsRepository).SaveChange();
+        var parkingZoneImages = await GetImageLinks(parkingZone.OwnerId, parkingZone.Id);
 
-        return Ok(ResponseNotification.UPDATE_SUCCESS);
+        var result = new
+        {
+            parkingZone.Id,
+            Key = parkingZone.SubId,
+            Commune = parkingZone.Commune.Name,
+            District = parkingZone.Commune.District.Name,
+            City = parkingZone.Commune.District.City.Name,
+            parkingZone.Name,
+            CreatedAt = $"{parkingZone.CreatedAt:dd-MM-yyyy}",
+            ModifiedAt = $"{parkingZone.ModifiedAt:dd-MM-yyyy}",
+            parkingZone.OwnerId,
+            parkingZone.DetailAddress, 
+            parkingZone.PricePerHour, 
+            parkingZone.PriceOverTimePerHour,
+            parkingZone.Slots,
+            parkingZone.Lat,
+            parkingZone.Lng,
+            parkingZone.WorkFrom,
+            parkingZone.WorkTo,
+            parkingZone.IsFull,
+            parkingZone.ParkingZoneAbsents,
+            ParkingZoneImages = parkingZoneImages
+        };
+        return Ok(result);
     }
 
     [HttpGet]
