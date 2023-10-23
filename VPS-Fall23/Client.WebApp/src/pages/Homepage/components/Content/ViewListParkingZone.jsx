@@ -66,6 +66,7 @@ function ViewListParkingZone() {
 
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalViewOpen, setIsModalViewOpen] = useState(false);
+  const [checkedState, setCheckedState] = useState(false);
   const [parkingZoneDetail, setParkingZoneDetail] = useState({});
   const [fileList, setFileList] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -79,6 +80,7 @@ function ViewListParkingZone() {
       setParkingZoneDetail(data);
       form.setFieldsValue({ ...data, workingTime: [dayjs(data.workFrom, 'HH:mm:ss'), dayjs(data.workTo, 'HH:mm:ss')] });
       setAddress([data.city, data.district, data.commune]);
+      setCheckedState(data.isFull);
 
       let files = [];
       for (let i = 0; i < data.parkingZoneImages.length; i++) {
@@ -227,6 +229,15 @@ function ViewListParkingZone() {
     },
   };
 
+  const handleChangeSwitch = (checked) => {
+    const params = {
+      parkingZoneId: parkingZoneDetail.id,
+      isFull: checked,
+    };
+    parkingZoneService.changeParkingZoneFullStatus(params);
+    setCheckedState(checked);
+  };
+
   const handleSubmitForm = (values) => {
     // if (!selectedAddress) {
     //   setValidateStatus('error');
@@ -278,7 +289,12 @@ function ViewListParkingZone() {
         onCancel={handleCancel}
         footer={(_, { CancelBtn }) => (
           <Space>
-            <Switch checkedChildren="Full" unCheckedChildren="Available" />
+            <Switch
+              checkedChildren="Full"
+              unCheckedChildren="Available"
+              onChange={handleChangeSwitch}
+              checked={checkedState}
+            />
             <CancelBtn />
             <Button
               className="bg-[#1677ff] text-white"
@@ -424,7 +440,14 @@ function ViewListParkingZone() {
         onCancel={handleCancel}
         footer={() => (
           <Space>
-            <Switch checkedChildren="Full" unCheckedChildren="Available" />
+            {account.RoleId === '2' && (
+              <Switch
+                checkedChildren="Full"
+                unCheckedChildren="Available"
+                onChange={handleChangeSwitch}
+                checked={checkedState}
+              />
+            )}
             <Button className="bg-[#1677ff] text-white" onClick={handleViewOk}>
               OK
             </Button>

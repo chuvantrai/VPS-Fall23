@@ -199,6 +199,26 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
+    [HttpPut]
+    // [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneFullStatus)]
+    public async Task<IActionResult> ChangeParkingZoneFullStatus(
+        [FromBody] ChangeParkingZoneFullStatus input)
+    {
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneById((Guid)input.ParkingZoneId!);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        parkingZone.IsFull = input.IsFull;
+        parkingZone.ModifiedAt = DateTime.Now;
+        await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
+        await ((IParkingZoneRepository)vpsRepository).SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.GetParkingZoneInfoById)]
     public async Task<IActionResult> GetParkingZoneInfoById(Guid parkingZoneId)
@@ -222,8 +242,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
             CreatedAt = $"{parkingZone.CreatedAt:dd-MM-yyyy}",
             ModifiedAt = $"{parkingZone.ModifiedAt:dd-MM-yyyy}",
             parkingZone.OwnerId,
-            parkingZone.DetailAddress, 
-            parkingZone.PricePerHour, 
+            parkingZone.DetailAddress,
+            parkingZone.PricePerHour,
             parkingZone.PriceOverTimePerHour,
             parkingZone.Slots,
             parkingZone.Lat,
