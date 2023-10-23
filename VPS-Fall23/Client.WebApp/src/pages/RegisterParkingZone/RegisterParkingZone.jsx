@@ -1,4 +1,4 @@
-import { Button, Form, Input, InputNumber, Modal, Upload } from 'antd';
+import { Button, Form, Input, InputNumber, Modal, TimePicker, Upload } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useState, useCallback } from 'react';
 
@@ -45,6 +45,7 @@ const RegisterParkingZone = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [validateStatus, setValidateStatus] = useState('null');
   const [help, setHelp] = useState('');
+  const [workingTime, setWorkingTime] = useState('');
 
   const addressCascaderProps = {
     style: { width: '100%' },
@@ -83,6 +84,10 @@ const RegisterParkingZone = () => {
 
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
+  const handelChangeTime = (_, timeString) => {
+    setWorkingTime(timeString);
+  };
+
   const onFinish = (values) => {
     if (!selectedAddress) {
       setValidateStatus('error');
@@ -101,6 +106,8 @@ const RegisterParkingZone = () => {
       values.parkingZoneImages.forEach((item) => {
         formData.append('parkingZoneImages', item.originFileObj);
       });
+      formData.append('workFrom', workingTime[0]);
+      formData.append('workTo', workingTime[1]);
 
       parkingZoneService.register(formData);
     }
@@ -155,6 +162,9 @@ const RegisterParkingZone = () => {
           ]}
         >
           <InputNumber className="w-[484px] h-[32px]" prefix="VND" />
+        </Form.Item>
+        <Form.Item name="workingTime" label="Thời gian làm việc" required>
+          <TimePicker.RangePicker onChange={handelChangeTime} />
         </Form.Item>
         <Form.Item
           className="pb-[24px] m-0"
