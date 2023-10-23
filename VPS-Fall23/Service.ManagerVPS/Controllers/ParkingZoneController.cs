@@ -48,7 +48,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
             DetailAddress = input.DetailAddress,
             PricePerHour = (decimal)input.PricePerHour!,
             PriceOverTimePerHour = (decimal)input.PriceOverTimePerHour!,
-            Slots = input.Slots
+            Slots = input.Slots,
+            WorkFrom = (TimeSpan)input.WorkFrom!,
+            WorkTo = (TimeSpan)input.WorkTo!,
+            IsFull = false
         };
 
         var fileManager =

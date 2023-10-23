@@ -13,6 +13,12 @@ public class RegisterParkingZone
     [Required]
     public decimal? PricePerHour { get; set; }
 
+    [Required]
+    public TimeSpan? WorkFrom { get; set; }
+
+    [Required]
+    public TimeSpan? WorkTo { get; set; }
+
     [Required] 
     public decimal? PriceOverTimePerHour { get; set; }
 
