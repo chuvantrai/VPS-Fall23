@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useCallback } from 'react';
+import dayjs from 'dayjs';
 import {
   Table,
   Modal,
@@ -16,6 +17,7 @@ import {
   Input,
   InputNumber,
   Upload,
+  TimePicker,
 } from 'antd';
 import { FormOutlined, UploadOutlined } from '@ant-design/icons';
 
@@ -58,7 +60,6 @@ function ViewListParkingZone() {
   ];
 
   const [form] = Form.useForm();
-  const formRef = React.createRef();
 
   const parkingZoneService = useParkingZoneService();
   const account = getAccountJwtModel();
@@ -76,7 +77,7 @@ function ViewListParkingZone() {
     await parkingZoneService.getParkingZoneDetail(parkingZoneId).then((res) => {
       const data = res.data;
       setParkingZoneDetail(data);
-      form.setFieldsValue(data);
+      form.setFieldsValue({ ...data, workingTime: [dayjs(data.workFrom, 'HH:mm:ss'), dayjs(data.workTo, 'HH:mm:ss')] });
       setAddress([data.city, data.district, data.commune]);
 
       let files = [];
@@ -90,7 +91,6 @@ function ViewListParkingZone() {
         });
       }
       setFileList(files);
-      console.log(files);
     });
 
     if (account.RoleId === '1' || (account.RoleId === '2' && isApprove === true)) {
@@ -129,15 +129,18 @@ function ViewListParkingZone() {
 
   let currentDate = new Date();
   let currentTime = currentDate.getHours() + ':' + currentDate.getMinutes() + ':' + currentDate.getSeconds();
+  let comparingCurrentTime = Date.parse('01/01/2001 ' + currentTime);
+  let comparingWorkFrom = Date.parse('01/01/2001 ' + parkingZoneDetail.workFrom);
+  let comparingWorkTo = Date.parse('01/01/2001 ' + parkingZoneDetail.workTo);
 
   const isActive = () => {
     if (parkingZoneDetail.parkingZoneAbsents?.length > 0) {
       return <Badge status="error" text="Ngừng hoạt động" />;
     } else {
-      if (parkingZoneDetail.workFrom > currentTime || parkingZoneDetail.workTo < currentTime) {
-        return <Badge status="error" text="Ngừng hoạt động" />;
-      } else {
+      if (comparingWorkFrom < comparingCurrentTime && comparingCurrentTime < comparingWorkTo) {
         return <Badge status="success" text="Đang hoạt động" />;
+      } else {
+        return <Badge status="error" text="Ngừng hoạt động" />;
       }
     }
   };
@@ -180,8 +183,15 @@ function ViewListParkingZone() {
     },
     {
       key: '7',
+      label: 'Thời gian làm việc',
+      children: parkingZoneDetail.workFrom + ' - ' + parkingZoneDetail.workTo,
+      span: 2,
+    },
+    {
+      key: '8',
       label: 'Địa chỉ chi tiết',
       children: parkingZoneDetail.detailAddress,
+      span: 2,
     },
   ];
 
@@ -335,6 +345,18 @@ function ViewListParkingZone() {
             ]}
           >
             <InputNumber className="w-[100%]" />
+          </Form.Item>
+          <Form.Item
+            name="workingTime"
+            label="Thời gian làm việc"
+            rules={[
+              {
+                required: true,
+                message: 'Không thể để trống',
+              },
+            ]}
+          >
+            <TimePicker.RangePicker className="w-[100%]" />
           </Form.Item>
           <Form.Item
             name="communeId"
