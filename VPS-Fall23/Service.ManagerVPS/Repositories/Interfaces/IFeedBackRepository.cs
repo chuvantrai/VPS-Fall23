@@ -5,5 +5,5 @@ namespace Service.ManagerVPS.Repositories.Interfaces;
 
 public interface IFeedBackRepository : IVpsRepository<Feedback>
 {
-    Task<Feedback?> CreateFeedBack(CreateFeedBackParkingZoneRequest request);
+    Task<int> CreateFeedBack(CreateFeedBackParkingZoneRequest request, ParkingZone parkingZone);
 }

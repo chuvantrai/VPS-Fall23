@@ -11,4 +11,7 @@ public class CreateFeedBackParkingZoneRequest
     [Required]
     [RegularExpression("^[1-5]$")]
     public int Rate { get; set; }
+    [Required]
+    [RegularExpression("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")]
+    public string Email { get; set; } = null!;
 }

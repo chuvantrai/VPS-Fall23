@@ -10,23 +10,27 @@ public class FeedBackRepository : VpsRepository<Feedback>, IFeedBackRepository
     public FeedBackRepository(FALL23_SWP490_G14Context context) : base(context)
     {
     }
-    
-    public async Task<Feedback?> CreateFeedBack(CreateFeedBackParkingZoneRequest request)
+
+    public async Task<int> CreateFeedBack(CreateFeedBackParkingZoneRequest request, ParkingZone parkingZone)
     {
-        var parkingZone = await context.ParkingZones
-            .FirstOrDefaultAsync(x => x.Id.Equals(request.ParkingZoneId) && x.IsApprove == true);
-        if (parkingZone == null) return null;
+        if (await context.Feedbacks.FirstOrDefaultAsync(x => x.ParkingZoneId.Equals(parkingZone.Id)
+                                                             && request.Email == x.Email) != null)
+        {
+            return 5010;
+        }
+
         var feedBack = new Feedback()
         {
             Id = Guid.NewGuid(),
             ParkingZoneId = parkingZone.Id,
-            Content = request.Content??string.Empty,
+            Content = request.Content ?? string.Empty,
             Rate = request.Rate,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
+            Email = request.Email
         };
         context.Feedbacks.Add(feedBack);
         await context.SaveChangesAsync();
         feedBack.ParkingZone = parkingZone;
-        return feedBack;
+        return 200;
     }
 }

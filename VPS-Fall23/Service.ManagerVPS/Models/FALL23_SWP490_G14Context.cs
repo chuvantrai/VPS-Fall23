@@ -366,6 +366,8 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.Email).HasColumnName("email");
+
                 entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
 
                 entity.Property(e => e.Rate)
@@ -781,13 +783,9 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
-                entity.Property(e => e.Email)
-                    .HasMaxLength(1)
-                    .HasColumnName("email");
+                entity.Property(e => e.Email).HasColumnName("email");
 
-                entity.Property(e => e.Phone)
-                    .HasMaxLength(1)
-                    .HasColumnName("phone");
+                entity.Property(e => e.Phone).HasColumnName("phone");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 

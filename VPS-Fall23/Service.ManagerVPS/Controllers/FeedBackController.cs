@@ -9,18 +9,24 @@ namespace Service.ManagerVPS.Controllers;
 
 public class FeedBackController : VpsController<Feedback>
 {
-    public FeedBackController(IFeedBackRepository feedBackRepository) : base(feedBackRepository)
+    public readonly IParkingTransactionRepository _parkingTransactionRepository;
+
+    public FeedBackController(IFeedBackRepository feedBackRepository,
+        IParkingTransactionRepository parkingTransactionRepository)
+        : base(feedBackRepository)
     {
+        _parkingTransactionRepository = parkingTransactionRepository;
     }
-    
+
     [HttpPost]
-    public async Task<IActionResult> CreateFeedBackParkingZone([FromForm] CreateFeedBackParkingZoneRequest request)
+    public async Task<IActionResult> CreateFeedBackParkingZone(CreateFeedBackParkingZoneRequest request)
     {
-        var feedBack = await ((IFeedBackRepository)vpsRepository).CreateFeedBack(request);
-        if (feedBack is null) throw new ClientException();
-        return Ok(new
-        {
-            idParkingZone = feedBack.ParkingZoneId
-        });
+        var parkingTransaction =
+            await _parkingTransactionRepository.GetParkingTransactionByIdEmail(request.ParkingZoneId, request.Email);
+        if (parkingTransaction == null) throw new ClientException(5008);
+        
+        var feedBackResult = await ((IFeedBackRepository)vpsRepository).CreateFeedBack(request, parkingTransaction.ParkingZone);
+        if (feedBackResult != 200) throw new ClientException(feedBackResult);
+        return Ok();
     }
 }

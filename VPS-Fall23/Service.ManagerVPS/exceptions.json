@@ -86,5 +86,17 @@
   {
     "code": 5007,
     "message": "Email của tài khoản chưa xác nhận!"
+  },
+  {
+    "code": 5008,
+    "message": "Email này chưa từng đặt chỗ ở đây!"
+  },
+  {
+    "code": 5009,
+    "message": "Đánh giá thất bại!"
+  },
+  {
+    "code": 5010,
+    "message": "Email này đã đánh giá!"
   }
 ]
