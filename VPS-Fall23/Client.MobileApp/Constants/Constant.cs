@@ -10,7 +10,8 @@ namespace Client.MobileApp.Constants
     {
         public static string GoogleAppCredentials = "GoogleAppCredentials.json";
         public static string ImageName = "Image " + DateTime.Now.ToString();
-        public static string API_PATH = "api/ParkingTransaction/CheckLicensePlate";
+        public static string API_PATH_VPS53 = "api/ParkingTransaction/CheckLicensePlateScan";
+        public static string API_PATH_VPS61 = "api/ParkingTransaction/CheckLicensePlateInput";
 
 
         public static string NOTIFICATION = "NOTIFICATION";

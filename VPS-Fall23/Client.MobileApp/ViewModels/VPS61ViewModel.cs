@@ -6,11 +6,11 @@ using System.Text.Json;
 
 namespace Client.MobileApp.ViewModels
 {
-    public class VPS53ViewModel : ViewModelBase
+    public class VPS61ViewModel : ViewModelBase
     {
         private readonly HttpClient _client;
 
-        public VPS53ViewModel()
+        public VPS61ViewModel()
         {
             _client = new HttpClient
             {
@@ -18,11 +18,10 @@ namespace Client.MobileApp.ViewModels
                 //BaseAddress = new Uri("http://localhost:5001")
             };
         }
-
-        public async Task<string> CheckLicensePLate(LicensePlateScan checkLicensePlate)
+        public async Task<string> CheckLicensePLate(LicensePlateInput checkLicensePlate)
         {
 
-            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
+            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS61, checkLicensePlate);
 
             if (response.IsSuccessStatusCode)
             {

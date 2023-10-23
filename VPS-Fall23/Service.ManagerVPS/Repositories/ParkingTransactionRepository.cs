@@ -38,7 +38,7 @@ namespace Service.ManagerVPS.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<string> CheckLicesePlate(string licenseplate, LicensePlateInfo checkLicensePlate)
+        public async Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy)
         {
             var transaction = await entities.Include(t => t.ParkingTransactionDetails)
                 .FirstOrDefaultAsync(pt => pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
@@ -51,8 +51,8 @@ namespace Service.ManagerVPS.Repositories
 
                 return transCount switch
                 {
-                    0 => await CanLicensePlateCheckin(licenseplate, checkLicensePlate),
-                    _ => await CanLicensePlateCheckout(licenseplate, checkLicensePlate),
+                    0 => await CanLicensePlateCheckin(licenseplate, checkAt, checkBy),
+                    _ => await CanLicensePlateCheckout(licenseplate, checkAt, checkBy),
                 };
             }
             else
@@ -62,10 +62,10 @@ namespace Service.ManagerVPS.Repositories
 
         }
 
-        public async Task<string> CanLicensePlateCheckin(string licenseplate, LicensePlateInfo? licensePlateCheckIn)
+        public async Task<string> CanLicensePlateCheckin(string licenseplate, DateTime checkAt, Guid checkBy)
         {
 
-            if (licensePlateCheckIn != null)
+            if (licenseplate != null)
             {
                 var transaction = await entities.Include(t => t.ParkingZone).Include(t => t.ParkingTransactionDetails)
                     .FirstOrDefaultAsync(pt => pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
@@ -77,17 +77,17 @@ namespace Service.ManagerVPS.Repositories
                     var transactionDetail = new ParkingTransactionDetail
                     {
                         Id = Guid.NewGuid(),
-                        From = licensePlateCheckIn.CheckAt,
+                        From = checkAt,
                         To = transaction.CheckoutAt ?? DateTime.Now,
                         ParkingTransaction = transaction,
                         CreatedAt = DateTime.Now,
                         ParkingTransactionId = transaction.Id,
                         UnitPricePerHour = transaction.ParkingZone.PricePerHour,
-                        Detail = "CHECK IN AT " + licensePlateCheckIn.CheckAt
+                        Detail = "CHECK IN AT " + checkAt
                     };
 
                     context.ParkingTransactionDetails.Add(transactionDetail);
-                    transaction.CheckinBy = licensePlateCheckIn.CheckBy;
+                    transaction.CheckinBy = checkBy;
                     await Update(transaction);
                     await SaveChange();
 
@@ -104,9 +104,9 @@ namespace Service.ManagerVPS.Repositories
             }
         }
 
-        public async Task<string> CanLicensePlateCheckout(string licenseplate, LicensePlateInfo? licensePlateCheckOut)
+        public async Task<string> CanLicensePlateCheckout(string licenseplate, DateTime checkAt, Guid checkBy)
         {
-            if (licensePlateCheckOut != null)
+            if (licenseplate != null)
             {
                 var transaction = await entities.Include(t => t.ParkingZone).Include(t => t.ParkingTransactionDetails)
                     .FirstOrDefaultAsync(pt => pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
@@ -121,28 +121,28 @@ namespace Service.ManagerVPS.Repositories
 
                     if (transactionDetail != null)
                     {
-                        if (transactionDetail.To < licensePlateCheckOut.CheckAt)
+                        if (transactionDetail.To < checkAt)
                         {
                             var newTransactionDetail = new ParkingTransactionDetail
                             {
                                 Id = Guid.NewGuid(),
                                 From = transactionDetail.To,
-                                To = licensePlateCheckOut.CheckAt,
+                                To = checkAt,
                                 ParkingTransaction = transaction,
                                 CreatedAt = DateTime.Now,
                                 ParkingTransactionId = transaction.Id,
                                 UnitPricePerHour = transaction.ParkingZone.PricePerHour,
-                                Detail = "CHECK OUT AT " + licensePlateCheckOut.CheckAt
+                                Detail = "CHECK OUT AT " + checkAt
                             };
 
                             context.ParkingTransactionDetails.Add(newTransactionDetail);
-                            transaction.CheckoutBy = licensePlateCheckOut.CheckBy;
+                            transaction.CheckoutBy = checkBy;
                             await Update(transaction);
                         }
                         else
                         {
-                            transactionDetail.To = licensePlateCheckOut.CheckAt;
-                            transactionDetail.Detail = "CHECK OUT AT " + licensePlateCheckOut.CheckAt;
+                            transactionDetail.To = checkAt;
+                            transactionDetail.Detail = "CHECK OUT AT " + checkAt;
                             context.ParkingTransactionDetails.Update(transactionDetail);
                         }
                     }
