@@ -68,6 +68,10 @@
     "message": "Không tìm thấy biển số xe!"
   },
   {
+    "code": 3003,
+    "message": "Không tìm thấy ảnh biển số xe!"
+  },
+  {
     "code": 5001,
     "message": "Tên tài khoản/email sai!"
   },

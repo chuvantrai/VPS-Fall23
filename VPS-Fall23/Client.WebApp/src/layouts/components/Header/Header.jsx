@@ -9,7 +9,11 @@ const cx = classNames.bind(styles);
 
 function Header() {
   return (
-    <AntdHeader className={cx('nav')}>
+    <AntdHeader className={cx('nav')}
+      style={{
+        borderBottom: '1px solid gray',
+      }}
+    >
       <Row className={cx('nav-row')}>
         <Col md={8} sm={0} xs={0} className={cx('nav-left')}>
           <HeaderLeft></HeaderLeft>

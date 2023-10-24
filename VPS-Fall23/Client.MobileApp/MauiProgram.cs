@@ -27,6 +27,7 @@ namespace Client.MobileApp
                 .RegisterViews()
                 .UseMauiCameraView()
                 .RegisterAppServices()
+                
                 ;
 
             builder.Services.AddSingleton<IBrowser>(Browser.Default);
@@ -48,7 +49,7 @@ namespace Client.MobileApp
         public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
         {
             builder.Services.AddTransient<VPS53>();
-
+            builder.Services.AddTransient<VPS61>();
             return builder;
         }
 

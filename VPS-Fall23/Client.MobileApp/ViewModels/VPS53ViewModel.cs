@@ -1,6 +1,7 @@
 ﻿using Client.MobileApp.Models;
 using System.Net;
 using System.Net.Http.Json;
+using Client.MobileApp.Constants;
 using System.Text.Json;
 
 namespace Client.MobileApp.ViewModels
@@ -13,34 +14,90 @@ namespace Client.MobileApp.ViewModels
         {
             _client = new HttpClient
             {
-                BaseAddress = new Uri("http://localhost:5001")
+                BaseAddress = new Uri("http://10.0.2.2:5001")
+                //BaseAddress = new Uri("http://localhost:5001")
             };
         }
 
-        public async Task<string> CheckLicensePLate(CheckLicensePlate checkLicensePlate)
+        public async Task<string> CheckLicensePLate(LicensePlateScan checkLicensePlate)
+        {
+
+            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                string errorResponse = await response.Content.ReadAsStringAsync();
+                var error = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
+                return $"{error.Code}{error.Message}";
+            }
+        }
+
+        public async Task<FileResult> OpenMediaPickerAsync()
         {
             try
             {
-                HttpResponseMessage response = await _client.PostAsJsonAsync("api/ParkingTransaction/CheckLicensePlate", checkLicensePlate);
+                var result = await MediaPicker.PickPhotoAsync(new MediaPickerOptions
+                {
+                    Title = "Please a pick photo"
+                });
 
-                if (response.IsSuccessStatusCode)
-                {
-                    return await response.Content.ReadAsStringAsync();
-                }
-                else if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    string errorResponse = await response.Content.ReadAsStringAsync();
-                    var error = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
-                    return $"Mã lỗi: {error.Code}, Thông báo: {error.Message}";
-                }
+                if (result.ContentType == "image/png" ||
+                    result.ContentType == "image/jpeg" ||
+                    result.ContentType == "image/jpg")
+                    return result;
                 else
-                {
-                    return $"Yêu cầu không thành công, mã trạng thái: {response.StatusCode}";
-                }
+                    await App.Current.MainPage.DisplayAlert("Error Type Image", "Please choose a new image", "Ok");
+
+                return null;
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
-                return ex.Message;
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public async Task<Stream> FileResultToStream(FileResult fileResult)
+        {
+            if (fileResult == null)
+                return null;
+
+            return await fileResult.OpenReadAsync();
+        }
+
+        public string ByteBase64ToString(byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes);
+        }
+
+        public async Task<ImageFile> Upload(FileResult fileResult)
+        {
+            byte[] bytes;
+
+            try
+            {
+                using (var ms = new MemoryStream())
+                {
+                    var stream = await FileResultToStream(fileResult);
+                    stream.CopyTo(ms);
+                    bytes = ms.ToArray();
+                }
+
+                return new ImageFile
+                {
+                    byteBase64 = ByteBase64ToString(bytes),
+                    ContentType = fileResult.ContentType,
+                    FileName = fileResult.FileName
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Google.Cloud.Vision.V1;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
@@ -6,6 +7,7 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.ExternalClients.VNPay;
+using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -16,8 +18,10 @@ namespace Service.ManagerVPS.Controllers
         private readonly VnPayConfig vnPayConfig;
         private readonly IParkingZoneRepository parkingZoneRepository;
         private readonly IPaymentTransactionRepository paymentTransactionRepository;
+        private readonly GoogleApiService _googleApiService;
+
         public ParkingTransactionController(
-            IParkingTransactionRepository parkingTransactionRepository,
+            IParkingTransactionRepository parkingTransactionRepository, GoogleApiService googleApiService,
             IOptions<VnPayConfig> vnPayConfig,
             IParkingZoneRepository parkingZoneRepository,
             IPaymentTransactionRepository paymentTransaction)
@@ -25,7 +29,7 @@ namespace Service.ManagerVPS.Controllers
         {
             this.vnPayConfig = vnPayConfig.Value;
             this.parkingZoneRepository = parkingZoneRepository;
-            paymentTransactionRepository = paymentTransaction;
+            paymentTransactionRepository = paymentTransaction; _googleApiService = googleApiService;
         }
         [HttpPost]
         public async Task<ParkingTransaction> Booking(BookingSlot bookingSlot)
@@ -65,16 +69,31 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPost]
-        public async Task<string> CheckLicensePlate(CheckLicensePlate checkLicensePlate)
+        public async Task<string> CheckLicensePlateScan(LicensePlateScan licensePlateScan)
         {
-            if (checkLicensePlate.LicensePlate == null)
+            var image = Image.FromBytes(licensePlateScan.Image) ?? throw new ClientException(3003);
+
+            var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);
+
+            if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {
-                throw new ClientException(3000);
+                throw new ClientException(3001);
             }
 
-            return GeneralExtension.IsLicensePlateValid(checkLicensePlate.LicensePlate)
-                ? throw new ClientException(3001)
-                : await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(checkLicensePlate) ?? throw new ClientException(3002);
+            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate, licensePlateScan.CheckAt, licensePlateScan.CheckBy) ?? throw new ClientException(3002);
+        }
+
+        [HttpPost]
+        public async Task<string> CheckLicensePlateInput(LicensePlateInput licensePlateInput)
+        {
+            var licensePlate = licensePlateInput.LicensePlate ?? throw new ClientException(3000);
+
+            if (!GeneralExtension.IsLicensePlateValid(licensePlate))
+            {
+                throw new ClientException(3001);
+            }
+
+            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate, licensePlateInput.CheckAt, licensePlateInput.CheckBy) ?? throw new ClientException(3002);
         }
         [HttpGet("{parkingTransactionId}")]
         public async Task<string> GetPayUrl(Guid parkingTransactionId)
@@ -103,5 +122,6 @@ namespace Service.ManagerVPS.Controllers
             _ = await paymentTransactionRepository.SaveChange();
             return url;
         }
+
     }
 }

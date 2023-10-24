@@ -10,5 +10,10 @@ public enum ActionFilterEnum
     RefreshToken,
     UpdateProfileAccount,
     GetAccountProfile,
-    GetRequestedParkingZones
+    GetRequestedParkingZones,
+    RegisterNewParkingZone,
+    GetParkingZoneInfoById,
+    ChangeParkingZoneStat,
+    GetAllParkingZones,
+    ChangeParkingZoneFullStatus
 }

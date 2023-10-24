@@ -1,9 +1,6 @@
 ﻿using Client.MobileApp.ViewModels;
-using Google.Cloud.Vision.V1;
-using Image = Google.Cloud.Vision.V1.Image;
 using CommunityToolkit.Maui.Views;
 using Client.MobileApp.Constants;
-using Client.MobileApp.Extensions;
 using Client.MobileApp.Models;
 
 namespace Client.MobileApp.Views;
@@ -42,52 +39,53 @@ public partial class VPS53 : ContentPage
             string path = String.Empty;
 
             string localFilePath = Path.Combine(FileSystem.Current.AppDataDirectory, Constant.ImageName);
-            await cameraView.SaveSnapShot(Camera.MAUI.ImageFormat.JPEG, localFilePath);
-#if ANDROID
-            await Logic.CopyFileToAppDataDirectory(Constant.GoogleAppCredentials);
-            path = Path.Combine(FileSystem.Current.AppDataDirectory, Constant.GoogleAppCredentials);
-#elif WINDOWS
-            path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), Constant.GoogleAppCredentials);
-#endif
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", path);
+            var imageSource = cameraView.GetSnapShot();
+            Stream imageSourceStream = await ((StreamImageSource)imageSource).Stream.Invoke(CancellationToken.None);
 
-            var client = ImageAnnotatorClient.Create();
-            var image = Image.FromFile(localFilePath);
-
-            var response = client.DetectText(image);
-
-            if (response[0].Description != null)
+            byte[] imageBytes;
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                licensePlate += response[0].Description;
-                var checkLicensePlate = new CheckLicensePlate
+                await imageSourceStream.CopyToAsync(memoryStream);
+                imageBytes = memoryStream.ToArray();
+            }
+
+            if (imageBytes != null)
+            {
+                var checkLicensePlate = new LicensePlateScan
                 {
-                    LicensePlate = licensePlate,
+                    Image = imageBytes,
                     CheckAt = DateTime.Now,
-                    CheckBy = new Guid()
+                    CheckBy = new Guid("D20939C1-7FA6-4DBB-B54A-3F6656AFA00E")
                 };
 
                 string apiResponse = await _viewModel.CheckLicensePLate(checkLicensePlate);
 
-                await DisplayAlert("NOTIFICATION", apiResponse, "Cancel");
+                await DisplayAlert(Constant.NOTIFICATION, apiResponse, Constant.CANCEL);
             }
             else
             {
-                await DisplayAlert("ALERT", "PLEASE TAKE THE LICENSE PLATE IN TO AREA !!!", "Cancel");
+                await DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
             }
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
+            });
+
         }
     }
 
-    private void ImageButton_Clicked(object sender, EventArgs e)
+    private async void ImageButton_Clicked(object sender, EventArgs e)
     {
+        var image = await _viewModel.OpenMediaPickerAsync();
+        var imagefile = await _viewModel.Upload(image);
 
     }
 
     private void LincenseButton_Clicked(object sender, EventArgs e)
     {
-        this.ShowPopup(new LicenseInputPopup());
+        this.ShowPopup(new VPS61());
     }
 }
