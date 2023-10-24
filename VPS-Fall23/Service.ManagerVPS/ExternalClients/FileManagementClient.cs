@@ -19,11 +19,12 @@ namespace Service.ManagerVPS.ExternalClients
 
         const string OBJECT_EXIST_URI =
             "api/{0}/object/exist?objectName={1}&eTag={2}&versionId={3}";
+
         public FileManagementClient(string baseUrl)
         {
             restClient = new RestClient(baseUrl);
         }
-        
+
         public FileManagementClient(string baseUrl, string accessKey, string secretKey)
             : this(baseUrl)
         {
@@ -53,6 +54,7 @@ namespace Service.ManagerVPS.ExternalClients
             streamContent.Dispose();
             multipartFormDataContent.Dispose();
         }
+
         public async Task Upload(string bucket, string folderPath,
             MultipartFormDataContent multipartFormDataContent)
         {
@@ -64,6 +66,7 @@ namespace Service.ManagerVPS.ExternalClients
                 throw new Exception(httpResponseMessage.ReasonPhrase);
             }
         }
+
         public async Task<(byte[] respones, MediaTypeHeaderValue contentType)> Download(
             string bucket,
             string objectName,
@@ -83,7 +86,7 @@ namespace Service.ManagerVPS.ExternalClients
             var response = await GetOne(bucket, objectName, eTag, versionId, false);
             return await response.Content.ReadFromJsonAsync<GetOneDto>();
         }
-        
+
         async Task<HttpResponseMessage> GetOne(string bucket,
             string objectName,
             string eTag = "",
@@ -120,6 +123,25 @@ namespace Service.ManagerVPS.ExternalClients
             if (!message.IsSuccessStatusCode)
             {
                 throw new Exception(message.ReasonPhrase);
+            }
+        }
+
+        public async Task RemoveMultipleObjects(string bucketName,
+            List<RemoveObjectsDto> removeObjectsDtos)
+        {
+            var uri = string.Format(OBJECT_DELETE_MULTIPLE, bucketName);
+
+            HttpRequestMessage httpRequest = new()
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri(uri),
+                Content = JsonContent.Create(removeObjectsDtos,
+                    new MediaTypeHeaderValue("application/json"))
+            };
+            var responseMessage = await restClient.SendAsync(httpRequest);
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                throw new Exception(responseMessage.ReasonPhrase);
             }
         }
     }

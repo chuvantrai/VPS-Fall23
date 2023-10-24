@@ -7,6 +7,7 @@ using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
+using Service.ManagerVPS.DTO.FileManagement;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Ouput;
@@ -258,14 +259,19 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpPut]
-    [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
-    public async Task<IActionResult> UpdateParkingZone([FromBody] UpdateParkingZoneInput input)
+    // [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
+    public async Task<IActionResult> UpdateParkingZone([FromForm] UpdateParkingZoneInput input)
     {
         var parkingZone =
             ((IParkingZoneRepository)vpsRepository).GetParkingZoneById((Guid)input.ParkingZoneId!);
         if (parkingZone is null)
         {
             throw new ServerException(2);
+        }
+
+        if (parkingZone.IsApprove == true)
+        {
+            throw new ServerException("Bãi đỗ xe đã xác thực. Không thể thay đổi thông tin!");
         }
 
         parkingZone.Name = input.ParkingZoneName;
@@ -278,15 +284,21 @@ public class ParkingZoneController : VpsController<ParkingZone>
         parkingZone.DetailAddress = input.DetailAddress;
         parkingZone.IsApprove = null;
         parkingZone.ModifiedAt = DateTime.Now;
-        
-        // delete old images
-        
-        
-        // add new images
+
+        var parkingZoneImages = await GetImageLinks(parkingZone.OwnerId, parkingZone.Id);
         var fileManager =
             new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
                 _config.GetValue<string>("fileManagementAccessKey:accessKey"),
                 _config.GetValue<string>("fileManagementAccessKey:secretKey"));
+
+        // delete old images
+        var removeObjectsDtos = parkingZoneImages
+            .Select(img => new RemoveObjectsDto { ObjectName = img })
+            .ToList();
+        await fileManager.RemoveMultipleObjects(
+            _config.GetValue<string>("fileManagementAccessKey:publicBucket"), removeObjectsDtos);
+
+        // add new images
         var parkingZoneImgs = new MultipartFormDataContent();
         for (var i = 0; i < input.ParkingZoneImages.Count; i++)
         {
@@ -294,12 +306,13 @@ public class ParkingZoneController : VpsController<ParkingZone>
             parkingZoneImgs.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
                 $"{parkingZone.Id}-{i}.{Path.GetExtension(input.ParkingZoneImages[i].FileName)}");
         }
+
         await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
             $"parking-zone-images/{parkingZone.OwnerId}/{parkingZone.Id}", parkingZoneImgs);
 
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
-        
+
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
