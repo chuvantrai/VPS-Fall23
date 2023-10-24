@@ -22,7 +22,7 @@ namespace Service.ManagerVPS.ExternalClients
 
             if (response[0].Description != null)
             {
-                licensePlate = string.Join("", response[0].Description.Split(new string[] { "\n" }, StringSplitOptions.None));
+                licensePlate = string.Join("", response[0].Description.Split(new string[] { "\n", "." }, StringSplitOptions.None));
             }
 
             return licensePlate;

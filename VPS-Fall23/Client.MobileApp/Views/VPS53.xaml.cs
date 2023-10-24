@@ -77,8 +77,10 @@ public partial class VPS53 : ContentPage
         }
     }
 
-    private void ImageButton_Clicked(object sender, EventArgs e)
+    private async void ImageButton_Clicked(object sender, EventArgs e)
     {
+        var image = await _viewModel.OpenMediaPickerAsync();
+        var imagefile = await _viewModel.Upload(image);
 
     }
 

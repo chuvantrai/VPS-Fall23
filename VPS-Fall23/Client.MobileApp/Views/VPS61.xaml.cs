@@ -64,8 +64,9 @@ public partial class VPS61 : Popup
     private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
     {
         await LicensePlateEntry.HideKeyboardAsync(CancellationToken.None);
-        LicensePlateEntry.Unfocus();
         await AreaCodeEntry.HideKeyboardAsync(CancellationToken.None);
+
+        LicensePlateEntry.Unfocus();
         AreaCodeEntry.Unfocus();
     }
 }
