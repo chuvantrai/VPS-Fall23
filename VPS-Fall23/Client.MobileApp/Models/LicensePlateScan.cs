@@ -2,7 +2,7 @@
 
 namespace Client.MobileApp.Models
 {
-    public class LicensePlateInfo
+    public class LicensePlateScan
     {
         [Required]
         public DateTime CheckAt { get; set; }

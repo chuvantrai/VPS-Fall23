@@ -1,9 +1,6 @@
 ﻿using Client.MobileApp.ViewModels;
-using Google.Cloud.Vision.V1;
-using Image = Google.Cloud.Vision.V1.Image;
 using CommunityToolkit.Maui.Views;
 using Client.MobileApp.Constants;
-using Client.MobileApp.Extensions;
 using Client.MobileApp.Models;
 
 namespace Client.MobileApp.Views;
@@ -54,7 +51,7 @@ public partial class VPS53 : ContentPage
 
             if (imageBytes != null)
             {
-                var checkLicensePlate = new LicensePlateInfo
+                var checkLicensePlate = new LicensePlateScan
                 {
                     Image = imageBytes,
                     CheckAt = DateTime.Now,
@@ -72,17 +69,23 @@ public partial class VPS53 : ContentPage
         }
         catch (Exception ex)
         {
-            throw new Exception(ex.Message);
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
+            });
+
         }
     }
 
-    private void ImageButton_Clicked(object sender, EventArgs e)
+    private async void ImageButton_Clicked(object sender, EventArgs e)
     {
+        var image = await _viewModel.OpenMediaPickerAsync();
+        var imagefile = await _viewModel.Upload(image);
 
     }
 
     private void LincenseButton_Clicked(object sender, EventArgs e)
     {
-        this.ShowPopup(new LicenseInputPopup());
+        this.ShowPopup(new VPS61());
     }
 }
