@@ -26,7 +26,8 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
             Type = (int)request.Type,
             CreatedBy = request.UserId,
             Email = request.Email,
-            Phone = request.Phone
+            Phone = request.Phone,
+            PaymentCode = request.PaymentCode
         };
         context.Reports.Add(report);
         await context.SaveChangesAsync();
@@ -36,5 +37,24 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
             .Include(x => x.StatusNavigation)
             .FirstOrDefaultAsync(x => x.Id.Equals(report.Id));
         return reportResult!;
+    }
+
+    public async Task<int?> CheckPaymentCodeInReport(string paymentCode)
+    {
+        var reportResult = await context.Reports
+            .FirstOrDefaultAsync(x => x.PaymentCode != null && x.PaymentCode.Equals(paymentCode));
+        if (reportResult != null)
+        {
+            return 5012;
+        }
+        
+        var payment = await context.PaymentTransactions
+            .FirstOrDefaultAsync(x => x.TxnRef.Equals(paymentCode));
+        if (payment == null)
+        {
+            return 5011;
+        }
+
+        return null;
     }
 }

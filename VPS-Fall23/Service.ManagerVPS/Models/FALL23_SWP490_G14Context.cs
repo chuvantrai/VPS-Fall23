@@ -785,6 +785,10 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.Email).HasColumnName("email");
 
+                entity.Property(e => e.PaymentCode)
+                    .HasMaxLength(100)
+                    .HasColumnName("payment_code");
+
                 entity.Property(e => e.Phone).HasColumnName("phone");
 
                 entity.Property(e => e.Status).HasColumnName("status");

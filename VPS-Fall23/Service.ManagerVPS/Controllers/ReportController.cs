@@ -7,6 +7,7 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -22,7 +23,8 @@ public class ReportController : VpsController<Report>
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateReport([FromForm] CreateReportRequest request)
+    [FilterPermission(Action = ActionFilterEnum.CreateReport)]
+    public async Task<IActionResult> CreateReport(CreateReportRequest request)
     {
         var accessToken = Request.Cookies["ACCESS_TOKEN"];
         if (accessToken != null)
@@ -32,9 +34,19 @@ public class ReportController : VpsController<Report>
         }
 
         if ((request.UserId is null && request.Email == null && request.Phone == null)
-            || (request.UserId is not null && request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND))
+            || (string.IsNullOrEmpty(request.PaymentCode) && request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND))
         {
             throw new ClientException();
+        }
+
+        if (request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND)
+        {
+            var checkPaymentCode = await ((IReportRepository)vpsRepository)
+                .CheckPaymentCodeInReport(request.PaymentCode!);
+            if (checkPaymentCode != null)
+            {
+                throw new ClientException((int)checkPaymentCode);
+            }
         }
 
         var report = await ((IReportRepository)vpsRepository).CreateReport(request);
@@ -79,8 +91,23 @@ public class ReportController : VpsController<Report>
             {
                 Key = KeyHtmlEmail.DESCRIPTRION,
                 Value = report.Content
+            },
+            new KeyValue()
+            {
+                Key = KeyHtmlEmail.CSS_PAYMENTCODE,
+                Value = request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND ? "" : "display: none;"
             }
         };
+
+        if (request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND)
+        {
+            keyValuesTemplate.Add(new KeyValue()
+            {
+                Key = KeyHtmlEmail.PAYMENTCODE,
+                Value = report.PaymentCode ?? ""
+            });
+        }
+
         var templateEmail = _generalVps.CreateTemplateEmail(keyValuesTemplate);
         var toEmail = new[] { "traicvhe153014@fpt.edu.vn", "0362351671trai@gmail.com" };
         var titleEmail = $"Thông báo người dùng gửi báo cáo về {report.TypeNavigation.Description}";

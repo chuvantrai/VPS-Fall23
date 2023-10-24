@@ -98,5 +98,13 @@
   {
     "code": 5010,
     "message": "Email này đã đánh giá!"
+  },
+  {
+    "code": 5011,
+    "message": "Mã giao dịch sai!"
+  },
+  {
+    "code": 5012,
+    "message": "Đã có yêu cầu của mã giao dịch!"
   }
 ]

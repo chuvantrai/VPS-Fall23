@@ -136,17 +136,14 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
         onCancel={onCloseCallback}
         okButtonProps={{
           style: {
-            backgroundColor: '#1677ff',
             display: 'none',
           },
         }}
-        cancelButtonProps={
-          {
-            style: {
-              display: 'none',
-            }
-          }
-        }
+        cancelButtonProps={{
+          style: {
+            display: 'none',
+          },
+        }}
         closable={true}
         title={parkingZone?.name}
         width={'40vw'}

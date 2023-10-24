@@ -9,4 +9,6 @@ public static class KeyHtmlEmail
     public const string EMAIL_USER = "@{EMAIL_USER}";
     public const string PHONE_USER = "@{PHONE_USER}";
     public const string DESCRIPTRION = "@{DESCRIPTRION}";
+    public const string PAYMENTCODE = "@{PAYMENTCODE}";
+    public const string CSS_PAYMENTCODE = "@{CSS_PAYMENTCODE}";
 }

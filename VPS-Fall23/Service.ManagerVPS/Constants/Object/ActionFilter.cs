@@ -56,6 +56,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.CreatApiBankingDemo,
             UserRole = null
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CreateReport,
+            UserRole = null
         }
     };
 
