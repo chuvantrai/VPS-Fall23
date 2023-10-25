@@ -73,6 +73,7 @@ function ViewListParkingZone() {
   const [validateStatus, setValidateStatus] = useState('null');
   const [help, setHelp] = useState('');
   const [address, setAddress] = useState([]);
+  const [workingTime, setWorkingTime] = useState('');
 
   const handleGetParkingZoneDetail = async (parkingZoneId, isApprove) => {
     await parkingZoneService.getParkingZoneDetail(parkingZoneId).then((res) => {
@@ -238,29 +239,34 @@ function ViewListParkingZone() {
     setCheckedState(checked);
   };
 
+  const handelChangeTime = (_, timeString) => {
+    setWorkingTime(timeString);
+  };
+
   const handleSubmitForm = (values) => {
-    // if (!selectedAddress) {
-    //   setValidateStatus('error');
-    //   setHelp('Vui lòng chọn địa chỉ của bãi đỗ xe');
-    // } else {
-    //   // values = { ...values, parkingZoneImages: fileList, communeId: selectedAddress?.id };
+    if (!selectedAddress) {
+      setValidateStatus('error');
+      setHelp('Vui lòng chọn địa chỉ của bãi đỗ xe');
+    } else {
+      values = { ...values, parkingZoneImages: fileList, communeId: selectedAddress?.id };
 
-    //   // const formData = new FormData();
-    //   // formData.append('ownerId', account.UserId);
-    //   // formData.append('name', values.name);
-    //   // formData.append('pricePerHour', values.pricePerHour);
-    //   // formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
-    //   // formData.append('slots', values.slots);
-    //   // formData.append('communeId', values.communeId);
-    //   // formData.append('detailAddress', values.detailAddress);
-    //   // values.parkingZoneImages.forEach((item) => {
-    //   //   formData.append('parkingZoneImages', item.originFileObj);
-    //   // });
+      const formData = new FormData();
+      formData.append('parkingZoneId', values.id);
+      formData.append('parkingZoneName', values.name);
+      formData.append('pricePerHour', values.pricePerHour);
+      formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
+      formData.append('slots', values.slots);
+      formData.append('workFrom', workingTime[0]);
+      formData.append('workTo', workingTime[1]);
+      formData.append('communeId', values.communeId);
+      formData.append('detailAddress', values.detailAddress);
+      values.parkingZoneImages.forEach((item) => {
+        formData.append('parkingZoneImages', item.originFileObj);
+      });
 
-    //   // parkingZoneService.register(formData);
-    //   console.log(values);
-    // }
-    console.log(values);
+      // parkingZoneService.updateParkingZone(formData);
+      console.log(values);
+    }
   };
 
   return (
@@ -372,7 +378,7 @@ function ViewListParkingZone() {
               },
             ]}
           >
-            <TimePicker.RangePicker className="w-[100%]" />
+            <TimePicker.RangePicker className="w-[100%]" onChange={handelChangeTime} />
           </Form.Item>
           <Form.Item
             name="communeId"

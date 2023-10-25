@@ -134,7 +134,7 @@ namespace Service.ManagerVPS.ExternalClients
             HttpRequestMessage httpRequest = new()
             {
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri(uri),
+                RequestUri = new Uri(uri, UriKind.Relative),
                 Content = JsonContent.Create(removeObjectsDtos,
                     new MediaTypeHeaderValue("application/json"))
             };

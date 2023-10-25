@@ -292,11 +292,21 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 _config.GetValue<string>("fileManagementAccessKey:secretKey"));
 
         // delete old images
-        var removeObjectsDtos = parkingZoneImages
-            .Select(img => new RemoveObjectsDto { ObjectName = img })
-            .ToList();
-        await fileManager.RemoveMultipleObjects(
-            _config.GetValue<string>("fileManagementAccessKey:publicBucket"), removeObjectsDtos);
+        if (parkingZoneImages.Count > 0)
+        {
+            var removeObjectsDtos = parkingZoneImages
+                .Select(img => new RemoveObjectsDto
+                {
+                    ObjectName =
+                        img.Replace(
+                            $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}/{_fileManagementConfig.PublicBucket}/",
+                            "")
+                })
+                .ToList();
+            await fileManager.RemoveMultipleObjects(
+                _config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+                removeObjectsDtos);
+        }
 
         // add new images
         var parkingZoneImgs = new MultipartFormDataContent();
