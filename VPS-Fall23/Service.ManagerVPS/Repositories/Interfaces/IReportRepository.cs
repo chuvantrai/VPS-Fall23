@@ -7,5 +7,5 @@ public interface IReportRepository : IVpsRepository<Report>
 {
     Task<Report> CreateReport(CreateReportRequest request);
     
-    Task<int?> CheckPaymentCodeInReport(string paymentCode);
+    Task<int?> CheckPaymentCodeInReport(string paymentCode,int type);
 }

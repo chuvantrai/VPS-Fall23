@@ -39,13 +39,19 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
         return reportResult!;
     }
 
-    public async Task<int?> CheckPaymentCodeInReport(string paymentCode)
+    public async Task<int?> CheckPaymentCodeInReport(string paymentCode,int type)
     {
         var reportResult = await context.Reports
-            .FirstOrDefaultAsync(x => x.PaymentCode != null && x.PaymentCode.Equals(paymentCode));
+            .FirstOrDefaultAsync(x => x.PaymentCode != null && x.PaymentCode.Equals(paymentCode) && x.Type == type);
         if (reportResult != null)
         {
-            return 5012;
+            switch (type)
+            {
+                case (int)ReportTypeEnum.REQUEST_TRANSACTION_REFUND:
+                    return 5012;
+                case (int)ReportTypeEnum.TRANSACTION_ERROR:
+                    return 5013;
+            }
         }
         
         var payment = await context.PaymentTransactions

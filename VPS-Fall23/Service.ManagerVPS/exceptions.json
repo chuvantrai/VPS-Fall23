@@ -105,6 +105,10 @@
   },
   {
     "code": 5012,
-    "message": "Đã có yêu cầu của mã giao dịch!"
+    "message": "Đã có yêu cầu hoàn tiền của mã giao dịch này!"
+  },
+  {
+    "code": 5013,
+    "message": "Đã có thông báo lỗi của mã giao dịch này!"
   }
 ]

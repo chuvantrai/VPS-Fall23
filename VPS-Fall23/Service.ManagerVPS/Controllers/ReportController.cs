@@ -39,10 +39,10 @@ public class ReportController : VpsController<Report>
             throw new ClientException();
         }
 
-        if (request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND)
+        if (request.Type is ReportTypeEnum.REQUEST_TRANSACTION_REFUND or ReportTypeEnum.TRANSACTION_ERROR)
         {
             var checkPaymentCode = await ((IReportRepository)vpsRepository)
-                .CheckPaymentCodeInReport(request.PaymentCode!);
+                .CheckPaymentCodeInReport(request.PaymentCode!, (int)request.Type);
             if (checkPaymentCode != null)
             {
                 throw new ClientException((int)checkPaymentCode);
