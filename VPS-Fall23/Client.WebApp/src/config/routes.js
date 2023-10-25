@@ -7,6 +7,7 @@ const routes = {
   forgotPassword: '/forgotPassword',
   changePassword: '/changePassword',
   viewRequestedParkingZones: '/viewRequestedParkingZones',
+  test: '/test'
 };
 
 export default routes;

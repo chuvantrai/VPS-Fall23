@@ -1,6 +1,4 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
-import { Alert, Badge, Carousel, Descriptions, Image, Modal, Typography, notification } from 'antd';
+import { Alert, Badge, Carousel, Descriptions, Image, Modal, Typography, notification, Tabs } from 'antd';
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
@@ -8,6 +6,8 @@ import useParkingTransactionService from '../../../../services/parkingTransactio
 import { useSelector } from 'react-redux';
 import { setShowBookingForm } from '../../../../stores/parkingZones/parkingZone.store';
 import store from '../../../../stores';
+import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm.jsx';
+
 const { Text } = Typography;
 
 const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
@@ -56,7 +56,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
       {
         key: 4,
         label: 'Tình trạng hoạt động',
-        children: <Badge status="processing" text="Đang hoạt động" />,
+        children: <Badge status='processing' text='Đang hoạt động' />,
       },
       {
         key: 5,
@@ -64,9 +64,9 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
         children: (
           <Alert
             style={{ padding: 0, textAlign: 'center' }}
-            type="error"
+            type='error'
             description={
-              <Text type="danger" style={{}}>
+              <Text type='danger' style={{}}>
                 {50}
               </Text>
             }
@@ -88,17 +88,60 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
       store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
     });
   };
+  const items = [
+    {
+      key: '1',
+      label: 'Chi tiết',
+      children: (<Descriptions
+        bordered
+        items={getDetailDescription()}
+        size='small'
+        column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
+      />),
+    },
+    {
+      key: '2',
+      label: 'Xem đánh giá',
+      children: (<Descriptions
+        bordered
+        items={getDetailDescription()}
+        size='small'
+        column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
+      />),
+    },
+    {
+      key: '3',
+      label: 'Đặt chỗ',
+      children: (<BookingForm
+        parkingZone={parkingZone}
+        onCloseCallback={closeBookingForm}
+        onSubmitCallback={onConfirmBooking}
+      ></BookingForm>),
+    },
+    {
+      key: '4',
+      label: 'Viết đánh giá',
+      children: (<FeedBackForm
+        parkingZoneId={parkingZone?.id}
+      />),
+    },
+  ];
+  const onChangeTabs = (key) => {
+    console.log(key);
+  };
   return (
     <>
       <Modal
         open={isShow}
         onCancel={onCloseCallback}
-        onOk={showBookingForm}
-        okText="Đặt vé"
-        cancelText="Thoát"
         okButtonProps={{
           style: {
-            backgroundColor: '#1677ff',
+            display: 'none',
+          },
+        }}
+        cancelButtonProps={{
+          style: {
+            display: 'none',
           },
         }}
         closable={true}
@@ -106,26 +149,16 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
         width={'40vw'}
       >
         <Image.PreviewGroup>
-          <Carousel autoplay dotPosition="top" style={{}}>
+          <Carousel autoplay dotPosition='top' style={{}}>
             {imageLinks.map((val, index) => {
               return <Image key={index} src={val}></Image>;
             })}
           </Carousel>
         </Image.PreviewGroup>
-        <Descriptions
-          title="Chi tiết"
-          bordered
-          items={getDetailDescription()}
-          size="small"
-          column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
-        />
+        <div className={('pt-[10px]')}>
+          <Tabs defaultActiveKey='1' items={items} onChange={onChangeTabs} />
+        </div>
       </Modal>
-      <BookingForm
-        isShow={isShowBookingForm}
-        parkingZone={parkingZone}
-        onCloseCallback={closeBookingForm}
-        onSubmitCallback={onConfirmBooking}
-      ></BookingForm>
     </>
   );
 };

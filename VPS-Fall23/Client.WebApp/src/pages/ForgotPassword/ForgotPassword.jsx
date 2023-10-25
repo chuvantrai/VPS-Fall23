@@ -71,7 +71,6 @@ function ForgotPassword() {
     const usernameValue = form.getFieldValue('username');
     axios.put('/api/Auth/ResendVerificationCode', { userName: usernameValue })
       .then((res) => {
-        console.log(res);
         app.notification.success({
           message: `Kiểm tra email ${convertEmailToStars(res.data)} của bạn để lấy mã xác thực!`,
           placement: 'topRight',

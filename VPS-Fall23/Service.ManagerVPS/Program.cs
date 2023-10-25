@@ -21,9 +21,11 @@ builder.Services.AddControllersWithViews()
         options.SerializerSettings.ReferenceLoopHandling =
             Newtonsoft.Json.ReferenceLoopHandling.Ignore
     );
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 //Config appsetting to model
 builder.Services.Configure<FileManagementConfig>(builder.Configuration.GetSection("fileManagementAccessKey"));
 builder.Services.AddOptions();
@@ -35,7 +37,9 @@ builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
 
 //AddSingleton 
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
+builder.Services.AddSingleton<IVnPayLibrary, VnPayLibrary>();
 builder.Services.AddSingleton<GoogleApiService>();
+
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICommuneRepository, CommuneRepository>();
@@ -44,6 +48,8 @@ builder.Services.AddScoped<ICityRepository, CityRepository>();
 builder.Services.AddScoped<IParkingZoneOwnerRepository, ParkingZoneOwnerRepository>();
 builder.Services.AddScoped<IParkingZoneRepository, ParkingZoneRepository>();
 builder.Services.AddScoped<IParkingTransactionRepository, ParkingTransactionRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
 
 //Session
@@ -54,6 +60,9 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+// orther
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -71,5 +80,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseExceptionHandler("/error");
 app.UseSession();
+app.UseStaticFiles();
 
 app.Run();

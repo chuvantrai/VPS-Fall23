@@ -160,5 +160,16 @@ namespace Service.ManagerVPS.Repositories
                 return ResponseNotification.CHECKOUT_ERROR;
             }
         }
+
+        public async Task<ParkingTransaction?> GetParkingTransactionByIdEmail(Guid id, string email)
+        {
+            var parkingTransaction = await context.ParkingTransactions
+                .Include(x => x.ParkingZone)
+                .Include(x => x.PaymentTransactions)
+                .FirstOrDefaultAsync(x => x.ParkingZoneId.Equals(id)
+                                          && x.ParkingZone.IsApprove == true
+                                          && x.Email == email);
+            return parkingTransaction;
+        }
     }
 }

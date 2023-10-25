@@ -14,6 +14,7 @@ namespace Service.ManagerVPS.Models
         public int Type { get; set; }
         public string? Email { get; set; }
         public string? Phone { get; set; }
+        public string? PaymentCode { get; set; }
 
         public virtual Account? CreatedByNavigation { get; set; }
         public virtual GlobalStatus StatusNavigation { get; set; } = null!;
