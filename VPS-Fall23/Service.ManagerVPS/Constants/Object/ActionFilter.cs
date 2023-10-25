@@ -61,6 +61,31 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.CreateReport,
             UserRole = null
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.RegisterNewParkingZone,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetParkingZoneInfoById,
+            UserRole = new[] { UserRoleEnum.OWNER, UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.ChangeParkingZoneStat,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetAllParkingZones,
+            UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.ChangeParkingZoneFullStatus,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 

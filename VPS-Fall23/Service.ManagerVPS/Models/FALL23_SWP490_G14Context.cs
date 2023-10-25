@@ -144,7 +144,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Cities)
@@ -186,7 +187,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Communes)
@@ -245,7 +247,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.ParkingZone)
                     .WithMany(p => p.Contracts)
@@ -283,7 +286,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.TypeId).HasColumnName("type_id");
 
@@ -335,7 +339,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.City)
                     .WithMany(p => p.Districts)
@@ -376,7 +381,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.ParkingZone)
                     .WithMany(p => p.Feedbacks)
@@ -449,7 +455,6 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("phone");
 
                 entity.Property(e => e.StatusId).HasColumnName("status_id");
-
                 entity.HasOne(d => d.CheckinByNavigation)
                     .WithMany(p => p.ParkingTransactionCheckinByNavigations)
                     .HasForeignKey(d => d.CheckinBy)
@@ -498,7 +503,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.To)
                     .HasColumnType("datetime")
@@ -624,7 +630,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.To)
                     .HasColumnType("datetime")
@@ -782,7 +789,7 @@ namespace Service.ManagerVPS.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-
+                
                 entity.Property(e => e.Email).HasColumnName("email");
 
                 entity.Property(e => e.PaymentCode)
@@ -795,7 +802,10 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+                entity.Property(e => e.Type).HasColumnName("type");
 
                 entity.Property(e => e.Type).HasColumnName("type");
 

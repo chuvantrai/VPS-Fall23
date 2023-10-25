@@ -1,9 +1,10 @@
-import { Button, Form, Input, InputNumber, Modal, Upload } from 'antd';
+import { Button, Form, Input, InputNumber, Modal, TimePicker, Upload } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useState, useCallback } from 'react';
 
 import AddressCascader from '@/components/cascader/AddressCascader';
 import useParkingZoneService from '@/services/parkingZoneService';
+import { getAccountJwtModel } from '@/helpers';
 
 const layout = {
   labelCol: {
@@ -35,6 +36,7 @@ const getBase64 = (file) =>
 
 const RegisterParkingZone = () => {
   const parkingZoneService = useParkingZoneService();
+  const account = getAccountJwtModel();
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
@@ -43,6 +45,7 @@ const RegisterParkingZone = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [validateStatus, setValidateStatus] = useState('null');
   const [help, setHelp] = useState('');
+  const [workingTime, setWorkingTime] = useState('');
 
   const addressCascaderProps = {
     style: { width: '100%' },
@@ -81,6 +84,10 @@ const RegisterParkingZone = () => {
 
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
+  const handelChangeTime = (_, timeString) => {
+    setWorkingTime(timeString);
+  };
+
   const onFinish = (values) => {
     if (!selectedAddress) {
       setValidateStatus('error');
@@ -89,7 +96,7 @@ const RegisterParkingZone = () => {
       values = { ...values, parkingZoneImages: fileList, communeId: selectedAddress?.id };
 
       const formData = new FormData();
-      formData.append('ownerId', '290E1476-AA4F-4BD6-8A23-E7167E1D0417');
+      formData.append('ownerId', account.UserId);
       formData.append('name', values.name);
       formData.append('pricePerHour', values.pricePerHour);
       formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
@@ -99,6 +106,8 @@ const RegisterParkingZone = () => {
       values.parkingZoneImages.forEach((item) => {
         formData.append('parkingZoneImages', item.originFileObj);
       });
+      formData.append('workFrom', workingTime[0]);
+      formData.append('workTo', workingTime[1]);
 
       parkingZoneService.register(formData);
     }
@@ -153,6 +162,9 @@ const RegisterParkingZone = () => {
           ]}
         >
           <InputNumber className="w-[484px] h-[32px]" prefix="VND" />
+        </Form.Item>
+        <Form.Item name="workingTime" label="Thời gian làm việc" required>
+          <TimePicker.RangePicker onChange={handelChangeTime} />
         </Form.Item>
         <Form.Item
           className="pb-[24px] m-0"

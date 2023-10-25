@@ -10,9 +10,13 @@ function ContentLayout() {
   } = theme.useToken();
 
   return (
-    <Content style={{
-      backgroundColor: colorBgContainer,
-    }}>
+    <Content
+      className="flex justify-center items-center"
+      style={{
+        backgroundColor: colorBgContainer,
+        margin: 0,
+      }}
+    >
       <Outlet></Outlet>
     </Content>
   );

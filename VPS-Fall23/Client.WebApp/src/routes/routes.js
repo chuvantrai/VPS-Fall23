@@ -21,16 +21,16 @@ export const routes = [
     subRoutes: [
       {
         url: 'profile',
-        component: AccountProfile
+        component: AccountProfile,
       },
       {
         url: 'listParkingZone',
-        component: ViewListParkingZone
+        component: ViewListParkingZone,
       },
       {
         url: 'registerParkingZone',
         component: RegisterParkingZone,
-        userRole: [userRoleEnum.OWNER]
+        userRole: [userRoleEnum.OWNER],
       },
       {
         url: 'viewRequestedParkingZones',
@@ -53,10 +53,6 @@ export const routes = [
     layout: null,
   },
   {
-    path: config.routes.registerParkingZone,
-    component: RegisterParkingZone,
-  },
-  {
     path: config.routes.login,
     component: Login,
     layout: null,
@@ -69,6 +65,6 @@ export const routes = [
   {
     path: config.routes.changePassword,
     component: ChangePassword,
-    layout: null
+    layout: null,
   },
 ];

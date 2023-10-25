@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
+using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -37,6 +38,7 @@ builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
 //AddSingleton 
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
 builder.Services.AddSingleton<IVnPayLibrary, VnPayLibrary>();
+builder.Services.AddSingleton<GoogleApiService>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -48,6 +50,7 @@ builder.Services.AddScoped<IParkingZoneRepository, ParkingZoneRepository>();
 builder.Services.AddScoped<IParkingTransactionRepository, ParkingTransactionRepository>();
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
+builder.Services.AddScoped<IContractRepository, ContractRepository>();
 
 //Session
 builder.Services.AddDistributedMemoryCache();

@@ -63,13 +63,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\VPS61.xaml.cs">
+	    <DependentUpon>VPS61.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\VPS53.xaml.cs">
 	    <DependentUpon>VPS53.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\LicenseInputPopup.xaml">
+	  <MauiXaml Update="Views\VPS61.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\VPS53.xaml">
@@ -109,11 +112,5 @@
 
 	<ItemGroup>
 	  <None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x64\tesseract50.dll" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiAsset Include="GoogleAppCredentials.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </MauiAsset>
 	</ItemGroup>
 </Project>
