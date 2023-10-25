@@ -1,8 +1,6 @@
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
 import { Layout } from 'antd';
-import { useState } from 'react';
-
 import styles from './DefaultLayout.module.scss';
 import ManageLayout from '../ManageLayout/ManageLayout';
 import Footer from '@/layouts/components/Footer';
@@ -11,7 +9,7 @@ import getAccountJwtModel from '@/helpers/getAccountJwtModel.js';
 import DriverHompage from '@/pages/Homepage/components/DriverHompage';
 import Sidebar from '@/layouts/components/Sidebar';
 import config from '@/config';
-
+import { useState } from 'react';
 const cx = classNames.bind(styles);
 const getSideBar = (account, setSelectedURLCallback, setContentItemCallback) => {
   if (!account) {

@@ -49,14 +49,14 @@ const useAxios = () => {
     if (error.request?.responseType === 'arraybuffer') {
       let errorObject = JSON.parse(new TextDecoder().decode(error?.response?.data));
       notification.error({
-        message: 'Error',
+        message: 'Lỗi',
         description: errorObject.message,
         placement: 'topRight',
       });
       return;
     }
     notification.error({
-      message: 'Error',
+      message: 'Lỗi',
       description: error?.response?.data?.message,
       placement: 'topRight',
     });

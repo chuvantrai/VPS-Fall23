@@ -10,7 +10,7 @@ export const adminSidebar = [
         title: 'Thông tin tài khoản',
         desc: 'Mọi thông tin về tài khoản được hiển thị dưới đây',
       },
-      { label: 'test', url: '/' },
+      { label: 'test', url: '/test' },
     ],
   },
   {
