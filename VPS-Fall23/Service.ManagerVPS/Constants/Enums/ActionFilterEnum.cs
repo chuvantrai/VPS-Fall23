@@ -17,5 +17,6 @@ public enum ActionFilterEnum
     GetParkingZoneInfoById,
     ChangeParkingZoneStat,
     GetAllParkingZones,
-    ChangeParkingZoneFullStatus
+    ChangeParkingZoneFullStatus,
+    UpdateParkingZone
 }

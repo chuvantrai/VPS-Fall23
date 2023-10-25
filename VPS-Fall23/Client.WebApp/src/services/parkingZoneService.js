@@ -91,6 +91,22 @@ const useParkingZoneService = () => {
       });
   };
 
+  const updateParkingZone = (params) => {
+    axios
+      .put(`${BASE_URI}/UpdateParkingZone`, params)
+      .then((res) => {
+        notification.success({
+          message: res?.data,
+        });
+      })
+      .catch((err) => {
+        notification.error({
+          message: 'Có lỗi xảy ra!',
+          description: err.message,
+        });
+      });
+  };
+
   return {
     getByAddress,
     register,
@@ -101,6 +117,7 @@ const useParkingZoneService = () => {
     getAllParkingZone,
     getParkingZoneDetail,
     changeParkingZoneFullStatus,
+    updateParkingZone,
   };
 };
 

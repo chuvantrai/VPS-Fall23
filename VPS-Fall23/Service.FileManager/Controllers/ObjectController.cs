@@ -37,15 +37,16 @@ namespace VPS.MinIO.API.Controllers
             }
 
             files.AsParallel().ForAll(async file =>
-               {
-                   using Stream stream = file.OpenReadStream();
-                   PutObjectArgs putObjectArgs = new PutObjectArgs()
-                       .WithBucket(bucketName)
-                       .WithObject($"{folderPath}/{file.FileName}")
-                       .WithObjectSize(file.Length)
-                       .WithStreamData(stream);
-                   PutObjectResponse putObjectResponse = await objectRepository.PutObjectAsync(putObjectArgs, cancellationToken);
-               });
+            {
+                using Stream stream = file.OpenReadStream();
+                PutObjectArgs putObjectArgs = new PutObjectArgs()
+                    .WithBucket(bucketName)
+                    .WithObject($"{folderPath}/{file.FileName}")
+                    .WithObjectSize(file.Length)
+                    .WithStreamData(stream);
+                PutObjectResponse putObjectResponse =
+                    await objectRepository.PutObjectAsync(putObjectArgs, cancellationToken);
+            });
         }
 
         [HttpGet]
@@ -112,11 +113,13 @@ namespace VPS.MinIO.API.Controllers
             CancellationToken cancellation = default
         )
         {
-            RemoveObjectsArgs removeObjectsArgs = new RemoveObjectsArgs()
+            var removeObjectsArgs = new RemoveObjectsArgs()
                 .WithBucket(bucketName)
-                .WithObjects(removeObjectsDtos.Where(r => r.VersionsId.Length == 0)
+                .WithObjects(removeObjectsDtos
+                    .Where(r => r.VersionsId?.Length == 0 || r.VersionsId is null)
                     .Select(r => r.ObjectName).ToArray())
-                .WithObjectsVersions(removeObjectsDtos.Where(r => r.VersionsId.Length > 0)
+                .WithObjectsVersions(removeObjectsDtos
+                    .Where(r => r.VersionsId?.Length > 0 && r.VersionsId is not null)
                     .Select(r => r.ToTuple()).ToList());
             await objectRepository.RemoveObjects(removeObjectsArgs, cancellation);
             return NoContent();
