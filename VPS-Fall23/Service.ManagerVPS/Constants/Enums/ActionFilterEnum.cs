@@ -18,5 +18,6 @@ public enum ActionFilterEnum
     ChangeParkingZoneStat,
     GetAllParkingZones,
     ChangeParkingZoneFullStatus,
-    UpdateParkingZone
+    UpdateParkingZone,
+    CreateAttendantAccount
 }
