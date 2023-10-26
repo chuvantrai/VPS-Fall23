@@ -8,28 +8,57 @@
     <ScrollView>
 
         <Grid>
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="5*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" BackgroundColor="#FF6B00">
+            <Grid Grid.Row="0" 
+                  BackgroundColor="#83E9EE">
+                
                 <Image Source="logo.png"/>
+                
             </Grid>
 
-            <cv:CameraView Grid.Row="1" x:Name="cameraView" CamerasLoaded="cameraView_CamerasLoaded"/>
+            <cv:CameraView Grid.Row="1" 
+                           x:Name="cameraView" 
+                           CamerasLoaded="CameraView_CamerasLoaded"/>
 
-            <Grid  Grid.Row="2" BackgroundColor="#FF6B00">
+            <Grid  Grid.Row="2" 
+                   BackgroundColor="#83E9EE">
+                
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button ImageSource="licenseplate.png" MaximumHeightRequest="80" MaximumWidthRequest="80" BackgroundColor="#D9D9D9" Grid.Column="0" Clicked="LincenseButton_Clicked" CornerRadius="40"></Button>
-                <Button ImageSource="videocamera.png" MaximumHeightRequest="80" MaximumWidthRequest="80" BackgroundColor="#D9D9D9" Grid.Column="1" Clicked="CameraButton_Clicked" CornerRadius="40"></Button>
-                <Button ImageSource="imagegallery.png" MaximumHeightRequest="80" MaximumWidthRequest="80" BackgroundColor="#D9D9D9" Grid.Column="2" Clicked="ImageButton_Clicked" CornerRadius="40"></Button>
+                <Button ImageSource="licenseplate.png" 
+                        MaximumHeightRequest="80" 
+                        MaximumWidthRequest="80" 
+                        BackgroundColor="#D9D9D9" 
+                        Grid.Column="0" 
+                        Clicked="LincenseButton_Clicked" 
+                        CornerRadius="40"/>
+
+                <Button ImageSource="videocamera.png" 
+                        MaximumHeightRequest="80" 
+                        MaximumWidthRequest="80"
+                        BackgroundColor="#D9D9D9"
+                        Grid.Column="1" 
+                        Clicked="CameraButton_Clicked" 
+                        CornerRadius="40"/>
+
+                <Button ImageSource="imagegallery.png" 
+                        MaximumHeightRequest="80"
+                        MaximumWidthRequest="80"
+                        BackgroundColor="#D9D9D9" 
+                        Grid.Column="2"
+                        Clicked="ImageButton_Clicked"
+                        CornerRadius="40"/>
+                
             </Grid>
         </Grid>
 

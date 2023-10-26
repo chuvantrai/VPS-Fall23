@@ -6,29 +6,82 @@
            CanBeDismissedByTappingOutsideOfPopup="False"
            Size="400, 200">
 
-    <Grid Padding="20" BackgroundColor="#FF6B00">
+    <Grid Padding="20" 
+          BackgroundColor="#83E9EE">
+        
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
         </Grid.GestureRecognizers>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
+        
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Grid.Column="0" BackgroundColor="White" HeightRequest="40" Margin="0,0,10,0">
-            <Entry x:Name="AreaCodeEntry" Placeholder="Area" HorizontalOptions="FillAndExpand" BackgroundColor="Transparent" MaxLength="4"/>
-        </Grid>
-        <Label Grid.Row="0" Grid.Column="1" Text="-" FontSize="Large" HorizontalOptions="CenterAndExpand" TextColor="White"/>
-        <Grid Grid.Row="0" Grid.Column="2" BackgroundColor="White" HeightRequest="40" Margin="10,0,0,0">
-            <Entry x:Name="LicensePlateEntry" Placeholder="Nhập biển số xe" HorizontalOptions="FillAndExpand" BackgroundColor="Transparent" MaxLength="7"/>
+        <Grid Grid.Row="0" 
+              Grid.Column="0"
+              BackgroundColor="White"
+              HeightRequest="40"
+              Margin="0,0,10,0">
+            
+            <Entry x:Name="AreaCodeEntry" 
+                   Placeholder="Area"
+                   HorizontalOptions="FillAndExpand"
+                   BackgroundColor="Transparent"
+                   MaxLength="4"/>
+            
         </Grid>
 
-        <Button Grid.ColumnSpan="3" FontSize="Large" Grid.Row="1" Text="Xong" Clicked="OkButton_Clicked" CornerRadius="10" BackgroundColor="White" TextColor="#FF6B00" VerticalOptions="CenterAndExpand" HorizontalOptions="StartAndExpand" Margin="20,0" />
-        <Button Grid.ColumnSpan="3" FontSize="Large" Grid.Row="1" Text="Thoát" Clicked="CancelButton_Clicked" CornerRadius="10" BackgroundColor="White" TextColor="#FF6B00" VerticalOptions="CenterAndExpand" HorizontalOptions="EndAndExpand" Margin="20,0" />
+        <Label Grid.Row="0" 
+               Grid.Column="1" 
+               Text="-"
+               FontSize="Large"
+               HorizontalOptions="CenterAndExpand" 
+               TextColor="White"/>
+        
+        <Grid Grid.Row="0" 
+              Grid.Column="2"
+              BackgroundColor="White" 
+              HeightRequest="40" 
+              Margin="10,0,0,0">
+            
+            <Entry x:Name="LicensePlateEntry"
+                   Placeholder="Nhập biển số xe" 
+                   HorizontalOptions="FillAndExpand" 
+                   BackgroundColor="Transparent"
+                   MaxLength="7"/>
+            
+        </Grid>
+
+        <Button Grid.ColumnSpan="3"
+                FontSize="Large" 
+                Grid.Row="1"
+                Text="Xong" 
+                Clicked="OkButton_Clicked"
+                CornerRadius="10" 
+                BackgroundColor="White" 
+                TextColor="#83E9EE" 
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="StartAndExpand" 
+                Margin="20,0"/>
+        
+        <Button Grid.ColumnSpan="3" 
+                FontSize="Large"
+                Grid.Row="1"
+                Text="Thoát"
+                Clicked="CancelButton_Clicked"
+                CornerRadius="10" 
+                BackgroundColor="White"
+                TextColor="#83E9EE" 
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="EndAndExpand" 
+                Margin="20,0"/>
+        
     </Grid>
 </mct:Popup>

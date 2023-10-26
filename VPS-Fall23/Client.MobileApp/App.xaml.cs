@@ -1,4 +1,7 @@
-﻿
+﻿#if ANDROID
+using Microsoft.Maui.Controls.Compatibility.Platform.Android;
+#endif
+
 namespace Client.MobileApp
 {
     public partial class App : Application
@@ -7,6 +10,15 @@ namespace Client.MobileApp
         {
             InitializeComponent();
             MainPage = appShell;
+
+#if ANDROID
+            Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
+            {
+                handler.PlatformView.BackgroundTintList =
+                    Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
+            });
+#endif
+
         }
     }
 }

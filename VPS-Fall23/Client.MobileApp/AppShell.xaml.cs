@@ -8,6 +8,8 @@ namespace Client.MobileApp
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(VPS53), typeof(VPS53));
+            Routing.RegisterRoute(nameof(VPS61), typeof(VPS61));
+            Routing.RegisterRoute(nameof(VPS79), typeof(VPS79));
         }
     }
 }
