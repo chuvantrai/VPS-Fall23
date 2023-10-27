@@ -11,9 +11,34 @@ const useParkingZoneService = () => {
   const axios = useAxios();
   const navigate = useNavigate();
 
-  const getAllParkingZone = () => {
-    return axios.get(`${BASE_URI}/GetAll`);
+  const getAllParkingZone = ({ pageNumber, pageSize }) => {
+    return axios.get(`${BASE_URI}/GetAll`, {
+      params: {
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+      },
+    });
   };
+
+  const getParkingZoneByName = ({ pageNumber, pageSize, name }) => {
+    return axios.get(`${BASE_URI}/GetByName`, {
+      params: {
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        name: name,
+      },
+    });
+  };
+
+  // const getParkingZoneByOwner = ({ pageNumber, pageSize, name }) => {
+  //   return axios.get(`${BASE_URI}/GetByOwner`, {
+  //     params: {
+  //       pageNumber: pageNumber,
+  //       pageSize: pageSize,
+  //       name: name,
+  //     },
+  //   });
+  // };
 
   const register = (values) => {
     axios
@@ -115,6 +140,7 @@ const useParkingZoneService = () => {
     getRequestParkingZones,
     changeParkingZoneStat,
     getAllParkingZone,
+    getParkingZoneByName,
     getParkingZoneDetail,
     changeParkingZoneFullStatus,
     updateParkingZone,
