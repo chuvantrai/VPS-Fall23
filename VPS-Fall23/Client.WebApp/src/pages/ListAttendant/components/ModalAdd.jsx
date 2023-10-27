@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import AddressCascader from '@/components/cascader/AddressCascader';
 import useParkingZoneService from '@/services/parkingZoneService';
+import { getAccountJwtModel } from '@/helpers';
 
 const validateMessages = {
   required: '${label} không được để trống!',
@@ -19,23 +20,16 @@ const validateMessages = {
 function ModalAdd({ open, onCreate, onCancel }) {
   const [form] = Form.useForm();
   const parkingZoneService = useParkingZoneService();
+  const account = getAccountJwtModel();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [parkingZoneList, setParkingZoneList] = useState([]);
 
   useEffect(() => {
     parkingZoneService
-      .getAllParkingZone()
+      .getAllParkingZoneByOwnerId(account.UserId)
       .then((res) => {
-        const data = res.data;
-        let list = [];
-        data.map((item) => {
-          list.push({
-            value: item.id,
-            label: item.name,
-          });
-        });
-        setParkingZoneList(list);
+        setParkingZoneList(res.data);
       })
       .catch((err) => {
         notification.error({
