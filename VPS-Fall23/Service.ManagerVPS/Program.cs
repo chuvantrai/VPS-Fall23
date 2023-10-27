@@ -28,7 +28,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<FileManagementConfig>(builder.Configuration.GetSection("fileManagementAccessKey"));
 builder.Services.AddOptions();
 
-
 //Add DBContext
 builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("ConStr")));
