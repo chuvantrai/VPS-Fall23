@@ -7,7 +7,7 @@ const items = [
 ];
 
 const ManagerRightHeader = ({ account }) => {
-
+console.log(123)
     return (
         <Dropdown
             menu={{ items }}
@@ -17,8 +17,8 @@ const ManagerRightHeader = ({ account }) => {
             <span className={'h-[50px] cursor-pointer'} onClick={(e) => e.preventDefault()}>
                 <Space>
                     <img
-                        className={'w-[50px] h-[50px!important] rounded-[50%] object-cover'}
-                        src={account.Avatar ?? '../src/assets/images/AvatarDefault.png'} />
+                        className={'w-[50px] h-[50px!important] rounded-[10px] object-cover'}
+                        src={account.Avatar === "" ? '../src/assets/images/AvatarDefault.png':account.Avatar} />
                 </Space>
             </span>
         </Dropdown>

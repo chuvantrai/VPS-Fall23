@@ -92,6 +92,46 @@ const useParkingZoneService = () => {
     return axios.put(`${BASE_URI}/ChangeParkingZoneStat`, params);
   };
 
+  const getParkingZoneDetail = async (parkingZoneId) => {
+    return axios.get(`${BASE_URI}/GetParkingZoneInfoById`, {
+      params: {
+        parkingZoneId: parkingZoneId,
+      },
+    });
+  };
+
+  const changeParkingZoneFullStatus = (params) => {
+    axios
+      .put(`${BASE_URI}/ChangeParkingZoneFullStatus`, params)
+      .then((res) => {
+        notification.success({
+          message: res?.data,
+        });
+      })
+      .catch((err) => {
+        notification.error({
+          message: 'Có lỗi xảy ra!',
+          description: err.message,
+        });
+      });
+  };
+
+  const updateParkingZone = (params) => {
+    axios
+      .put(`${BASE_URI}/UpdateParkingZone`, params)
+      .then((res) => {
+        notification.success({
+          message: res?.data,
+        });
+      })
+      .catch((err) => {
+        notification.error({
+          message: 'Có lỗi xảy ra!',
+          description: err.message,
+        });
+      });
+  };
+
   return {
     getByAddress,
     register,
@@ -101,6 +141,9 @@ const useParkingZoneService = () => {
     changeParkingZoneStat,
     getAllParkingZone,
     getParkingZoneByName,
+    getParkingZoneDetail,
+    changeParkingZoneFullStatus,
+    updateParkingZone,
   };
 };
 

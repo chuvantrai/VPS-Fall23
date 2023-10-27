@@ -47,9 +47,9 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPost]
-        public async Task<string> CheckLicensePlate(LicensePlateInfo licensePlateInfo)
+        public async Task<string> CheckLicensePlateScan(LicensePlateScan licensePlateScan)
         {
-            var image = Image.FromBytes(licensePlateInfo.Image) ?? throw new ClientException(3003);
+            var image = Image.FromBytes(licensePlateScan.Image) ?? throw new ClientException(3003);
 
             var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);
 
@@ -58,7 +58,21 @@ namespace Service.ManagerVPS.Controllers
                 throw new ClientException(3001);
             }
 
-            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate,licensePlateInfo) ?? throw new ClientException(3002);
+            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate, licensePlateScan.CheckAt, licensePlateScan.CheckBy) ?? throw new ClientException(3002);
         }
+
+        [HttpPost]
+        public async Task<string> CheckLicensePlateInput(LicensePlateInput licensePlateInput)
+        {
+            var licensePlate = licensePlateInput.LicensePlate ?? throw new ClientException(3000);
+
+            if (!GeneralExtension.IsLicensePlateValid(licensePlate))
+            {
+                throw new ClientException(3001);
+            }
+
+            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate, licensePlateInput.CheckAt, licensePlateInput.CheckBy) ?? throw new ClientException(3002);
+        }
+
     }
 }

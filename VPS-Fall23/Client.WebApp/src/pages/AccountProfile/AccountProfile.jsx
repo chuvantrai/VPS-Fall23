@@ -69,7 +69,7 @@ function AccountProfile() {
   // avartar update
 
   return (
-    <div className={cx('w-full pl-[20px] pr-[20px] min-h-[calc(100vh-250px)] mt-[20px] page-account-profile')}>
+    <div className={cx('w-full pl-[20px] pt-[20px] pr-[20px] min-h-[calc(100vh-250px)] mt-[20px] page-account-profile')}>
       <Form
         className={cx('grid-rows-2 gap-4')}
         layout={'vertical'}

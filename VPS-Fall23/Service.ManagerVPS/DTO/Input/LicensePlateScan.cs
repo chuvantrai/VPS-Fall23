@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Service.ManagerVPS.DTO.Input
 {
-    public class LicensePlateInfo
+    public class LicensePlateScan
     {
         [Required]
         public DateTime CheckAt { get; set; }

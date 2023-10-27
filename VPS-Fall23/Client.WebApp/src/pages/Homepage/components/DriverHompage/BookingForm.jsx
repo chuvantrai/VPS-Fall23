@@ -1,4 +1,4 @@
-import { DatePicker, Form, Input, Modal, Space } from "antd"
+import { Button, DatePicker, Form, Input, Modal, Space } from 'antd';
 import dayjs from "dayjs"
 
 const range = (start, end) => {
@@ -9,7 +9,7 @@ const range = (start, end) => {
     return result;
 };
 
-const BookingForm = ({ isShow, parkingZone, onSubmitCallback, onCloseCallback }) => {
+const BookingForm = ({ parkingZone, onSubmitCallback, onCloseCallback }) => {
 
     const [form] = Form.useForm();
 
@@ -33,23 +33,10 @@ const BookingForm = ({ isShow, parkingZone, onSubmitCallback, onCloseCallback })
             onSubmitCallback(parkingTransaction);
         });
     }
-    return (<Modal
-        title={`Đặt chỗ gửi xe tại ${parkingZone?.name}`}
-        open={isShow}
-        onCancel={onCloseCallback}
-        destroyOnClose={true}
-        onOk={onSubmitClick}
-        okText="Thanh toán"
-        cancelText="Hủy"
-        okButtonProps={{
-            style: {
-                backgroundColor: '#1677ff',
-            }
-        }}
-    >
+    return (
         <Form
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 14 }}
             form={form}
         >
             <Form.Item
@@ -127,12 +114,18 @@ const BookingForm = ({ isShow, parkingZone, onSubmitCallback, onCloseCallback })
                     disabledDate={getDateFromNow}
                     disabledTime={getDisabledTime}
                     showTime={true}
+                    popupClassName={'popupDatePicker'}
                     format="YYYY-MM-DD HH:mm"
                     name="checkinTime"
                 />
             </Form.Item>
+            <Form.Item className={('flex justify-center m-0')}>
+                <Button className={('bg-[#1890FF] w-[200%]')} type='primary' onClick={onSubmitClick}>
+                    Đặt chỗ
+                </Button>
+            </Form.Item>
         </Form>
-    </Modal >)
+    )
 }
 
 export default BookingForm  
