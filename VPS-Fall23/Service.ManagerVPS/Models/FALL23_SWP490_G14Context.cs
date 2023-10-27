@@ -37,7 +37,6 @@ namespace Service.ManagerVPS.Models
         public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Type> Types { get; set; } = null!;
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
@@ -792,10 +791,6 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.PaymentCode)
                     .HasMaxLength(100)
                     .HasColumnName("payment_code");
-
-                entity.Property(e => e.Phone).HasColumnName("phone");
-
-                entity.Property(e => e.Email).HasColumnName("email");
 
                 entity.Property(e => e.Phone).HasColumnName("phone");
 
