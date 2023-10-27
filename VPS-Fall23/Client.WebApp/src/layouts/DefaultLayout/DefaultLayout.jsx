@@ -13,28 +13,39 @@ import { useState } from 'react';
 const cx = classNames.bind(styles);
 const getSideBar = (account, setSelectedURLCallback, setContentItemCallback) => {
   if (!account) {
-    return (<></>)
+    return <></>;
+  } else {
+    if (account.RoleId === '1') {
+      const onChangeURL = (e) => {
+        setSelectedURLCallback(e.url);
+        const itemFoundWithLabel = config.adminSidebar.find((item) => item.label == e.label);
+        const contentItemWithUrl = itemFoundWithLabel.options.find((i) => i.url == e.url);
+        setContentItemCallback(contentItemWithUrl);
+      };
+      return <Sidebar rowData={config.adminSidebar} setSelectedKey={onChangeURL} />;
+    } else if (account.RoleId === '2') {
+      const onChangeURL = (e) => {
+        setSelectedURLCallback(e.url);
+        const itemFoundWithLabel = config.ownerSidebar.find((item) => item.label == e.label);
+        const contentItemWithUrl = itemFoundWithLabel.options.find((i) => i.url == e.url);
+        setContentItemCallback(contentItemWithUrl);
+      };
+      return <Sidebar rowData={config.ownerSidebar} setSelectedKey={onChangeURL} />;
+    }
   }
-  const onChangeURL = (e) => {
-    setSelectedURLCallback(e.url);
-    const itemFoundWithLabel = config.adminSidebar.find((item) => item.label == e.label)
-    const contentItemWithUrl = itemFoundWithLabel.options.find((i) => i.url == e.url);
-    setContentItemCallback(contentItemWithUrl);
-  };
-  return (<Sidebar rowData={config.adminSidebar} setSelectedKey={onChangeURL} />)
-}
+};
 
 const defaultContentItem = {
   label: '',
   url: '',
   title: '',
   desc: '',
-}
+};
 
 const defaultSelectedUrl = {
   label: '',
-  url: ''
-}
+  url: '',
+};
 
 function DefaultLayout() {
   const account = getAccountJwtModel();
@@ -46,12 +57,7 @@ function DefaultLayout() {
       <Header />
       <Layout style={{ position: 'relative' }}>
         {getSideBar(account, setSelectedURL, setContentItem)}
-        {account
-          ?
-          <ManageLayout contentItem={contentItem} isShow={selectedURL} />
-          :
-          <DriverHompage />
-        }
+        {account ? <ManageLayout contentItem={contentItem} isShow={selectedURL} /> : <DriverHompage />}
       </Layout>
       {account ? <></> : <Footer />}
     </Layout>
