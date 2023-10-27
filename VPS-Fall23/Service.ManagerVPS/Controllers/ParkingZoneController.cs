@@ -15,7 +15,6 @@ using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
-using static Google.Cloud.Vision.V1.ProductSearchResults.Types;
 
 namespace Service.ManagerVPS.Controllers;
 
@@ -126,7 +125,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
     {
         try
         {
-            var list = ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
+            var list =
+                ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
             foreach (ParkingZone item in list)
             {
@@ -139,6 +139,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     Status = item.IsApprove
                 });
             }
+
             var metadata = new
             {
                 list.TotalCount,
@@ -155,6 +156,20 @@ public class ParkingZoneController : VpsController<ParkingZone>
         {
             return NotFound(ex);
         }
+    }
+
+    [HttpGet]
+    // [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
+    public IActionResult GetAllParkingZoneByOwnerId([FromQuery] string ownerId)
+    {
+        var parkingZoneList =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneByOwnerId(ownerId);
+        var result = parkingZoneList.Select(x => new
+        {
+            Value = x.Id,
+            Label = x.Name
+        }).ToList();
+        return Ok(result);
     }
 
     [HttpGet]

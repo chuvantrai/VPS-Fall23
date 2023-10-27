@@ -33,35 +33,6 @@ const onChange = (pagination, filters, sorter, extra) => {
 };
 
 function ViewListParkingZone() {
-  const columnsModel = [
-    {
-      title: 'Tên',
-      dataIndex: 'name',
-    },
-    {
-      title: 'Chủ sở hữu',
-      dataIndex: 'owner',
-    },
-    {
-      title: 'Ngày tạo',
-      dataIndex: 'created',
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            handleGetParkingZoneDetail(record.key, record.isApprove);
-          }}
-        >
-          <FormOutlined />
-        </a>
-      ),
-    },
-  ];
-
   const [form] = Form.useForm();
 
   const parkingZoneService = useParkingZoneService();
@@ -156,12 +127,17 @@ function ViewListParkingZone() {
       key: 'status',
     },
     {
-      title: '',
+      title: 'Action',
       key: 'action',
-      render: () => (
-        <Space size="middle">
-          <a>Detail</a>
-        </Space>
+      render: (_, record) => (
+        <a
+          onClick={(e) => {
+            e.preventDefault();
+            handleGetParkingZoneDetail(record.key, record.isApprove);
+          }}
+        >
+          <FormOutlined />
+        </a>
       ),
     },
   ];
@@ -283,25 +259,6 @@ function ViewListParkingZone() {
 
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
-  const formItemLayout = {
-    labelCol: {
-      xs: {
-        span: 24,
-      },
-      sm: {
-        span: 4,
-      },
-    },
-    wrapperCol: {
-      xs: {
-        span: 24,
-      },
-      sm: {
-        span: 20,
-      },
-    },
-  };
-
   const handleChangeSwitch = (checked) => {
     const params = {
       parkingZoneId: parkingZoneDetail.id,
@@ -399,7 +356,7 @@ function ViewListParkingZone() {
         )}
         width={600}
       >
-        <Form {...formItemLayout} form={form} name="editForm" style={{ maxWidth: '600px' }} labelWrap>
+        <Form form={form} name="editForm" style={{ maxWidth: '600px' }} layout="vertical">
           <Form.Item className="hidden" name="id">
             <Input type="hidden" />
           </Form.Item>

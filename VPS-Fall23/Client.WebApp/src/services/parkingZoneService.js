@@ -40,6 +40,14 @@ const useParkingZoneService = () => {
   //   });
   // };
 
+  const getAllParkingZoneByOwnerId = (ownerId) => {
+    return axios.get(`${BASE_URI}/GetAllParkingZoneByOwnerId`, {
+      params: {
+        ownerId,
+      },
+    });
+  };
+
   const register = (values) => {
     axios
       .post(REGISTER, values, {
@@ -144,6 +152,7 @@ const useParkingZoneService = () => {
     getParkingZoneDetail,
     changeParkingZoneFullStatus,
     updateParkingZone,
+    getAllParkingZoneByOwnerId,
   };
 };
 

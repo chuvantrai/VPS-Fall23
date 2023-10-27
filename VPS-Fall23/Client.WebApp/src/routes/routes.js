@@ -10,8 +10,8 @@ import Login from '@/pages/Login';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ChangePassword from '@/pages/ChangePassword/index.js';
 import AccountProfile from '@/pages/AccountProfile/index.js';
-import userRoleEnum from '@/helpers/userRoleEnum.js';
 import Test from '@/pages/Test/index.js';
+import ListAttendant from '@/pages/ListAttendant';
 
 export const routes = [
   {
@@ -30,7 +30,6 @@ export const routes = [
       {
         url: 'registerParkingZone',
         component: RegisterParkingZone,
-        userRole: [userRoleEnum.OWNER],
       },
       {
         url: 'viewRequestedParkingZones',
@@ -39,6 +38,10 @@ export const routes = [
       {
         url: 'test',
         component: Test,
+      },
+      {
+        url: 'listAttendant',
+        component: ListAttendant,
       },
     ],
   },
