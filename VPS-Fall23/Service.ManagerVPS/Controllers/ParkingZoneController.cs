@@ -83,7 +83,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    //[FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
     public IActionResult GetAll([FromQuery] QueryStringParameters parameters)
     {
         try
@@ -135,10 +135,20 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     Name = item.Name,
                     Owner = item.Owner.Email,
                     Created = item.CreatedAt,
-                    IsApprove = item.IsApprove
+                    Status = item.IsApprove
                 });
             }
-            return Ok(res);
+            var metadata = new
+            {
+                list.TotalCount,
+                list.PageSize,
+                list.CurrentPage,
+                list.TotalPages,
+                list.HasNext,
+                list.HasPrev,
+                Data = res
+            };
+            return Ok(metadata);
         }
         catch (Exception ex)
         {
