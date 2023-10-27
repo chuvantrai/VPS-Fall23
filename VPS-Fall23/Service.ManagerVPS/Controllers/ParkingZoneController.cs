@@ -14,6 +14,7 @@ using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using static Google.Cloud.Vision.V1.ProductSearchResults.Types;
 
 namespace Service.ManagerVPS.Controllers;
 
@@ -82,12 +83,49 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
-    public IActionResult GetAll()
+    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    public IActionResult GetAll([FromQuery] QueryStringParameters parameters)
     {
         try
         {
-            List<ParkingZone> list = ((IParkingZoneRepository)vpsRepository).GetAllParkingZone();
+            var list = ((IParkingZoneRepository)vpsRepository).GetAllParkingZone(parameters);
+            List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
+            foreach (ParkingZone item in list)
+            {
+                res.Add(new ParkingZoneItemOutput
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Owner = item.Owner.Email,
+                    Created = item.CreatedAt
+                });
+            }
+
+            var metadata = new
+            {
+                list.TotalCount,
+                list.PageSize,
+                list.CurrentPage,
+                list.TotalPages,
+                list.HasNext,
+                list.HasPrev,
+                Data = res
+            };
+            return Ok(metadata);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex);
+        }
+    }
+
+    [HttpGet]
+    //[FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    public IActionResult GetByName([FromQuery] QueryStringParameters parameters, string name)
+    {
+        try
+        {
+            var list = ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
             foreach (ParkingZone item in list)
             {
@@ -100,7 +138,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     IsApprove = item.IsApprove
                 });
             }
-
             return Ok(res);
         }
         catch (Exception ex)

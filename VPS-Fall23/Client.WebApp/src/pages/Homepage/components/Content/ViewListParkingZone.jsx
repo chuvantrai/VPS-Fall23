@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Fragment } from 'react';
 import dayjs from 'dayjs';
 import {
   Table,
@@ -18,19 +18,22 @@ import {
   InputNumber,
   Upload,
   TimePicker,
+  Pagination,
+  AutoComplete,
 } from 'antd';
 import { FormOutlined, UploadOutlined } from '@ant-design/icons';
 
-import useParkingZoneService from '@/services/parkingZoneService.js';
+import useParkingZoneService from '@/services/parkingZoneService';
 import { getAccountJwtModel } from '@/helpers';
 import AddressCascader from '@/components/cascader/AddressCascader';
+import { useDebounce } from 'use-debounce';
 
 const onChange = (pagination, filters, sorter, extra) => {
   console.log('params', pagination, filters, sorter, extra);
 };
 
 function ViewListParkingZone() {
-  const columns = [
+  const columnsModel = [
     {
       title: 'Tên',
       dataIndex: 'name',
@@ -111,22 +114,91 @@ function ViewListParkingZone() {
     setIsModalViewOpen(false);
   };
 
-  const [data, setData] = useState([{ id: '', name: '', owner: '', created: Date, isApprove: null }]);
-  let dataShow = [{ key: '', name: '', owner: '', created: Date, isApprove: null }];
+  const [data, setData] = useState([{ id: '', name: '', owner: '', status: null, created: Date }]);
+  let dataShow = [{ key: '', name: '', owner: '', status: null, created: Date }];
+
+  const [inputValue, setInputValue] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const [totalItems, setTotalItems] = useState();
+
+  // eslint-disable-next-line no-unused-vars
+  const [debouncedValue] = useDebounce(inputValue, 1000);
+
+  const handleSearch = (e) => {
+    searchDataByName(e);
+    setInputValue(e);
+  };
+
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: '30%',
+    },
+    {
+      title: 'Owner',
+      dataIndex: 'owner',
+      key: 'owner',
+      width: '20%',
+    },
+    {
+      title: 'Created',
+      dataIndex: 'created',
+      key: 'created',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: '',
+      key: 'action',
+      render: () => (
+        <Space size="middle">
+          <a>Detail</a>
+        </Space>
+      ),
+    },
+  ];
 
   useEffect(() => {
     getData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue]);
 
-  const getData = async () => {
+  const getData = async (currentPage) => {
     await parkingZoneService
-      .getAllParkingZone()
+      .getAllParkingZone({ pageNumber: currentPage, pageSize: pageSize })
       .then((res) => {
-        setData(res.data);
+        setData(res?.data.data);
+        setTotalItems(res?.data.totalCount);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
+  };
+
+  const searchDataByName = async (e) => {
+    if (e !== '') {
+      await parkingZoneService
+        .getParkingZoneByName({ pageNumber: currentPage, pageSize: pageSize, name: e })
+        .then((res) => {
+          setData(res?.data.data);
+          setTotalItems(res?.data.totalCount);
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        });
+    }
+  };
+
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    getData(page);
   };
 
   let currentDate = new Date();
@@ -264,22 +336,33 @@ function ViewListParkingZone() {
   };
 
   return (
-    <>
+    <Fragment>
       <div className="w-full px-4">
+        <AutoComplete style={{ width: 200 }} onSearch={handleSearch} placeholder="input here" className="mt-4 mb-4" />
         {data !== undefined &&
           data.map((val) => {
             const item = {
               key: val.id,
               name: val.name,
               owner: val.owner,
+              status: val.status === null ? 'null' : val.status,
               created: val.created,
-              isApprove: val.isApprove,
             };
             dataShow.push(item);
           })}
-        {dataShow.shift() && console.log('1')}
-        {dataShow.length != 1 && dataShow[0].key !== '' && (
-          <Table columns={columns} dataSource={dataShow} onChange={onChange} />
+        {console.log(data)}
+        {dataShow.shift() && dataShow.length > 1 && dataShow[0].key !== '' && (
+          <Fragment>
+            <Table columns={columns} dataSource={dataShow} onChange={onChange} pagination={false} />
+            <div className="py-[16px] flex flex-row-reverse pr-[24px]">
+              <Pagination
+                current={currentPage}
+                onChange={handleChangePage}
+                total={totalItems}
+                showSizeChanger={false}
+              />
+            </div>
+          </Fragment>
         )}
       </div>
       <Modal
@@ -463,7 +546,7 @@ function ViewListParkingZone() {
         </Image.PreviewGroup>
         <Descriptions bordered items={descItems} column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }} />
       </Modal>
-    </>
+    </Fragment>
   );
 }
 
