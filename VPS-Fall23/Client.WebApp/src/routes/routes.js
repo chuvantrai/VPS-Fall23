@@ -30,7 +30,6 @@ export const routes = [
       {
         url: 'registerParkingZone',
         component: RegisterParkingZone,
-        userRole: [userRoleEnum.OWNER],
       },
       {
         url: 'viewRequestedParkingZones',
