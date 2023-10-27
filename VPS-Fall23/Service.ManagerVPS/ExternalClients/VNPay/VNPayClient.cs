@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Service.ManagerVPS.Constants.Enums.VNPay;
 using Service.ManagerVPS.DTO.VNPay;
-using System.Collections.Specialized;
 using System.Globalization;
 using System.Net;
 using System.Reflection;

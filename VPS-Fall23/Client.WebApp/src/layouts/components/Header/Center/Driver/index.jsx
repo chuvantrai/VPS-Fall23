@@ -12,6 +12,7 @@ const DriverCenterHeader = () => {
     const addressCascaderProps = {
         style: { width: '100%' },
         placeholder: 'Chọn địa điểm bạn muốn đến',
+
     };
 
     const onCascaderChange = useCallback((value, selectedOptions) => {

@@ -25,6 +25,7 @@ const BookingForm = ({ isShow, parkingZone }) => {
     }
     const onClose = () => {
         form.resetFields();
+        setPaymentResult({...paymentResult, isShow: false})
         store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
     }
     let connection = new HubConnectionBuilder()
@@ -77,6 +78,7 @@ const BookingForm = ({ isShow, parkingZone }) => {
         destroyOnClose={true}
         onOk={onSubmitClick}
         okText="Thanh toán"
+        zIndex={2001}
         cancelText="Đóng"
         okButtonProps={{
             style: {
@@ -182,12 +184,6 @@ const BookingForm = ({ isShow, parkingZone }) => {
         </Form>
         {paymentResult.isShow === true && <Result
             {...getPaymentResultProps()}
-        // extra={[
-        //     <Button type="primary" key="console">
-        //         Go Console
-        //     </Button>,
-        //     <Button key="buy">Buy Again</Button>,
-        // ]}
         />}
 
     </Modal >)

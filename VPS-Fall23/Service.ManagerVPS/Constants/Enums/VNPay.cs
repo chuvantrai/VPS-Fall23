@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace Service.ManagerVPS.Constants.Enums.VNPay
+﻿namespace Service.ManagerVPS.Constants.Enums.VNPay
 {
     public enum BankCode
     {

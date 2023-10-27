@@ -74,6 +74,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
         open={isShow}
         onCancel={onCloseCallback}
         onOk={showBookingForm}
+        zIndex={2000}
         okText="Đặt vé"
         cancelText="Thoát"
         okButtonProps={{

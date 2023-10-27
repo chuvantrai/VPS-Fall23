@@ -10,6 +10,7 @@ using Service.ManagerVPS.ExternalClients.VNPay;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using Service.ManagerVPS.Constants.Enums;
 
 namespace Service.ManagerVPS.Controllers
 {
@@ -58,6 +59,7 @@ namespace Service.ManagerVPS.Controllers
                 CheckinAt = bookingSlot.CheckinAt,
                 CheckoutAt = bookingSlot.CheckoutAt,
                 Email = bookingSlot.Email,
+                StatusId = (int)ParkingTransactionStatusEnum.BOOKED,
                 Phone = bookingSlot.Phone,
                 LicensePlate = bookingSlot.LicensePlate
             };
