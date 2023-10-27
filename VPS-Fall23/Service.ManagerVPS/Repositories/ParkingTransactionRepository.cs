@@ -160,8 +160,10 @@ namespace Service.ManagerVPS.Repositories
         {
             return this.entities.AnyAsync(p => p.ParkingZoneId == bookingSlot.ParkingZoneId
             && p.LicensePlate == bookingSlot.LicensePlate
-            && p.CheckinAt == bookingSlot.CheckinAt
-            && p.CheckoutAt == bookingSlot.CheckoutAt);
+             && p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
+            && ((bookingSlot.CheckinAt >= p.CheckinAt && bookingSlot.CheckinAt <= p.CheckoutAt)
+            || (bookingSlot.CheckoutAt >= p.CheckinAt && bookingSlot.CheckoutAt <= p.CheckoutAt))
+            && !p.ParkingTransactionDetails.Any());
         }
     }
 }

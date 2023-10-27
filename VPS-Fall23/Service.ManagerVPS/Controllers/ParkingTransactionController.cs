@@ -22,7 +22,8 @@ namespace Service.ManagerVPS.Controllers
         private readonly GoogleApiService _googleApiService;
 
         public ParkingTransactionController(
-            IParkingTransactionRepository parkingTransactionRepository, GoogleApiService googleApiService,
+            IParkingTransactionRepository parkingTransactionRepository,
+            GoogleApiService googleApiService,
             IOptions<VnPayConfig> vnPayConfig,
             IParkingZoneRepository parkingZoneRepository,
             IPaymentTransactionRepository paymentTransaction)
@@ -30,7 +31,8 @@ namespace Service.ManagerVPS.Controllers
         {
             this.vnPayConfig = vnPayConfig.Value;
             this.parkingZoneRepository = parkingZoneRepository;
-            paymentTransactionRepository = paymentTransaction; _googleApiService = googleApiService;
+            paymentTransactionRepository = paymentTransaction;
+            _googleApiService = googleApiService;
         }
         [HttpPost]
         public async Task<ParkingTransaction> Booking(BookingSlot bookingSlot)
