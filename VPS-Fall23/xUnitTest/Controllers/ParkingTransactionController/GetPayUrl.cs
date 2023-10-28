@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
+using Service.ManagerVPS.Constants.Notifications;
+using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
@@ -106,6 +108,14 @@ namespace xUnitTest.Controllers.ParkingTransactionController
             var parkingZone = await parkingZoneRepository.Find(parkingTransaction.ParkingZoneId);
 
             Assert.Equal(paymentTransaction.Amount, parkingZone.PricePerHour * (parkingTransaction.CheckoutAt - parkingTransaction.CheckinAt).Value.Hours);
+        }
+        [Fact]
+        public async Task NotExistTransaction()
+        {
+            var id = Guid.NewGuid();
+
+            var exception = await Assert.ThrowsAsync<ClientException>(async () => await parkingTransactionController.GetPayUrl(id));
+            Assert.Equal(ResponseNotification.NOT_FOUND, exception.Message);
         }
     }
 }
