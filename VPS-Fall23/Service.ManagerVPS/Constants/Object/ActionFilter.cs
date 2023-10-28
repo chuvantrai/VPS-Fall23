@@ -54,6 +54,16 @@ public static class ActionFilter
         },
         new ActionModel
         {
+            Action = ActionFilterEnum.CreatApiBankingDemo,
+            UserRole = null
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CreateReport,
+            UserRole = null
+        },
+        new ActionModel
+        {
             Action = ActionFilterEnum.RegisterNewParkingZone,
             UserRole = new[] { UserRoleEnum.OWNER }
         },
@@ -75,6 +85,21 @@ public static class ActionFilter
         new ActionModel
         {
             Action = ActionFilterEnum.ChangeParkingZoneFullStatus,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.UpdateParkingZone,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CreateAttendantAccount,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetAllParkingZoneByOwnerId,
             UserRole = new[] { UserRoleEnum.OWNER }
         }
     };

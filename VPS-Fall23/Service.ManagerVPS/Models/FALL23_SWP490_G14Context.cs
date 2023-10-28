@@ -24,7 +24,10 @@ namespace Service.ManagerVPS.Models
         public virtual DbSet<Feedback> Feedbacks { get; set; } = null!;
         public virtual DbSet<GlobalStatus> GlobalStatuses { get; set; } = null!;
         public virtual DbSet<ParkingTransaction> ParkingTransactions { get; set; } = null!;
-        public virtual DbSet<ParkingTransactionDetail> ParkingTransactionDetails { get; set; } = null!;
+
+        public virtual DbSet<ParkingTransactionDetail> ParkingTransactionDetails { get; set; } =
+            null!;
+
         public virtual DbSet<ParkingZone> ParkingZones { get; set; } = null!;
         public virtual DbSet<ParkingZoneAbsent> ParkingZoneAbsents { get; set; } = null!;
         public virtual DbSet<ParkingZoneAttendant> ParkingZoneAttendants { get; set; } = null!;
@@ -37,8 +40,9 @@ namespace Service.ManagerVPS.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!;");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https: //go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer(
+                    "server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!;");
             }
         }
         protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -375,6 +379,8 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.Email).HasColumnName("email");
+
                 entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
 
                 entity.Property(e => e.Rate)
@@ -502,7 +508,8 @@ namespace Service.ManagerVPS.Models
                     .HasColumnType("datetime")
                     .HasColumnName("from");
 
-                entity.Property(e => e.ParkingTransactionId).HasColumnName("parking_transaction_id");
+                entity.Property(e => e.ParkingTransactionId)
+                    .HasColumnName("parking_transaction_id");
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
@@ -792,6 +799,16 @@ namespace Service.ManagerVPS.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+
+                entity.Property(e => e.Email).HasColumnName("email");
+
+                entity.Property(e => e.PaymentCode)
+                    .HasMaxLength(100)
+                    .HasColumnName("payment_code");
+
+                entity.Property(e => e.Phone).HasColumnName("phone");
+
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()

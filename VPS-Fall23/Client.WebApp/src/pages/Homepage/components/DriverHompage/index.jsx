@@ -23,7 +23,7 @@ const DriverHompage = () => {
     if (map) { map.setCenter(focusPosition.lat, focusPosition.lng, map.getZoom()) }
     else initMap(focusPosition)
     listFounded.map((parkingZone, index) => {
-      if (!parkingZone.lat || !parkingZone.lng) {
+      if(!parkingZone.lat||!parkingZone.lng){
         return;
       }
       const marker = new AdvancedMarkerElement({

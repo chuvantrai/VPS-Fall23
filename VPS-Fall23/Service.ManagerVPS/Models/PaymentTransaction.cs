@@ -1,4 +1,4 @@
-﻿namespace Service.ManagerVPS.Models
+namespace Service.ManagerVPS.Models
 {
     public partial class PaymentTransaction
     {

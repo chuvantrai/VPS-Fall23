@@ -88,8 +88,8 @@ const BookingForm = ({ isShow, parkingZone }) => {
         }}
     >
         <Form
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 14 }}
             form={form}
             hidden={paymentResult.isShow}
         >
@@ -180,6 +180,11 @@ const BookingForm = ({ isShow, parkingZone }) => {
 
                 </Slider>
 
+            </Form.Item>
+            <Form.Item className={('flex justify-center m-0')}>
+                <Button className={('bg-[#1890FF] w-[200%]')} type='primary' onClick={onSubmitClick}>
+                    Đặt chỗ
+                </Button>
             </Form.Item>
         </Form>
         {paymentResult.isShow === true && <Result

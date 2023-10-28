@@ -12,10 +12,48 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
     }
 
-    public List<ParkingZone> GetAllParkingZone()
+    public PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters)
     {
-        var parkingZone = context.ParkingZones.Include(o => o.Owner).ToList();
-        return parkingZone;
+        var parkingZone = entities.Include(o => o.Owner);
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<ParkingZone> GetOwnerParkingZone(QueryStringParameters parameters, Guid id)
+    {
+        var parkingZone = entities.Include(o => o.Owner).Where(x => x.OwnerId == id);
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<ParkingZone> GetOwnerParkingZoneByName(QueryStringParameters parameters, string name, Guid id)
+    {
+        var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name) && x.OwnerId == id);
+
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+    
+    public PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters, string name)
+    {
+        var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name));
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<ParkingZone> GetParkingZoneByOwner(QueryStringParameters parameters,
+        string owner)
+    {
+        var parkingZone = entities.Include(o => o.Owner)
+            .Where(x => x.Owner.Email == owner);
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public List<ParkingZone> GetParkingZoneByOwnerId(string ownerId)
+    {
+        var list = entities.Where(x => x.OwnerId.ToString().ToLower().Equals(ownerId)).ToList();
+        return list;
     }
 
     public ParkingZone? GetParkingZoneById(Guid id)
@@ -45,7 +83,7 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             Owner = parkingZone.Owner,
             NumberOfParkingZones = numberOfParkingZone
         };
-        
+
         return result;
     }
 

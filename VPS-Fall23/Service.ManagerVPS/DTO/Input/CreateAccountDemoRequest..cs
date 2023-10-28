@@ -13,6 +13,6 @@ public class CreateAccountDemoRequest
     [Required] public string Email { get; set; } = null!;
     [Required] 
     [StringLength(10, MinimumLength = 10, ErrorMessage = "sđt sai")]
-    [RegularExpression(@"^[0-9]+$", ErrorMessage = "sđt sai")]
+    [RegularExpression("^[0-9]+$", ErrorMessage = "sđt sai")]
     public string PhoneNumber { get; set; } = null!;
 }

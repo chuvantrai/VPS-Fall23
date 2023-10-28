@@ -10,6 +10,8 @@ import Login from '@/pages/Login';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ChangePassword from '@/pages/ChangePassword/index.js';
 import AccountProfile from '@/pages/AccountProfile/index.js';
+import Test from '@/pages/Test/index.js';
+import ListAttendant from '@/pages/ListAttendant';
 
 export const routes = [
   {
@@ -17,12 +19,29 @@ export const routes = [
     component: Homepage,
     layout: DefaultLayout,
     subRoutes: [
-      { url: 'profile', component: AccountProfile },
-      { url: 'listParkingZone', component: ViewListParkingZone },
-      { url: 'registerParkingZone', component: RegisterParkingZone },
+      {
+        url: 'profile',
+        component: AccountProfile,
+      },
+      {
+        url: 'listParkingZone',
+        component: ViewListParkingZone,
+      },
+      {
+        url: 'registerParkingZone',
+        component: RegisterParkingZone,
+      },
       {
         url: 'viewRequestedParkingZones',
         component: ViewRequestedParkingZones,
+      },
+      {
+        url: 'test',
+        component: Test,
+      },
+      {
+        url: 'listAttendant',
+        component: ListAttendant,
       },
     ],
   },

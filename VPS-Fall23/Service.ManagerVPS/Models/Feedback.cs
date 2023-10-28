@@ -8,6 +8,7 @@
         public string? Content { get; set; }
         public int Rate { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? Email { get; set; }
 
         public virtual ParkingZone ParkingZone { get; set; } = null!;
     }

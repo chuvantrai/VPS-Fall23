@@ -16,37 +16,34 @@ public class FilterPermission : ActionFilterAttribute
         try
         {
             var action = ActionFilter.GetAllActionModel(Action);
-            if (action is { UserRole.Length: > 0 })
+            var userRoles = action?.UserRole;
+            var httpContext = actionContext.HttpContext;
+            var accessToken = httpContext.Request.Cookies["ACCESS_TOKEN"];
+            if (!string.IsNullOrEmpty(accessToken))
             {
-                var userRoles = action.UserRole!;
-                var httpContext = actionContext.HttpContext;
-                var accessToken = httpContext.Request.Cookies["ACCESS_TOKEN"];
-                if (!string.IsNullOrEmpty(accessToken))
+                var userToken = JwtTokenExtension.ReadToken(accessToken);
+                if (userToken != null && DateTime.Now < userToken.Expires)
                 {
-                    var userToken = JwtTokenExtension.ReadToken(accessToken);
-                    if (userToken != null && DateTime.Now < userToken.Expires)
+                    // get account in db
+                    using var context = new FALL23_SWP490_G14Context();
+                    var account =
+                        context.Accounts.FirstOrDefault(x => x.Id.ToString().Equals(userToken.UserId.ToUpper()));
+                    if (account != null &&
+                        GeneralExtension.CheckEqualDateTime(account.ModifiedAt, userToken.ModifiedAt))
                     {
-                        // get account in db
-                        using var context = new FALL23_SWP490_G14Context();
-                        var account =
-                            context.Accounts.FirstOrDefault(x => x.Id.ToString().Equals(userToken.UserId.ToUpper()));
-                        if (account != null &&
-                            GeneralExtension.CheckEqualDateTime(account.ModifiedAt, userToken.ModifiedAt))
+                        // check role Permission
+                        if (userRoles == null ||
+                            userRoles.Contains(EnumExtension.CoverIntToEnum<UserRoleEnum>(userToken.RoleId)))
                         {
-                            // check role Permission
-                            if (userRoles.Contains(EnumExtension.CoverIntToEnum<UserRoleEnum>(userToken.RoleId)))
-                            {
-                                // Permission to access
-                                return;
-                            }
+                            // Permission to access
+                            return;
                         }
                     }
                 }
             }
             else
             {
-                // api publish
-                return;
+                if (userRoles == null) return;
             }
 
             // No Permission

@@ -11,9 +11,14 @@ public enum ActionFilterEnum
     UpdateProfileAccount,
     GetAccountProfile,
     GetRequestedParkingZones,
+    CreatApiBankingDemo,
+    CreateReport,
     RegisterNewParkingZone,
     GetParkingZoneInfoById,
     ChangeParkingZoneStat,
     GetAllParkingZones,
-    ChangeParkingZoneFullStatus
+    ChangeParkingZoneFullStatus,
+    UpdateParkingZone,
+    CreateAttendantAccount,
+    GetAllParkingZoneByOwnerId
 }

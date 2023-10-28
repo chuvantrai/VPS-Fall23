@@ -5,6 +5,8 @@ import BookingForm from './BookingForm';
 import { useSelector } from 'react-redux';
 import { setShowBookingForm } from '../../../../stores/parkingZones/parkingZone.store';
 import store from '../../../../stores';
+import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm.jsx';
+
 const { Text } = Typography;
 
 const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
@@ -79,26 +81,27 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
         cancelText="Thoát"
         okButtonProps={{
           style: {
-            backgroundColor: '#1677ff',
+            display: 'none',
+          },
+        }}
+        cancelButtonProps={{
+          style: {
+            display: 'none',
           },
         }}
         closable={true}
         title={parkingZone?.name}
       >
         <Image.PreviewGroup>
-          <Carousel autoplay dotPosition="top" style={{}}>
+          <Carousel autoplay dotPosition='top' style={{}}>
             {imageLinks.map((val, index) => {
               return <Image key={index} src={val}></Image>;
             })}
           </Carousel>
         </Image.PreviewGroup>
-        <Descriptions
-          title="Chi tiết"
-          bordered
-          items={getDetailDescription()}
-          size="small"
-          column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
-        />
+        <div className={('pt-[10px]')}>
+          <Tabs defaultActiveKey='1' items={items} onChange={onChangeTabs} />
+        </div>
       </Modal>
       <BookingForm
         isShow={isShowBookingForm}

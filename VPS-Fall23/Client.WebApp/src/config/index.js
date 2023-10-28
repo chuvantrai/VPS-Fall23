@@ -1,9 +1,10 @@
 import routes from './routes';
-import { adminSidebar } from './sidebar';
+import { adminSidebar, ownerSidebar } from './sidebar';
 
 const config = {
   routes,
   adminSidebar,
+  ownerSidebar,
 };
 
 export default config;
