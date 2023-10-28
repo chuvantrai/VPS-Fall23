@@ -11,5 +11,6 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         Task<int> GetRemainingSlot(Guid parkingZoneId, DateTime checkAt);
         bool IsAlreadyBooking(ParkingTransaction parkingTransaction);
         Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy);
+        Task<string> CheckOutConfirm(string licenseplate, DateTime checkAt, Guid checkBy);
     }
 }

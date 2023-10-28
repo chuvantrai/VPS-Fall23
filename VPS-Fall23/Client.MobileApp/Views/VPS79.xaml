@@ -70,26 +70,27 @@
                 </Label>
 
                 <Frame Grid.Row="2" Padding="10,3,10,0">
-                    
-                <Entry
-                       IsSpellCheckEnabled="False"
-                       Placeholder="nhập tài khoản"
-                       HorizontalOptions="FillAndExpand"
-                       PlaceholderColor="Black"
-                       FontSize="14"/>
-                    
+
+                    <Entry  
+                            x:Name="UserName"
+                            IsSpellCheckEnabled="False"
+                            Placeholder="nhập tài khoản"
+                            HorizontalOptions="FillAndExpand"
+                            PlaceholderColor="Black"
+                            FontSize="14"/>
+
                 </Frame>
 
                 <Frame Grid.Row="4" Padding="10,3,10,0">
                     
-                    <Entry
-                       VerticalOptions="End"    
-                       IsTextPredictionEnabled="False"
-                       Placeholder="nhập mật khẩu"
-                       PlaceholderColor="Black"
-                       FontSize="14"
-                       HorizontalOptions="FillAndExpand"
-                       IsPassword="True"/>
+                    <Entry  
+                            x:Name="Password" 
+                            IsTextPredictionEnabled="False"
+                            Placeholder="nhập mật khẩu"
+                            PlaceholderColor="Black"
+                            FontSize="14"
+                            HorizontalOptions="FillAndExpand"
+                            IsPassword="True"/>
                     
                 </Frame>
 

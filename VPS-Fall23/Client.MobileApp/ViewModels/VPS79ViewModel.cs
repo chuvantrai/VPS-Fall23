@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Client.MobileApp.Constants;
 using System.Text.Json;
+using Org.Apache.Http.Cookies;
 
 namespace Client.MobileApp.ViewModels
 {
@@ -18,14 +19,16 @@ namespace Client.MobileApp.ViewModels
                 //BaseAddress = new Uri("http://localhost:5001")
             };
         }
-        public async Task<string> CheckLicensePLate(LicensePlateInput checkLicensePlate)
+
+        public async Task<string> CheckAccount(LoginRequest loginRequest)
         {
 
-            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS61, checkLicensePlate);
+            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS79, loginRequest);
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
+                Constant.USER = new Guid(await response.Content.ReadAsStringAsync());
+                return Constant.LOGIN_SUCCESS;
             }
             else
             {

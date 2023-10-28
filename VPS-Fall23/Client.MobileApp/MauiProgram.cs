@@ -53,6 +53,10 @@ namespace Client.MobileApp
             builder.Services.AddTransient<VPS61>();
             builder.Services.AddTransient<VPS79>();
 
+            Routing.RegisterRoute(nameof(VPS53), typeof(VPS53));
+            Routing.RegisterRoute(nameof(VPS61), typeof(VPS61));
+            Routing.RegisterRoute(nameof(VPS79), typeof(VPS79));
+
             return builder;
         }
 

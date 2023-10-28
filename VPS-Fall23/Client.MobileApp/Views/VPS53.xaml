@@ -4,6 +4,7 @@
              x:Class="Client.MobileApp.Views.VPS53"
              xmlns:viewmodel="clr-namespace:Client.MobileApp.ViewModels"
              x:DataType="viewmodel:VPS53ViewModel"
+             Shell.NavBarIsVisible="False"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI">
     <ScrollView>
 

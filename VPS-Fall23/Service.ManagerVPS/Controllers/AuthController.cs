@@ -348,4 +348,36 @@ public class AuthController : VpsController<Account>
             RoleId = account.TypeId
         });
     }
+
+    [HttpPost]
+    public async Task<IActionResult> AttendanceLogin(LoginRequest request)
+    {
+        var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
+        if (account == null)
+        {
+            throw new ClientException(5001);
+        }
+
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account.Password))
+        {
+            throw new ClientException(5006);
+        }
+
+        if (account.IsVerified == false)
+        {
+            throw new ClientException(5007);
+        }
+
+        if (account.IsBlock)
+        {
+            throw new ClientException(5002);
+        }
+
+        if (account.TypeId != (int)UserRoleEnum.ADMIN && account.TypeId != (int)UserRoleEnum.ATTENDANT)
+        {
+            throw new ClientException(5001);
+        }
+
+        return Ok(account.Id);
+    }
 }

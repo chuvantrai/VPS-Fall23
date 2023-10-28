@@ -34,5 +34,21 @@ namespace Client.MobileApp.ViewModels
                 return $"{error.Code}{error.Message}";
             }
         }
+
+        public async Task<string> CheckOutConfirm(LicensePlateScan checkLicensePlate)
+        {
+            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80, checkLicensePlate);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                string errorResponse = await response.Content.ReadAsStringAsync();
+                var error = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
+                return $"{error.Code}{error.Message}";
+            }
+        }
     }
 }

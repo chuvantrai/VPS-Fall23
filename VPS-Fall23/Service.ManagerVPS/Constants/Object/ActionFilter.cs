@@ -76,6 +76,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.ChangeParkingZoneFullStatus,
             UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.AttendanceLogin,
+            UserRole = new[] { UserRoleEnum.OWNER, UserRoleEnum.ADMIN, UserRoleEnum.ATTENDANT }
         }
     };
 
