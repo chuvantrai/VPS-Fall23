@@ -1,4 +1,4 @@
-import { Alert, Badge, Carousel, Descriptions, Image, Modal, Tag, Typography, notification } from 'antd';
+import { Alert, Badge, Carousel, Descriptions, Image, Modal, Tabs, Tag, Typography, notification } from 'antd';
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
@@ -99,9 +99,9 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
             })}
           </Carousel>
         </Image.PreviewGroup>
-        <div className={('pt-[10px]')}>
+        {/* <div className={('pt-[10px]')}>
           <Tabs defaultActiveKey='1' items={items} onChange={onChangeTabs} />
-        </div>
+        </div> */}
       </Modal>
       <BookingForm
         isShow={isShowBookingForm}
