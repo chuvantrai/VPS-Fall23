@@ -36,6 +36,18 @@
     "message": "Email của bạn chưa được đăng ký!"
   },
   {
+    "code": 2004,
+    "message": "Tên đăng nhập đã tồn tại! Vui lòng chọn tên đăng nhập khác!"
+  },
+  {
+    "code": 2005,
+    "message": "Bãi đỗ xe không tồn tại!"
+  },
+  {
+    "code": 2006,
+    "message": "Bãi đỗ xe đã bị từ chối hoặc đang trong quá trình xử lý không thể thêm tài khoản cho nhân viên!"
+  },
+  {
     "code": 1001,
     "message": "Có lỗi khi lấy vị trí bản đồ"
   },
@@ -90,5 +102,29 @@
   {
     "code": 5007,
     "message": "Email của tài khoản chưa xác nhận!"
+  },
+  {
+    "code": 5008,
+    "message": "Email này chưa từng đặt chỗ ở đây!"
+  },
+  {
+    "code": 5009,
+    "message": "Đánh giá thất bại!"
+  },
+  {
+    "code": 5010,
+    "message": "Email này đã đánh giá!"
+  },
+  {
+    "code": 5011,
+    "message": "Mã giao dịch sai!"
+  },
+  {
+    "code": 5012,
+    "message": "Đã có yêu cầu hoàn tiền của mã giao dịch này!"
+  },
+  {
+    "code": 5013,
+    "message": "Đã có thông báo lỗi của mã giao dịch này!"
   }
 ]

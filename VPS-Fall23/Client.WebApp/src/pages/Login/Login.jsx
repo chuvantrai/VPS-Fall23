@@ -6,7 +6,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import config from '@/config/index.js';
 import { useAxios } from '@/hooks/index.js';
 import Cookies from 'js-cookie';
-import { convertAccountDataToCode, keyNameCookies } from '@/helpers/index.js';
+import { convertAccountDataToCode, getAccountJwtModel, keyNameCookies } from '@/helpers/index.js';
+import store from '@/stores/index.jsx';
+import { useSelector } from 'react-redux';
+import { setAccountDataJwt } from '@/stores/account/account.store.js';
 
 const cx = classNames.bind(styles);
 const formItemLayout = {
@@ -43,6 +46,10 @@ function Login() {
         if (rememberPassword) {
           Cookies.set(keyNameCookies.ACCOUNT_DATA, convertAccountDataToCode(values.username, values.password));
         }
+        let accountJwtModel = getAccountJwtModel();
+        accountJwtModel.Expires = null;
+        accountJwtModel.ModifiedAt = null;
+        store.dispatch(setAccountDataJwt({ accountDataJwt: accountJwtModel }));
         navigate('/');
       })
       .catch(err => {

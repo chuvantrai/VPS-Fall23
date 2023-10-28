@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Http.Json;
 using Client.MobileApp.Constants;
 using System.Text.Json;
-using Org.Apache.Http.Cookies;
 
 namespace Client.MobileApp.ViewModels
 {

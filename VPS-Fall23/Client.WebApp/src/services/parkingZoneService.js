@@ -11,8 +11,41 @@ const useParkingZoneService = () => {
   const axios = useAxios();
   const navigate = useNavigate();
 
-  const getAllParkingZone = () => {
-    return axios.get(`${BASE_URI}/GetAll`);
+  const getAllParkingZone = ({ pageNumber, pageSize }) => {
+    return axios.get(`${BASE_URI}/GetAll`, {
+      params: {
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+      },
+    });
+  };
+
+  const getParkingZoneByName = ({ pageNumber, pageSize, name }) => {
+    return axios.get(`${BASE_URI}/GetByName`, {
+      params: {
+        pageNumber: pageNumber,
+        pageSize: pageSize,
+        name: name,
+      },
+    });
+  };
+
+  // const getParkingZoneByOwner = ({ pageNumber, pageSize, name }) => {
+  //   return axios.get(`${BASE_URI}/GetByOwner`, {
+  //     params: {
+  //       pageNumber: pageNumber,
+  //       pageSize: pageSize,
+  //       name: name,
+  //     },
+  //   });
+  // };
+
+  const getAllParkingZoneByOwnerId = (ownerId) => {
+    return axios.get(`${BASE_URI}/GetAllParkingZoneByOwnerId`, {
+      params: {
+        ownerId,
+      },
+    });
   };
 
   const register = (values) => {
@@ -91,6 +124,22 @@ const useParkingZoneService = () => {
       });
   };
 
+  const updateParkingZone = (params) => {
+    axios
+      .put(`${BASE_URI}/UpdateParkingZone`, params)
+      .then((res) => {
+        notification.success({
+          message: res?.data,
+        });
+      })
+      .catch((err) => {
+        notification.error({
+          message: 'Có lỗi xảy ra!',
+          description: err.message,
+        });
+      });
+  };
+
   return {
     getByAddress,
     register,
@@ -99,8 +148,11 @@ const useParkingZoneService = () => {
     getRequestParkingZones,
     changeParkingZoneStat,
     getAllParkingZone,
+    getParkingZoneByName,
     getParkingZoneDetail,
     changeParkingZoneFullStatus,
+    updateParkingZone,
+    getAllParkingZoneByOwnerId,
   };
 };
 

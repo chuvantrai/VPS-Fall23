@@ -7,9 +7,11 @@ using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
+using Service.ManagerVPS.DTO.FileManagement;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Ouput;
+using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
@@ -82,12 +84,21 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
-    public IActionResult GetAll()
+    //[FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
+    public IActionResult GetAll([FromQuery] QueryStringParameters parameters)
     {
         try
         {
-            List<ParkingZone> list = ((IParkingZoneRepository)vpsRepository).GetAllParkingZone();
+            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+            var list = ((IParkingZoneRepository)vpsRepository).GetAllParkingZone(parameters);
+
+            if (userToken.RoleId == 3) return NotFound();
+            if (userToken.RoleId == 2)
+            {
+                Guid ownerId = new Guid(userToken.UserId);
+                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZone(parameters, ownerId);
+            }
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
             foreach (ParkingZone item in list)
             {
@@ -97,16 +108,88 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     Name = item.Name,
                     Owner = item.Owner.Email,
                     Created = item.CreatedAt,
-                    IsApprove = item.IsApprove
+                    Status = item.IsApprove
                 });
             }
 
-            return Ok(res);
+            var metadata = new
+            {
+                list.TotalCount,
+                list.PageSize,
+                list.CurrentPage,
+                list.TotalPages,
+                list.HasNext,
+                list.HasPrev,
+                Data = res
+            };
+            return Ok(metadata);
         }
         catch (Exception ex)
         {
             return NotFound(ex);
         }
+    }
+
+    [HttpGet]
+    //[FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    public IActionResult GetByName([FromQuery] QueryStringParameters parameters, string name)
+    {
+        try
+        {
+            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+            var list = ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
+            List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
+
+            if (userToken.RoleId == 3) return NotFound();
+            if (userToken.RoleId == 2)
+            {
+                Guid ownerId = new Guid(userToken.UserId);
+                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZoneByName(parameters, name, ownerId);
+            }
+
+            foreach (ParkingZone item in list)
+            {
+                res.Add(new ParkingZoneItemOutput
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Owner = item.Owner.Email,
+                    Created = item.CreatedAt,
+                    Status = item.IsApprove
+                });
+            }
+
+            var metadata = new
+            {
+                list.TotalCount,
+                list.PageSize,
+                list.CurrentPage,
+                list.TotalPages,
+                list.HasNext,
+                list.HasPrev,
+                Data = res
+            };
+            return Ok(metadata);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex);
+        }
+    }
+
+    [HttpGet]
+    // [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
+    public IActionResult GetAllParkingZoneByOwnerId([FromQuery] string ownerId)
+    {
+        var parkingZoneList =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneByOwnerId(ownerId);
+        var result = parkingZoneList.Select(x => new
+        {
+            Value = x.Id,
+            Label = x.Name
+        }).ToList();
+        return Ok(result);
     }
 
     [HttpGet]
@@ -200,7 +283,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpPut]
-    // [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneFullStatus)]
+    [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneFullStatus)]
     public async Task<IActionResult> ChangeParkingZoneFullStatus(
         [FromBody] ChangeParkingZoneFullStatus input)
     {
@@ -255,6 +338,74 @@ public class ParkingZoneController : VpsController<ParkingZone>
             ParkingZoneImages = parkingZoneImages
         };
         return Ok(result);
+    }
+
+    [HttpPut]
+    // [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
+    public async Task<IActionResult> UpdateParkingZone([FromForm] UpdateParkingZoneInput input)
+    {
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneById((Guid)input.ParkingZoneId!);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        if (parkingZone.IsApprove == true)
+        {
+            throw new ServerException("Bãi đỗ xe đã xác thực. Không thể thay đổi thông tin!");
+        }
+
+        parkingZone.Name = input.ParkingZoneName;
+        parkingZone.PricePerHour = (decimal)input.PricePerHour!;
+        parkingZone.PriceOverTimePerHour = (decimal)input.PriceOverTimePerHour!;
+        parkingZone.Slots = (int)input.Slots!;
+        parkingZone.WorkFrom = input.WorkFrom;
+        parkingZone.WorkTo = input.WorkTo;
+        parkingZone.CommuneId = (Guid)input.CommuneId!;
+        parkingZone.DetailAddress = input.DetailAddress;
+        parkingZone.IsApprove = null;
+        parkingZone.ModifiedAt = DateTime.Now;
+
+        var parkingZoneImages = await GetImageLinks(parkingZone.OwnerId, parkingZone.Id);
+        var fileManager =
+            new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                _config.GetValue<string>("fileManagementAccessKey:accessKey"),
+                _config.GetValue<string>("fileManagementAccessKey:secretKey"));
+
+        // delete old images
+        if (parkingZoneImages.Count > 0)
+        {
+            var removeObjectsDtos = parkingZoneImages
+                .Select(img => new RemoveObjectsDto
+                {
+                    ObjectName =
+                        img.Replace(
+                            $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}/{_fileManagementConfig.PublicBucket}/",
+                            "")
+                })
+                .ToList();
+            await fileManager.RemoveMultipleObjects(
+                _config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+                removeObjectsDtos);
+        }
+
+        // add new images
+        var parkingZoneImgs = new MultipartFormDataContent();
+        for (var i = 0; i < input.ParkingZoneImages.Count; i++)
+        {
+            var streamContent = new StreamContent(input.ParkingZoneImages[i].OpenReadStream());
+            parkingZoneImgs.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
+                $"{parkingZone.Id}-{i}.{Path.GetExtension(input.ParkingZoneImages[i].FileName)}");
+        }
+
+        await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+            $"parking-zone-images/{parkingZone.OwnerId}/{parkingZone.Id}", parkingZoneImgs);
+
+        await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
+        await ((IParkingZoneRepository)vpsRepository).SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
     [HttpGet]

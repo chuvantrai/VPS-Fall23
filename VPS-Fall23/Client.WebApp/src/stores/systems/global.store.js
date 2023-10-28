@@ -3,7 +3,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 
 const initialState = {
-
   isLoading: false
 };
 
@@ -13,7 +12,6 @@ const globalSlice = createSlice({
   reducers: {
     setGlobalState(state, action) {
       Object.assign(state, action.payload);
-
     }
   },
 });

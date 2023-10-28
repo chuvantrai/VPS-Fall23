@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Fragment } from 'react';
 import dayjs from 'dayjs';
 import {
   Table,
@@ -18,47 +18,21 @@ import {
   InputNumber,
   Upload,
   TimePicker,
+  Pagination,
+  AutoComplete,
 } from 'antd';
 import { FormOutlined, UploadOutlined } from '@ant-design/icons';
 
-import useParkingZoneService from '@/services/parkingZoneService.js';
+import useParkingZoneService from '@/services/parkingZoneService';
 import { getAccountJwtModel } from '@/helpers';
 import AddressCascader from '@/components/cascader/AddressCascader';
+import { useDebounce } from 'use-debounce';
 
 const onChange = (pagination, filters, sorter, extra) => {
   console.log('params', pagination, filters, sorter, extra);
 };
 
 function ViewListParkingZone() {
-  const columns = [
-    {
-      title: 'Tên',
-      dataIndex: 'name',
-    },
-    {
-      title: 'Chủ sở hữu',
-      dataIndex: 'owner',
-    },
-    {
-      title: 'Ngày tạo',
-      dataIndex: 'created',
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            handleGetParkingZoneDetail(record.key, record.isApprove);
-          }}
-        >
-          <FormOutlined />
-        </a>
-      ),
-    },
-  ];
-
   const [form] = Form.useForm();
 
   const parkingZoneService = useParkingZoneService();
@@ -73,6 +47,7 @@ function ViewListParkingZone() {
   const [validateStatus, setValidateStatus] = useState('null');
   const [help, setHelp] = useState('');
   const [address, setAddress] = useState([]);
+  const [workingTime, setWorkingTime] = useState('');
 
   const handleGetParkingZoneDetail = async (parkingZoneId, isApprove) => {
     await parkingZoneService.getParkingZoneDetail(parkingZoneId).then((res) => {
@@ -111,22 +86,115 @@ function ViewListParkingZone() {
     setIsModalViewOpen(false);
   };
 
-  const [data, setData] = useState([{ id: '', name: '', owner: '', created: Date, isApprove: null }]);
-  let dataShow = [{ key: '', name: '', owner: '', created: Date, isApprove: null }];
+  const [data, setData] = useState([{ id: '', name: '', owner: '', status: 'null', created: Date }]);
+  let dataShow = [{ key: '', name: '', owner: '', status: 'null', created: Date }];
+
+  const [inputValue, setInputValue] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const [totalItems, setTotalItems] = useState();
+
+  // eslint-disable-next-line no-unused-vars
+  const [debouncedValue] = useDebounce(inputValue, 1000);
+
+  const handleSearch = (e) => {
+    searchDataByName(e);
+    setInputValue(e);
+  };
+
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: '30%',
+    },
+    {
+      title: 'Owner',
+      dataIndex: 'owner',
+      key: 'owner',
+      width: '20%',
+    },
+    {
+      title: 'Created',
+      dataIndex: 'created',
+      key: 'created',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (val) => (
+        <Fragment>
+          {val === null && (
+            <Tag color="processing">
+              <a>Đang duyệt</a>
+            </Tag>
+          )}
+          {val === false && (
+            <Tag color="red">
+              <a>Đã từ chối</a>
+            </Tag>
+          )}
+          {val === true && (
+            <Tag color="success">
+              <a>Đã duyệt</a>
+            </Tag>
+          )}
+        </Fragment>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <a
+          onClick={(e) => {
+            e.preventDefault();
+            handleGetParkingZoneDetail(record.key, record.isApprove);
+          }}
+        >
+          <FormOutlined />
+        </a>
+      ),
+    },
+  ];
 
   useEffect(() => {
     getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getData = async () => {
+  const getData = async (currentPage) => {
     await parkingZoneService
-      .getAllParkingZone()
+      .getAllParkingZone({ pageNumber: currentPage, pageSize: pageSize })
       .then((res) => {
-        setData(res.data);
+        setData(res?.data.data);
+        setTotalItems(res?.data.totalCount);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
+  };
+
+  const searchDataByName = async (e) => {
+    if (e !== '') {
+      await parkingZoneService
+        .getParkingZoneByName({ pageNumber: currentPage, pageSize: pageSize, name: e })
+        .then((res) => {
+          setData(res?.data.data);
+          setTotalItems(res?.data.totalCount);
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        });
+    }
+  };
+
+  const handleChangePage = (page) => {
+    setCurrentPage(page);
+    getData(page);
   };
 
   let currentDate = new Date();
@@ -210,25 +278,6 @@ function ViewListParkingZone() {
 
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
-  const formItemLayout = {
-    labelCol: {
-      xs: {
-        span: 24,
-      },
-      sm: {
-        span: 4,
-      },
-    },
-    wrapperCol: {
-      xs: {
-        span: 24,
-      },
-      sm: {
-        span: 20,
-      },
-    },
-  };
-
   const handleChangeSwitch = (checked) => {
     const params = {
       parkingZoneId: parkingZoneDetail.id,
@@ -238,48 +287,63 @@ function ViewListParkingZone() {
     setCheckedState(checked);
   };
 
+  const handelChangeTime = (_, timeString) => {
+    setWorkingTime(timeString);
+  };
+
   const handleSubmitForm = (values) => {
-    // if (!selectedAddress) {
-    //   setValidateStatus('error');
-    //   setHelp('Vui lòng chọn địa chỉ của bãi đỗ xe');
-    // } else {
-    //   // values = { ...values, parkingZoneImages: fileList, communeId: selectedAddress?.id };
+    if (!selectedAddress) {
+      setValidateStatus('error');
+      setHelp('Vui lòng chọn địa chỉ của bãi đỗ xe');
+    } else {
+      values = { ...values, parkingZoneImages: fileList, communeId: selectedAddress?.id };
 
-    //   // const formData = new FormData();
-    //   // formData.append('ownerId', account.UserId);
-    //   // formData.append('name', values.name);
-    //   // formData.append('pricePerHour', values.pricePerHour);
-    //   // formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
-    //   // formData.append('slots', values.slots);
-    //   // formData.append('communeId', values.communeId);
-    //   // formData.append('detailAddress', values.detailAddress);
-    //   // values.parkingZoneImages.forEach((item) => {
-    //   //   formData.append('parkingZoneImages', item.originFileObj);
-    //   // });
+      const formData = new FormData();
+      formData.append('parkingZoneId', values.id);
+      formData.append('parkingZoneName', values.name);
+      formData.append('pricePerHour', values.pricePerHour);
+      formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
+      formData.append('slots', values.slots);
+      formData.append('workFrom', workingTime[0]);
+      formData.append('workTo', workingTime[1]);
+      formData.append('communeId', values.communeId);
+      formData.append('detailAddress', values.detailAddress);
+      values.parkingZoneImages.forEach((item) => {
+        formData.append('parkingZoneImages', item.originFileObj);
+      });
 
-    //   // parkingZoneService.register(formData);
-    //   console.log(values);
-    // }
-    console.log(values);
+      // parkingZoneService.updateParkingZone(formData);
+      console.log(values);
+    }
   };
 
   return (
-    <>
+    <Fragment>
       <div className="w-full px-4">
+        <AutoComplete style={{ width: 200 }} onSearch={handleSearch} placeholder="Tìm kiếm" className="mt-4 mb-4" />
         {data !== undefined &&
           data.map((val) => {
             const item = {
               key: val.id,
               name: val.name,
               owner: val.owner,
+              status: val.status,
               created: val.created,
-              isApprove: val.isApprove,
             };
             dataShow.push(item);
           })}
-        {dataShow.shift() && console.log('1')}
-        {dataShow.length != 1 && dataShow[0].key !== '' && (
-          <Table columns={columns} dataSource={dataShow} onChange={onChange} />
+        {dataShow.shift() && dataShow.length > 1 && dataShow[0].key !== '' && (
+          <Fragment>
+            <Table columns={columns} dataSource={dataShow} onChange={onChange} pagination={false} />
+            <div className="py-[16px] flex flex-row-reverse pr-[24px]">
+              <Pagination
+                current={currentPage}
+                onChange={handleChangePage}
+                total={totalItems}
+                showSizeChanger={false}
+              />
+            </div>
+          </Fragment>
         )}
       </div>
       <Modal
@@ -310,7 +374,7 @@ function ViewListParkingZone() {
         )}
         width={600}
       >
-        <Form {...formItemLayout} form={form} name="editForm" style={{ maxWidth: '600px' }} labelWrap>
+        <Form form={form} name="editForm" style={{ maxWidth: '600px' }} layout="vertical">
           <Form.Item className="hidden" name="id">
             <Input type="hidden" />
           </Form.Item>
@@ -372,7 +436,7 @@ function ViewListParkingZone() {
               },
             ]}
           >
-            <TimePicker.RangePicker className="w-[100%]" />
+            <TimePicker.RangePicker className="w-[100%]" onChange={handelChangeTime} />
           </Form.Item>
           <Form.Item
             name="communeId"
@@ -463,7 +527,7 @@ function ViewListParkingZone() {
         </Image.PreviewGroup>
         <Descriptions bordered items={descItems} column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }} />
       </Modal>
-    </>
+    </Fragment>
   );
 }
 

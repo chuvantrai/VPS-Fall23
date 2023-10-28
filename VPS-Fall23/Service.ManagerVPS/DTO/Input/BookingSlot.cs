@@ -6,12 +6,12 @@ namespace Service.ManagerVPS.DTO.Input
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
         [Required]
         [Phone]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = null!;
         [Required]
-        public string LicensePlate { get; set; }
+        public string LicensePlate { get; set; } = null!;
         [Required]
         public DateTime CheckinAt { get; set; }
         [Required]
