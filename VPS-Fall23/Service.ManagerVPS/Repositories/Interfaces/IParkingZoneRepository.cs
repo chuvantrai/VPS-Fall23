@@ -7,7 +7,9 @@ namespace Service.ManagerVPS.Repositories.Interfaces;
 public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
 {
     PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters);
+    PagedList<ParkingZone> GetOwnerParkingZone(QueryStringParameters parameters, Guid id);
     PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters, string name);
+    PagedList<ParkingZone> GetOwnerParkingZoneByName(QueryStringParameters parameters, string name, Guid id);
     PagedList<ParkingZone> GetParkingZoneByOwner(QueryStringParameters parameters, string owner);
     ParkingZone? GetParkingZoneById(Guid id);
 

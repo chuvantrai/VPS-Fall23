@@ -12,12 +12,16 @@ function ManageLayout({ isShow, contentItem }) {
   const breadcrumbItems = pathnames.map((name, index) => {
     const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
     const isLast = index === pathnames.length - 1;
-
+    name = capitalizeFirstLetter(name);
     return {
       path: routeTo,
       breadcrumbName: isLast ? name : <Link to={routeTo}>{name}</Link>,
     };
   });
+
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 
   return (
     <Content
@@ -35,8 +39,7 @@ function ManageLayout({ isShow, contentItem }) {
           <Breadcrumb.Item key={item.path}>{item.breadcrumbName}</Breadcrumb.Item>
         ))}
       </Breadcrumb>
-
-      {isShow && <ContentLayout></ContentLayout>}
+      {isShow && <ContentLayout title={contentItem.title} desc={contentItem.desc}></ContentLayout>}
     </Content>
   );
 }
