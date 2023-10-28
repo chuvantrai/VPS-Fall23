@@ -86,8 +86,8 @@ function ViewListParkingZone() {
     setIsModalViewOpen(false);
   };
 
-  const [data, setData] = useState([{ id: '', name: '', owner: '', status: null, created: Date }]);
-  let dataShow = [{ key: '', name: '', owner: '', status: null, created: Date }];
+  const [data, setData] = useState([{ id: '', name: '', owner: '', status: 'null', created: Date }]);
+  let dataShow = [{ key: '', name: '', owner: '', status: 'null', created: Date }];
 
   const [inputValue, setInputValue] = useState('');
 
@@ -125,6 +125,25 @@ function ViewListParkingZone() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (val) => (
+        <Fragment>
+          {val === null && (
+            <Tag color="processing">
+              <a>Đang duyệt</a>
+            </Tag>
+          )}
+          {val === false && (
+            <Tag color="red">
+              <a>Đã từ chối</a>
+            </Tag>
+          )}
+          {val === true && (
+            <Tag color="success">
+              <a>Đã duyệt</a>
+            </Tag>
+          )}
+        </Fragment>
+      ),
     },
     {
       title: 'Action',
@@ -145,7 +164,7 @@ function ViewListParkingZone() {
   useEffect(() => {
     getData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedValue]);
+  }, []);
 
   const getData = async (currentPage) => {
     await parkingZoneService
@@ -301,19 +320,18 @@ function ViewListParkingZone() {
   return (
     <Fragment>
       <div className="w-full px-4">
-        <AutoComplete style={{ width: 200 }} onSearch={handleSearch} placeholder="input here" className="mt-4 mb-4" />
+        <AutoComplete style={{ width: 200 }} onSearch={handleSearch} placeholder="Tìm kiếm" className="mt-4 mb-4" />
         {data !== undefined &&
           data.map((val) => {
             const item = {
               key: val.id,
               name: val.name,
               owner: val.owner,
-              status: val.status === null ? 'null' : val.status,
+              status: val.status,
               created: val.created,
             };
             dataShow.push(item);
           })}
-        {console.log(data)}
         {dataShow.shift() && dataShow.length > 1 && dataShow[0].key !== '' && (
           <Fragment>
             <Table columns={columns} dataSource={dataShow} onChange={onChange} pagination={false} />

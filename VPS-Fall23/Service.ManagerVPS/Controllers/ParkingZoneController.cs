@@ -11,6 +11,7 @@ using Service.ManagerVPS.DTO.FileManagement;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Ouput;
+using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
@@ -83,12 +84,21 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    //[FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    //[FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
     public IActionResult GetAll([FromQuery] QueryStringParameters parameters)
     {
         try
         {
+            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
             var list = ((IParkingZoneRepository)vpsRepository).GetAllParkingZone(parameters);
+
+            if (userToken.RoleId == 3) return NotFound();
+            if (userToken.RoleId == 2)
+            {
+                Guid ownerId = new Guid(userToken.UserId);
+                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZone(parameters, ownerId);
+            }
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
             foreach (ParkingZone item in list)
             {
@@ -97,7 +107,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     Id = item.Id,
                     Name = item.Name,
                     Owner = item.Owner.Email,
-                    Created = item.CreatedAt
+                    Created = item.CreatedAt,
+                    Status = item.IsApprove
                 });
             }
 
@@ -125,9 +136,18 @@ public class ParkingZoneController : VpsController<ParkingZone>
     {
         try
         {
-            var list =
-                ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
+            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+            var list = ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
+
+            if (userToken.RoleId == 3) return NotFound();
+            if (userToken.RoleId == 2)
+            {
+                Guid ownerId = new Guid(userToken.UserId);
+                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZoneByName(parameters, name, ownerId);
+            }
+
             foreach (ParkingZone item in list)
             {
                 res.Add(new ParkingZoneItemOutput

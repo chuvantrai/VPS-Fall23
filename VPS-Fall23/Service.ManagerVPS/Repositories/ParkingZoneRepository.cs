@@ -20,8 +20,22 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             parameters.PageSize);
     }
 
-    public PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters,
-        string name)
+    public PagedList<ParkingZone> GetOwnerParkingZone(QueryStringParameters parameters, Guid id)
+    {
+        var parkingZone = entities.Include(o => o.Owner).Where(x => x.OwnerId == id);
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<ParkingZone> GetOwnerParkingZoneByName(QueryStringParameters parameters, string name, Guid id)
+    {
+        var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name) && x.OwnerId == id);
+
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+    
+    public PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters, string name)
     {
         var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name));
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
