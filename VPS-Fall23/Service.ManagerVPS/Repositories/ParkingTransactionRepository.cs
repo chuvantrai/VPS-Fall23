@@ -36,7 +36,9 @@ namespace Service.ManagerVPS.Repositories
         public async Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy)
         {
             var transaction = await entities.Include(t => t.ParkingTransactionDetails)
-                .FirstOrDefaultAsync(pt => pt.LicensePlate.Equals(licenseplate));
+                .FirstOrDefaultAsync(pt => pt.LicensePlate.Equals(licenseplate)
+                && pt.CheckinAt <= checkAt && pt.CheckoutAt >= checkAt
+                && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
 
             if (transaction != null)
             {
@@ -50,7 +52,7 @@ namespace Service.ManagerVPS.Repositories
             }
             else
             {
-                var parkingZone = context.ParkingZoneAttendants.Select(pz => pz.ParkingZone).FirstOrDefault(pz => pz.Id == checkBy);
+                var parkingZone = context.ParkingZoneAttendants.FirstOrDefault(pz => pz.Id == checkBy)?.ParkingZone;
                 if (parkingZone != null)
                 {
                     ParkingTransaction parkingTransaction = new()
@@ -88,7 +90,9 @@ namespace Service.ManagerVPS.Repositories
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.PAYED
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.UNPAY
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT
-                    && pt.LicensePlate.Equals(licenseplate));
+                    && pt.LicensePlate.Equals(licenseplate)
+                     && pt.CheckinAt <= checkAt && pt.CheckoutAt >= checkAt
+                && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
 
                 if (transaction != null)
                 {
