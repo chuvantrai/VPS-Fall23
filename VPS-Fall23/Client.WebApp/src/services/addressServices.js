@@ -8,9 +8,22 @@ const DISTRICT_URI = "api/District"
 const useAddressServices = () => {
     const axios = useAxios();
 
-    const getCities = () => {
-        return axios.get(CITY_URI)
+    const getCities = (id = null) => {
+        let uri = CITY_URI;
+        if (id) {
+            uri += "/" + id
+        }
+        return axios.get(uri)
     }
+    const getDistrictById = (id) => {
+        let uri = DISTRICT_URI + "/" + id;
+        return axios.get(uri)
+    }
+    const getCommuneById = (id) => {
+        let uri = COMMUNE_URI + "/" + id;
+        return axios.get(uri)
+    }
+
     const getCommunes = (districtId = null) => {
         let commnueUri = COMMUNE_URI
         if (districtId) commnueUri += `/GetByDistrict/${districtId}`
@@ -22,7 +35,7 @@ const useAddressServices = () => {
         return axios.get(districtUri)
     }
     return {
-        getCities, getCommunes, getDistricts
+        getCities, getCommunes, getDistricts, getDistrictById, getCommuneById
     }
 
 }

@@ -24,15 +24,17 @@ public class ParkingZoneController : VpsController<ParkingZone>
     private readonly IConfiguration _config;
     private readonly FileManagementConfig _fileManagementConfig;
     private readonly IContractRepository _contractRepository;
-
+    readonly IParkingTransactionRepository parkingTransactionRepository;
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
-        IContractRepository contractRepository)
+        IContractRepository contractRepository,
+        IParkingTransactionRepository parkingTransactionRepository)
         : base(parkingZoneRepository)
     {
         _config = config;
         _fileManagementConfig = options.Value;
         _contractRepository = contractRepository;
+        this.parkingTransactionRepository = parkingTransactionRepository;
     }
 
     [HttpPost]
@@ -450,5 +452,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 true);
 
         return objectResults.Select(x => GetImageLink(x.Key)).ToList();
+    }
+    [HttpGet("{parkingZoneId}")]
+    public async Task<int> GetBookedSlot(Guid parkingZoneId, DateTime? checkAt = null)
+    {
+        return await parkingTransactionRepository.GetBookedSlot(parkingZoneId, checkAt ?? DateTime.Now);
     }
 }
