@@ -1,5 +1,4 @@
-﻿using Google.Cloud.Vision.V1;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Service.ManagerVPS.DTO.Input
 {

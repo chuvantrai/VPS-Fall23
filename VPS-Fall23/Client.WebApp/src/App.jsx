@@ -13,8 +13,8 @@ function App() {
   const { isLoading } = useSelector((state) => state.global);
   return (
     <ConfigProvider>
-      <AntdApp className='app'>
-        <Spin spinning={isLoading} indicator={antIcon}>
+      <AntdApp className="app">
+        <Spin spinning={isLoading} indicator={antIcon} style={{zIndex:1000000}}>
           <Router>
             <Routes>
               {

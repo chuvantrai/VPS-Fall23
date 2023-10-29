@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;

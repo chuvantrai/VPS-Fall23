@@ -58,4 +58,6 @@ public static class GeneralExtension
         string pattern = @"^[A-Za-z0-9\-\.]+$";
         return Regex.IsMatch(licensePlate, pattern);
     }
+
+
 }

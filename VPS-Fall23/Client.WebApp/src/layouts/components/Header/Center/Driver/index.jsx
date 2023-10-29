@@ -12,7 +12,9 @@ const DriverCenterHeader = () => {
     const addressCascaderProps = {
         style: { width: '100%' },
         placeholder: 'Chọn địa điểm bạn muốn đến',
+
     };
+
     const onCascaderChange = useCallback((value, selectedOptions) => {
         setSelectedAddress(selectedOptions ? selectedOptions[selectedOptions.length - 1] : null);
     }, []);
@@ -26,15 +28,19 @@ const DriverCenterHeader = () => {
         }
         parkingZoneService.getByAddress(selectedAddress.id, selectedAddress.type).then((res) => {
             store.dispatch(setFoundedParkingZones({ listFounded: res?.data ?? [] }));
+            notification.success({
+                message: `Đã tìm thấy ${res?.data?.length ?? 0} nhà xe theo vị trí bạn chọn`,
+                description: "Mở danh sách đã tìm được bằng nút bấm góc trái của bản đồ để xem chi tiết."
+            })
         });
     };
 
     return (
         <Row gutter={2}>
-            <Col md={20} sm={24}>
+            <Col span={20}>
                 <AddressCascader cascaderProps={addressCascaderProps} onCascaderChangeCallback={onCascaderChange} />
             </Col>
-            <Col md={4}>
+            <Col span={4}>
                 <Button onClick={onSearch}>Tìm kiếm</Button>
             </Col>
         </Row>

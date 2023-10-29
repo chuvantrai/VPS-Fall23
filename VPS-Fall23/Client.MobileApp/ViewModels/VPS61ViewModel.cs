@@ -1,5 +1,4 @@
 ﻿using Client.MobileApp.Models;
-using System.Net;
 using System.Net.Http.Json;
 using Client.MobileApp.Constants;
 using System.Text.Json;

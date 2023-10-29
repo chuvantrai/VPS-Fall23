@@ -9,8 +9,6 @@ async function initMap(focusPosition) {
   const position = focusPosition;
   // Request needed libraries.
   //@ts-ignore
-
-  // The map, centered at Uluru
   map = new Map(document.getElementById('map'), {
     zoom: 12,
     center: position,
@@ -22,7 +20,8 @@ const DriverHompage = () => {
   const [focusPosition, setFocusPosition] = useState({ lat: 20.98257, lng: 105.844949 });
   const { listFounded } = useSelector((state) => state.parkingZone);
   useEffect(() => {
-    initMap(focusPosition);
+    if (map) { map.setCenter(focusPosition.lat, focusPosition.lng, map.getZoom()) }
+    else initMap(focusPosition)
     listFounded.map((parkingZone, index) => {
       if(!parkingZone.lat||!parkingZone.lng){
         return;
@@ -40,7 +39,7 @@ const DriverHompage = () => {
         disableAutoPan: false,
       });
       marker.addListener('click', () => {
-        setDetailFormInfo({ parkingZone: parkingZone, isShow: true });
+        // setDetailFormInfo({ parkingZone: parkingZone, isShow: true });
       });
     });
   }, [JSON.stringify(focusPosition)]);

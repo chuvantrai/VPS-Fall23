@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Service.ManagerVPS.DTO.FileManagement
+﻿namespace Service.ManagerVPS.DTO.FileManagement
 {
     public class ListObjectsDto
     {

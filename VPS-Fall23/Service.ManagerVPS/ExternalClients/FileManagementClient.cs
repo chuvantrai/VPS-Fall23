@@ -1,23 +1,20 @@
-using System.Net.Http.Headers;
 using InvoiceApi.ExternalData;
 using Service.ManagerVPS.DTO.FileManagement;
+using System.Net.Http.Headers;
 
 namespace Service.ManagerVPS.ExternalClients
 {
     public class FileManagementClient
     {
         public const string MULTIPART_FORM_PARAM_NAME = "files";
-        readonly RestClient restClient;
-        const string BUCKET_URI = "api/bucket";
-        const string CHECK_EXIST_BUCKET_URI = "api/bucket/{0}/exist";
-        const string OBJECT_URI = "api/{0}/object";
-
-        const string OBJECT_GET_ONE_URI =
+        private readonly RestClient restClient;
+        private const string BUCKET_URI = "api/bucket";
+        private const string CHECK_EXIST_BUCKET_URI = "api/bucket/{0}/exist";
+        private const string OBJECT_URI = "api/{0}/object";
+        private const string OBJECT_GET_ONE_URI =
             "api/{0}/object/get-one?objectName={1}&eTag={2}&versionId={3}&download={4}";
-
-        const string OBJECT_DELETE_MULTIPLE = "api/{0}/object/multiple";
-
-        const string OBJECT_EXIST_URI =
+        private const string OBJECT_DELETE_MULTIPLE = "api/{0}/object/multiple";
+        private const string OBJECT_EXIST_URI =
             "api/{0}/object/exist?objectName={1}&eTag={2}&versionId={3}";
 
         public FileManagementClient(string baseUrl)
@@ -28,11 +25,11 @@ namespace Service.ManagerVPS.ExternalClients
         public FileManagementClient(string baseUrl, string accessKey, string secretKey)
             : this(baseUrl)
         {
-            restClient.DefaultRequestHeaders.TryAddWithoutValidation("minio-access-key", accessKey);
-            restClient.DefaultRequestHeaders.TryAddWithoutValidation("minio-secret-key", secretKey);
+            _ = restClient.DefaultRequestHeaders.TryAddWithoutValidation("minio-access-key", accessKey);
+            _ = restClient.DefaultRequestHeaders.TryAddWithoutValidation("minio-secret-key", secretKey);
         }
 
-        public async Task<List<ListObjectsDto>> GetObjects(string bucket, string prefix = null,
+        public async Task<List<ListObjectsDto>> GetObjects(string bucket, string? prefix = null,
             bool recursive = false)
         {
             string uri = string.Format(OBJECT_URI, bucket);
@@ -44,9 +41,9 @@ namespace Service.ManagerVPS.ExternalClients
         public async Task Upload(string bucket, string folderPath, byte[] fileBytes,
             string fileName)
         {
-            using MemoryStream memoryStream = new MemoryStream(fileBytes);
-            StreamContent streamContent = new StreamContent(memoryStream);
-            MultipartFormDataContent multipartFormDataContent = new MultipartFormDataContent
+            using MemoryStream memoryStream = new(fileBytes);
+            StreamContent streamContent = new(memoryStream);
+            MultipartFormDataContent multipartFormDataContent = new()
             {
                 { streamContent, MULTIPART_FORM_PARAM_NAME, fileName }
             };
@@ -73,7 +70,7 @@ namespace Service.ManagerVPS.ExternalClients
             string eTag = "",
             string versionId = "")
         {
-            var response = await GetOne(bucket, objectName, eTag, versionId, true);
+            HttpResponseMessage response = await GetOne(bucket, objectName, eTag, versionId, true);
             return (await response.Content.ReadAsByteArrayAsync(),
                 response.Content.Headers.ContentType);
         }
@@ -83,7 +80,7 @@ namespace Service.ManagerVPS.ExternalClients
             string eTag = "",
             string versionId = "")
         {
-            var response = await GetOne(bucket, objectName, eTag, versionId, false);
+            HttpResponseMessage response = await GetOne(bucket, objectName, eTag, versionId, false);
             return await response.Content.ReadFromJsonAsync<GetOneDto>();
         }
 
@@ -95,13 +92,8 @@ namespace Service.ManagerVPS.ExternalClients
         {
             string uri =
                 $"{string.Format(OBJECT_GET_ONE_URI, bucket, objectName, eTag, versionId, download)}";
-            HttpResponseMessage httpResponseMessage = (await restClient.GetAsync(uri));
-            if (!httpResponseMessage.IsSuccessStatusCode)
-            {
-                throw new Exception(httpResponseMessage.ReasonPhrase);
-            }
-
-            return httpResponseMessage;
+            HttpResponseMessage httpResponseMessage = await restClient.GetAsync(uri);
+            return !httpResponseMessage.IsSuccessStatusCode ? throw new Exception(httpResponseMessage.ReasonPhrase) : httpResponseMessage;
         }
 
         public async Task<bool> IsObjectExist(string bucketName,
