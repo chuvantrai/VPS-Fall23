@@ -127,5 +127,17 @@ namespace Service.ManagerVPS.Controllers
             return url;
         }
 
+        [HttpPost]
+        public async Task<string> CheckOutConfirm(LicensePlateInput licensePlateInput)
+        {
+            var licensePlate = licensePlateInput.LicensePlate ?? throw new ClientException(3000);
+
+            if (!GeneralExtension.IsLicensePlateValid(licensePlate))
+            {
+                throw new ClientException(3001);
+            }
+
+            return await ((IParkingTransactionRepository)vpsRepository).CheckOutConfirm(licensePlate, licensePlateInput.CheckAt, licensePlateInput.CheckBy) ?? throw new ClientException(3002);
+        }
     }
 }

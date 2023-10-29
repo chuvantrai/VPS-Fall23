@@ -59,10 +59,14 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="Syncfusion.Maui.DataForm" Version="23.1.42" />
 		<PackageReference Include="System.Net.Http" Version="4.3.4" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\VPS79.xaml.cs">
+	    <DependentUpon>VPS79.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\VPS61.xaml.cs">
 	    <DependentUpon>VPS61.xaml</DependentUpon>
 	  </Compile>
@@ -72,6 +76,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\VPS79.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\VPS61.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

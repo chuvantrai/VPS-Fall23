@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Client.MobileApp.Views.VPS79"
+             xmlns:dataForm="clr-namespace:Syncfusion.Maui.DataForm;assembly=Syncfusion.Maui.DataForm"
+             xmlns:system="clr-namespace:System;assembly=netstandard"
+             xmlns:local="clr-namespace:Client.MobileApp">
+
+    <Grid ColumnDefinitions="0.5*, 0.5*"
+          RowDefinitions="0.3*, 0.7*" 
+          Background="Transparent">
+        
+        <Border  Grid.ColumnSpan="2"
+                 Stroke="Transparent"
+                 Background="#83E9EE" 
+                 Grid.RowSpan="1">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="0,0,100,100"/>
+            </Border.StrokeShape>
+            <Image Source="logo.png" 
+                   Grid.Row="0"  
+                   Grid.Column="0"  
+                   HorizontalOptions="Center" 
+                   Aspect="AspectFit"/>
+        </Border>
+
+        <Frame CornerRadius="10" 
+               Grid.Column="0"  
+               BorderColor="White" 
+               HeightRequest="420" 
+               Background="White"
+               Grid.Row="1" 
+               WidthRequest="380" VerticalOptions="Start"
+               Grid.ColumnSpan="2" 
+               Grid.RowSpan="1" >
+            
+            <Grid IsClippedToBounds="True" 
+                  HeightRequest="420" >
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="90"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="40"/>
+                    
+                </Grid.RowDefinitions>
+
+                <Label Padding="0,10,0,0" 
+                       HorizontalOptions="Center" 
+                       HorizontalTextAlignment="Center" 
+                       VerticalTextAlignment="Start">
+                    
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Welcome back" 
+                                  FontSize="32"  
+                                  FontAttributes="Bold"/>
+                            
+                            <Span Text="{x:Static system:Environment.NewLine}"/>
+                            
+                            <Span Text="Login to your account"
+                                  FontSize="14"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                    
+                </Label>
+
+                <Frame Grid.Row="2" Padding="10,3,10,0">
+
+                    <Entry  
+                            x:Name="UserName"
+                            IsSpellCheckEnabled="False"
+                            Placeholder="nhập tài khoản"
+                            HorizontalOptions="FillAndExpand"
+                            PlaceholderColor="Black"
+                            FontSize="14"/>
+
+                </Frame>
+
+                <Frame Grid.Row="4" Padding="10,3,10,0">
+                    
+                    <Entry  
+                            x:Name="Password" 
+                            IsTextPredictionEnabled="False"
+                            Placeholder="nhập mật khẩu"
+                            PlaceholderColor="Black"
+                            FontSize="14"
+                            HorizontalOptions="FillAndExpand"
+                            IsPassword="True"/>
+                    
+                </Frame>
+
+                <Button Text="LOGIN" 
+                        Clicked="loginButton_Clicked"
+                        x:Name="loginButton" 
+                        HeightRequest="40" 
+                        VerticalOptions="End"
+                        HorizontalOptions="Fill" 
+                        Margin="20,0,20,0"
+                        CornerRadius="10"
+                        Padding="0" 
+                        FontAttributes="Bold"
+                        Grid.Row="6" 
+                        Background="#83E9EE"/>
+
+            </Grid>
+        </Frame>
+    </Grid>
+
+</ContentPage>

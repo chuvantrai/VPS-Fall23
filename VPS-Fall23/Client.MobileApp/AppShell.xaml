@@ -7,7 +7,18 @@
     Shell.FlyoutBehavior="Disabled">
 
     <ShellContent
+    ContentTemplate="{DataTemplate views:VPS79}"
+    Route="VPS79" />
+
+    <ShellContent
     ContentTemplate="{DataTemplate views:VPS53}"
     Route="VPS53" />
 
+    <ShellContent
+    ContentTemplate="{DataTemplate views:VPS61}"
+    Route="VPS61" />
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" IsEnabled="False" />
+    </Shell.BackButtonBehavior>
 </Shell>

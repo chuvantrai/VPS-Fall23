@@ -7,7 +7,6 @@ namespace Client.MobileApp
         public AppShell()
         {
             InitializeComponent();
-            Routing.RegisterRoute(nameof(VPS53), typeof(VPS53));
         }
     }
 }
