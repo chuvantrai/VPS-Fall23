@@ -591,7 +591,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.WorkFrom)
                     .HasColumnName("work_from")
@@ -812,7 +813,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.Type).HasColumnName("type");
 
