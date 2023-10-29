@@ -51,12 +51,27 @@ public partial class VPS53 : ContentPage
                 {
                     Image = imageBytes,
                     CheckAt = DateTime.Now,
-                    CheckBy = new Guid("D20939C1-7FA6-4DBB-B54A-3F6656AFA00E")
+                    CheckBy = Constant.USER
                 };
 
-                string apiResponse = await _viewModel.CheckLicensePLate(checkLicensePlate);
+                string response_1 = await _viewModel.CheckLicensePLate(checkLicensePlate);
 
-                await DisplayAlert(Constant.NOTIFICATION, apiResponse, Constant.CANCEL);
+                if (response_1 == Constant.CHECKOUT_CONFIRM || response_1.Contains(Constant.OVERTIME_CONFIRM))
+                {
+                    var answer = await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
+
+                    if (answer.ToString() == Constant.ACCEPT)
+                    {
+                        string response_2 = await _viewModel.CheckOutConfirm(checkLicensePlate);
+
+                        await DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
+                    }
+                }
+                else
+                {
+                    await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
+                }
+
             }
             else
             {

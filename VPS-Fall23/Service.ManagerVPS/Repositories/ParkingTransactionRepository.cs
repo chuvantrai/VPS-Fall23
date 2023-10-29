@@ -180,6 +180,8 @@ namespace Service.ManagerVPS.Repositories
                             context.ParkingTransactionDetails.Add(newTransactionDetail);
                             transaction.CheckoutBy = checkBy;
                             await Update(transaction);
+
+                            return ResponseNotification.OVERTIME_CONFIRM + ((double)newTransactionDetail.UnitPricePerHour * (checkAt - transactionDetail.To).TotalHours).ToString();
                         }
                         else
                         {

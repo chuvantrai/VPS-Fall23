@@ -37,7 +37,7 @@ namespace Client.MobileApp.ViewModels
 
         public async Task<string> CheckOutConfirm(LicensePlateScan checkLicensePlate)
         {
-            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80, checkLicensePlate);
+            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_1, checkLicensePlate);
 
             if (response.IsSuccessStatusCode)
             {

@@ -37,4 +37,5 @@ public static class ResponseNotification
     public const string CONFIRM_ERROR = "Xác nhận thất bại";
     public const string CONFIRM_SUCCESS = "Xác nhận thành công";
     public const string BOOKING_ERROR = "Bãi đỗ xe đã hết chỗ";
+    public const string OVERTIME_CONFIRM = "Số tiền bạn phải trả là : ";
 }
