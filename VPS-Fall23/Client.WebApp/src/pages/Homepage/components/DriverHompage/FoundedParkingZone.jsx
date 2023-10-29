@@ -9,20 +9,20 @@ const viewOnGoogleMapCallback = (parkingZone) => {
 };
 const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
   const { listFounded } = useSelector((state) => state.parkingZone);
-  const [detailFormInfo, setDetailFormInfo] = useState({ parkingZone: null, isShow: false, defaultTab: 1 });
+  const [detailFormInfo, setDetailFormInfo] = useState({ parkingZone: null, isShow: false, defaultTab: '1' });
   const [listFoundedSearch, setListFoundedSearch] = useState();
-  const viewDetailInfo = (parkingZone, defaultTab = 1) => {
+  const viewDetailInfo = (parkingZone, defaultTab = '1') => {
     setDetailFormInfo({ defaultTab: defaultTab, parkingZone: parkingZone, isShow: true });
   };
   const onDetailCloseCallback = useCallback(() => {
-    setDetailFormInfo({ defaultTab: 1, parkingZone: null, isShow: false });
+    setDetailFormInfo({ defaultTab: '1', parkingZone: null, isShow: false });
   }, []);
 
   const getDescriptionItem = (parkingZone) => [
     {
       key: 1,
       span: 2,
-      label: <Button onClick={() => viewDetailInfo(parkingZone, 3)} type="primary" danger>Đặt vé</Button>,
+      label: <Button onClick={() => viewDetailInfo(parkingZone, '3')} type="primary" danger>Đặt vé</Button>,
       children: (<ButtonGroup>
         <Button onClick={() => viewDetailInfo(parkingZone)}>{parkingZone.name}</Button>
 

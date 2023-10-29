@@ -1,4 +1,4 @@
-import { Alert, Badge, Carousel, Descriptions, Image, Modal, Tabs, Tag, Typography, notification } from 'antd';
+import { Alert, Badge, Button, Carousel, Descriptions, Image, Modal, Tabs, Tag, Typography, notification } from 'antd';
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
@@ -6,14 +6,23 @@ import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm
 
 
 
-const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 1 }) => {
+const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = '1' }) => {
+
   const parkingZoneService = useParkingZoneService();
   const [imageLinks, setImageLinks] = useState([]);
-  const [tab, setTab] = useState(defaultTab);
+  const [freeSlots, setFreeSlots] = useState(parkingZone?.slots ?? 0);
+  const [tab, setTab] = useState('1');
   useEffect(() => {
+    setTab(defaultTab)
+  }, [defaultTab])
+  useEffect(() => {
+
     if (!parkingZone) return;
     parkingZoneService.getImageLink(parkingZone.id).then((res) => setImageLinks(res?.data));
   }, [parkingZone?.id]);
+  const onGetFreeSlot = (parkingZoneId) => {
+    parkingZoneService.getBookedSlot(parkingZoneId).then(res => setFreeSlots(parkingZone.slots - res.data));
+  }
   const getDetailDescription = () => {
     if (!parkingZone) return [];
     return [
@@ -48,22 +57,20 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
         children: parkingZone.priceOverTimePerHour ?? 0,
       },
       {
-        key: 4,
-        label: 'Tình trạng hoạt động',
-        children: <Badge status="success" text="Đang hoạt động" />,
-      },
-      {
         key: 5,
         label: 'Số chỗ trống',
         children: (
-          <Tag color="processing">{parkingZone.slots}</Tag>
+          <Button
+            onClick={() => onGetFreeSlot(parkingZone.id)}
+          >{freeSlots ?? parkingZone.slots}</Button>
         ),
       },
     ];
   };
   const items = [
     {
-      key: 1,
+
+      key: '1',
       label: 'Chi tiết',
       children: (<Descriptions
         bordered
@@ -73,7 +80,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
       />),
     },
     {
-      key: 2,
+      key: '2',
       label: 'Xem đánh giá',
       children: (<Descriptions
         bordered
@@ -83,7 +90,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
       />),
     },
     {
-      key: 3,
+      key: '3',
       label: 'Đặt chỗ',
       children: (<BookingForm
         parkingZone={parkingZone}
@@ -91,7 +98,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
       ></BookingForm>),
     },
     {
-      key: 4,
+      key: '4',
       label: 'Viết đánh giá',
       children: (<FeedBackForm
         parkingZoneId={parkingZone?.id}
@@ -107,7 +114,6 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
       <Modal
         open={isShow}
         onCancel={onCloseCallback}
-
         zIndex={2000}
         okButtonProps={{
           style: {
@@ -131,7 +137,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
         </Image.PreviewGroup>
         <div className={('pt-[10px]')}>
           <Tabs
-            accessKey={tab}
+            activeKey={tab}
             items={items}
             onChange={onChangeTabs} />
         </div>

@@ -71,10 +71,8 @@ const BookingForm = ({ parkingZone }) => {
             subTitle: (<>
                 <p>Số đơn hàng: {paymentResult?.paymentTransaction.txnRef}</p>
                 <p>Mã giao dịch: {paymentResult?.paymentTransaction.transactionNo}</p>
-            </>),
-            onclick: () => {
-                setPaymentResult(defaultPaymentResult)
-            }
+                <Button onClick={() => setPaymentResult(defaultPaymentResult)}>OK</Button>
+            </>)
         }
     }
     return (<    >
@@ -106,7 +104,7 @@ const BookingForm = ({ parkingZone }) => {
                             required: true, message: "Vui lòng nhập số điện thoại của bạn"
                         },
                         {
-                            pattern: /^\d+$/gm,
+                            pattern: /(0[3|5|7|8|9])+([0-9]{8})\b/g,
                             message: "Số điện thoại không hợp lệ"
                         }
                     ]
