@@ -36,4 +36,5 @@ public static class ResponseNotification
     public const string NO_DATA = "Không có dữ liệu";
     public const string CONFIRM_ERROR = "Xác nhận thất bại";
     public const string CONFIRM_SUCCESS = "Xác nhận thành công";
+    public const string BOOKING_ERROR = "Bãi đỗ xe đã hết chỗ";
 }

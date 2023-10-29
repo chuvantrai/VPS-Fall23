@@ -55,23 +55,31 @@ namespace Service.ManagerVPS.Repositories
                 var parkingZone = context.ParkingZoneAttendants.FirstOrDefault(pz => pz.Id == checkBy)?.ParkingZone;
                 if (parkingZone != null)
                 {
-                    ParkingTransaction parkingTransaction = new()
+                    if (parkingZone.Slots - await GetBookedSlot(parkingZone.Id, checkAt) > 0)
                     {
-                        Id = Guid.NewGuid(),
-                        LicensePlate = licenseplate,
-                        CreatedAt = DateTime.Now,
-                        StatusId = (int)ParkingTransactionStatusEnum.UNPAY,
-                        ParkingZone = parkingZone,
-                        ParkingZoneId = parkingZone.Id,
-                        CheckinAt = DateTime.Now,
-                        CheckinBy = checkBy,
-                        Email = licenseplate,
-                        Phone = licenseplate
-                    };
 
-                    await this.Create(parkingTransaction);
-                    await SaveChange();
-                    return await CanLicensePlateCheckin(licenseplate, checkAt, checkBy);
+                        ParkingTransaction parkingTransaction = new()
+                        {
+                            Id = Guid.NewGuid(),
+                            LicensePlate = licenseplate,
+                            CreatedAt = DateTime.Now,
+                            StatusId = (int)ParkingTransactionStatusEnum.UNPAY,
+                            ParkingZone = parkingZone,
+                            ParkingZoneId = parkingZone.Id,
+                            CheckinAt = DateTime.Now,
+                            CheckinBy = checkBy,
+                            Email = licenseplate,
+                            Phone = licenseplate
+                        };
+
+                        await this.Create(parkingTransaction);
+                        await SaveChange();
+                        return await CanLicensePlateCheckin(licenseplate, checkAt, checkBy);
+                    }
+                    else
+                    {
+                        return ResponseNotification.BOOKING_ERROR;
+                    }
                 }
                 else
                 {

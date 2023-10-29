@@ -11,6 +11,8 @@ using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.DTO.AppSetting;
+using Microsoft.AspNetCore.Identity;
 
 namespace Service.ManagerVPS.Controllers
 {
@@ -20,11 +22,15 @@ namespace Service.ManagerVPS.Controllers
         private readonly IParkingZoneRepository parkingZoneRepository;
         private readonly IPaymentTransactionRepository paymentTransactionRepository;
         private readonly GoogleApiService _googleApiService;
+        private readonly FileManagementConfig _fileManagementConfig;
+        private readonly IConfiguration _configuration;
 
         public ParkingTransactionController(
             IParkingTransactionRepository parkingTransactionRepository,
             GoogleApiService googleApiService,
+            IOptions<FileManagementConfig> fileManagementConfig,
             IOptions<VnPayConfig> vnPayConfig,
+            IConfiguration configuration,
             IParkingZoneRepository parkingZoneRepository,
             IPaymentTransactionRepository paymentTransaction)
             : base(parkingTransactionRepository)
@@ -33,6 +39,8 @@ namespace Service.ManagerVPS.Controllers
             this.parkingZoneRepository = parkingZoneRepository;
             paymentTransactionRepository = paymentTransaction;
             _googleApiService = googleApiService;
+            _fileManagementConfig = fileManagementConfig.Value;
+            _configuration = configuration;
         }
         [HttpPost]
         public async Task<ParkingTransaction> Booking(BookingSlot bookingSlot)
@@ -75,7 +83,11 @@ namespace Service.ManagerVPS.Controllers
         [HttpPost]
         public async Task<string> CheckLicensePlateScan(LicensePlateScan licensePlateScan)
         {
-            if(licensePlateScan.Image == null && licensePlateScan.Image?.Length == 0)
+            var fileManager = new FileManagementClient(_configuration.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                              _configuration.GetValue<string>("fileManagementAccessKey:accessKey"),
+                              _configuration.GetValue<string>("fileManagementAccessKey:secretKey"));
+
+            if (licensePlateScan.Image == null || licensePlateScan.Image.Length == 0)
             {
                 throw new ClientException(3003);
             }
@@ -83,6 +95,8 @@ namespace Service.ManagerVPS.Controllers
             var image = Image.FromBytes(licensePlateScan.Image) ?? throw new ClientException(3003);
 
             var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);
+
+            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:publicBucket"), $"License-plate-images/{licensePlate}-{licensePlateScan.CheckAt}", licensePlateScan.Image, $"{licensePlate}-{licensePlateScan.CheckAt}");
 
             if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {
