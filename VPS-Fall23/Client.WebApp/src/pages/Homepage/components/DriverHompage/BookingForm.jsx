@@ -5,10 +5,13 @@ import useParkingTransactionService from "../../../../services/parkingTransactio
 import store from "../../../../stores";
 import { setShowBookingForm } from "../../../../stores/parkingZones/parkingZone.store";
 const TIME_STEP_IN_HOUR = 1
-const BookingForm = ({ isShow, parkingZone }) => {
+const defaultPaymentResult = {
+    isPaymentRequested: false, isShow: false, paymentTransaction: {}, parkingTransaction: {}
+}
+const BookingForm = ({ parkingZone }) => {
 
     const [form] = Form.useForm();
-    const [paymentResult, setPaymentResult] = useState({ isPaymentRequested: false, isShow: false, paymentTransaction: {}, parkingTransaction: {} });
+    const [paymentResult, setPaymentResult] = useState(defaultPaymentResult);
     const parkingTransactionService = useParkingTransactionService();
     const onSubmitClick = () => {
         form.validateFields().then(form => {
@@ -25,7 +28,7 @@ const BookingForm = ({ isShow, parkingZone }) => {
     }
     const onClose = () => {
         form.resetFields();
-        setPaymentResult({...paymentResult, isShow: false})
+        setPaymentResult({ ...paymentResult, isShow: false })
         store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
     }
     let connection = new HubConnectionBuilder()
@@ -68,28 +71,16 @@ const BookingForm = ({ isShow, parkingZone }) => {
             subTitle: (<>
                 <p>Số đơn hàng: {paymentResult?.paymentTransaction.txnRef}</p>
                 <p>Mã giao dịch: {paymentResult?.paymentTransaction.transactionNo}</p>
-            </>)
+            </>),
+            onclick: () => {
+                setPaymentResult(defaultPaymentResult)
+            }
         }
     }
-    return (<Modal
-        title={`Đặt chỗ gửi xe tại ${parkingZone?.name}`}
-        open={isShow}
-        onCancel={onClose}
-        destroyOnClose={true}
-        onOk={onSubmitClick}
-        okText="Thanh toán"
-        zIndex={2001}
-        cancelText="Đóng"
-        okButtonProps={{
-            style: {
-                backgroundColor: '#1677ff',
-            },
-            disabled: paymentResult?.paymentTransaction.responseCode == "00" && paymentResult?.paymentTransaction.transactionStatus == "00"
-        }}
-    >
+    return (<    >
         <Form
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 14 }}
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 14 }}
             form={form}
             hidden={paymentResult.isShow}
         >
@@ -182,7 +173,11 @@ const BookingForm = ({ isShow, parkingZone }) => {
 
             </Form.Item>
             <Form.Item className={('flex justify-center m-0')}>
-                <Button className={('bg-[#1890FF] w-[200%]')} type='primary' onClick={onSubmitClick}>
+                <Button className={('bg-[#1890FF]')}
+                    type='primary'
+                    onClick={onSubmitClick}
+                    disabled={paymentResult?.paymentTransaction.responseCode == "00" && paymentResult?.paymentTransaction.transactionStatus == "00"}
+                >
                     Đặt chỗ
                 </Button>
             </Form.Item>
@@ -191,7 +186,7 @@ const BookingForm = ({ isShow, parkingZone }) => {
             {...getPaymentResultProps()}
         />}
 
-    </Modal >)
+    </ >)
 }
 
 export default BookingForm  

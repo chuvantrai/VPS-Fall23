@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.ExternalClients.VNPay;
+using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.SignalR;
 
@@ -41,13 +43,16 @@ namespace Service.ManagerVPS.Pages
         readonly VnPayConfig vnPayConfig;
         readonly IHubContext<PaymentHub> paymentHub;
         readonly IPaymentTransactionRepository paymentTransactionRepository;
+        readonly IParkingTransactionRepository parkingTransactionRepository;
         public PaidModel(IOptions<VnPayConfig> options,
            IHubContext<PaymentHub> paymentHub,
-            IPaymentTransactionRepository paymentTransactionRepository)
+            IPaymentTransactionRepository paymentTransactionRepository,
+            IParkingTransactionRepository parkingTransactionRepository)
         {
             this.vnPayConfig = options.Value;
             this.paymentHub = paymentHub;
             this.paymentTransactionRepository = paymentTransactionRepository;
+            this.parkingTransactionRepository = parkingTransactionRepository;
         }
 
         public async Task OnGet()
@@ -57,29 +62,38 @@ namespace Service.ManagerVPS.Pages
                 return;
             }
             bool isValid = VNPayHelper.ValidateSignature(this.Request.Query, vnPayConfig.HashSecret);
+
             if (!isValid)
             {
 
             }
+            bool isSuccess = Vnp_ResponseCode == 0 && Vnp_TransactionStatus == 0;
+
             var paymentTransaction = await paymentTransactionRepository.Find(Vnp_TxnRef);
             paymentTransaction.TransactionStatus = this.Vnp_TransactionStatus;
             paymentTransaction.TransactionNo = this.Vnp_TransactionNo;
             paymentTransaction.BankTranNo = this.Vnp_BankTranNo;
             paymentTransaction.BankCode = this.Vnp_BankCode;
             paymentTransaction.CardType = this.Vnp_CardType;
-            if (DateTime.TryParseExact(this.Vnp_PayDate.ToString(), 
+            if (DateTime.TryParseExact(this.Vnp_PayDate.ToString(),
                                         "yyyyMMddHHmmss",
-                                        System.Globalization.CultureInfo.InvariantCulture, 
+                                        System.Globalization.CultureInfo.InvariantCulture,
                                         System.Globalization.DateTimeStyles.None,
                                         out DateTime payDate))
             {
                 paymentTransaction.PayDate = payDate;
-             }
+            }
             paymentTransaction.OrderInfo = this.Vnp_OrderInfo;
             paymentTransaction.ResponseCode = this.Vnp_ResponseCode;
             paymentTransaction.TransactionStatus = this.Vnp_TransactionStatus;
             paymentTransaction.SecureHashType = this.Vnp_SecureHashType;
             await this.paymentTransactionRepository.Update(paymentTransaction);
+            if (!isSuccess)
+            {
+                var parkingTransaction = await parkingTransactionRepository.Find(paymentTransaction.BookingId);
+                parkingTransaction.StatusId = (int)ParkingTransactionStatusEnum.BOOKING_PAID_FAILED;
+                await parkingTransactionRepository.Update(parkingTransaction);
+            }
             await this.paymentTransactionRepository.SaveChange();
             await paymentHub.Clients.Client(paymentTransaction.ConnectionId).SendAsync("ReceivePaidStatus", paymentTransaction);
 

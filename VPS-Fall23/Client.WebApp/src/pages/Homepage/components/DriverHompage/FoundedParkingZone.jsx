@@ -2,31 +2,27 @@ import { PicCenterOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { Button, Descriptions, Input, List, Popover, notification } from 'antd';
 import { useSelector } from 'react-redux';
 import ButtonGroup from 'antd/es/button/button-group';
-import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useCallback, useState } from 'react';
 import ParkingZoneDetail from './ParkingZoneDetail';
-import store from '../../../../stores';
-import { setShowBookingForm } from '../../../../stores/parkingZones/parkingZone.store';
 const viewOnGoogleMapCallback = (parkingZone) => {
   window.open(`https://maps.google.com/?q=${parkingZone.lat},${parkingZone.lng}`, '_blank');
 };
 const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
   const { listFounded } = useSelector((state) => state.parkingZone);
-  const [detailFormInfo, setDetailFormInfo] = useState({ parkingZone: null, isShow: false });
+  const [detailFormInfo, setDetailFormInfo] = useState({ parkingZone: null, isShow: false, defaultTab: 1 });
   const [listFoundedSearch, setListFoundedSearch] = useState();
-  const parkingZoneService = useParkingZoneService();
-  const viewDetailInfo = (parkingZone) => {
-    setDetailFormInfo({ parkingZone: parkingZone, isShow: true });
+  const viewDetailInfo = (parkingZone, defaultTab = 1) => {
+    setDetailFormInfo({ defaultTab: defaultTab, parkingZone: parkingZone, isShow: true });
   };
   const onDetailCloseCallback = useCallback(() => {
-    setDetailFormInfo({ parkingZone: null, isShow: false });
+    setDetailFormInfo({ defaultTab: 1, parkingZone: null, isShow: false });
   }, []);
 
   const getDescriptionItem = (parkingZone) => [
     {
       key: 1,
       span: 2,
-      label: <Button onClick={() => bookingCallback(parkingZone)} type="primary" danger>Đặt vé</Button>,
+      label: <Button onClick={() => viewDetailInfo(parkingZone, 3)} type="primary" danger>Đặt vé</Button>,
       children: (<ButtonGroup>
         <Button onClick={() => viewDetailInfo(parkingZone)}>{parkingZone.name}</Button>
 
@@ -52,12 +48,7 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
   ];
   const getDesciptionTitle = (parkingZone) => (
     <>
-      {/* <ButtonGroup>
-        <Button onClick={() => viewDetailInfo(parkingZone)}>{parkingZone.name}</Button>
-        <Button onClick={() => bookingCallback(parkingZone)} type="primary" danger>
-          Đặt vé
-        </Button>
-      </ButtonGroup> */}
+
     </>
   );
   const getListFounded = () => {
@@ -103,10 +94,6 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
     );
   };
 
-  const bookingCallback = (parkingZone) => {
-    setDetailFormInfo({ ...detailFormInfo, parkingZone: parkingZone });
-    store.dispatch(setShowBookingForm({ isShowBookingForm: true }));
-  };
   return (
     <>
       <Popover
@@ -120,7 +107,7 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
       <ParkingZoneDetail
         {...detailFormInfo}
         onCloseCallback={onDetailCloseCallback}
-        bookingCallback={bookingCallback}
+
       ></ParkingZoneDetail>
     </>
 

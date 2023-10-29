@@ -2,18 +2,14 @@ import { Alert, Badge, Carousel, Descriptions, Image, Modal, Tabs, Tag, Typograp
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
-import { useSelector } from 'react-redux';
-import { setShowBookingForm } from '../../../../stores/parkingZones/parkingZone.store';
-import store from '../../../../stores';
 import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm.jsx';
 
-const { Text } = Typography;
 
-const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
+
+const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 1 }) => {
   const parkingZoneService = useParkingZoneService();
-
   const [imageLinks, setImageLinks] = useState([]);
-  const { isShowBookingForm } = useSelector((store) => store.parkingZone);
+  const [tab, setTab] = useState(defaultTab);
   useEffect(() => {
     if (!parkingZone) return;
     parkingZoneService.getImageLink(parkingZone.id).then((res) => setImageLinks(res?.data));
@@ -65,9 +61,45 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
       },
     ];
   };
-  const showBookingForm = () => {
-    store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
-    store.dispatch(setShowBookingForm({ isShowBookingForm: true }));
+  const items = [
+    {
+      key: 1,
+      label: 'Chi tiết',
+      children: (<Descriptions
+        bordered
+        items={getDetailDescription()}
+        size='small'
+        column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
+      />),
+    },
+    {
+      key: 2,
+      label: 'Xem đánh giá',
+      children: (<Descriptions
+        bordered
+        items={getDetailDescription()}
+        size='small'
+        column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
+      />),
+    },
+    {
+      key: 3,
+      label: 'Đặt chỗ',
+      children: (<BookingForm
+        parkingZone={parkingZone}
+
+      ></BookingForm>),
+    },
+    {
+      key: 4,
+      label: 'Viết đánh giá',
+      children: (<FeedBackForm
+        parkingZoneId={parkingZone?.id}
+      />),
+    },
+  ];
+  const onChangeTabs = (key) => {
+    setTab(key)
   };
 
   return (
@@ -75,10 +107,8 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
       <Modal
         open={isShow}
         onCancel={onCloseCallback}
-        onOk={showBookingForm}
+
         zIndex={2000}
-        okText="Đặt vé"
-        cancelText="Thoát"
         okButtonProps={{
           style: {
             display: 'none',
@@ -99,14 +129,14 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback }) => {
             })}
           </Carousel>
         </Image.PreviewGroup>
-        {/* <div className={('pt-[10px]')}>
-          <Tabs defaultActiveKey='1' items={items} onChange={onChangeTabs} />
-        </div> */}
+        <div className={('pt-[10px]')}>
+          <Tabs
+            accessKey={tab}
+            items={items}
+            onChange={onChangeTabs} />
+        </div>
       </Modal>
-      <BookingForm
-        isShow={isShowBookingForm}
-        parkingZone={parkingZone}
-      ></BookingForm>
+
     </>
   );
 };

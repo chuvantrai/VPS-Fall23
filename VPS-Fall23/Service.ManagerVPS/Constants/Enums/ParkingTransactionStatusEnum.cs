@@ -11,6 +11,8 @@ namespace Service.ManagerVPS.Constants.Enums
         [Description("Người dùng hủy")]
         USERCANCEL = 3,
         [Description("Nhà xe hủy")]
-        PARKINGCANCEL = 4
+        PARKINGCANCEL = 4,
+        [Description("Thanh toán thất bại")]
+        BOOKING_PAID_FAILED = 5
     }
 }
