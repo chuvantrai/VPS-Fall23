@@ -205,10 +205,13 @@ public class AuthController : VpsController<Account>
             existingAccount.FirstName = input.FirstName;
             existingAccount.LastName = input.LastName;
             existingAccount.PhoneNumber = input.PhoneNumber;
+            existingAccount.VerifyCode = verifyCode;
+            existingAccount.ExpireVerifyCode = DateTime.Now.AddMinutes(30);
+            await ((IUserRepository)vpsRepository).Update(existingAccount);
+
             var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner!;
             parkingZoneOwnerExistedAccount.Phone = input.PhoneNumber;
             parkingZoneOwnerExistedAccount.Dob = input.Dob;
-            await ((IUserRepository)vpsRepository).Update(existingAccount);
             await _parkingZoneOwnerRepository.Update(parkingZoneOwnerExistedAccount);
         }
         else
