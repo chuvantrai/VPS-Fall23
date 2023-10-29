@@ -8,11 +8,15 @@ namespace Service.ManagerVPS.Constants.Enums
         BOOKED = 1,
         [Description("Đã Đặt Cọc")]
         DEPOSIT = 2,
+        [Description("Chưa Trả Tiền")]
+        UNPAY = 3,
         [Description("Người dùng hủy")]
-        USERCANCEL = 3,
+        USERCANCEL = 4,
         [Description("Nhà xe hủy")]
-        PARKINGCANCEL = 4,
+        PARKINGCANCEL = 5,
+        [Description("Đã Trả Tiền")]
+        PAYED = 6,
         [Description("Thanh toán thất bại")]
-        BOOKING_PAID_FAILED = 5
+        BOOKING_PAID_FAILED = 7
     }
 }

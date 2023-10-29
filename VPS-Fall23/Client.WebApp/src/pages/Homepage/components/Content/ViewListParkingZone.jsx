@@ -70,10 +70,14 @@ function ViewListParkingZone() {
       setFileList(files);
     });
 
-    if (account.RoleId === '1' || (account.RoleId === '2' && isApprove === true)) {
+    if (account.RoleId === '1') {
       setIsModalViewOpen(true);
     } else if (account.RoleId === '2') {
-      setIsModalEditOpen(true);
+      if (isApprove === true) {
+        setIsModalViewOpen(true);
+      } else {
+        setIsModalEditOpen(true);
+      }
     }
   };
 
@@ -152,7 +156,7 @@ function ViewListParkingZone() {
         <a
           onClick={(e) => {
             e.preventDefault();
-            handleGetParkingZoneDetail(record.key, record.isApprove);
+            handleGetParkingZoneDetail(record.key, record.status);
           }}
         >
           <FormOutlined />

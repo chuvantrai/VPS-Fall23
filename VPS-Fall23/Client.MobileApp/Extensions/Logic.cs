@@ -1,20 +1,78 @@
-﻿namespace Client.MobileApp.Extensions
+using Client.MobileApp.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Client.MobileApp.Extensions
 {
     public static class Logic
     {
-        public static async Task CopyFileToAppDataDirectory(string filename)
+        public static async Task<FileResult> OpenMediaPickerAsync()
         {
-            if (!string.IsNullOrEmpty(filename))
+            try
             {
-                using Stream inputStream = await FileSystem.Current.OpenAppPackageFileAsync(filename);
-                StreamReader streamReader = new StreamReader(inputStream);
-                var content = streamReader.ReadToEnd();
-                string targetFile = Path.Combine(FileSystem.Current.AppDataDirectory, filename);
-                File.WriteAllText(targetFile, content);
+                var result = await MediaPicker.PickPhotoAsync(new MediaPickerOptions
+                {
+                    Title = "Please a pick photo"
+                });
+
+                if (result.ContentType == "image/png" ||
+                    result.ContentType == "image/jpeg" ||
+                    result.ContentType == "image/jpg")
+                    return result;
+                else
+                    await App.Current.MainPage.DisplayAlert("Error Type Image", "Please choose a new image", "Ok");
+
+                return null;
             }
-            else
+            catch (Exception ex)
             {
-                throw new Exception("File Not Found");
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public static async Task<byte[]> ConvertFileResultToByteArray(FileResult fileResult)
+        {
+            try
+            {
+                if (fileResult == null)
+                {
+                    return null;
+                }
+
+                using (var stream = await fileResult.OpenReadAsync())
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await stream.CopyToAsync(memoryStream);
+                        return memoryStream.ToArray();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
+        public static async Task<byte[]> ConvertStreamToByteArray(Stream stream)
+        {
+            try
+            {
+                byte[] imageBytes;
+                using MemoryStream memoryStream = new();
+                await stream.CopyToAsync(memoryStream);
+                imageBytes = memoryStream.ToArray();
+                return imageBytes;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
             }
         }
     }

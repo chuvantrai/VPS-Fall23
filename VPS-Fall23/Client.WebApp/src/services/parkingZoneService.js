@@ -60,7 +60,7 @@ const useParkingZoneService = () => {
           message: res?.data,
         });
         setTimeout(() => {
-          navigate('/');
+          navigate('/listParkingZone');
         }, 1000);
       })
       .catch((err) => {

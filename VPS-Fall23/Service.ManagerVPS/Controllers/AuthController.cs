@@ -205,10 +205,13 @@ public class AuthController : VpsController<Account>
             existingAccount.FirstName = input.FirstName;
             existingAccount.LastName = input.LastName;
             existingAccount.PhoneNumber = input.PhoneNumber;
+            existingAccount.VerifyCode = verifyCode;
+            existingAccount.ExpireVerifyCode = DateTime.Now.AddMinutes(30);
+            await ((IUserRepository)vpsRepository).Update(existingAccount);
+
             var parkingZoneOwnerExistedAccount = existingAccount.ParkingZoneOwner!;
             parkingZoneOwnerExistedAccount.Phone = input.PhoneNumber;
             parkingZoneOwnerExistedAccount.Dob = input.Dob;
-            await ((IUserRepository)vpsRepository).Update(existingAccount);
             await _parkingZoneOwnerRepository.Update(parkingZoneOwnerExistedAccount);
         }
         else
@@ -347,5 +350,37 @@ public class AuthController : VpsController<Account>
             AddressArray = commune == null ? null : new[] { city!.Name, district!.Name, commune.Name },
             RoleId = account.TypeId
         });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AttendanceLogin(LoginRequest request)
+    {
+        var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
+        if (account == null)
+        {
+            throw new ClientException(5001);
+        }
+
+        if (!BCrypt.Net.BCrypt.EnhancedVerify(request.Password, account.Password))
+        {
+            throw new ClientException(5006);
+        }
+
+        if (account.IsVerified == false)
+        {
+            throw new ClientException(5007);
+        }
+
+        if (account.IsBlock)
+        {
+            throw new ClientException(5002);
+        }
+
+        if (account.TypeId != (int)UserRoleEnum.ADMIN && account.TypeId != (int)UserRoleEnum.ATTENDANT)
+        {
+            throw new ClientException(5001);
+        }
+
+        return Ok(account.Id);
     }
 }
