@@ -75,6 +75,11 @@ namespace Service.ManagerVPS.Controllers
         [HttpPost]
         public async Task<string> CheckLicensePlateScan(LicensePlateScan licensePlateScan)
         {
+            if(licensePlateScan.Image == null && licensePlateScan.Image?.Length == 0)
+            {
+                throw new ClientException(3003);
+            }
+
             var image = Image.FromBytes(licensePlateScan.Image) ?? throw new ClientException(3003);
 
             var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);

@@ -116,7 +116,8 @@ namespace Service.ManagerVPS.Repositories
                     else
                     {
                         transaction.StatusId = (int)ParkingTransactionStatusEnum.PARKINGCANCEL;
-
+                        await Update(transaction);
+                        await SaveChange();
                         return ResponseNotification.CHECKIN_ERROR;
                     }
                 }
