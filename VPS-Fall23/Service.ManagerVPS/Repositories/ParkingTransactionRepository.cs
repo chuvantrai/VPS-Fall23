@@ -50,20 +50,31 @@ namespace Service.ManagerVPS.Repositories
             }
             else
             {
-                ParkingTransaction parkingTransaction = new()
+                var parkingZone = context.ParkingZoneAttendants.Select(pz => pz.ParkingZone).FirstOrDefault(pz => pz.Id == checkBy);
+                if (parkingZone != null)
                 {
-                    Id = Guid.NewGuid(),
-                    LicensePlate = licenseplate,
-                    CreatedAt = DateTime.Now,
-                    StatusId = (int)ParkingTransactionStatusEnum.UNPAY,
-                    CheckinAt = DateTime.Now,
-                    CheckinBy = checkBy,
-                    Email = licenseplate,
-                    Phone = licenseplate
-                };
+                    ParkingTransaction parkingTransaction = new()
+                    {
+                        Id = Guid.NewGuid(),
+                        LicensePlate = licenseplate,
+                        CreatedAt = DateTime.Now,
+                        StatusId = (int)ParkingTransactionStatusEnum.UNPAY,
+                        ParkingZone = parkingZone,
+                        ParkingZoneId = parkingZone.Id,
+                        CheckinAt = DateTime.Now,
+                        CheckinBy = checkBy,
+                        Email = licenseplate,
+                        Phone = licenseplate
+                    };
 
-                await SaveChange();
-                return await CanLicensePlateCheckin(licenseplate, checkAt, checkBy);
+                    await this.Create(parkingTransaction);
+                    await SaveChange();
+                    return await CanLicensePlateCheckin(licenseplate, checkAt, checkBy);
+                }
+                else
+                {
+                    return ResponseNotification.CHECKIN_ERROR;
+                }
             }
         }
 
