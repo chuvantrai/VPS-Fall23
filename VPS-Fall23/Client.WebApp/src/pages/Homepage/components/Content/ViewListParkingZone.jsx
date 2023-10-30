@@ -115,7 +115,7 @@ function ViewListParkingZone() {
     setIsModalViewOpen(false);
   };
 
-  const [data, setData] = useState([{ id: '', name: '', owner: '', status: 'null', created: Date }]);
+  const [data, setData] = useState([{ key: '', id: '', name: '', owner: '', status: 'null', created: Date }]);
   let dataShow = [{ key: '', name: '', owner: '', status: 'null', created: Date }];
 
   const [inputValue, setInputValue] = useState('');
@@ -191,15 +191,24 @@ function ViewListParkingZone() {
   }, []);
 
   const getData = async (currentPage) => {
-    await parkingZoneService
-      .getAllParkingZone({ pageNumber: currentPage, pageSize: pageSize })
-      .then((res) => {
-        setData(res?.data.data);
-        setTotalItems(res?.data.totalCount);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
+    if (inputValue === '' || inputValue === undefined || inputValue === null) {
+      await parkingZoneService
+        .getAllParkingZone({ pageNumber: currentPage, pageSize: pageSize })
+        .then((res) => {
+          const obj = res.data.data.map((val) => ({
+            key: val.id,
+            name: val.name,
+            owner: val.owner,
+            status: val.status,
+            created: val.created,
+          }));
+          setData(obj);
+          setTotalItems(res?.data.totalCount);
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        });
+    }
   };
 
   const searchDataByName = async (e) => {
@@ -207,7 +216,15 @@ function ViewListParkingZone() {
       await parkingZoneService
         .getParkingZoneByName({ pageNumber: currentPage, pageSize: pageSize, name: e })
         .then((res) => {
-          setData(res?.data.data);
+          const obj = res.data.data.map((val) => ({
+            key: val.id,
+            name: val.name,
+            owner: val.owner,
+            status: val.status,
+            created: val.created,
+          }));
+          setData(obj);
+          console.log(obj);
           setTotalItems(res?.data.totalCount);
         })
         .catch((error) => {
@@ -364,20 +381,9 @@ function ViewListParkingZone() {
     <Fragment>
       <div className="w-full px-4">
         <AutoComplete style={{ width: 200 }} onSearch={handleSearch} placeholder="Tìm kiếm" className="mt-4 mb-4" />
-        {data !== undefined &&
-          data.map((val) => {
-            const item = {
-              key: val.id,
-              name: val.name,
-              owner: val.owner,
-              status: val.status,
-              created: val.created,
-            };
-            dataShow.push(item);
-          })}
-        {dataShow.shift() && dataShow.length > 1 && dataShow[0].key !== '' && (
+        {data != undefined && (
           <Fragment>
-            <Table columns={columns} dataSource={dataShow} onChange={onChange} pagination={false} />
+            <Table columns={columns} dataSource={data} onChange={onChange} pagination={false} />
             <div className="py-[16px] flex flex-row-reverse pr-[24px]">
               <Pagination
                 current={currentPage}
