@@ -138,17 +138,17 @@ public class ParkingZoneController : VpsController<ParkingZone>
     {
         try
         {
-            var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
-            var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+            //var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+            //var userToken = JwtTokenExtension.ReadToken(accessToken)!;
             var list = ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
 
-            if (userToken.RoleId == 3) return NotFound();
-            if (userToken.RoleId == 2)
-            {
-                Guid ownerId = new Guid(userToken.UserId);
-                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZoneByName(parameters, name, ownerId);
-            }
+            //if (userToken.RoleId == 3) return NotFound();
+            //if (userToken.RoleId == 2)
+            //{
+                //Guid ownerId = new Guid(userToken.UserId);
+                //list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZoneByName(parameters, name, ownerId);
+            //}
 
             foreach (ParkingZone item in list)
             {
