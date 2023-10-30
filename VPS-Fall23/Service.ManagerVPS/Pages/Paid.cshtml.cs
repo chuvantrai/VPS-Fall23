@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.ExternalClients.VNPay;
-using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.SignalR;
 

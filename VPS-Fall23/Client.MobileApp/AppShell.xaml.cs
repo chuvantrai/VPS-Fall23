@@ -1,6 +1,4 @@
-﻿using Client.MobileApp.Views;
-
-namespace Client.MobileApp
+﻿namespace Client.MobileApp
 {
     public partial class AppShell : Shell
     {
