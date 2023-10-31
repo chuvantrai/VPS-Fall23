@@ -26,7 +26,7 @@ namespace Service.ManagerVPS.Repositories
                  .Where(p => p.ParkingZoneId == parkingZoneId
                  && p.CheckinAt <= checkAt
                  && p.CheckoutAt >= checkAt
-                 && p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
+                 && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED || p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
                  && (!p.ParkingTransactionDetails.Any()
                  || p.ParkingTransactionDetails.OrderByDescending(pt => pt.CreatedAt).First().To >= checkAt
                  ))
@@ -242,9 +242,10 @@ namespace Service.ManagerVPS.Repositories
 
         public Task<bool> IsAlreadyBooking(BookingSlot bookingSlot)
         {
-            return this.entities.AnyAsync(p => p.ParkingZoneId == bookingSlot.ParkingZoneId
-            && p.LicensePlate == bookingSlot.LicensePlate
-             && p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
+            return this.entities.AnyAsync(p =>
+             p.LicensePlate == bookingSlot.LicensePlate
+             && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
+             || p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
             && ((bookingSlot.CheckinAt >= p.CheckinAt && bookingSlot.CheckinAt <= p.CheckoutAt)
             || (bookingSlot.CheckoutAt >= p.CheckinAt && bookingSlot.CheckoutAt <= p.CheckoutAt))
             && !p.ParkingTransactionDetails.Any());

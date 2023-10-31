@@ -2,11 +2,6 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace xUnitTest.Controllers.CityController
 {

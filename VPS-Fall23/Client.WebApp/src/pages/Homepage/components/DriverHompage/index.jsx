@@ -16,6 +16,7 @@ async function initMap(focusPosition) {
   });
 }
 
+
 const DriverHompage = () => {
   const [focusPosition, setFocusPosition] = useState({ lat: 20.98257, lng: 105.844949 });
   const { listFounded } = useSelector((state) => state.parkingZone);
@@ -23,7 +24,7 @@ const DriverHompage = () => {
     if (map) { map.setCenter(focusPosition.lat, focusPosition.lng, map.getZoom()) }
     else initMap(focusPosition)
     listFounded.map((parkingZone, index) => {
-      if(!parkingZone.lat||!parkingZone.lng){
+      if (!parkingZone.lat || !parkingZone.lng) {
         return;
       }
       const marker = new AdvancedMarkerElement({

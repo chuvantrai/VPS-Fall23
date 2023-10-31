@@ -14,7 +14,7 @@ function App() {
   return (
     <ConfigProvider>
       <AntdApp className="app">
-        <Spin spinning={isLoading} indicator={antIcon} style={{zIndex:1000000}}>
+        <Spin spinning={isLoading} indicator={antIcon} style={{ zIndex: 10000000 }}>
           <Router>
             <Routes>
               {

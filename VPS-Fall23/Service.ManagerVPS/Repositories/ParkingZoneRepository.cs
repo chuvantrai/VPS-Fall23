@@ -33,7 +33,7 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
             parameters.PageSize);
     }
-    
+
     public PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters, string name)
     {
         var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name));
@@ -94,7 +94,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .Include(p => p.Commune)
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
-            .Where(p => p.Commune.District.CityId == cityId);
+            .Where(p => p.Commune.District.CityId == cityId
+            && p.IsFull == false
+            && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByCommuneId(Guid communeId)
@@ -103,7 +105,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .Include(p => p.Commune)
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
-            .Where(p => p.CommuneId == communeId);
+            .Where(p => p.CommuneId == communeId
+            && p.IsFull == false
+            && !p.ParkingZoneAbsents.Any(pa => pa.From<= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByDistrictId(Guid districtId)
@@ -111,7 +115,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
         return entities.Include(p => p.Owner)
             .Include(p => p.Commune)
             .ThenInclude(c => c.District)
-            .ThenInclude(d => d.City).Where(p => p.Commune.DistrictId == districtId);
+            .ThenInclude(d => d.City).Where(p => p.Commune.DistrictId == districtId
+            && p.IsFull == false
+            && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public PagedList<ParkingZone> GetRequestedParkingZones(QueryStringParameters parameters)
