@@ -25,7 +25,7 @@ namespace Client.MobileApp.ViewModels
 
             if (response.IsSuccessStatusCode)
             {
-                Constant.USER = new Guid(await response.Content.ReadAsStringAsync());
+                Constant.USER = await response.Content.ReadFromJsonAsync<Guid>();
                 return Constant.LOGIN_SUCCESS;
             }
             else

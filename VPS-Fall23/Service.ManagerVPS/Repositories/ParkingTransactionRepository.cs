@@ -36,7 +36,9 @@ namespace Service.ManagerVPS.Repositories
         public async Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy)
         {
             var transaction = await entities.Include(t => t.ParkingTransactionDetails)
-                .FirstOrDefaultAsync(pt => pt.LicensePlate.Equals(licenseplate));
+                .FirstOrDefaultAsync(pt => pt.LicensePlate.Equals(licenseplate)
+                && pt.CheckinAt <= checkAt && pt.CheckoutAt >= checkAt
+                && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
 
             if (transaction != null)
             {
@@ -50,20 +52,39 @@ namespace Service.ManagerVPS.Repositories
             }
             else
             {
-                ParkingTransaction parkingTransaction = new()
+                var parkingZone = context.ParkingZoneAttendants.FirstOrDefault(pz => pz.Id == checkBy)?.ParkingZone;
+                if (parkingZone != null)
                 {
-                    Id = Guid.NewGuid(),
-                    LicensePlate = licenseplate,
-                    CreatedAt = DateTime.Now,
-                    StatusId = (int)ParkingTransactionStatusEnum.UNPAY,
-                    CheckinAt = DateTime.Now,
-                    CheckinBy = checkBy,
-                    Email = licenseplate,
-                    Phone = licenseplate
-                };
+                    if (parkingZone.Slots - await GetBookedSlot(parkingZone.Id, checkAt) > 0)
+                    {
 
-                await SaveChange();
-                return await CanLicensePlateCheckin(licenseplate, checkAt, checkBy);
+                        ParkingTransaction parkingTransaction = new()
+                        {
+                            Id = Guid.NewGuid(),
+                            LicensePlate = licenseplate,
+                            CreatedAt = DateTime.Now,
+                            StatusId = (int)ParkingTransactionStatusEnum.UNPAY,
+                            ParkingZone = parkingZone,
+                            ParkingZoneId = parkingZone.Id,
+                            CheckinAt = DateTime.Now,
+                            CheckinBy = checkBy,
+                            Email = licenseplate,
+                            Phone = licenseplate
+                        };
+
+                        await this.Create(parkingTransaction);
+                        await SaveChange();
+                        return await CanLicensePlateCheckin(licenseplate, checkAt, checkBy);
+                    }
+                    else
+                    {
+                        return ResponseNotification.BOOKING_ERROR;
+                    }
+                }
+                else
+                {
+                    return ResponseNotification.CHECKIN_ERROR;
+                }
             }
         }
 
@@ -77,7 +98,9 @@ namespace Service.ManagerVPS.Repositories
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.PAYED
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.UNPAY
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT
-                    && pt.LicensePlate.Equals(licenseplate));
+                    && pt.LicensePlate.Equals(licenseplate)
+                     && pt.CheckinAt <= checkAt && pt.CheckoutAt >= checkAt
+                && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
 
                 if (transaction != null)
                 {
@@ -105,7 +128,8 @@ namespace Service.ManagerVPS.Repositories
                     else
                     {
                         transaction.StatusId = (int)ParkingTransactionStatusEnum.PARKINGCANCEL;
-
+                        await Update(transaction);
+                        await SaveChange();
                         return ResponseNotification.CHECKIN_ERROR;
                     }
                 }
@@ -156,6 +180,8 @@ namespace Service.ManagerVPS.Repositories
                             context.ParkingTransactionDetails.Add(newTransactionDetail);
                             transaction.CheckoutBy = checkBy;
                             await Update(transaction);
+
+                            return ResponseNotification.OVERTIME_CONFIRM + ((double)newTransactionDetail.UnitPricePerHour * (checkAt - transactionDetail.To).TotalHours).ToString();
                         }
                         else
                         {

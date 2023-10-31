@@ -7,7 +7,9 @@
         public static string API_PATH_VPS53 = "api/ParkingTransaction/CheckLicensePlateScan";
         public static string API_PATH_VPS61 = "api/ParkingTransaction/CheckLicensePlateInput";
         public static string API_PATH_VPS79 = "api/Auth/AttendanceLogin";
-        public static string API_PATH_VPS80 = "api/ParkingTransaction/CheckOutConfirm";
+        public static string API_PATH_VPS80_1 = "api/ParkingTransaction/CheckOutScanConfirm";
+        public static string API_PATH_VPS80_2 = "api/ParkingTransaction/CheckOutInputConfirm";
+
         public static Guid USER = new Guid();
 
         /// <summary>
@@ -21,5 +23,6 @@
         public static string LOGIN_SUCCESS = "Đăng nhập thành công !";
         public static string LOGIN_FAILED = "Mật khẩu hoặc tài khoản chưa chính xác !";
         public static string CHECKOUT_CONFIRM = "Chưa trả tiền xe";
+        public const string OVERTIME_CONFIRM = "Số tiền bạn phải trả là : ";
     }
 }

@@ -55,7 +55,7 @@ public static class GeneralExtension
 
     public static bool IsLicensePlateValid(string licensePlate)
     {
-        string pattern = @"^[A-Za-z0-9\-\.]+$";
+        string pattern = @"^[A-Za-z0-9\-\.]{8-9}+$";
         return Regex.IsMatch(licensePlate, pattern);
     }
 
