@@ -1,9 +1,6 @@
-﻿using FakeItEasy;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 using Service.ManagerVPS.Models;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using System.Net.Sockets;
 
 namespace xUnitTest.Repositories.ParkingTransactionRepository
 {

@@ -1,9 +1,6 @@
 using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
 using Client.MobileApp.ViewModels;
-using CommunityToolkit.Maui.Core.Platform;
-using CommunityToolkit.Maui.Views;
-using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Client.MobileApp.Views;
 

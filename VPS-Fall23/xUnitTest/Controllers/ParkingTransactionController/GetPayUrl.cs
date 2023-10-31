@@ -8,13 +8,8 @@ using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using Xunit.Abstractions;
 
 namespace xUnitTest.Controllers.ParkingTransactionController

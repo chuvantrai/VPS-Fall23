@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.ExternalClients.VNPay;
-using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.SignalR;
 
@@ -95,7 +95,7 @@ namespace Service.ManagerVPS.Pages
                 await parkingTransactionRepository.Update(parkingTransaction);
             }
             await this.paymentTransactionRepository.SaveChange();
-            await paymentHub.Clients.Client(paymentTransaction.ConnectionId).SendAsync("ReceivePaidStatus", paymentTransaction);
+            await paymentHub.Clients.Client(paymentTransaction.ConnectionId).SendAsync("ReceivePaidStatus", JsonConvert.SerializeObject(paymentTransaction, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
 
         }
     }
