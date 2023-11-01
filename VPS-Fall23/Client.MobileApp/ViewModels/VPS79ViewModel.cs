@@ -20,20 +20,30 @@ namespace Client.MobileApp.ViewModels
 
         public async Task<string> CheckAccount(LoginRequest loginRequest)
         {
-
-            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS79, loginRequest);
-
-            if (response.IsSuccessStatusCode)
+            return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                Constant.USER = await response.Content.ReadFromJsonAsync<Guid>();
-                return Constant.LOGIN_SUCCESS;
-            }
-            else
-            {
-                string errorResponse = await response.Content.ReadAsStringAsync();
-                var error = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
-                return $"{error.Code}{error.Message}";
-            }
+                IsBusy = true;
+                CameraIndex = -1;
+                LoadingIndex = 1;
+                HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS79, loginRequest);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+                    Constant.USER = await response.Content.ReadFromJsonAsync<Guid>();
+                    return Constant.LOGIN_SUCCESS;
+                }
+                else
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    return $"{errorResponse.Message}";
+                }
+            });
         }
     }
 }

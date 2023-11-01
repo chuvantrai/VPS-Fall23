@@ -9,60 +9,103 @@
     <ScrollView>
 
         <Grid>
-            
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
+            </Grid.GestureRecognizers>
+
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="5*"/>
+                <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
+            
+            <Grid BackgroundColor="#A0808080" Grid.RowSpan="4">
+                <ActivityIndicator 
+                               Scale="0.2"
+                               ZIndex="{Binding LoadingIndex}" 
+                               IsRunning="{Binding IsBusy}" 
+                               IsVisible="{Binding IsBusy}" 
+                               Color="#83E9EE" 
+                               VerticalOptions="FillAndExpand"
+                               HorizontalOptions="FillAndExpand"
+                               />
+            </Grid>
+            
             <Grid Grid.Row="0" 
-                  BackgroundColor="#83E9EE">
-                
+                  BackgroundColor="#83E9EE"
+                  ZIndex="{Binding CameraIndex}">
+
                 <Image Source="logo.png"/>
-                
+
             </Grid>
 
             <cv:CameraView Grid.Row="1" 
                            x:Name="cameraView" 
-                           CamerasLoaded="CameraView_CamerasLoaded"/>
+                           VerticalOptions="Start"
+                           ZIndex="{Binding CameraIndex}"/>
 
-            <Grid  Grid.Row="2" 
-                   BackgroundColor="#83E9EE">
-                
+            <Grid Grid.Row="2" BackgroundColor="#83E9EE" ZIndex="{Binding CameraIndex}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="0.2*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.5*"/>
+
+                </Grid.ColumnDefinitions>
+                <Frame Margin="10" Grid.Column="0" Padding="10,0,10,-2">
+
+                    <Entry x:Name="AreaCodeEntry"
+                           IsSpellCheckEnabled="False"
+                           Text="{Binding AreaEntry}"
+                           HorizontalOptions="FillAndExpand"
+                           PlaceholderColor="Black"
+                           FontSize="14"/>
+
+                </Frame>
+                <Label  Grid.Column="1" 
+                        Text="-"
+                        FontSize="Large"
+                        HorizontalOptions="CenterAndExpand" 
+                        VerticalOptions="CenterAndExpand"
+                        TextColor="Black"/>
+
+                <Frame Margin="10" Grid.Column="2" Padding="10,0,10,-2">
+
+                    <Entry x:Name="LicensePlateEntry" 
+                           IsTextPredictionEnabled="False"
+                           Text="{Binding LicensePlateEntry}"
+                           PlaceholderColor="Black"
+                           FontSize="14"
+                           HorizontalOptions="FillAndExpand"/>
+
+                </Frame>
+                <Button Clicked="OkButton_Clicked" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="3" CornerRadius="100"></Button>
+            </Grid>
+
+            <Grid  Grid.Row="3" 
+                   BackgroundColor="#83E9EE"
+                   ZIndex="{Binding CameraIndex}">
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button ImageSource="licenseplate.png" 
-                        MaximumHeightRequest="80" 
-                        MaximumWidthRequest="80" 
-                        BackgroundColor="#D9D9D9" 
-                        Grid.Column="0" 
-                        Clicked="LincenseButton_Clicked" 
-                        CornerRadius="40"/>
-
                 <Button ImageSource="videocamera.png" 
                         MaximumHeightRequest="80" 
                         MaximumWidthRequest="80"
                         BackgroundColor="#D9D9D9"
                         Grid.Column="1" 
+                        BorderWidth="1"
+                        BorderColor="Black"
                         Clicked="CameraButton_Clicked" 
                         CornerRadius="40"/>
 
-                <Button ImageSource="imagegallery.png" 
-                        MaximumHeightRequest="80"
-                        MaximumWidthRequest="80"
-                        BackgroundColor="#D9D9D9" 
-                        Grid.Column="2"
-                        Clicked="ImageButton_Clicked"
-                        CornerRadius="40"/>
-                
             </Grid>
+
         </Grid>
 
     </ScrollView>
-
 </ContentPage>

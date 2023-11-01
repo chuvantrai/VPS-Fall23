@@ -36,7 +36,7 @@ namespace Service.ManagerVPS.Repositories
         public async Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy)
         {
             var transaction = await entities.Include(t => t.ParkingTransactionDetails)
-                .FirstOrDefaultAsync(pt => pt.LicensePlate.Equals(licenseplate)
+                .FirstOrDefaultAsync(pt => pt.LicensePlate.Contains(licenseplate)
                 && pt.CheckinAt <= checkAt && pt.CheckoutAt >= checkAt
                 && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
 
@@ -98,7 +98,7 @@ namespace Service.ManagerVPS.Repositories
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.PAYED
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.UNPAY
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT
-                    && pt.LicensePlate.Equals(licenseplate)
+                    && pt.LicensePlate.Contains(licenseplate)
                      && pt.CheckinAt <= checkAt && pt.CheckoutAt >= checkAt
                 && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
 
@@ -153,7 +153,7 @@ namespace Service.ManagerVPS.Repositories
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.PAYED
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.UNPAY
                     || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT
-                    && pt.LicensePlate.Equals(licenseplate));
+                    && pt.LicensePlate.Contains(licenseplate));
 
                 if (transaction != null)
                 {
@@ -219,7 +219,7 @@ namespace Service.ManagerVPS.Repositories
             {
                 var transaction = await entities.Include(t => t.ParkingZone).Include(t => t.ParkingTransactionDetails)
                     .FirstOrDefaultAsync(pt => pt.StatusId == (int)ParkingTransactionStatusEnum.UNPAY
-                    && pt.LicensePlate.Equals(licenseplate));
+                    && pt.LicensePlate.Contains(licenseplate));
 
                 if (transaction != null)
                 {

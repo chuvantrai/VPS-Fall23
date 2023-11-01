@@ -3,7 +3,6 @@ using Client.MobileApp.ViewModels;
 using Client.MobileApp.Views;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using Syncfusion.Maui.Core.Hosting;
 
 
 #if ANDROID
@@ -28,7 +27,6 @@ namespace Client.MobileApp
                 .RegisterViews()
                 .UseMauiCameraView()
                 .RegisterAppServices()
-                .ConfigureSyncfusionCore()
                 ;
 
             builder.Services.AddSingleton<IBrowser>(Browser.Default);
@@ -50,11 +48,9 @@ namespace Client.MobileApp
         public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
         {
             builder.Services.AddTransient<VPS53>();
-            builder.Services.AddTransient<VPS61>();
             builder.Services.AddTransient<VPS79>();
 
             Routing.RegisterRoute(nameof(VPS53), typeof(VPS53));
-            Routing.RegisterRoute(nameof(VPS61), typeof(VPS61));
             Routing.RegisterRoute(nameof(VPS79), typeof(VPS79));
 
             return builder;
@@ -63,7 +59,6 @@ namespace Client.MobileApp
         public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
         {
             builder.Services.AddTransient<VPS53ViewModel>();
-            builder.Services.AddTransient<VPS61ViewModel>();
             builder.Services.AddTransient<VPS79ViewModel>();
 
             return builder;

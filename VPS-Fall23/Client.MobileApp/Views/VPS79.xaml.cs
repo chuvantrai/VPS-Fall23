@@ -27,8 +27,6 @@ public partial class VPS79 : ContentPage
             {
                 if (response.Equals(Constant.LOGIN_SUCCESS))
                 {
-                    await DisplayAlert(Constant.NOTIFICATION, response, Constant.CANCEL);
-                    await Task.Delay(1000);
                     await Shell.Current.GoToAsync(nameof(VPS53));
                 }
                 else

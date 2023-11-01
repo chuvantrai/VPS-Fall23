@@ -13,7 +13,7 @@ namespace Service.ManagerVPS.Controllers.Base
         [Route("/error")]
         public IActionResult HandleErrorDevelopment()
         {
-            var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
+             var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
 
 
 
@@ -37,7 +37,7 @@ namespace Service.ManagerVPS.Controllers.Base
                 case UnauthorizeException:
                     {
                         return Unauthorized(responseObject);
-                    }
+                    }   
                 case ServerException:
                 default:
                     {

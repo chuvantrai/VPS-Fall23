@@ -3,6 +3,7 @@ using CommunityToolkit.Maui.Views;
 using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
 using Client.MobileApp.Extensions;
+using CommunityToolkit.Maui.Core.Platform;
 
 namespace Client.MobileApp.Views;
 
@@ -16,6 +17,21 @@ public partial class VPS53 : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
         _viewModel = viewModel;
+        cameraView.Loaded += CameraView_CamerasLoaded;
+    }
+
+    private void LoadCamera()
+    {
+        if (cameraView.Cameras.Count > 0)
+        {
+            cameraView.Camera = cameraView.Cameras.First();
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await cameraView.StopCameraAsync();
+                await cameraView.StartCameraAsync();
+            });
+        }
     }
 
     private void CameraView_CamerasLoaded(object sender, EventArgs e)
@@ -39,11 +55,9 @@ public partial class VPS53 : ContentPage
             string licensePlate = String.Empty;
             string path = String.Empty;
 
-            string localFilePath = Path.Combine(FileSystem.Current.AppDataDirectory, Constant.ImageName);
-            var imageSource = cameraView.GetSnapShot();
-            Stream imageSourceStream = await ((StreamImageSource)imageSource).Stream.Invoke(CancellationToken.None);
-
-            var imageBytes = await Logic.ConvertStreamToByteArray(imageSourceStream);
+            var imageSource = await cameraView.TakePhotoAsync();
+            imageSource.Seek(0, SeekOrigin.Begin);
+            var imageBytes = await Logic.ConvertStreamToByteArray(imageSource);
 
             if (imageBytes != null)
             {
@@ -54,7 +68,9 @@ public partial class VPS53 : ContentPage
                     CheckBy = Constant.USER
                 };
 
-                string response_1 = await _viewModel.CheckLicensePLate(checkLicensePlate);
+                await cameraView.StopCameraAsync();
+                string response_1 = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
+                LoadCamera();
 
                 if (response_1 == Constant.CHECKOUT_CONFIRM || response_1.Contains(Constant.OVERTIME_CONFIRM))
                 {
@@ -62,7 +78,9 @@ public partial class VPS53 : ContentPage
 
                     if (answer.ToString() == Constant.ACCEPT)
                     {
-                        string response_2 = await _viewModel.CheckOutConfirm(checkLicensePlate);
+                        await cameraView.StopCameraAsync();
+                        string response_2 = await _viewModel.CheckOutScanConfirm(checkLicensePlate);
+                        LoadCamera();
 
                         await DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
                     }
@@ -77,6 +95,7 @@ public partial class VPS53 : ContentPage
             {
                 await DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
             }
+            await imageSource.DisposeAsync();
         }
         catch (Exception ex)
         {
@@ -88,42 +107,61 @@ public partial class VPS53 : ContentPage
         }
     }
 
-    private async void ImageButton_Clicked(object sender, EventArgs e)
+    private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
+    {
+        await LicensePlateEntry.HideKeyboardAsync(CancellationToken.None);
+        await AreaCodeEntry.HideKeyboardAsync(CancellationToken.None);
+
+        LicensePlateEntry.Unfocus();
+        AreaCodeEntry.Unfocus();
+    }
+
+    private async void OkButton_Clicked(object sender, EventArgs e)
     {
         try
         {
-            var imageBytes = await Logic.ConvertFileResultToByteArray(await Logic.OpenMediaPickerAsync());
-            if (imageBytes != null)
+            string licensePlate = AreaCodeEntry.Text + "-" + LicensePlateEntry.Text;
+
+            if (!String.IsNullOrEmpty(licensePlate))
             {
-                var checkLicensePlate = new LicensePlateScan
+                var checkLicensePlate = new LicensePlateInput
                 {
-                    Image = imageBytes,
+                    LicensePlate = licensePlate,
                     CheckAt = DateTime.Now,
                     CheckBy = Constant.USER
                 };
 
-                string response_1 = await _viewModel.CheckLicensePLate(checkLicensePlate);
+                await cameraView.StopCameraAsync();
+                string response_1 = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
+                LoadCamera();
 
                 if (response_1 == Constant.CHECKOUT_CONFIRM)
                 {
-                    var answer = await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
-
-                    if(answer.ToString() == Constant.ACCEPT)
+                    MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        string response_2 = await _viewModel.CheckOutConfirm(checkLicensePlate);
+                        var answer = await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
 
-                        await DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
-                    }
-                }
-                else
-                {
-                    await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
-                }
+                        if (answer.ToString() == Constant.ACCEPT)
+                        {
+                            await cameraView.StopCameraAsync();
+                            string response_2 = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
+                            LoadCamera();
 
+                            await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
+                        }
+                    });
+                }
             }
             else
             {
-                await DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    await Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
+                });
             }
         }
         catch (Exception ex)
@@ -132,12 +170,6 @@ public partial class VPS53 : ContentPage
             {
                 await Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
             });
-
         }
-    }
-
-    private void LincenseButton_Clicked(object sender, EventArgs e)
-    {
-        this.ShowPopup(new VPS61());
     }
 }

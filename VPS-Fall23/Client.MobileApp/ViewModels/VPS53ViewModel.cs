@@ -17,38 +17,124 @@ namespace Client.MobileApp.ViewModels
                 //BaseAddress = new Uri("http://localhost:5001")
             };
         }
-
-        public async Task<string> CheckLicensePLate(LicensePlateScan checkLicensePlate)
+        public async Task<string> CheckLicensePLateScan(LicensePlateScan checkLicensePlate)
         {
-
-            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
-
-            if (response.IsSuccessStatusCode)
+            return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                return await response.Content.ReadAsStringAsync();
-            }
-            else
-            {
-                string errorResponse = await response.Content.ReadAsStringAsync();
-                var error = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
-                return $"{error.Code}{error.Message}";
-            }
+                IsBusy = true;
+                CameraIndex = -1;
+                LoadingIndex = 1;
+
+                HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+
+                    var ObjectResponse = await response.Content.ReadFromJsonAsync<LicensePlateScanResponse>();
+
+                    string[] licensePlate = ObjectResponse.LicensePlate.Split('-');
+
+                    AreaEntry = licensePlate[0];
+                    LicensePlateEntry = licensePlate[1];
+
+                    return ObjectResponse.Notification;
+                }
+                else
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    return $"{errorResponse.Message}";
+                }
+            });
         }
 
-        public async Task<string> CheckOutConfirm(LicensePlateScan checkLicensePlate)
+        public async Task<string> CheckOutScanConfirm(LicensePlateScan checkLicensePlate)
         {
-            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_1, checkLicensePlate);
+            return await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                IsBusy = true;
+                CameraIndex = -1;
+                LoadingIndex = 1;
 
-            if (response.IsSuccessStatusCode)
+                HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_1, checkLicensePlate);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    return $"{errorResponse.Message}";
+                }
+            });
+        }
+
+        public async Task<string> CheckLicensePLateInput(LicensePlateInput checkLicensePlate)
+        {
+            return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                return await response.Content.ReadAsStringAsync();
-            }
-            else
+                IsBusy = true;
+                CameraIndex = -1;
+                LoadingIndex = 1;
+
+                HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS61, checkLicensePlate);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    return $"{errorResponse.Message}";
+                }
+            });
+        }
+
+        public async Task<string> CheckOutInputConfirm(LicensePlateInput checkLicensePlate)
+        {
+            return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                string errorResponse = await response.Content.ReadAsStringAsync();
-                var error = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
-                return $"{error.Code}{error.Message}";
-            }
+                IsBusy = true;
+                CameraIndex = -1;
+                LoadingIndex = 1;
+                HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_2, checkLicensePlate);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+                    return await response.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    IsBusy = false;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
+                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    return $"{errorResponse.Message}";
+                }
+            });
         }
     }
 }

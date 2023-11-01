@@ -5,21 +5,72 @@ namespace Client.MobileApp.ViewModels
 {
     public class ViewModelBase : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected virtual bool SetProperty<T>(ref T storage, T value, [CallerMemberName] string? propertyName = null)
-        {
-            if (Equals(storage, value))
-            {
-                return false;
-            }
+        bool isBusy = false;
+        int cameraIndex = 1;
+        int loadingIndex = -1;
+        string areaEntry = "";
+        string licensePlateEntry = "";
 
-            storage = value;
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set { SetProperty(ref isBusy, value); }
+        }
+
+        public string AreaEntry
+        {
+            get { return areaEntry; }
+            set { SetProperty(ref areaEntry, value); }
+        }
+
+        public string LicensePlateEntry
+        {
+            get { return licensePlateEntry; }
+            set { SetProperty(ref licensePlateEntry, value); }
+        }
+
+        public int CameraIndex
+        {
+            get { return cameraIndex; }
+            set { SetProperty(ref cameraIndex, value); }
+        }
+
+        public int LoadingIndex
+        {
+            get { return loadingIndex; }
+            set { SetProperty(ref loadingIndex, value); }
+        }
+
+        string title = string.Empty;
+        public string Title
+        {
+            get { return title; }
+            set { SetProperty(ref title, value); }
+        }
+
+        protected bool SetProperty<T>(ref T backingStore, T value,
+            [CallerMemberName] string propertyName = "",
+            Action onChanged = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(backingStore, value))
+                return false;
+
+            backingStore = value;
+            onChanged?.Invoke();
             OnPropertyChanged(propertyName);
             return true;
         }
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            var changed = PropertyChanged;
+            if (changed == null)
+                return;
+
+            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion
     }
 }

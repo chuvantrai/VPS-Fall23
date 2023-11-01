@@ -9,7 +9,6 @@
         public static string API_PATH_VPS79 = "api/Auth/AttendanceLogin";
         public static string API_PATH_VPS80_1 = "api/ParkingTransaction/CheckOutScanConfirm";
         public static string API_PATH_VPS80_2 = "api/ParkingTransaction/CheckOutInputConfirm";
-
         public static Guid USER = new Guid();
 
         /// <summary>
