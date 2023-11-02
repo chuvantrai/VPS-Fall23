@@ -54,7 +54,7 @@ function ListAttendant() {
   const [open, setOpen] = useState(false);
   const [data, setData] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
-  const [totalItems, setTotalItems] = useState();
+  const [totalItems, setTotalItems] = useState(0);
   const [searchText, setSearchText] = useState('')
 
   const [debounceValue] = useDebounce(searchText, 500);
@@ -74,14 +74,11 @@ function ListAttendant() {
       })
   }
 
-  useEffect(() => {
-    getData()
-  }, [pageNumber])
-
   const firstUpdate = useRef(true)
   useEffect(() => {
     if (firstUpdate.current) {
       firstUpdate.current = false;
+      getData();
       return;
     }
 
@@ -90,15 +87,10 @@ function ListAttendant() {
     } else {
       searchData()
     }
-  }, [debounceValue])
+  }, [debounceValue, pageNumber])
 
   const handleChangePage = (page) => {
     setPageNumber(page);
-    if (debounceValue !== "") {
-      searchData()
-    } else {
-      getData()
-    }
   };
 
   const handleAdd = () => {

@@ -94,8 +94,9 @@ public class AttendantController : VpsController<ParkingZoneAttendant>
         [FromQuery] QueryStringParameters parameters)
     {
         var attendantAccounts = _userRepository.GetListAttendantAccount(ownerId, parameters);
-        var result = attendantAccounts.Select(x => new
+        var result = attendantAccounts.Select((x, ind) => new
         {
+            Key = ind + 1,
             x.Id,
             x.Username,
             FullName = x.FirstName + " " + x.LastName,
@@ -124,8 +125,9 @@ public class AttendantController : VpsController<ParkingZoneAttendant>
     {
         var attendantAccounts =
             _userRepository.SearchAttendantByName(ownerId, attendantName, parameters);
-        var result = attendantAccounts.Select(x => new
+        var result = attendantAccounts.Select((x, ind) => new
         {
+            Key = ind + 1,
             x.Id,
             x.Username,
             FullName = x.FirstName + " " + x.LastName,
