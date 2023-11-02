@@ -312,7 +312,7 @@ public class AuthController : VpsController<Account>
 
         // saveFile
         var account = await ((IUserRepository)vpsRepository).UpdateAccountById(request);
-        if (account == null) throw new ClientException(6);
+        if (account == null) throw new ClientException();
 
         return Ok(new
         {

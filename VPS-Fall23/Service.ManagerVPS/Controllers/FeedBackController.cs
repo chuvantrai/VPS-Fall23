@@ -9,7 +9,7 @@ namespace Service.ManagerVPS.Controllers;
 
 public class FeedBackController : VpsController<Feedback>
 {
-    public readonly IParkingTransactionRepository _parkingTransactionRepository;
+    private readonly IParkingTransactionRepository _parkingTransactionRepository;
 
     public FeedBackController(IFeedBackRepository feedBackRepository,
         IParkingTransactionRepository parkingTransactionRepository)
@@ -23,10 +23,15 @@ public class FeedBackController : VpsController<Feedback>
     {
         var parkingTransaction =
             await _parkingTransactionRepository.GetParkingTransactionByIdEmail(request.ParkingZoneId, request.Email);
-        if (parkingTransaction == null) throw new ClientException(5008);
+        if (parkingTransaction.Id != 200) throw new ClientException(parkingTransaction.id);
+
+        var feedBackResult = await ((IFeedBackRepository)vpsRepository)
+            .CreateFeedBack(request, (ParkingZone)parkingTransaction.ParkingTransaction.ParkingZone);
         
-        var feedBackResult = await ((IFeedBackRepository)vpsRepository).CreateFeedBack(request, parkingTransaction.ParkingZone);
-        if (feedBackResult != 200) throw new ClientException(feedBackResult);
-        return Ok();
+        if (feedBackResult.Id != 200) throw new ClientException(feedBackResult.Id);
+        return Ok(new
+        {
+            FeedBackResult = feedBackResult.FeedBack
+        });
     }
 }

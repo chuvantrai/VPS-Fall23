@@ -114,5 +114,9 @@
   {
     "code": 5013,
     "message": "Đã có thông báo lỗi của mã giao dịch này!"
+  },
+  {
+    "code": 5014,
+    "message": "Bãi đỗ xe không tồi tại!"
   }
 ]

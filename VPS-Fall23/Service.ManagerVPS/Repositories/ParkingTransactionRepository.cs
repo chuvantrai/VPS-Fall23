@@ -161,15 +161,38 @@ namespace Service.ManagerVPS.Repositories
             }
         }
 
-        public async Task<ParkingTransaction?> GetParkingTransactionByIdEmail(Guid id, string email)
+        public async Task<dynamic> GetParkingTransactionByIdEmail(Guid id, string email)
         {
-            var parkingTransaction = await context.ParkingTransactions
+            var parkingTransactions = await context.ParkingTransactions
                 .Include(x => x.ParkingZone)
                 .Include(x => x.PaymentTransactions)
-                .FirstOrDefaultAsync(x => x.ParkingZoneId.Equals(id)
+                .Where(x => x.ParkingZoneId.Equals(id)
                                           && x.ParkingZone.IsApprove == true
-                                          && x.Email == email);
-            return parkingTransaction;
+                                          && x.Email == email).ToListAsync();
+            if (parkingTransactions.Count == 0)
+            {
+                return new
+                {
+                    ParkingTransaction = parkingTransactions,
+                    Id = 5014
+                };
+            }
+            var parkingTransaction = parkingTransactions.FirstOrDefault(x => x.Email == email);
+
+            if (parkingTransaction != null)
+            {
+                return new
+                {
+                    ParkingTransaction = parkingTransactions,
+                    id = 5010
+                };
+            }
+            
+            return new
+            {
+                ParkingTransaction = parkingTransaction,
+                Id = 200
+            };
         }
     }
 }
