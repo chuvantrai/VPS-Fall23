@@ -60,6 +60,7 @@ builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IAttendantRepository, AttendantRepository>();
+builder.Services.AddScoped<IParkingZoneAbsentRepository, ParkingZoneAbsentRepository>();
 
 //Session
 builder.Services.AddDistributedMemoryCache();

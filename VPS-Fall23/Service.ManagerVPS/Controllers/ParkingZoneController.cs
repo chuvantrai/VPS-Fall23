@@ -25,17 +25,20 @@ public class ParkingZoneController : VpsController<ParkingZone>
     private readonly FileManagementConfig _fileManagementConfig;
     private readonly IContractRepository _contractRepository;
     readonly IParkingTransactionRepository parkingTransactionRepository;
+    private readonly IParkingZoneAbsentRepository _absentRepository;
 
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
         IContractRepository contractRepository,
-        IParkingTransactionRepository parkingTransactionRepository)
+        IParkingTransactionRepository parkingTransactionRepository,
+        IParkingZoneAbsentRepository absentRepository)
         : base(parkingZoneRepository)
     {
         _config = config;
         _fileManagementConfig = options.Value;
         _contractRepository = contractRepository;
         this.parkingTransactionRepository = parkingTransactionRepository;
+        _absentRepository = absentRepository;
     }
 
     [HttpPost]
@@ -305,6 +308,50 @@ public class ParkingZoneController : VpsController<ParkingZone>
         parkingZone.ModifiedAt = DateTime.Now;
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.CloseParkingZone)]
+    public async Task<IActionResult> CloseParkingZone([FromBody] CloseParkingZoneInput input)
+    {
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneAndAbsentById(
+                (Guid)input.ParkingZoneId!);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        if (parkingZone.IsApprove is null or false)
+        {
+            throw new ServerException(
+                "Bãi đỗ xe đang chờ duyệt hoặc bị từ chối không thể đóng cửa!");
+        }
+
+        var absent = parkingZone.ParkingZoneAbsents.MaxBy(x => x.SubId);
+        if (absent is not null && (absent.To < DateTime.Now || absent.To is null))
+        {
+            throw new ServerException("Bãi đỗ xe đã đóng cửa!");
+        }
+
+        var newAbsent = new ParkingZoneAbsent
+        {
+            Id = Guid.NewGuid(),
+            ParkingZoneId = (Guid)input.ParkingZoneId,
+            From = input.CloseFrom,
+            To = input.CloseTo,
+            Reason = input.Reason,
+            CreatedAt = DateTime.Now
+        };
+        var absentAdded = await _absentRepository.Create(newAbsent);
+        if (absentAdded is null)
+        {
+            throw new ServerException(3);
+        }
+
+        await _absentRepository.SaveChange();
 
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
