@@ -1,7 +1,6 @@
 import { App, Button, Col, Form, Input, Row } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import config from '@/config/index.js';
 import classNames from 'classnames/bind';
 import styles from '@/pages/ForgotPassword/ForgotPassword.module.scss';
 import { useAxios } from '@/hooks/index.js';
@@ -203,7 +202,7 @@ function ForgotPassword() {
               </Col>
               <Col span={4}>
                 <Link
-                  to={config.routes.login}
+                  to={'/login'}
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >

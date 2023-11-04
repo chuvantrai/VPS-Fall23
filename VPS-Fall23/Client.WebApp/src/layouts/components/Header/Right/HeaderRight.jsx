@@ -8,15 +8,18 @@ const cs = classNames.bind(styles);
 
 const HeaderRight = () => {
   const account = getAccountJwtModel();
+  const headerRightMap = {
+    0: <DriverRightHeader />,
+    1: <ManagerRightHeader account={account} />,
+    2: <ManagerRightHeader account={account} />
+  }
 
+  const getHeaderRightMap = () => {
+    return headerRightMap[account?.RoleId ?? 0]
+  }
   return (
     <div className={cs('wrapper flex justify-end h-full items-center')}>
-      {
-        account ?
-          <ManagerRightHeader account={account}></ManagerRightHeader>
-          :
-          <DriverRightHeader></DriverRightHeader>
-      }
+      {getHeaderRightMap()}
     </div>
   );
 };

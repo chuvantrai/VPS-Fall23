@@ -1,0 +1,49 @@
+import Header from '@/layouts/components/Header';
+import AccountProfile from '@/pages/AccountProfile'
+import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
+import ViewRequestedParkingZone from '@/pages/ViewRequestedParkingZones'
+import ManagerLayout from '../layouts/ManagerLayout';
+import guidGenerator from '../helpers/guidGenerator';
+export const adminRoutesConfig = {
+    header: Header,
+    footer: null,
+    layout: ManagerLayout,
+    routes: [
+        {
+            key: guidGenerator(),
+            path: 'user',
+            label: 'User',
+            children: [
+                {
+                    key: guidGenerator(),
+                    path: 'profile',
+                    label: 'Profile',
+                    component: AccountProfile,
+                    description: 'Mọi thông tin về tài khoản được hiển thị dưới đây',
+
+                }
+            ],
+        },
+        {
+            key: guidGenerator(),
+            path: 'parking-zone',
+            label: 'Bãi đỗ xe',
+            children: [
+                {
+                    key: guidGenerator(),
+                    path: 'view',
+                    label: 'Danh sách bãi đỗ xe',
+                    description: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
+                    component: ViewListParkingZone
+                },
+                {
+                    key: guidGenerator(),
+                    path: 'requested-list',
+                    label: 'Danh sách yêu cầu',
+                    description: 'Toàn bộ danh sách yêu cầu bãi gửi xe hiển thị dưới đây',
+                    component: ViewRequestedParkingZone
+                },
+            ],
+        }
+    ]
+}

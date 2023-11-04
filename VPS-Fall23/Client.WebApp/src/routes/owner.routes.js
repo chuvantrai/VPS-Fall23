@@ -1,0 +1,74 @@
+import Header from '@/layouts/components/Header';
+import AccountProfile from '@/pages/AccountProfile/';
+import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
+import RegisterParkingZone from '@/pages/RegisterParkingZone';
+import ListAttendant from '@/pages/ListAttendant';
+import ManagerLayout from '../layouts/ManagerLayout';
+import guidGenerator from '../helpers/guidGenerator';
+export const ownerRoutesConfig = {
+    header: Header,
+    footer: null,
+    layout: ManagerLayout,
+    routes: [
+        {
+            key: guidGenerator(),
+            path: 'dashboard',
+            label: 'Trang chủ',
+            component: ListAttendant,
+            description: ''
+        },
+        {
+            key: guidGenerator(),
+            path: 'user',
+            label: "Người dùng",
+            children: [
+                {
+                    key: guidGenerator(),
+                    path: 'profile',
+                    label: 'Thông tin cá nhân',
+                    component: AccountProfile,
+                    description: 'Thông tin cá nhân tài khoản đăng nhập'
+
+                },
+            ]
+        },
+        {
+            key: guidGenerator(),
+            path: 'parking-zone',
+            label: 'Bãi đỗ xe',
+            children: [
+                {
+                    key: guidGenerator(),
+                    path: 'view',
+                    label: 'Danh sách bãi đỗ xe',
+                    component: ViewListParkingZone,
+                    description: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
+
+                },
+                {
+                    key: guidGenerator(),
+                    path: 'register',
+                    label: 'Đăng ký bãi đỗ xe',
+                    component: RegisterParkingZone,
+                    description: 'Điền vào mẫu dưới đây để đăng ký bãi gửi xe mới',
+
+                },
+            ],
+        },
+        {
+            key: guidGenerator(),
+            path: 'attendant',
+            label: 'Nhân viên',
+            children: [
+                {
+                    key: guidGenerator(),
+                    path: 'view',
+                    label: 'Danh sách nhân viên',
+                    component: ListAttendant,
+                    description: 'Toàn bộ danh sách nhân viên hiển thị dưới đây',
+
+                },
+            ],
+        },
+    ]
+}
