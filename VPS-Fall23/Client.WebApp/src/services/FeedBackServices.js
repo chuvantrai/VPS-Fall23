@@ -18,7 +18,10 @@ const feedBackServices = () => {
         });
       });
   };
-  return { createFeedBack };
+  const getByParkingZone = (parkingZoneId, page, pageSize) => {
+    return axios.get(`api/FeedBack/GetFeedbacksByParkingZone/${parkingZoneId}?page=${page}&pageSize=${pageSize}`)
+  }
+  return { createFeedBack, getByParkingZone };
 };
 
 export default feedBackServices;
