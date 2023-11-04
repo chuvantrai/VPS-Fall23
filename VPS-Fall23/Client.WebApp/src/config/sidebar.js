@@ -23,6 +23,12 @@ export const adminSidebar = [
         desc: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
       },
       {
+        label: 'View Owner List',
+        url: '/listOwner',
+        title: 'Danh sách chủ sở hữu bãi gửi xe',
+        desc: 'Toàn bộ danh sách chủ sở hữu bãi gửi xe hiển thị dưới đây',
+      },
+      {
         label: 'Register Parking Zone',
         url: routes.registerParkingZone,
         title: 'Form đăng ký bãi gửi xe',

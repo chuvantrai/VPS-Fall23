@@ -5,6 +5,7 @@ import Register from '@/pages/Register';
 import VerifyEmail from '@/pages/VerifyEmail';
 import RegisterParkingZone from '@/pages/RegisterParkingZone';
 import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
+import ViewListOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
 import ViewRequestedParkingZones from '@/pages/ViewRequestedParkingZones';
 import Login from '@/pages/Login';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -26,6 +27,10 @@ export const routes = [
       {
         url: 'listParkingZone',
         component: ViewListParkingZone,
+      },
+      {
+        url: 'listOwner',
+        component: ViewListOwner,
       },
       {
         url: 'registerParkingZone',
