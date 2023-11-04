@@ -44,7 +44,7 @@ public partial class VPS53 : ContentPage
             Stream imageSourceStream = await ((StreamImageSource)imageSource).Stream.Invoke(CancellationToken.None);
 
             var imageBytes = await Logic.ConvertStreamToByteArray(imageSourceStream);
-
+            
             if (imageBytes != null)
             {
                 var checkLicensePlate = new LicensePlateScan
