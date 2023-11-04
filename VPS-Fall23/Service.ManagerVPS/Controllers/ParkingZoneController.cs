@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Quartz;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.FileManagement;
 using Service.ManagerVPS.Constants.Notifications;
@@ -12,6 +13,7 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Ouput;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
@@ -26,12 +28,13 @@ public class ParkingZoneController : VpsController<ParkingZone>
     private readonly IContractRepository _contractRepository;
     readonly IParkingTransactionRepository parkingTransactionRepository;
     private readonly IParkingZoneAbsentRepository _absentRepository;
+    private readonly IScheduler _scheduler;
 
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
         IContractRepository contractRepository,
         IParkingTransactionRepository parkingTransactionRepository,
-        IParkingZoneAbsentRepository absentRepository)
+        IParkingZoneAbsentRepository absentRepository, IScheduler scheduler)
         : base(parkingZoneRepository)
     {
         _config = config;
@@ -39,6 +42,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         _contractRepository = contractRepository;
         this.parkingTransactionRepository = parkingTransactionRepository;
         _absentRepository = absentRepository;
+        _scheduler = scheduler;
     }
 
     [HttpPost]
@@ -334,6 +338,24 @@ public class ParkingZoneController : VpsController<ParkingZone>
         if (absent is not null && (absent.To < DateTime.Now || absent.To is null))
         {
             throw new ServerException("Bãi đỗ xe đã đóng cửa!");
+        }
+
+        if (input.CloseTo is null)
+        {
+            // Tạo công việc DeleteParkingLotJob
+            var job = JobBuilder.Create<DeleteParkingZoneJob>()
+                .WithIdentity($"deleteParkingLotJob-{input.ParkingZoneId}", "group1")
+                .UsingJobData("parkingZoneId", (Guid)input.ParkingZoneId)
+                .Build();
+
+            // Tạo trigger để lên lịch công việc sau 5 ngày
+            var trigger = TriggerBuilder.Create()
+                .WithIdentity($"deleteParkingLotTrigger-{input.ParkingZoneId}", "group1")
+                .StartAt(DateTimeOffset.Now.Add(TimeSpan.FromMinutes(1)))
+                .Build();
+
+            // Lên lịch công việc
+            await _scheduler.ScheduleJob(job, trigger);
         }
 
         var newAbsent = new ParkingZoneAbsent
