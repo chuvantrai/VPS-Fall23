@@ -19,7 +19,6 @@ function Sidebar() {
     setMenuItems(routesConfig.routes)
     const path = location.pathname.split('/');
     path.splice(0, 1);
-    console.log(path);
     setSelectedKey(findRouteConfigByPaths(routesConfig.routes, path) ?? defaultSelectedKeys)
   }, [])
   const findRouteConfigByPaths = (routesConfigParam, paths) => {

@@ -39,7 +39,7 @@ export const ownerRoutesConfig = {
             children: [
                 {
                     key: guidGenerator(),
-                    path: 'view',
+                    path: '',
                     label: 'Danh sách bãi đỗ xe',
                     component: ViewListParkingZone,
                     description: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
@@ -62,7 +62,7 @@ export const ownerRoutesConfig = {
             children: [
                 {
                     key: guidGenerator(),
-                    path: 'view',
+                    path: '',
                     label: 'Danh sách nhân viên',
                     component: ListAttendant,
                     description: 'Toàn bộ danh sách nhân viên hiển thị dưới đây',

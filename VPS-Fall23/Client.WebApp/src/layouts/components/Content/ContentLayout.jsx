@@ -14,7 +14,7 @@ function ContentLayout({ description }) {
         className="flex justify-center items-center"
         style={{
           padding: '2%',
-          background: colorBgContainer,
+          background: colorBgContainer
         }}
       >
         <Outlet></Outlet>

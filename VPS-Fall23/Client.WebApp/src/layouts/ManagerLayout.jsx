@@ -31,7 +31,7 @@ const ManagerLayout = () => {
         return findRouteConfigByPath(routesConfig?.filter((r) => r.children)?.flatMap((r) => r.children), path)
     }
     return (
-        <Layout>
+        <Layout style={{ marginTop: 10 }}>
             <Sidebar />
             <Content
                 style={{

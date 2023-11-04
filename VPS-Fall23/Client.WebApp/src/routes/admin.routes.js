@@ -31,7 +31,7 @@ export const adminRoutesConfig = {
             children: [
                 {
                     key: guidGenerator(),
-                    path: 'view',
+                    path: '',
                     label: 'Danh sách bãi đỗ xe',
                     description: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
                     component: ViewListParkingZone
