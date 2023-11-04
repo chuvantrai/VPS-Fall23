@@ -12,6 +12,7 @@ import ChangePassword from '@/pages/ChangePassword/index.js';
 import AccountProfile from '@/pages/AccountProfile/index.js';
 import Test from '@/pages/Test/index.js';
 import ListAttendant from '@/pages/ListAttendant';
+import IncomeDashboard from '@/pages/IncomeDashboard';
 
 export const routes = [
   {
@@ -42,6 +43,10 @@ export const routes = [
       {
         url: 'listAttendant',
         component: ListAttendant,
+      },
+      {
+        url: 'incomeDashboard',
+        component: IncomeDashboard,
       },
     ],
   },

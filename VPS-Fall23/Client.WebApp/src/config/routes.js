@@ -10,6 +10,7 @@ const routes = {
   test: '/test',
   listParkingZone: '/listParkingZone',
   listAttendant: '/listAttendant',
+  incomeDashboard: '/incomeDashboard',
 };
 
 export default routes;

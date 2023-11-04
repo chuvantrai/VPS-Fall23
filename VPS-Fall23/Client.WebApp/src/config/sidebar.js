@@ -73,4 +73,15 @@ export const ownerSidebar = [
       },
     ],
   },
+  {
+    label: 'thống kê',
+    options: [
+      {
+        label: 'Thống kê doanh thu',
+        url: routes.incomeDashboard,
+        title: 'Thống kê doanh thu',
+        desc: 'Toàn bộ Thống kê doanh thu hiển thị dưới đây:',
+      },
+    ],
+  },
 ];
