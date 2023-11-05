@@ -15,23 +15,25 @@ function IncomeDashboard() {
   const { RangePicker } = DatePicker;
   const { Option } = Select;
   const account = getAccountJwtModel();
-  const [selectedStat, setSelectedStat] = useState(null);
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [averageMonthlyIncome, setAverageMonthlyIncome] = useState(0);
+  const [averageYearlyIncome, setAverageYearlyIncome] = useState(0);
   const [dateRange, setDateRange] = useState('all');
   const [data, setData] = useState([]);
   const [ParkingZoneOptions, setParkingZoneOptions] = useState([]);
   const [selectedParkingZone, setSelectedParkingZone] = useState('');
+  const [ParkingZoneData, setParkingZoneData] = useState([]);
+
   const handleDateRangeChange = (value) => {
     setDateRange(value);
   };
-
-  ParkingZoneData = [];
 
   const handleStatChange = (value) => {
     setSelectedParkingZone(value);
     parkingTransactionService.getAllIncome(value)
       .then((response) => {
         setData(response.data);
-        ParkingZoneData = response.data;
+        setParkingZoneData(response.data);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -39,7 +41,7 @@ function IncomeDashboard() {
   };
 
   useEffect(() => {
-
+    const filteredData = ParkingZoneData.filter((item) => item.parkingZoneId === selectedParkingZone);
     parkingZoneService.getAllParkingZoneByOwnerId(account.UserId)
       .then((response) => {
         setParkingZoneOptions(response.data);
@@ -52,19 +54,49 @@ function IncomeDashboard() {
       const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
       const thisMonthData = Array.from({ length: daysInMonth }, (_, i) => ({
         name: `Ngày ${i + 1}`,
-        income: Math.floor(Math.random() * 1000),
+        income: filteredData.find((item) => new Date(item.incomeDate).getDate() === i + 1)?.income || 0,
       }));
       setData(thisMonthData);
     } else if (dateRange === 'year') {
       const thisYearData = Array.from({ length: 12 }, (_, i) => ({
         name: `Tháng ${i + 1}`,
-        income: Math.floor(Math.random() * 1000),
+        income: filteredData
+          .filter((item) => new Date(item.incomeDate).getMonth() === i)
+          .reduce((total, item) => total + item.income, 0),
       }));
       setData(thisYearData);
     } else if (dateRange === 'all') {
-      // setData(initialData);
+      const allTimeData = [];
+      const groupedData = {};
+      filteredData.forEach((item) => {
+        const incomeYear = new Date(item.incomeDate).getFullYear();
+        if (!groupedData[incomeYear]) {
+          groupedData[incomeYear] = 0;
+        }
+        groupedData[incomeYear] += item.income;
+      });
+
+      for (const year in groupedData) {
+        allTimeData.push({
+          name: year,
+          income: groupedData[year],
+        });
+      }
+
+      setData(allTimeData);
     }
-  }, [dateRange], [selectedStat]);
+
+    const totalIncome = data.reduce((total, entry) => total + entry.income, 0);
+
+    const averageMonthlyIncome = data.reduce((total, entry) => total + entry.income, 0) / 12;
+
+    const averageYearlyIncome = data.length > 0 ? totalIncome / data.length : 0;
+
+    setTotalIncome(totalIncome);
+    setAverageMonthlyIncome(averageMonthlyIncome);
+    setAverageYearlyIncome(averageYearlyIncome);
+
+  }, [dateRange, selectedParkingZone, ParkingZoneData]);
   return (
 
     <div className={styles.dashboard}>
@@ -83,17 +115,17 @@ function IncomeDashboard() {
       <Row gutter={24}>
         <Col span={8}>
           <Card className={styles.cardTitle} title="Tổng Thu Nhập">
-            <p>{data.reduce((total, entry) => total + entry.income, 0)} đồng</p>
+            <p>{totalIncome} đồng</p>
           </Card>
         </Col>
         <Col span={8}>
           <Card className={styles.cardTitle} title="Trung Bình Hàng Tháng">
-            {/* <p>{averageMonthlyData} đồng</p> */}
+            <p>{averageMonthlyIncome} đồng</p>
           </Card>
         </Col>
         <Col span={8}>
           <Card className={styles.cardTitle} title="Trung Bình Hàng Năm">
-            {/* <p>{averageMonthlyData} đồng</p> */}
+            <p>{averageYearlyIncome} đồng</p>
           </Card>
         </Col>
       </Row>
