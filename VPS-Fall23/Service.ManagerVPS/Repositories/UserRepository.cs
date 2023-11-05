@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -19,7 +20,8 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
 
     public bool CheckEmailExists(string email)
     {
-        var existAccount = context.Accounts.FirstOrDefault(x => x.Email.Equals(email) && x.IsVerified == true);
+        var existAccount =
+            context.Accounts.FirstOrDefault(x => x.Email.Equals(email) && x.IsVerified == true);
         return existAccount is not null;
     }
 
@@ -121,9 +123,37 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
             .Include(x => x.Commune)
             .ThenInclude(x => x!.District)
             .ThenInclude(x => x.City)
-            .Include(x=>x.ParkingZoneOwner)
+            .Include(x => x.ParkingZoneOwner)
             .FirstOrDefaultAsync(x => x.Id.Equals(id) && !x.IsBlock && x.IsVerified == true);
-        
+
         return account;
+    }
+
+    public PagedList<Account> GetListAttendantAccount(string ownerId,
+        QueryStringParameters parameters)
+    {
+        var attendants = entities
+            .Include(x => x.ParkingZoneAttendant)
+            .ThenInclude(x => x!.ParkingZone)
+            .Where(x =>
+                x.ParkingZoneAttendant!.ParkingZone.OwnerId.ToString().Equals(ownerId) &&
+                x.TypeId == (int)UserRoleEnum.ATTENDANT);
+        return PagedList<Account>.ToPagedList(attendants, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<Account> SearchAttendantByName(string ownerId, string attendantName,
+        QueryStringParameters parameters)
+    {
+        var attendants = entities
+            .Include(x => x.ParkingZoneAttendant)
+            .ThenInclude(x => x!.ParkingZone)
+            .Where(x =>
+                x.ParkingZoneAttendant!.ParkingZone.OwnerId.ToString().Equals(ownerId) &&
+                (x.FirstName.ToLower().Contains(attendantName) ||
+                 x.LastName.ToLower().Contains(attendantName)) &&
+                x.TypeId == (int)UserRoleEnum.ATTENDANT);
+        return PagedList<Account>.ToPagedList(attendants, parameters.PageNumber,
+            parameters.PageSize);
     }
 }

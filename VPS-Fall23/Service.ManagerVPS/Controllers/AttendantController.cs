@@ -4,6 +4,7 @@ using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -85,5 +86,66 @@ public class AttendantController : VpsController<ParkingZoneAttendant>
         await ((IAttendantRepository)vpsRepository).SaveChange();
 
         return Ok(ResponseNotification.ADD_SUCCESS);
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetListAttendant)]
+    public IActionResult GetListAttendant(string ownerId,
+        [FromQuery] QueryStringParameters parameters)
+    {
+        var attendantAccounts = _userRepository.GetListAttendantAccount(ownerId, parameters);
+        var result = attendantAccounts.Select((x, ind) => new
+        {
+            Key = ind + 1,
+            x.Id,
+            x.Username,
+            FullName = x.FirstName + " " + x.LastName,
+            x.Address,
+            x.PhoneNumber,
+            ParkingZone = x.ParkingZoneAttendant!.ParkingZone.Name,
+            x.IsBlock
+        }).ToList();
+        var metadata = new
+        {
+            attendantAccounts.TotalCount,
+            attendantAccounts.PageSize,
+            attendantAccounts.CurrentPage,
+            attendantAccounts.TotalPages,
+            attendantAccounts.HasNext,
+            attendantAccounts.HasPrev,
+            Data = result
+        };
+        return Ok(metadata);
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.SearchAttendantByName)]
+    public IActionResult SearchAttendantByName(string ownerId, string attendantName,
+        [FromQuery] QueryStringParameters parameters)
+    {
+        var attendantAccounts =
+            _userRepository.SearchAttendantByName(ownerId, attendantName, parameters);
+        var result = attendantAccounts.Select((x, ind) => new
+        {
+            Key = ind + 1,
+            x.Id,
+            x.Username,
+            FullName = x.FirstName + " " + x.LastName,
+            x.Address,
+            x.PhoneNumber,
+            ParkingZone = x.ParkingZoneAttendant!.ParkingZone.Name,
+            x.IsBlock
+        }).ToList();
+        var metadata = new
+        {
+            attendantAccounts.TotalCount,
+            attendantAccounts.PageSize,
+            attendantAccounts.CurrentPage,
+            attendantAccounts.TotalPages,
+            attendantAccounts.HasNext,
+            attendantAccounts.HasPrev,
+            Data = result
+        };
+        return Ok(metadata);
     }
 }

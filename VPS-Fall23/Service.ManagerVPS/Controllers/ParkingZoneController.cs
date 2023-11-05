@@ -25,6 +25,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     private readonly FileManagementConfig _fileManagementConfig;
     private readonly IContractRepository _contractRepository;
     readonly IParkingTransactionRepository parkingTransactionRepository;
+
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
         IContractRepository contractRepository,
@@ -86,7 +87,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    //[FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
+    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
     public IActionResult GetAll([FromQuery] QueryStringParameters parameters)
     {
         try
@@ -99,8 +100,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
             if (userToken.RoleId == 2)
             {
                 Guid ownerId = new Guid(userToken.UserId);
-                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZone(parameters, ownerId);
+                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZone(parameters,
+                    ownerId);
             }
+
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
             foreach (ParkingZone item in list)
             {
@@ -133,21 +136,23 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    //[FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
     public IActionResult GetByName([FromQuery] QueryStringParameters parameters, string name)
     {
         try
         {
             var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
             var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-            var list = ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
+            var list =
+                ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
 
             if (userToken.RoleId == 3) return NotFound();
             if (userToken.RoleId == 2)
             {
                 Guid ownerId = new Guid(userToken.UserId);
-                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZoneByName(parameters, name, ownerId);
+                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZoneByName(parameters,
+                    name, ownerId);
             }
 
             foreach (ParkingZone item in list)
@@ -181,7 +186,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    // [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
+    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
     public IActionResult GetAllParkingZoneByOwnerId([FromQuery] string ownerId)
     {
         var parkingZoneList =
@@ -343,7 +348,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpPut]
-    // [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
+    [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
     public async Task<IActionResult> UpdateParkingZone([FromForm] UpdateParkingZoneInput input)
     {
         var parkingZone =
@@ -453,9 +458,11 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
         return objectResults.Select(x => GetImageLink(x.Key)).ToList();
     }
+
     [HttpGet("{parkingZoneId}")]
     public async Task<int> GetBookedSlot(Guid parkingZoneId, DateTime? checkAt = null)
     {
-        return await parkingTransactionRepository.GetBookedSlot(parkingZoneId, checkAt ?? DateTime.Now);
+        return await parkingTransactionRepository.GetBookedSlot(parkingZoneId,
+            checkAt ?? DateTime.Now);
     }
 }

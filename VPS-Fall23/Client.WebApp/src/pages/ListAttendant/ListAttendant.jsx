@@ -1,85 +1,97 @@
-import { useState } from 'react';
-import { Button, Table, Space, Tag, notification } from 'antd';
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useRef, useState } from 'react';
+import { Button, Table, notification, Pagination, Input, Row, Col, Tooltip } from 'antd';
+import { LockFilled, UnlockFilled, UserAddOutlined, QuestionCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useDebounce } from 'use-debounce';
 
 import useAttendantService from '@/services/attendantServices';
+import { getAccountJwtModel } from '@/helpers';
 import ModalAdd from './components/ModalAdd';
 
 const columns = [
   {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: (text) => <a>{text}</a>,
+    title: 'Username',
+    dataIndex: 'username',
+    key: 'username'
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
+    title: 'Họ và Tên',
+    dataIndex: 'fullName',
+    key: 'fullName',
   },
   {
-    title: 'Address',
+    title: 'Địa chỉ',
     dataIndex: 'address',
     key: 'address',
   },
   {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
+    title: 'Số điện thoại',
+    key: 'phoneNumber',
+    dataIndex: 'phoneNumber'
   },
   {
-    title: 'Action',
+    title: 'Bãi đỗ xe làm việc',
+    key: 'parkingZone',
+    dataIndex: 'parkingZone'
+  },
+  {
+    title: '',
     key: 'action',
     render: (_, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
+      <>
+        {record.isBlock === false && <Button className='bg-red-600 flex items-center'><LockFilled className='text-white' /></Button>}
+        {record.isBlock === true && <Button className='bg-green-600 flex items-center'><UnlockFilled className='text-white' /></Button>}
+      </>
     ),
-  },
-];
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sydney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
   },
 ];
 
 function ListAttendant() {
   const service = useAttendantService();
+  const account = getAccountJwtModel();
 
   const [open, setOpen] = useState(false);
+  const [data, setData] = useState([]);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [searchText, setSearchText] = useState('')
+
+  const [debounceValue] = useDebounce(searchText, 500);
+
+  const getData = () => {
+    service.getListAttendant(account.UserId, pageNumber)
+      .then(res => {
+        setData(res.data.data)
+        setTotalItems(res.data.totalCount);
+      })
+  }
+  const searchData = () => {
+    service.searchAttendantByName(account.UserId, debounceValue, pageNumber)
+      .then(res => {
+        setData(res.data.data)
+        setTotalItems(res.data.totalCount);
+      })
+  }
+
+  const firstUpdate = useRef(true)
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+      getData();
+      return;
+    }
+
+    if (debounceValue.trim() === '') {
+      getData()
+    } else {
+      searchData()
+    }
+  }, [debounceValue, pageNumber])
+
+  const handleChangePage = (page) => {
+    setPageNumber(page);
+  };
 
   const handleAdd = () => {
     setOpen(true);
@@ -89,18 +101,38 @@ function ListAttendant() {
       notification.success({
         message: res.data,
       });
-      console.log(res);
     });
     setOpen(false);
   };
 
   return (
     <div className="w-[100%] mt-[20px] mx-[16px]">
-      <Button className="mb-[16px] bg-[#1890FF]" onClick={handleAdd} type="primary">
-        Thêm tài khoản
-      </Button>
+      <div className='flex justify-between items-center mb-[16px]'>
+        <div>
+          <Row>
+            <Col span={8} className='flex items-center justify-center'>
+              <p>Tìm kiếm <Tooltip title='Nhập tên cần tìm kiếm vào đây'><QuestionCircleOutlined /></Tooltip> :</p>
+            </Col>
+            <Col span={16}>
+              <Input
+                placeholder='Nhập tên...'
+                allowClear
+                onChange={e => {
+                  setSearchText(e.target.value)
+                }}
+              />
+            </Col>
+          </Row>
+        </div>
+        <Button className="bg-[#1890FF] flex items-center" onClick={handleAdd} type="primary">
+          <UserAddOutlined />Thêm tài khoản
+        </Button>
+      </div>
 
-      <Table columns={columns} dataSource={data} />
+      <Table columns={columns} dataSource={data} pagination={false} />
+      <div className="py-[16px] flex flex-row-reverse pr-[24px]">
+        <Pagination current={pageNumber} onChange={handleChangePage} total={totalItems} showSizeChanger={false} />
+      </div>
 
       <ModalAdd
         open={open}

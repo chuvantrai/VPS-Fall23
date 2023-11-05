@@ -97,7 +97,7 @@ namespace Service.ManagerVPS.Controllers
 
             var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);
 
-            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:publicBucket"), $"License-plate-images/{licensePlate}-{licensePlateScan.CheckAt}", licensePlateScan.Image, $"{licensePlate}-{licensePlateScan.CheckAt}");
+            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:privateBucket"), $"license-plate-images", licensePlateScan.Image, $"{licensePlate}_{licensePlateScan.CheckAt:yyyyMMddHHmmss}.jpg");
 
             if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {
