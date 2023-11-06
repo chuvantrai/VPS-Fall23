@@ -48,8 +48,6 @@ function ViewListParkingZoneOwner() {
   const pageSize = 10;
   const [totalItems, setTotalItems] = useState();
 
-  const formatted = moment().format('YYYY-MM-DD HH:mm:ss');
-
   const handleSearch = (e) => {
     searchDataByName(e);
     setInputValue(e);
