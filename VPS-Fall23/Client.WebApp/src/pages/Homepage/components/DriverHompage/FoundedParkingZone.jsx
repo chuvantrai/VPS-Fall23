@@ -54,7 +54,8 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
   const getListFounded = () => {
     if (!listFoundedSearch) return listFounded;
     return listFounded.filter(val => {
-      return val.detailAddress.toLowerCase().trim().includes(listFoundedSearch.toLowerCase().trim());
+      return val.detailAddress.toLowerCase().trim().includes(listFoundedSearch.toLowerCase().trim())
+        || val.name.toLowerCase().trim().includes(listFoundedSearch.toLowerCase().trim());
     })
   }
   const getFoundedParkingZonePopupContent = () => {
@@ -62,7 +63,7 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
       <>
         <Input
           type='search'
-          placeholder='Nhập để tìm nhà xe theo địa chỉ cụ thể'
+          placeholder='Nhập để tìm nhà xe...'
           onChange={({ target }) => setListFoundedSearch(target.value)}
         >
 

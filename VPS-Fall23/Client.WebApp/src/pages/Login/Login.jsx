@@ -3,12 +3,10 @@ import classNames from 'classnames/bind';
 import { Button, Checkbox, Col, Form, Input, Row } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import config from '@/config/index.js';
 import { useAxios } from '@/hooks/index.js';
 import Cookies from 'js-cookie';
 import { convertAccountDataToCode, getAccountJwtModel, keyNameCookies } from '@/helpers/index.js';
 import store from '@/stores/index.jsx';
-import { useSelector } from 'react-redux';
 import { setAccountDataJwt } from '@/stores/account/account.store.js';
 
 const cx = classNames.bind(styles);
@@ -50,7 +48,7 @@ function Login() {
         accountJwtModel.Expires = null;
         accountJwtModel.ModifiedAt = null;
         store.dispatch(setAccountDataJwt({ accountDataJwt: accountJwtModel }));
-        navigate('/');
+        window.location.href = '/';
       })
       .catch(err => {
         console.log(err);
@@ -137,7 +135,7 @@ function Login() {
               </Col>
               <Col span={4}>
                 <Link
-                  to={config.routes.forgotPassword}
+                  to={'forgot-password'}
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >
@@ -160,7 +158,7 @@ function Login() {
               </Col>
               <Col span={4} className={'flex justify-center h-[32px] items-center'}>
                 <Link
-                  to={config.routes.register}
+                  to={'register'}
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >

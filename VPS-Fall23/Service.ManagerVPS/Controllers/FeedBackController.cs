@@ -2,6 +2,7 @@
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -24,9 +25,16 @@ public class FeedBackController : VpsController<Feedback>
         var parkingTransaction =
             await _parkingTransactionRepository.GetParkingTransactionByIdEmail(request.ParkingZoneId, request.Email);
         if (parkingTransaction == null) throw new ClientException(5008);
-        
+
         var feedBackResult = await ((IFeedBackRepository)vpsRepository).CreateFeedBack(request, parkingTransaction.ParkingZone);
         if (feedBackResult != 200) throw new ClientException(feedBackResult);
         return Ok();
+    }
+    [HttpGet("{parkingZoneId}")]
+    public QueryResponseModel<Feedback> GetFeedbacksByParkingZone(Guid parkingZoneId, int page = 1, int pageSize = 10)
+    {
+        var result = new QueryResponseModel<Feedback>(page, pageSize, vpsRepository.Entities.Where(p => p.ParkingZoneId == parkingZoneId).OrderByDescending(p => p.Rate));
+        return result;
+
     }
 }

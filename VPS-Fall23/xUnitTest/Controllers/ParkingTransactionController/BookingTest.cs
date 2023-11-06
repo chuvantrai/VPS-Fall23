@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.VNPay;
@@ -209,8 +211,11 @@ parkingZone
             parkingTransactionController = new Service.ManagerVPS.Controllers.ParkingTransactionController(
                parkingTransactionRepo,
                 googleApiService,
+                FakeItEasy.A.Fake<IOptions<FileManagementConfig>>(),
                 options,
+                 FakeItEasy.A.Fake<IConfiguration>(),
                parkingZoneRepo,
+
                 paymentTransactionRepository);
         }
         [Fact]
