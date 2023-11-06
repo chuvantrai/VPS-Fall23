@@ -1,6 +1,4 @@
-﻿using Service.ManagerVPS.Constants.Enums;
-
-namespace Service.ManagerVPS.DTO.OtherModels;
+﻿namespace Service.ManagerVPS.DTO.OtherModels;
 
 public class UserTokenHeader
 {

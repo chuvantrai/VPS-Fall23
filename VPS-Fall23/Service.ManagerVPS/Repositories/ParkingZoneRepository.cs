@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
@@ -34,7 +33,7 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
             parameters.PageSize);
     }
-    
+
     public PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters, string name)
     {
         var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name));
@@ -42,11 +41,19 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             parameters.PageSize);
     }
 
-    public PagedList<ParkingZone> GetParkingZoneByOwner(QueryStringParameters parameters, string owner)
+    public PagedList<ParkingZone> GetParkingZoneByOwner(QueryStringParameters parameters,
+        string owner)
     {
-        var parkingZone = entities.Include(o => o.Owner).Where(x => x.Owner.Email == owner);
+        var parkingZone = entities.Include(o => o.Owner)
+            .Where(x => x.Owner.Email == owner);
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
             parameters.PageSize);
+    }
+
+    public List<ParkingZone> GetParkingZoneByOwnerId(string ownerId)
+    {
+        var list = entities.Where(x => x.OwnerId.ToString().ToLower().Equals(ownerId)).ToList();
+        return list;
     }
 
     public ParkingZone? GetParkingZoneById(Guid id)
@@ -76,7 +83,7 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             Owner = parkingZone.Owner,
             NumberOfParkingZones = numberOfParkingZone
         };
-        
+
         return result;
     }
 
@@ -87,7 +94,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .Include(p => p.Commune)
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
-            .Where(p => p.Commune.District.CityId == cityId);
+            .Where(p => p.Commune.District.CityId == cityId
+            && p.IsFull == false
+            && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByCommuneId(Guid communeId)
@@ -96,7 +105,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .Include(p => p.Commune)
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
-            .Where(p => p.CommuneId == communeId);
+            .Where(p => p.CommuneId == communeId
+            && p.IsFull == false
+            && !p.ParkingZoneAbsents.Any(pa => pa.From<= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByDistrictId(Guid districtId)
@@ -104,7 +115,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
         return entities.Include(p => p.Owner)
             .Include(p => p.Commune)
             .ThenInclude(c => c.District)
-            .ThenInclude(d => d.City).Where(p => p.Commune.DistrictId == districtId);
+            .ThenInclude(d => d.City).Where(p => p.Commune.DistrictId == districtId
+            && p.IsFull == false
+            && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public PagedList<ParkingZone> GetRequestedParkingZones(QueryStringParameters parameters)
@@ -114,5 +127,13 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .OrderBy(p => p.SubId);
         return PagedList<ParkingZone>.ToPagedList(requestedParkingZones, parameters.PageNumber,
             parameters.PageSize);
+    }
+
+    public ParkingZone? GetParkingZoneAndAbsentById(Guid parkingZoneId)
+    {
+        var parkingZone = entities
+            .Include(x => x.ParkingZoneAbsents)
+            .FirstOrDefault(x => x.Id.Equals(parkingZoneId));
+        return parkingZone;
     }
 }

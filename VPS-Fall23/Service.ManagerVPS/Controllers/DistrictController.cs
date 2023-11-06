@@ -12,7 +12,7 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpGet("GetByCity/{cityId}")]
-        public async Task<IEnumerable<District>> GetCommuneByDistrict(Guid cityId)
+        public async Task<IEnumerable<District>> GetDistrictByCityId(Guid cityId)
         {
             return await ((IDistrictRepository)this.vpsRepository).GetByCity(cityId);
         }

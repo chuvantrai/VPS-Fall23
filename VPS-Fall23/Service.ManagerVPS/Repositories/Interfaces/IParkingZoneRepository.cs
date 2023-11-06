@@ -11,6 +11,9 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
     PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters, string name);
     PagedList<ParkingZone> GetOwnerParkingZoneByName(QueryStringParameters parameters, string name, Guid id);
     PagedList<ParkingZone> GetParkingZoneByOwner(QueryStringParameters parameters, string owner);
+
+    List<ParkingZone> GetParkingZoneByOwnerId(string ownerId);
+    
     ParkingZone? GetParkingZoneById(Guid id);
 
     ParkingZoneAndOwnerOutput? GetParkingZoneAndOwnerByParkingZoneId(Guid id);
@@ -22,4 +25,6 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
     IQueryable<ParkingZone> GetByDistrictId(Guid districtId);
 
     PagedList<ParkingZone> GetRequestedParkingZones(QueryStringParameters parameters);
+
+    ParkingZone? GetParkingZoneAndAbsentById(Guid parkingZoneId);
 }

@@ -1,5 +1,4 @@
 ﻿using Client.MobileApp.Models;
-using System.Net;
 using System.Net.Http.Json;
 using Client.MobileApp.Constants;
 using System.Text.Json;
@@ -22,6 +21,22 @@ namespace Client.MobileApp.ViewModels
         {
 
             HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS61, checkLicensePlate);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                string errorResponse = await response.Content.ReadAsStringAsync();
+                var error = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
+                return $"{error.Code}{error.Message}";
+            }
+        }
+
+        public async Task<string> CheckOutConfirm(LicensePlateInput checkLicensePlate)
+        {
+            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_2, checkLicensePlate);
 
             if (response.IsSuccessStatusCode)
             {

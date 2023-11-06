@@ -6,7 +6,6 @@ import { Button, Form, Input, Row, Col, DatePicker } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 import styles from './Register.module.scss';
-import config from '@/config';
 import useAuthService from '@/services/authService';
 
 const cx = classNames.bind(styles);
@@ -62,7 +61,7 @@ function Register() {
           <h5
             className={cx(
               'register-form-text  flex flex-col justify-center items-start self-stretch' +
-                'text-[color:var(--character-title-85,rgba(0,0,0,0.85))] text-[16px] not-italic font-medium leading-6',
+              'text-[color:var(--character-title-85,rgba(0,0,0,0.85))] text-[16px] not-italic font-medium leading-6',
             )}
           >
             Đăng ký
@@ -199,7 +198,7 @@ function Register() {
               <Col span={12}>
                 <Form.Item>
                   <Link
-                    to={config.routes.login}
+                    to={'/login'}
                     className={cx('login-link')}
                     style={{
                       color: '#1677ff',
@@ -213,7 +212,7 @@ function Register() {
           </Form>
         </div>
 
-        {account && <Navigate to={config.routes.verifyEmail} replace={true} state={account} />}
+        {account && <Navigate to={'verify-email'} replace={true} state={account} />}
       </div>
     </div>
   );

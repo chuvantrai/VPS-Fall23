@@ -36,6 +36,18 @@
     "message": "Email của bạn chưa được đăng ký!"
   },
   {
+    "code": 2004,
+    "message": "Tên đăng nhập đã tồn tại! Vui lòng chọn tên đăng nhập khác!"
+  },
+  {
+    "code": 2005,
+    "message": "Bãi đỗ xe không tồn tại!"
+  },
+  {
+    "code": 2006,
+    "message": "Bãi đỗ xe đã bị từ chối hoặc đang trong quá trình xử lý không thể thêm tài khoản cho nhân viên!"
+  },
+  {
     "code": 1001,
     "message": "Có lỗi khi lấy vị trí bản đồ"
   },
@@ -46,6 +58,14 @@
   {
     "code": 1003,
     "message": "Biển số này đã được đặt trước đó vào khoảng thời gian này, vui lòng kiểm tra lại"
+  },
+  {
+    "code": 1004,
+    "message": "Nhà xe không còn chỗ trống trong khoảng thời gian vào bạn đã chọn, vui lòng chọn khoảng thời gian khác"
+  },
+  {
+    "code": 1005,
+    "message": "Nhà xe không còn chỗ trống trong khoảng thời gian ra bạn đã chọn, vui lòng chọn khoảng thời gian khác"
   },
   {
     "code": 3000,

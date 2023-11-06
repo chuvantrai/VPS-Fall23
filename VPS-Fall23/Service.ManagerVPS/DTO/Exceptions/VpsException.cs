@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace Service.ManagerVPS.DTO.Exceptions
+﻿namespace Service.ManagerVPS.DTO.Exceptions
 {
     [Serializable]
     public abstract class VpsException : Exception

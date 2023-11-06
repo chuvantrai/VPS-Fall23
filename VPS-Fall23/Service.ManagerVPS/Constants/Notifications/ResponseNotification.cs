@@ -32,5 +32,10 @@ public static class ResponseNotification
     public const string CHECKIN_ERROR = "Checkin thất bại";
     public const string CHECKOUT_SUCCESS = "Checkout thành công";
     public const string CHECKOUT_ERROR = "Checkout thất bại";
+    public const string CHECKOUT_CONFIRM = "Chưa trả tiền xe";
     public const string NO_DATA = "Không có dữ liệu";
+    public const string CONFIRM_ERROR = "Xác nhận thất bại";
+    public const string CONFIRM_SUCCESS = "Xác nhận thành công";
+    public const string BOOKING_ERROR = "Bãi đỗ xe đã hết chỗ";
+    public const string OVERTIME_CONFIRM = "Số tiền bạn phải trả là : ";
 }

@@ -34,15 +34,29 @@ public partial class VPS61 : Popup
                 {
                     LicensePlate = licensePlate,
                     CheckAt = DateTime.Now,
-                    CheckBy = new Guid("D20939C1-7FA6-4DBB-B54A-3F6656AFA00E")
+                    CheckBy = Constant.USER
                 };
 
-                string apiResponse = await _viewModel.CheckLicensePLate(checkLicensePlate);
+                string response_1 = await _viewModel.CheckLicensePLate(checkLicensePlate);
 
-                MainThread.BeginInvokeOnMainThread(async () =>
+                if (response_1 == Constant.CHECKOUT_CONFIRM)
                 {
-                    await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, apiResponse, Constant.CANCEL);
-                });
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        var answer = await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
+
+                        if (answer.ToString() == Constant.ACCEPT)
+                        {
+                            string response_2 = await _viewModel.CheckOutConfirm(checkLicensePlate);
+
+                            await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
+                        }
+                    });
+                }
             }
             else
             {

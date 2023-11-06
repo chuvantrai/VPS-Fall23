@@ -1,5 +1,4 @@
 ﻿using Client.MobileApp.Models;
-using System.Net;
 using System.Net.Http.Json;
 using Client.MobileApp.Constants;
 using System.Text.Json;
@@ -36,68 +35,19 @@ namespace Client.MobileApp.ViewModels
             }
         }
 
-        public async Task<FileResult> OpenMediaPickerAsync()
+        public async Task<string> CheckOutConfirm(LicensePlateScan checkLicensePlate)
         {
-            try
+            HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_1, checkLicensePlate);
+
+            if (response.IsSuccessStatusCode)
             {
-                var result = await MediaPicker.PickPhotoAsync(new MediaPickerOptions
-                {
-                    Title = "Please a pick photo"
-                });
-
-                if (result.ContentType == "image/png" ||
-                    result.ContentType == "image/jpeg" ||
-                    result.ContentType == "image/jpg")
-                    return result;
-                else
-                    await App.Current.MainPage.DisplayAlert("Error Type Image", "Please choose a new image", "Ok");
-
-                return null;
+                return await response.Content.ReadAsStringAsync();
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine(ex.Message);
-                return null;
-            }
-        }
-
-        public async Task<Stream> FileResultToStream(FileResult fileResult)
-        {
-            if (fileResult == null)
-                return null;
-
-            return await fileResult.OpenReadAsync();
-        }
-
-        public string ByteBase64ToString(byte[] bytes)
-        {
-            return Convert.ToBase64String(bytes);
-        }
-
-        public async Task<ImageFile> Upload(FileResult fileResult)
-        {
-            byte[] bytes;
-
-            try
-            {
-                using (var ms = new MemoryStream())
-                {
-                    var stream = await FileResultToStream(fileResult);
-                    stream.CopyTo(ms);
-                    bytes = ms.ToArray();
-                }
-
-                return new ImageFile
-                {
-                    byteBase64 = ByteBase64ToString(bytes),
-                    ContentType = fileResult.ContentType,
-                    FileName = fileResult.FileName
-                };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
+                string errorResponse = await response.Content.ReadAsStringAsync();
+                var error = JsonSerializer.Deserialize<ErrorResponse>(errorResponse);
+                return $"{error.Code}{error.Message}";
             }
         }
     }

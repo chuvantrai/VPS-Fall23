@@ -9,16 +9,21 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using Xunit.Abstractions;
 
 namespace xUnitTest.Controllers;
 
-public class AuthControllerTests
+public class AuthControllerTests : GlobalBase
 {
     private readonly IUserRepository _userRepository = A.Fake<IUserRepository>();
     private readonly IGeneralVPS _generalVps = A.Fake<IGeneralVPS>();
     private readonly IParkingZoneOwnerRepository _ownerRepository = A.Fake<IParkingZoneOwnerRepository>();
     private readonly IConfiguration _config = A.Fake<IConfiguration>();
     private readonly IOptions<FileManagementConfig> options = A.Fake<IOptions<FileManagementConfig>>();
+
+    public AuthControllerTests(ITestOutputHelper output) : base(output)
+    {
+    }
 
     [Fact]
     public void AuthController_Register_ReturnOK()
@@ -38,7 +43,7 @@ public class AuthControllerTests
         A.CallTo(() => _ownerRepository.Create(parkingZoneOwner));
 
         var controller = new AuthController(_userRepository, _generalVps, _ownerRepository, _config, options);
-
+        base.output.WriteLine(existedAccount.Id.ToString());
         var result = controller.Register(input);
 
         result.Should().BeOfType(typeof(Task<IActionResult>));

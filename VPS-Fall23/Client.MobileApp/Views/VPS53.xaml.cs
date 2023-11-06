@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Views;
 using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
+using Client.MobileApp.Extensions;
 
 namespace Client.MobileApp.Views;
 
@@ -17,7 +18,7 @@ public partial class VPS53 : ContentPage
         _viewModel = viewModel;
     }
 
-    private void cameraView_CamerasLoaded(object sender, EventArgs e)
+    private void CameraView_CamerasLoaded(object sender, EventArgs e)
     {
         if (cameraView.Cameras.Count > 0)
         {
@@ -42,25 +43,35 @@ public partial class VPS53 : ContentPage
             var imageSource = cameraView.GetSnapShot();
             Stream imageSourceStream = await ((StreamImageSource)imageSource).Stream.Invoke(CancellationToken.None);
 
-            byte[] imageBytes;
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                await imageSourceStream.CopyToAsync(memoryStream);
-                imageBytes = memoryStream.ToArray();
-            }
-
+            var imageBytes = await Logic.ConvertStreamToByteArray(imageSourceStream);
+            
             if (imageBytes != null)
             {
                 var checkLicensePlate = new LicensePlateScan
                 {
                     Image = imageBytes,
                     CheckAt = DateTime.Now,
-                    CheckBy = new Guid("D20939C1-7FA6-4DBB-B54A-3F6656AFA00E")
+                    CheckBy = Constant.USER
                 };
 
-                string apiResponse = await _viewModel.CheckLicensePLate(checkLicensePlate);
+                string response_1 = await _viewModel.CheckLicensePLate(checkLicensePlate);
 
-                await DisplayAlert(Constant.NOTIFICATION, apiResponse, Constant.CANCEL);
+                if (response_1 == Constant.CHECKOUT_CONFIRM || response_1.Contains(Constant.OVERTIME_CONFIRM))
+                {
+                    var answer = await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
+
+                    if (answer.ToString() == Constant.ACCEPT)
+                    {
+                        string response_2 = await _viewModel.CheckOutConfirm(checkLicensePlate);
+
+                        await DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
+                    }
+                }
+                else
+                {
+                    await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
+                }
+
             }
             else
             {
@@ -79,9 +90,50 @@ public partial class VPS53 : ContentPage
 
     private async void ImageButton_Clicked(object sender, EventArgs e)
     {
-        var image = await _viewModel.OpenMediaPickerAsync();
-        var imagefile = await _viewModel.Upload(image);
+        try
+        {
+            var imageBytes = await Logic.ConvertFileResultToByteArray(await Logic.OpenMediaPickerAsync());
+            if (imageBytes != null)
+            {
+                var checkLicensePlate = new LicensePlateScan
+                {
+                    Image = imageBytes,
+                    CheckAt = DateTime.Now,
+                    CheckBy = Constant.USER
+                };
 
+                string response_1 = await _viewModel.CheckLicensePLate(checkLicensePlate);
+
+                if (response_1 == Constant.CHECKOUT_CONFIRM)
+                {
+                    var answer = await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
+
+                    if(answer.ToString() == Constant.ACCEPT)
+                    {
+                        string response_2 = await _viewModel.CheckOutConfirm(checkLicensePlate);
+
+                        await DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
+                    }
+                }
+                else
+                {
+                    await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
+                }
+
+            }
+            else
+            {
+                await DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
+            }
+        }
+        catch (Exception ex)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
+            });
+
+        }
     }
 
     private void LincenseButton_Clicked(object sender, EventArgs e)

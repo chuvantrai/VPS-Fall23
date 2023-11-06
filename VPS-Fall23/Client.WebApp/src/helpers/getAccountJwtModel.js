@@ -10,7 +10,7 @@ const getAccountJwtModel = () => {
       FirstName: decodedToken.FirstName,
       LastName: decodedToken.LastName,
       Email: decodedToken.Email,
-      RoleId: +decodedToken.RoleId,
+      RoleId: decodedToken.RoleId,
       RoleName: decodedToken.RoleName,
       Avatar: decodedToken.Avatar,
       Expires: new Date(decodedToken.Expires),

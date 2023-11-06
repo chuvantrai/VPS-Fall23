@@ -20,48 +20,23 @@ import {
   TimePicker,
   Pagination,
   AutoComplete,
+  Divider,
+  Popconfirm,
+  notification,
 } from 'antd';
-import { FormOutlined, UploadOutlined } from '@ant-design/icons';
+import { FormOutlined, UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 import useParkingZoneService from '@/services/parkingZoneService';
 import { getAccountJwtModel } from '@/helpers';
 import AddressCascader from '@/components/cascader/AddressCascader';
 import { useDebounce } from 'use-debounce';
+import CloseModalForm from './components/CloseModalForm';
 
 const onChange = (pagination, filters, sorter, extra) => {
   console.log('params', pagination, filters, sorter, extra);
 };
 
 function ViewListParkingZone() {
-  const columnsModel = [
-    {
-      title: 'Tên',
-      dataIndex: 'name',
-    },
-    {
-      title: 'Chủ sở hữu',
-      dataIndex: 'owner',
-    },
-    {
-      title: 'Ngày tạo',
-      dataIndex: 'created',
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            handleGetParkingZoneDetail(record.key, record.isApprove);
-          }}
-        >
-          <FormOutlined />
-        </a>
-      ),
-    },
-  ];
-
   const [form] = Form.useForm();
 
   const parkingZoneService = useParkingZoneService();
@@ -77,6 +52,8 @@ function ViewListParkingZone() {
   const [help, setHelp] = useState('');
   const [address, setAddress] = useState([]);
   const [workingTime, setWorkingTime] = useState('');
+  const [openCloseModal, setOpenCloseModal] = useState(false);
+  const [parkingZoneId, setParkingZoneId] = useState('');
 
   const handleGetParkingZoneDetail = async (parkingZoneId, isApprove) => {
     await parkingZoneService.getParkingZoneDetail(parkingZoneId).then((res) => {
@@ -99,10 +76,14 @@ function ViewListParkingZone() {
       setFileList(files);
     });
 
-    if (account.RoleId === '1' || (account.RoleId === '2' && isApprove === true)) {
+    if (account.RoleId === '1') {
       setIsModalViewOpen(true);
     } else if (account.RoleId === '2') {
-      setIsModalEditOpen(true);
+      if (isApprove === true) {
+        setIsModalViewOpen(true);
+      } else {
+        setIsModalEditOpen(true);
+      }
     }
   };
 
@@ -133,24 +114,22 @@ function ViewListParkingZone() {
 
   const columns = [
     {
-      title: 'Name',
+      title: 'Tên bãi đỗ xe',
       dataIndex: 'name',
       key: 'name',
-      width: '30%',
     },
     {
-      title: 'Owner',
+      title: 'Chủ bãi đỗ xe',
       dataIndex: 'owner',
       key: 'owner',
-      width: '20%',
     },
     {
-      title: 'Created',
+      title: 'Ngày tạo',
       dataIndex: 'created',
       key: 'created',
     },
     {
-      title: 'Status',
+      title: 'Trạng thái duyệt',
       dataIndex: 'status',
       key: 'status',
       render: (val) => (
@@ -176,9 +155,36 @@ function ViewListParkingZone() {
     {
       title: '',
       key: 'action',
-      render: () => (
-        <Space size="middle">
-          <a>Detail</a>
+      render: (_, record) => (
+        <Space split={<Divider type="vertical" />}>
+          <a
+            onClick={(e) => {
+              e.preventDefault();
+              handleGetParkingZoneDetail(record.key, record.status);
+            }}
+          >
+            <FormOutlined />
+          </a>
+
+          <Popconfirm
+            title="Đóng cửa bãi đỗ xe"
+            description="Bạn có chắc muốn đóng cửa bãi đỗ xe này?"
+            onConfirm={() => {
+              handleOpenCloseModal(record.key);
+            }}
+            onCancel={() => {
+              console.log('cancel');
+            }}
+            icon={
+              <QuestionCircleOutlined
+                style={{
+                  color: 'red',
+                }}
+              />
+            }
+          >
+            <Button danger>Đóng cửa</Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -230,6 +236,11 @@ function ViewListParkingZone() {
           console.error('Error fetching data:', error);
         });
     }
+  };
+
+  const handleOpenCloseModal = (parkingZoneId) => {
+    setOpenCloseModal(true);
+    setParkingZoneId(parkingZoneId);
   };
 
   const handleChangePage = (page) => {
@@ -318,25 +329,6 @@ function ViewListParkingZone() {
 
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
-  const formItemLayout = {
-    labelCol: {
-      xs: {
-        span: 24,
-      },
-      sm: {
-        span: 4,
-      },
-    },
-    wrapperCol: {
-      xs: {
-        span: 24,
-      },
-      sm: {
-        span: 20,
-      },
-    },
-  };
-
   const handleChangeSwitch = (checked) => {
     const params = {
       parkingZoneId: parkingZoneDetail.id,
@@ -374,6 +366,26 @@ function ViewListParkingZone() {
       // parkingZoneService.updateParkingZone(formData);
       console.log(values);
     }
+  };
+
+  const handleSubmitCloseParkingZoneForm = (values) => {
+    let input = {};
+    if (typeof values.closeTime === 'object') {
+      input = {
+        parkingZoneId: values.parkingZoneId,
+        reason: values.reason,
+        closeFrom: values.closeTime[0],
+        closeTo: values.closeTime[1],
+      };
+    } else {
+      input = {
+        parkingZoneId: values.parkingZoneId,
+        reason: values.reason,
+        closeFrom: values.closeTime,
+      };
+    }
+    parkingZoneService.closeParkingZone(input);
+    setOpenCloseModal(false);
   };
 
   return (
@@ -422,7 +434,7 @@ function ViewListParkingZone() {
         )}
         width={600}
       >
-        <Form {...formItemLayout} form={form} name="editForm" style={{ maxWidth: '600px' }} labelWrap>
+        <Form form={form} name="editForm" style={{ maxWidth: '600px' }} layout="vertical">
           <Form.Item className="hidden" name="id">
             <Input type="hidden" />
           </Form.Item>
@@ -575,6 +587,15 @@ function ViewListParkingZone() {
         </Image.PreviewGroup>
         <Descriptions bordered items={descItems} column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }} />
       </Modal>
+
+      <CloseModalForm
+        open={openCloseModal}
+        parkingZoneId={parkingZoneId}
+        onCancel={() => {
+          setOpenCloseModal(false);
+        }}
+        onClose={handleSubmitCloseParkingZoneForm}
+      />
     </Fragment>
   );
 }

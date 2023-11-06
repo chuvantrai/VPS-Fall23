@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Quartz;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.FileManagement;
 using Service.ManagerVPS.Constants.Notifications;
@@ -12,11 +13,11 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Ouput;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
-using static Google.Cloud.Vision.V1.ProductSearchResults.Types;
 
 namespace Service.ManagerVPS.Controllers;
 
@@ -25,15 +26,23 @@ public class ParkingZoneController : VpsController<ParkingZone>
     private readonly IConfiguration _config;
     private readonly FileManagementConfig _fileManagementConfig;
     private readonly IContractRepository _contractRepository;
+    readonly IParkingTransactionRepository parkingTransactionRepository;
+    private readonly IParkingZoneAbsentRepository _absentRepository;
+    private readonly IScheduler _scheduler;
 
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
-        IContractRepository contractRepository)
+        IContractRepository contractRepository,
+        IParkingTransactionRepository parkingTransactionRepository,
+        IParkingZoneAbsentRepository absentRepository, IScheduler scheduler)
         : base(parkingZoneRepository)
     {
         _config = config;
         _fileManagementConfig = options.Value;
         _contractRepository = contractRepository;
+        this.parkingTransactionRepository = parkingTransactionRepository;
+        _absentRepository = absentRepository;
+        _scheduler = scheduler;
     }
 
     [HttpPost]
@@ -85,7 +94,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    //[FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
+    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
     public IActionResult GetAll([FromQuery] QueryStringParameters parameters)
     {
         try
@@ -98,8 +107,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
             if (userToken.RoleId == 2)
             {
                 Guid ownerId = new Guid(userToken.UserId);
-                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZone(parameters, ownerId);
+                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZone(parameters,
+                    ownerId);
             }
+
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
             foreach (ParkingZone item in list)
             {
@@ -132,21 +143,23 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    //[FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
     public IActionResult GetByName([FromQuery] QueryStringParameters parameters, string name)
     {
         try
         {
             var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
             var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-            var list = ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
+            var list =
+                ((IParkingZoneRepository)vpsRepository).GetParkingZoneByName(parameters, name);
             List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
 
             if (userToken.RoleId == 3) return NotFound();
             if (userToken.RoleId == 2)
             {
                 Guid ownerId = new Guid(userToken.UserId);
-                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZoneByName(parameters, name, ownerId);
+                list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZoneByName(parameters,
+                    name, ownerId);
             }
 
             foreach (ParkingZone item in list)
@@ -160,6 +173,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     Status = item.IsApprove
                 });
             }
+
             var metadata = new
             {
                 list.TotalCount,
@@ -176,6 +190,20 @@ public class ParkingZoneController : VpsController<ParkingZone>
         {
             return NotFound(ex);
         }
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
+    public IActionResult GetAllParkingZoneByOwnerId([FromQuery] string ownerId)
+    {
+        var parkingZoneList =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneByOwnerId(ownerId);
+        var result = parkingZoneList.Select(x => new
+        {
+            Value = x.Id,
+            Label = x.Name
+        }).ToList();
+        return Ok(result);
     }
 
     [HttpGet]
@@ -288,6 +316,68 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.CloseParkingZone)]
+    public async Task<IActionResult> CloseParkingZone([FromBody] CloseParkingZoneInput input)
+    {
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneAndAbsentById(
+                (Guid)input.ParkingZoneId!);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        if (parkingZone.IsApprove is null or false)
+        {
+            throw new ServerException(
+                "Bãi đỗ xe đang chờ duyệt hoặc bị từ chối không thể đóng cửa!");
+        }
+
+        var absent = parkingZone.ParkingZoneAbsents.MaxBy(x => x.SubId);
+        if (absent is not null && (absent.To < DateTime.Now || absent.To is null))
+        {
+            throw new ServerException("Bãi đỗ xe đã đóng cửa!");
+        }
+
+        if (input.CloseTo is null)
+        {
+            // Tạo công việc DeleteParkingLotJob
+            var job = JobBuilder.Create<DeleteParkingZoneJob>()
+                .WithIdentity($"deleteParkingLotJob-{input.ParkingZoneId}", "group1")
+                .UsingJobData("parkingZoneId", (Guid)input.ParkingZoneId)
+                .Build();
+
+            // Tạo trigger để lên lịch công việc sau 5 ngày
+            var trigger = TriggerBuilder.Create()
+                .WithIdentity($"deleteParkingLotTrigger-{input.ParkingZoneId}", "group1")
+                .StartAt(DateTimeOffset.Now.Add(TimeSpan.FromMinutes(1)))
+                .Build();
+
+            // Lên lịch công việc
+            await _scheduler.ScheduleJob(job, trigger);
+        }
+
+        var newAbsent = new ParkingZoneAbsent
+        {
+            Id = Guid.NewGuid(),
+            ParkingZoneId = (Guid)input.ParkingZoneId,
+            From = input.CloseFrom,
+            To = input.CloseTo,
+            Reason = input.Reason,
+            CreatedAt = DateTime.Now
+        };
+        var absentAdded = await _absentRepository.Create(newAbsent);
+        if (absentAdded is null)
+        {
+            throw new ServerException(3);
+        }
+
+        await _absentRepository.SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.GetParkingZoneInfoById)]
     public async Task<IActionResult> GetParkingZoneInfoById(Guid parkingZoneId)
@@ -327,7 +417,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpPut]
-    // [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
+    [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
     public async Task<IActionResult> UpdateParkingZone([FromForm] UpdateParkingZoneInput input)
     {
         var parkingZone =
@@ -436,5 +526,12 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 true);
 
         return objectResults.Select(x => GetImageLink(x.Key)).ToList();
+    }
+
+    [HttpGet("{parkingZoneId}")]
+    public async Task<int> GetBookedSlot(Guid parkingZoneId, DateTime? checkAt = null)
+    {
+        return await parkingTransactionRepository.GetBookedSlot(parkingZoneId,
+            checkAt ?? DateTime.Now);
     }
 }

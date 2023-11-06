@@ -11,7 +11,10 @@ namespace Service.ManagerVPS.Repositories.Interfaces
 
         Task Delete<TKeyType>(params TKeyType[] keyType)
             where TKeyType : struct;
+
         Task Delete(TEntity entity);
+
+        Task DeleteRange(List<TEntity> listEntity);
 
         Task<TEntity> Update(TEntity entity);
 
