@@ -63,6 +63,10 @@ builder.Services.AddSession(options =>
 
 // orther
 builder.Services.AddHttpContextAccessor();
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenLocalhost(5001);
+});
 
 var app = builder.Build();
 
