@@ -26,4 +26,5 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
 
     PagedList<ParkingZone> GetRequestedParkingZones(QueryStringParameters parameters);
 
+    ParkingZone? GetParkingZoneAndAbsentById(Guid parkingZoneId);
 }

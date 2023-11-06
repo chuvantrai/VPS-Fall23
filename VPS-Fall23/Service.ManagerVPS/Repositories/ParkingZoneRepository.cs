@@ -128,4 +128,12 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
         return PagedList<ParkingZone>.ToPagedList(requestedParkingZones, parameters.PageNumber,
             parameters.PageSize);
     }
+
+    public ParkingZone? GetParkingZoneAndAbsentById(Guid parkingZoneId)
+    {
+        var parkingZone = entities
+            .Include(x => x.ParkingZoneAbsents)
+            .FirstOrDefault(x => x.Id.Equals(parkingZoneId));
+        return parkingZone;
+    }
 }
