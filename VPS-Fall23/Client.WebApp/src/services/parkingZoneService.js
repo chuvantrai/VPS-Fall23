@@ -140,8 +140,16 @@ const useParkingZoneService = () => {
       });
   };
   const getBookedSlot = (parkingZoneId) => {
-    return axios.get(`${BASE_URI}/GetBookedSlot/${parkingZoneId}`)
-  }
+    return axios.get(`${BASE_URI}/GetBookedSlot/${parkingZoneId}`);
+  };
+
+  const closeParkingZone = (input) => {
+    axios.put(`${BASE_URI}/CloseParkingZone`, input).then((res) => {
+      notification.success({
+        message: res?.data,
+      });
+    });
+  };
 
   return {
     getByAddress,
@@ -156,7 +164,8 @@ const useParkingZoneService = () => {
     changeParkingZoneFullStatus,
     updateParkingZone,
     getAllParkingZoneByOwnerId,
-    getBookedSlot
+    getBookedSlot,
+    closeParkingZone,
   };
 };
 
