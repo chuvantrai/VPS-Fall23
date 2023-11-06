@@ -6,10 +6,12 @@ using Service.WorkerVPS;
 using Service.WorkerVPS.BackgroundServices.ParkingZoneBackgroundServices;
 using Service.WorkerVPS.Brokers;
 using Service.WorkerVPS.Brokers.ParkingZoneJobBrokers;
+using Service.WorkerVPS.Models;
 
 IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services =>
+    .ConfigureServices((context, services) =>
     {
+        services.Configure<RabbitMQProfile>(context.Configuration.GetSection("RabbitMQ"));
         services.AddHostedService<AutoDeleteParkingZoneBackgroundService>();
         services.AddSingleton<IJobFactory, JobFactory>();
         services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();

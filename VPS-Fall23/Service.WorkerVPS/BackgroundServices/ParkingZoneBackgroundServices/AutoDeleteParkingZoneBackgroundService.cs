@@ -1,6 +1,5 @@
 ﻿using Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
-using Service.WorkerVPS.Brokers.ParkingZoneJobBrokers;
-using Service.WorkerVPS.Models.ParkingZoneJob;
+using Service.WorkerVPS.Brokers;
 
 namespace Service.WorkerVPS.BackgroundServices.ParkingZoneBackgroundServices
 {
@@ -10,8 +9,8 @@ namespace Service.WorkerVPS.BackgroundServices.ParkingZoneBackgroundServices
         public AutoDeleteParkingZoneBackgroundService(
             ILogger<AutoDeleteParkingZoneBackgroundService> logger,
             QuartzServices quartzServices,
-            AutoDeleteParkingZoneDequeue parkingZoneJobBroker)
-            : base(logger, quartzServices, parkingZoneJobBroker)
+            IRabbitMQClient rabbitMQClient)
+            : base(logger, quartzServices, rabbitMQClient)
         {
         }
 

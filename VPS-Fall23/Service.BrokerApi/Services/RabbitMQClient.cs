@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
 using Service.BrokerApi.Models;
 using System.Text;
 using System.Text.Json;
@@ -42,7 +43,11 @@ namespace Service.BrokerApi.Services
                   rabbitMQProfile.QueueIn)
         {
         }
+        public RabbitMQClient(IOptions<RabbitMQProfile> options)
+            :this(options.Value)
+        {
 
+        }
         public Task SendMessageAsync<T>(T message)
         {
             string jsonMsg = JsonSerializer.Serialize(message);

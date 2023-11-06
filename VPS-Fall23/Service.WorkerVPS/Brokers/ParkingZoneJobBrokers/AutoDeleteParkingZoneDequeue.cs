@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Extensions.Options;
 using Quartz;
 using Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
 using Service.WorkerVPS.Models;
@@ -10,8 +11,8 @@ namespace Service.WorkerVPS.Brokers.ParkingZoneJobBrokers
     internal class AutoDeleteParkingZoneDequeue : RabbitMQClient<AutoDeleteParkingZoneDto>
     {
         protected QuartzServices quartzServices;
-        public AutoDeleteParkingZoneDequeue(RabbitMQProfile rabbitMQProfile, QuartzServices quartzServices)
-            : base(rabbitMQProfile)
+        public AutoDeleteParkingZoneDequeue(IOptions<RabbitMQProfile> rabbitMQProfileConfig, QuartzServices quartzServices)
+            : base(rabbitMQProfileConfig.Value)
         {
             this.quartzServices = quartzServices;
         }
