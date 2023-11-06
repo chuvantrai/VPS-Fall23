@@ -23,5 +23,6 @@ public enum ActionFilterEnum
     GetAllParkingZoneByOwnerId,
     GetListAttendant,
     SearchAttendantByName,
-    CloseParkingZone
+    CloseParkingZone,
+    DeleteParkingZoneAndAbsent
 }
