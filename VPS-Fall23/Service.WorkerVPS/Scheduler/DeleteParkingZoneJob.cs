@@ -4,7 +4,7 @@ namespace Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
 
 public class DeleteParkingZoneJob : IJob
 {
-   
+
 
     public DeleteParkingZoneJob()
     {
@@ -13,7 +13,7 @@ public class DeleteParkingZoneJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        Console.WriteLine("Delete job start running!");
+        var parkingZoneId = context.MergedJobDataMap.GetGuid("parkingZoneId");
 
     }
 }
