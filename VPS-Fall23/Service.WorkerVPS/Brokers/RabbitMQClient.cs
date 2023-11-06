@@ -1,16 +1,20 @@
 ﻿using RabbitMQ.Client;
-using Service.BrokerApi.Models;
+using RabbitMQ.Client.Events;
+using Service.WorkerVPS.Models;
 using System.Text;
 using System.Text.Json;
 
-namespace Service.BrokerApi.Services
+namespace Service.WorkerVPS.Brokers
 {
-    public class RabbitMQClient : IRabbitMQClient
+    internal abstract class RabbitMQClient<TQueueMessageType> : IRabbitMQClient
+        where TQueueMessageType : class
+       
     {
         protected readonly IConnection connection;
         protected readonly string queueOut;
         protected readonly ushort fetchNo;
         protected readonly IModel channel;
+        protected readonly EventingBasicConsumer consumer;
         public RabbitMQClient(string endpoint,
             int port,
             string username,
@@ -32,6 +36,7 @@ namespace Service.BrokerApi.Services
             channel = connection.CreateModel();
             _ = channel.QueueDeclare(queueOut, true, false, false, null);
             channel.BasicQos(prefetchSize: 0, prefetchCount: fetchNo, global: false);
+            consumer = new(channel);
         }
         public RabbitMQClient(RabbitMQProfile rabbitMQProfile)
             : this(rabbitMQProfile.EndPoint,
@@ -43,13 +48,23 @@ namespace Service.BrokerApi.Services
         {
         }
 
-        public Task SendMessageAsync<T>(T message)
+        public Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            string jsonMsg = JsonSerializer.Serialize(message);
-            var msgBytes = Encoding.UTF8.GetBytes(jsonMsg);
-            channel.BasicPublish(string.Empty, string.Empty, null, msgBytes);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                Console.WriteLine("Broker stopped");
+                return Task.CompletedTask;
+            }
+            consumer.Received += Dequeue;
             return Task.CompletedTask;
         }
+        protected void Dequeue(object? sender, BasicDeliverEventArgs e)
+        {
+            string msgJson = Encoding.UTF8.GetString(e.Body.ToArray());
+            TQueueMessageType message = JsonSerializer.Deserialize<TQueueMessageType>(msgJson);
+            DequeueHandle(message).Wait();
+        }
+        public abstract Task DequeueHandle(TQueueMessageType message);
 
     }
 }

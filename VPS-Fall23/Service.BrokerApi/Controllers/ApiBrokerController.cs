@@ -6,9 +6,9 @@ namespace Service.BrokerApi.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public class ApiBrokerController<T> : ControllerBase
-        where T : RabbitMQClient
+        where T : IRabbitMQClient
     {
-        protected readonly RabbitMQClient rabbitMQClient;
+        protected readonly IRabbitMQClient rabbitMQClient;
         public ApiBrokerController(T rabbitMQClient)
         {
             this.rabbitMQClient = rabbitMQClient;

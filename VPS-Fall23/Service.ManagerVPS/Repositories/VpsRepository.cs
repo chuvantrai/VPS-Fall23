@@ -41,7 +41,6 @@ namespace Service.ManagerVPS.Repositories
         {
             return Task.Run(() => entities.RemoveRange(listEntity));
         }
-
         public async Task<T> Find(params object[] keys)
         {
             T entity = await this.entities.FindAsync(keys)

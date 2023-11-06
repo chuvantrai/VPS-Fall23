@@ -330,8 +330,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
         if (parkingZone.IsApprove is null or false)
         {
-            throw new ServerException(
-                "Bãi đỗ xe đang chờ duyệt hoặc bị từ chối không thể đóng cửa!");
+            throw new ServerException("Bãi đỗ xe đang chờ duyệt hoặc bị từ chối không thể đóng cửa!");
         }
 
         var absent = parkingZone.ParkingZoneAbsents.MaxBy(x => x.SubId);
@@ -367,12 +366,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
             Reason = input.Reason,
             CreatedAt = DateTime.Now
         };
-        var absentAdded = await _absentRepository.Create(newAbsent);
-        if (absentAdded is null)
-        {
-            throw new ServerException(3);
-        }
-
+        await _absentRepository.Create(newAbsent);
         await _absentRepository.SaveChange();
 
         return Ok(ResponseNotification.UPDATE_SUCCESS);
@@ -486,10 +480,9 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
     [HttpDelete("{parkingZoneId:guid}")]
     // [FilterPermission(Action = ActionFilterEnum.DeleteParkingZoneAndAbsent)]
-    public async Task<IActionResult> DeleteParkingZoneAndAbsent(Guid parkingZoneId)
+    public async Task<IActionResult> DeleteParkingZone(Guid parkingZoneId)
     {
-        var parkingZone =
-            ((IParkingZoneRepository)vpsRepository).GetParkingZoneAndAbsentById(parkingZoneId);
+        var parkingZone = await ((IParkingZoneRepository)vpsRepository).Find(parkingZoneId);
         if (parkingZone is null)
         {
             throw new ServerException(2);
@@ -499,12 +492,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
         {
             throw new ServerException("Bãi đỗ xe chưa đóng cửa!");
         }
-
-        await _absentRepository.DeleteRange(parkingZone.ParkingZoneAbsents.ToList());
-        await ((IParkingZoneRepository)vpsRepository).Delete(parkingZone);
-
-        await ((IParkingZoneRepository)vpsRepository).SaveChange();
-
+        await vpsRepository.Delete(parkingZone);
+        await vpsRepository.SaveChange();
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 

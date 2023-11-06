@@ -4,15 +4,15 @@ using Service.BrokerApi.Services;
 
 namespace Service.BrokerApi.Controllers
 {
-    public class ParkingZoneJobBrokerController : ApiBrokerController<ParkingZoneJobBroker>
+    public class ParkingZoneJobBrokerController : ApiBrokerController<IRabbitMQClient>
     {
-        public ParkingZoneJobBrokerController(ParkingZoneJobBroker rabbitMQClient) : base(rabbitMQClient)
+        public ParkingZoneJobBrokerController(IRabbitMQClient rabbitMQClient) : base(rabbitMQClient)
         {
         }
         [HttpPost("auto-delete-parking-zone")]
-        public IActionResult AutoDeleteParkingZone(AutoDeleteDto autoDeleteDto)
+        public async Task<IActionResult> AutoDeleteParkingZone(AutoDeleteDto autoDeleteDto)
         {
-            this.rabbitMQClient.ExcuteAsync(autoDeleteDto);
+            await this.rabbitMQClient.SendMessageAsync(autoDeleteDto);
             return NoContent();
         }
     }

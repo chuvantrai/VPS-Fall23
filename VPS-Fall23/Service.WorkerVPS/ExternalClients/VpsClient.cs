@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Service.WorkerVPS.ExternalClients
+﻿namespace Service.WorkerVPS.ExternalClients
 {
     internal class VpsClient
     {
         readonly RestClient restClient;
-        const string DeleteParkingZoneUri = "";
+        static string DeleteParkingZoneUri = "api/ParkingZone/DeleteParkingZone/{0}";
         public VpsClient(string baseUrl)
         {
             restClient = new RestClient(baseUrl);
         }
-        public 
+        public async Task<bool> DeleteParkingZone(Guid id)
+        {
+            string uri = string.Format(DeleteParkingZoneUri, id);
+
+            var response = await this.restClient.Delete(uri);
+            return response;
+        }
 
     }
 }

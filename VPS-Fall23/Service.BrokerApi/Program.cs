@@ -1,3 +1,6 @@
+using Service.BrokerApi.Models;
+using Service.BrokerApi.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,6 +9,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IRabbitMQClient, RabbitMQClient>(imf =>
+{
+    return new RabbitMQClient(builder.Configuration.GetValue<RabbitMQProfile>("RabbitMQ"));
+});
 
 var app = builder.Build();
 
