@@ -5,7 +5,6 @@ using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
-using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -115,5 +114,51 @@ public class FeedBackController : VpsController<Feedback>
         await ((IFeedBackRepository)vpsRepository).Create(reply);
         await ((IFeedBackRepository)vpsRepository).SaveChange();
         return Ok(ResponseNotification.ADD_SUCCESS);
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.FilterFeedback)]
+    public IActionResult FilterFeedback([FromQuery] Guid ownerId,
+        [FromQuery] QueryStringParameters parameters, [FromQuery] string? parkingZoneId,
+        [FromQuery] string? rate)
+    {
+        var lstFeedback =
+            ((IFeedBackRepository)vpsRepository).FilterFeedbackForOwner(ownerId, parameters,
+                parkingZoneId, rate);
+
+        var result = lstFeedback
+            .Select((x, index) => new
+            {
+                Key = index + 1,
+                x.SubId,
+                x.Id,
+                x.ParkingZoneId,
+                ParkingZoneName = x.ParkingZone.Name,
+                x.Email,
+                CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
+                x.Rate,
+                x.Content,
+                Replies = x.InverseParent
+                    .OrderBy(y => y.SubId)
+                    .Select((y, idx) => new
+                    {
+                        ChildKey = idx + 1,
+                        y.SubId,
+                        y.Id,
+                        y.Content
+                    })
+            }).ToList();
+
+        var metadata = new
+        {
+            lstFeedback.TotalCount,
+            lstFeedback.PageSize,
+            lstFeedback.CurrentPage,
+            lstFeedback.TotalPages,
+            lstFeedback.HasNext,
+            lstFeedback.HasPrev,
+            Data = result
+        };
+        return Ok(metadata);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
-using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -41,7 +40,6 @@ public class FeedBackRepository : VpsRepository<Feedback>, IFeedBackRepository
         QueryStringParameters parameters)
     {
         var lstFeedback = entities
-            .AsNoTracking()
             .Include(x => x.InverseParent)
             .Include(x => x.ParkingZone)
             .OrderBy(x => x.SubId)
@@ -56,5 +54,30 @@ public class FeedBackRepository : VpsRepository<Feedback>, IFeedBackRepository
         var feedback = entities
             .FirstOrDefault(x => x.Id.Equals(id));
         return feedback;
+    }
+
+    public PagedList<Feedback> FilterFeedbackForOwner(Guid ownerId,
+        QueryStringParameters parameters, string parkingZoneId, string rate)
+    {
+        var lstFeedback = entities
+            .Include(x => x.InverseParent)
+            .Include(x => x.ParkingZone)
+            .OrderBy(x => x.SubId)
+            .Where(x => x.ParkingZone.OwnerId.Equals(ownerId) && x.ParentId == null)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(parkingZoneId))
+        {
+            lstFeedback = lstFeedback.Where(x =>
+                x.ParkingZoneId.ToString().ToLower().Equals(parkingZoneId));
+        }
+
+        if (!string.IsNullOrEmpty(rate))
+        {
+            lstFeedback = lstFeedback.Where(x => x.Rate == int.Parse(rate));
+        }
+
+        return PagedList<Feedback>.ToPagedList(lstFeedback, parameters.PageNumber,
+            parameters.PageSize);
     }
 }

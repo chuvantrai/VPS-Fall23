@@ -11,4 +11,7 @@ public interface IFeedBackRepository : IVpsRepository<Feedback>
     PagedList<Feedback> GetListFeedbackForOwner(Guid ownerId, QueryStringParameters parameters);
 
     Feedback? GetFeedbackById(Guid id);
+
+    PagedList<Feedback> FilterFeedbackForOwner(Guid ownerId, QueryStringParameters parameters,
+        string parkingZoneId, string rate);
 }

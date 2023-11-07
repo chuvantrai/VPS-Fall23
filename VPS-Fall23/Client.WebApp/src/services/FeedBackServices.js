@@ -41,7 +41,19 @@ const useFeedbackServices = () => {
     });
   };
 
-  return { createFeedBack, getByParkingZone, getFeedbackForOwner, addReplyToFeedback };
+  const filterFeedback = (ownerId, pageNumber, pageSize, parkingZoneId, rate) => {
+    return axios.get(`api/FeedBack/FilterFeedback`, {
+      params: {
+        ownerId,
+        pageNumber,
+        pageSize,
+        parkingZoneId,
+        rate,
+      },
+    });
+  };
+
+  return { createFeedBack, getByParkingZone, getFeedbackForOwner, addReplyToFeedback, filterFeedback };
 };
 
 export default useFeedbackServices;
