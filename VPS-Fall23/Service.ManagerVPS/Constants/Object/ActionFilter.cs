@@ -121,6 +121,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.DeleteParkingZoneAndAbsent,
             UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetFeedbackForOwner,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 

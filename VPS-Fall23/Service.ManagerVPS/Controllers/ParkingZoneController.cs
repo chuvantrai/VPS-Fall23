@@ -11,7 +11,7 @@ using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.FileManagement;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
-using Service.ManagerVPS.DTO.Ouput;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
 using Service.ManagerVPS.ExternalClients;

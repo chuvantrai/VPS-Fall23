@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.OtherModels;
-using Service.ManagerVPS.DTO.Ouput;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -65,7 +63,8 @@ namespace Service.ManagerVPS.Controllers
             {
                 var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
                 var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-                var list = ((IParkingZoneOwnerRepository)vpsRepository).GetOwnerByEmail(parameters, email);
+                var list =
+                    ((IParkingZoneOwnerRepository)vpsRepository).GetOwnerByEmail(parameters, email);
                 List<ParkingZoneOwner> res = new List<ParkingZoneOwner>();
 
                 if (userToken.RoleId == 3 || userToken.RoleId == 2) return NotFound();
@@ -82,6 +81,7 @@ namespace Service.ManagerVPS.Controllers
                         Dob = item.Dob,
                     });
                 }
+
                 var metadata = new
                 {
                     list.TotalCount,

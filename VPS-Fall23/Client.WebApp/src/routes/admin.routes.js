@@ -1,7 +1,6 @@
 import Header from '@/layouts/components/Header';
 import AccountProfile from '@/pages/AccountProfile';
 import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
-import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
 import ViewRequestedParkingZone from '@/pages/ViewRequestedParkingZones';
 import ManagerLayout from '../layouts/ManagerLayout';
 import guidGenerator from '../helpers/guidGenerator';
