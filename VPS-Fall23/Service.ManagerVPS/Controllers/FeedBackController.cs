@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
+using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -47,7 +49,7 @@ public class FeedBackController : VpsController<Feedback>
     }
 
     [HttpGet]
-    // [FilterPermission(Action = ActionFilterEnum.GetFeedbackForOwner)]
+    [FilterPermission(Action = ActionFilterEnum.GetFeedbackForOwner)]
     public IActionResult GetFeedbackForOwner([FromQuery] Guid ownerId,
         [FromQuery] QueryStringParameters parameters)
     {
@@ -60,6 +62,11 @@ public class FeedBackController : VpsController<Feedback>
                 Key = index + 1,
                 x.SubId,
                 x.Id,
+                x.ParkingZoneId,
+                ParkingZoneName = x.ParkingZone.Name,
+                x.Email,
+                CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
+                x.Rate,
                 x.Content,
                 Replies = x.InverseParent
                     .OrderBy(y => y.SubId)

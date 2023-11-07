@@ -44,6 +44,7 @@ public class FeedBackRepository : VpsRepository<Feedback>, IFeedBackRepository
             .AsNoTracking()
             .Include(x => x.InverseParent)
             .Include(x => x.ParkingZone)
+            .OrderBy(x => x.SubId)
             .Where(x => x.ParkingZone.OwnerId.Equals(ownerId) && x.ParentId == null);
 
         return PagedList<Feedback>.ToPagedList(lstFeedback, parameters.PageNumber,
