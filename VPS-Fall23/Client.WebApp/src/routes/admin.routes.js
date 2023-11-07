@@ -4,6 +4,8 @@ import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListPar
 import ViewRequestedParkingZone from '@/pages/ViewRequestedParkingZones';
 import ManagerLayout from '../layouts/ManagerLayout';
 import guidGenerator from '../helpers/guidGenerator';
+import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
+
 export const adminRoutesConfig = {
   header: Header,
   footer: null,
