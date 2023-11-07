@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
@@ -90,5 +91,29 @@ public class FeedBackController : VpsController<Feedback>
             Data = result
         };
         return Ok(metadata);
+    }
+
+    [HttpPost]
+    [FilterPermission(Action = ActionFilterEnum.AddReplyToFeedback)]
+    public async Task<IActionResult> AddReplyToFeedback([FromBody] AddReplyToFeedbackInput input)
+    {
+        var feedback =
+            ((IFeedBackRepository)vpsRepository).GetFeedbackById((Guid)input.FeedbackId!);
+        if (feedback is null)
+        {
+            throw new ServerException(2);
+        }
+
+        var reply = new Feedback
+        {
+            Id = Guid.NewGuid(),
+            ParkingZoneId = feedback.ParkingZoneId,
+            Content = input.Content,
+            CreatedAt = DateTime.Now,
+            ParentId = feedback.Id
+        };
+        await ((IFeedBackRepository)vpsRepository).Create(reply);
+        await ((IFeedBackRepository)vpsRepository).SaveChange();
+        return Ok(ResponseNotification.ADD_SUCCESS);
     }
 }

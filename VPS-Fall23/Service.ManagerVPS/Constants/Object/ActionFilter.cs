@@ -126,6 +126,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.GetFeedbackForOwner,
             UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.AddReplyToFeedback,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 

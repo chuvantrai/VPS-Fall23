@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Table, Button } from 'antd';
+import { Table, Button, Pagination } from 'antd';
 import { useEffect, useState } from 'react';
 
 import useFeedbackServices from '@/services/feedbackServices';
@@ -69,23 +69,41 @@ function ListFeedback() {
   const [data, setData] = useState([]);
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [feedbackId, setFeedbackId] = useState('');
+  const [pageNumber, setPageNumber] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   const handleOpenReplyModal = (feedbackId) => {
     setFeedbackId(feedbackId);
     setReplyModalOpen(true);
   };
 
-  useEffect(() => {
-    service.getFeedbackForOwner(account.UserId).then((res) => {
-      setData(res.data.data);
-    });
-  }, []);
+  const handleChangePage = (page) => {
+    setPageNumber(page);
+  };
 
-  const handleReplyFeedback = (feedbackId) => {};
+  const loadData = () => {
+    service.getFeedbackForOwner(account.UserId, pageNumber).then((res) => {
+      setData(res.data.data);
+      setTotalItems(res.data.totalCount);
+    });
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [pageNumber]);
+
+  const handleReplyFeedback = (values) => {
+    service.addReplyToFeedback(values);
+    setReplyModalOpen(false);
+    loadData();
+  };
 
   return (
-    <>
-      <Table className="w-[100%]" columns={columns} dataSource={data} />
+    <div className="w-[100%]">
+      <Table columns={columns} dataSource={data} pagination={false} />
+      <div className="py-[16px] flex flex-row-reverse pr-[24px]">
+        <Pagination current={pageNumber} onChange={handleChangePage} total={totalItems} showSizeChanger={false} />
+      </div>
       <ReplyModal
         open={replyModalOpen}
         feedbackId={feedbackId}
@@ -94,7 +112,7 @@ function ListFeedback() {
           setReplyModalOpen(false);
         }}
       />
-    </>
+    </div>
   );
 }
 

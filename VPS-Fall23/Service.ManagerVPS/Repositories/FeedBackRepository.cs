@@ -50,4 +50,11 @@ public class FeedBackRepository : VpsRepository<Feedback>, IFeedBackRepository
         return PagedList<Feedback>.ToPagedList(lstFeedback, parameters.PageNumber,
             parameters.PageSize);
     }
+
+    public Feedback? GetFeedbackById(Guid id)
+    {
+        var feedback = entities
+            .FirstOrDefault(x => x.Id.Equals(id));
+        return feedback;
+    }
 }
