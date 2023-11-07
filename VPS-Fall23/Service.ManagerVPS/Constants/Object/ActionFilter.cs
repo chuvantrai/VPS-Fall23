@@ -111,6 +111,31 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.SearchAttendantByName,
             UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CloseParkingZone,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.DeleteParkingZoneAndAbsent,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetFeedbackForOwner,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.AddReplyToFeedback,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.FilterFeedback,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 

@@ -15,7 +15,7 @@ function HomepageAdmin() {
 
   return (
     <Layout className="min-h-screen">
-      <Sidebar rowData={rowData} setContentState={setContentState} />
+      <Sidebar menuItems={rowData} setContentState={setContentState} />
       <Layout
         style={{
           padding: '0 24px 24px',

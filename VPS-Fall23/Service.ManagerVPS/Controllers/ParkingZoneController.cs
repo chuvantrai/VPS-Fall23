@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Quartz;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.FileManagement;
 using Service.ManagerVPS.Constants.Notifications;
@@ -10,8 +11,9 @@ using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.FileManagement;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
-using Service.ManagerVPS.DTO.Ouput;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
@@ -25,17 +27,22 @@ public class ParkingZoneController : VpsController<ParkingZone>
     private readonly FileManagementConfig _fileManagementConfig;
     private readonly IContractRepository _contractRepository;
     readonly IParkingTransactionRepository parkingTransactionRepository;
+    private readonly IParkingZoneAbsentRepository _absentRepository;
+    private readonly IScheduler _scheduler;
 
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
         IContractRepository contractRepository,
-        IParkingTransactionRepository parkingTransactionRepository)
+        IParkingTransactionRepository parkingTransactionRepository,
+        IParkingZoneAbsentRepository absentRepository, IScheduler scheduler)
         : base(parkingZoneRepository)
     {
         _config = config;
         _fileManagementConfig = options.Value;
         _contractRepository = contractRepository;
         this.parkingTransactionRepository = parkingTransactionRepository;
+        _absentRepository = absentRepository;
+        _scheduler = scheduler;
     }
 
     [HttpPost]
@@ -309,6 +316,68 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.CloseParkingZone)]
+    public async Task<IActionResult> CloseParkingZone([FromBody] CloseParkingZoneInput input)
+    {
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneAndAbsentById(
+                (Guid)input.ParkingZoneId!);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        if (parkingZone.IsApprove is null or false)
+        {
+            throw new ServerException(
+                "Bãi đỗ xe đang chờ duyệt hoặc bị từ chối không thể đóng cửa!");
+        }
+
+        var absent = parkingZone.ParkingZoneAbsents.MaxBy(x => x.SubId);
+        if (absent is not null && (absent.To < DateTime.Now || absent.To is null))
+        {
+            throw new ServerException("Bãi đỗ xe đã đóng cửa!");
+        }
+
+        if (input.CloseTo is null)
+        {
+            // Tạo công việc DeleteParkingLotJob
+            var job = JobBuilder.Create<DeleteParkingZoneJob>()
+                .WithIdentity($"deleteParkingLotJob-{input.ParkingZoneId}", "group1")
+                .UsingJobData("parkingZoneId", (Guid)input.ParkingZoneId)
+                .Build();
+
+            // Tạo trigger để lên lịch công việc sau 5 ngày
+            var trigger = TriggerBuilder.Create()
+                .WithIdentity($"deleteParkingLotTrigger-{input.ParkingZoneId}", "group1")
+                .StartAt(DateTimeOffset.Now.Add(TimeSpan.FromMinutes(1)))
+                .Build();
+
+            // Lên lịch công việc
+            await _scheduler.ScheduleJob(job, trigger);
+        }
+
+        var newAbsent = new ParkingZoneAbsent
+        {
+            Id = Guid.NewGuid(),
+            ParkingZoneId = (Guid)input.ParkingZoneId,
+            From = input.CloseFrom,
+            To = input.CloseTo,
+            Reason = input.Reason,
+            CreatedAt = DateTime.Now
+        };
+        var absentAdded = await _absentRepository.Create(newAbsent);
+        if (absentAdded is null)
+        {
+            throw new ServerException(3);
+        }
+
+        await _absentRepository.SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.GetParkingZoneInfoById)]
     public async Task<IActionResult> GetParkingZoneInfoById(Guid parkingZoneId)
@@ -410,6 +479,30 @@ public class ParkingZoneController : VpsController<ParkingZone>
             $"parking-zone-images/{parkingZone.OwnerId}/{parkingZone.Id}", parkingZoneImgs);
 
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
+        await ((IParkingZoneRepository)vpsRepository).SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
+    [HttpDelete("{parkingZoneId:guid}")]
+    // [FilterPermission(Action = ActionFilterEnum.DeleteParkingZoneAndAbsent)]
+    public async Task<IActionResult> DeleteParkingZoneAndAbsent(Guid parkingZoneId)
+    {
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneAndAbsentById(parkingZoneId);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        if (parkingZone.ParkingZoneAbsents is null)
+        {
+            throw new ServerException("Bãi đỗ xe chưa đóng cửa!");
+        }
+
+        await _absentRepository.DeleteRange(parkingZone.ParkingZoneAbsents.ToList());
+        await ((IParkingZoneRepository)vpsRepository).Delete(parkingZone);
+
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
 
         return Ok(ResponseNotification.UPDATE_SUCCESS);

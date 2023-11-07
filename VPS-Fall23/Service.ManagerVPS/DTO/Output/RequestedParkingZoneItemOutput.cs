@@ -1,4 +1,4 @@
-﻿namespace Service.ManagerVPS.DTO.Ouput;
+﻿namespace Service.ManagerVPS.DTO.Output;
 
 public class RequestedParkingZoneItemOutput
 {

@@ -1,3 +1,6 @@
+﻿using System;
+using System.Collections.Generic;
+
 namespace Service.ManagerVPS.Models
 {
     public partial class PaymentTransaction
