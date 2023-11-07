@@ -3,6 +3,7 @@ using Client.MobileApp.ViewModels;
 using Client.MobileApp.Views;
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 
 #if ANDROID
@@ -27,6 +28,7 @@ namespace Client.MobileApp
                 .RegisterViews()
                 .UseMauiCameraView()
                 .RegisterAppServices()
+                .UseSkiaSharp()
                 ;
 
             builder.Services.AddSingleton<IBrowser>(Browser.Default);

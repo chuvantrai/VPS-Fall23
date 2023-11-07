@@ -69,7 +69,6 @@ function ViewRequestedParkingZones() {
     service
       .getRequestParkingZones({ pageNumber: currentPage })
       .then((res) => {
-        console.log(res);
         setDataSrc(res?.data.data);
         setTotalItems(res?.data.totalCount);
       })

@@ -101,6 +101,16 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.GetAllParkingZoneByOwnerId,
             UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetListAttendant,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.SearchAttendantByName,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 

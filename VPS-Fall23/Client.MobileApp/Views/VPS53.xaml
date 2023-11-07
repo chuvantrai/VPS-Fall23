@@ -5,6 +5,7 @@
              xmlns:viewmodel="clr-namespace:Client.MobileApp.ViewModels"
              x:DataType="viewmodel:VPS53ViewModel"
              Shell.NavBarIsVisible="False"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI">
     <ScrollView>
 
@@ -44,7 +45,7 @@
                            x:Name="cameraView" 
                            VerticalOptions="Start"
                            ZIndex="{Binding CameraIndex}"/>
-
+           
             <Grid Grid.Row="2" BackgroundColor="#83E9EE" ZIndex="{Binding CameraIndex}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.5*"/>
@@ -104,7 +105,7 @@
                         CornerRadius="40"/>
 
             </Grid>
-
+            <skia:SKCanvasView Grid.Row="1" x:Name="canvasView" VerticalOptions="FillAndExpand" ZIndex="{Binding CameraIndex}" PaintSurface="OnPaintSurface" />
         </Grid>
 
     </ScrollView>

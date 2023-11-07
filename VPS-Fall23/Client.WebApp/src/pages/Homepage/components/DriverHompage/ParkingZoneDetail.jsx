@@ -3,6 +3,7 @@ import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
 import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm.jsx';
+import FeedbackList from './FeedbackList';
 
 
 
@@ -82,12 +83,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
     {
       key: '2',
       label: 'Xem đánh giá',
-      children: (<Descriptions
-        bordered
-        items={getDetailDescription()}
-        size='small'
-        column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
-      />),
+      children: <FeedbackList parkingZoneId={parkingZone?.id} />
     },
     {
       key: '3',
@@ -139,6 +135,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
           <Tabs
             activeKey={tab}
             items={items}
+            destroyInactiveTabPane={true}
             onChange={onChangeTabs} />
         </div>
       </Modal>
