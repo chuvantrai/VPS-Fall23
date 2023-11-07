@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Form, Input, Modal } from 'antd';
+import { SendOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 
 const validateMessages = {
@@ -23,9 +24,12 @@ function ReplyModal({ open, feedbackId, onCreate, onCancel }) {
   return (
     <Modal
       open={open}
-      title="Thêm tài khoản"
-      centered
-      okText="Tạo"
+      title="Trả lời"
+      okText={
+        <>
+          Gửi <SendOutlined />
+        </>
+      }
       cancelText="Hủy"
       onCancel={onCancel}
       onOk={() => {

@@ -33,7 +33,15 @@ const useFeedbackServices = () => {
     });
   };
 
-  return { createFeedBack, getByParkingZone, getFeedbackForOwner };
+  const addReplyToFeedback = (input) => {
+    axios.post(`api/FeedBack/AddReplyToFeedback`, input).then((res) => {
+      notification.success({
+        message: res.data,
+      });
+    });
+  };
+
+  return { createFeedBack, getByParkingZone, getFeedbackForOwner, addReplyToFeedback };
 };
 
 export default useFeedbackServices;
