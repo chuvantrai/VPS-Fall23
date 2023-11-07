@@ -97,7 +97,6 @@ function ViewListParkingZone() {
   };
 
   const [data, setData] = useState([{ key: '', id: '', name: '', owner: '', status: 'null', created: Date }]);
-  let dataShow = [{ key: '', name: '', owner: '', status: 'null', created: Date }];
 
   const [inputValue, setInputValue] = useState('');
 

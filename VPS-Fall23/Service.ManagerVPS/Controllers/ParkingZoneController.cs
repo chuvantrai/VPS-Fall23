@@ -484,6 +484,30 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
+    [HttpDelete("{parkingZoneId:guid}")]
+    // [FilterPermission(Action = ActionFilterEnum.DeleteParkingZoneAndAbsent)]
+    public async Task<IActionResult> DeleteParkingZoneAndAbsent(Guid parkingZoneId)
+    {
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneAndAbsentById(parkingZoneId);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        if (parkingZone.ParkingZoneAbsents is null)
+        {
+            throw new ServerException("Bãi đỗ xe chưa đóng cửa!");
+        }
+
+        await _absentRepository.DeleteRange(parkingZone.ParkingZoneAbsents.ToList());
+        await ((IParkingZoneRepository)vpsRepository).Delete(parkingZone);
+
+        await ((IParkingZoneRepository)vpsRepository).SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
     [HttpGet]
     public IEnumerable<ParkingZone> GetByAddress(Guid id,
         AddressType addressType = AddressType.Commune)
