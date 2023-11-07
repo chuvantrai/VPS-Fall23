@@ -9,15 +9,13 @@ namespace Service.BrokerApi.Services
     public class RabbitMQClient : IRabbitMQClient
     {
         protected readonly IConnection connection;
-        protected readonly string queueOut;
         protected readonly ushort fetchNo;
         protected readonly IModel channel;
         public RabbitMQClient(string endpoint,
             int port,
             string username,
             string password,
-            ushort fetchNo,
-            string queueOut)
+            ushort fetchNo)
         {
             var connectionFactory = new ConnectionFactory()
             {
@@ -29,9 +27,7 @@ namespace Service.BrokerApi.Services
             };
             connection = connectionFactory.CreateConnection();
             this.fetchNo = fetchNo;
-            this.queueOut = queueOut;
             channel = connection.CreateModel();
-            _ = channel.QueueDeclare(queueOut, true, false, false, null);
             channel.BasicQos(prefetchSize: 0, prefetchCount: fetchNo, global: false);
         }
         public RabbitMQClient(RabbitMQProfile rabbitMQProfile)
@@ -39,8 +35,7 @@ namespace Service.BrokerApi.Services
                   rabbitMQProfile.Port,
                   rabbitMQProfile.Username,
                   rabbitMQProfile.Password,
-                  rabbitMQProfile.FetchNo,
-                  rabbitMQProfile.QueueIn)
+                  rabbitMQProfile.FetchNo)
         {
         }
         public RabbitMQClient(IOptions<RabbitMQProfile> options)
@@ -48,11 +43,13 @@ namespace Service.BrokerApi.Services
         {
 
         }
-        public Task SendMessageAsync<T>(T message)
+        public Task SendMessageAsync<T>(string queueIn, T message)
         {
+            _ = channel.QueueDeclare(queueIn, true, false, false, null);
+          
             string jsonMsg = JsonSerializer.Serialize(message);
             var msgBytes = Encoding.UTF8.GetBytes(jsonMsg);
-            channel.BasicPublish(string.Empty, string.Empty, null, msgBytes);
+            channel.BasicPublish(queueIn, string.Empty, null, msgBytes);
             return Task.CompletedTask;
         }
 

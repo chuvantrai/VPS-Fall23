@@ -12,11 +12,13 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         services.Configure<RabbitMQProfile>(context.Configuration.GetSection("RabbitMQ"));
-        services.AddHostedService<AutoDeleteParkingZoneBackgroundService>();
+        services.AddHostedService<CreateDeletingPZJobBackgroundService>();
+        services.AddHostedService<RemoveDeletingPZJobBackGroundService>();
         services.AddSingleton<IJobFactory, JobFactory>();
         services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
         services.AddSingleton<QuartzServices>();
-        services.AddSingleton<IRabbitMQClient, AutoDeleteParkingZoneDequeue>();
+        services.AddSingleton<CreateDeletingPZJobDequeue>();
+        services.AddSingleton<RemoveDeletingPZJobDequeue>();
     })
     .Build();
 

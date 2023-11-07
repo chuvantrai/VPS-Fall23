@@ -7,7 +7,6 @@ using System.Text.Json;
 namespace Service.WorkerVPS.Brokers
 {
     internal abstract class RabbitMQClient<TQueueMessageType> : IRabbitMQClient
-        where TQueueMessageType : class
        
     {
         protected readonly IConnection connection;
@@ -38,13 +37,13 @@ namespace Service.WorkerVPS.Brokers
             channel.BasicQos(prefetchSize: 0, prefetchCount: fetchNo, global: false);
             consumer = new(channel);
         }
-        public RabbitMQClient(RabbitMQProfile rabbitMQProfile)
+        public RabbitMQClient(RabbitMQProfile rabbitMQProfile, string queueOut)
             : this(rabbitMQProfile.EndPoint,
                   rabbitMQProfile.Port,
                   rabbitMQProfile.Username,
                   rabbitMQProfile.Password,
                   rabbitMQProfile.FetchNo,
-                  rabbitMQProfile.QueueIn)
+                  queueOut)
         {
         }
 

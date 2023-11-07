@@ -2,6 +2,6 @@
 {
     public interface IRabbitMQClient
     {
-        Task SendMessageAsync<T>(T message);
+        Task SendMessageAsync<T>(string queueIn, T message);
     }
 }
