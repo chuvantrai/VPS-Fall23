@@ -1,10 +1,9 @@
-import { Alert, Badge, Button, Carousel, Descriptions, Image, Modal, Tabs, Tag, Typography, notification } from 'antd';
+import { Button, Carousel, Descriptions, Image, Modal, Tabs, Tag, Typography, notification } from 'antd';
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
 import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm.jsx';
 import FeedbackList from './FeedbackList';
-
 
 
 const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = '1' }) => {
@@ -14,8 +13,8 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
   const [freeSlots, setFreeSlots] = useState(parkingZone?.slots ?? 0);
   const [tab, setTab] = useState('1');
   useEffect(() => {
-    setTab(defaultTab)
-  }, [defaultTab])
+    setTab(defaultTab);
+  }, [defaultTab]);
   useEffect(() => {
 
     if (!parkingZone) return;
@@ -23,7 +22,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
   }, [parkingZone?.id]);
   const onGetFreeSlot = (parkingZoneId) => {
     parkingZoneService.getBookedSlot(parkingZoneId).then(res => setFreeSlots(parkingZone.slots - res.data));
-  }
+  };
   const getDetailDescription = () => {
     if (!parkingZone) return [];
     return [
@@ -83,7 +82,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
     {
       key: '2',
       label: 'Xem đánh giá',
-      children: <FeedbackList parkingZoneId={parkingZone?.id} />
+      children: <FeedbackList parkingZoneId={parkingZone?.id} />,
     },
     {
       key: '3',
@@ -102,9 +101,8 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
     },
   ];
   const onChangeTabs = (key) => {
-    setTab(key)
+    setTab(key);
   };
-
   return (
     <>
       <Modal
@@ -139,7 +137,6 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
             onChange={onChangeTabs} />
         </div>
       </Modal>
-
     </>
   );
 };

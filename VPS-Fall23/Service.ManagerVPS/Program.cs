@@ -20,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", build => build.AllowAnyMethod()
-        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(hostName => true).Build());
+        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(_ => true).Build());
 });
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
@@ -38,6 +38,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Config appsetting to model
+builder.Services.Configure<FileManagementConfig>(builder.Configuration.GetSection("fileManagementAccessKey"));
+builder.Services.AddOptions();
+
+//Config appsetting to model
 builder.Services.Configure<FileManagementConfig>(
     builder.Configuration.GetSection("fileManagementAccessKey"));
 builder.Services.Configure<VnPayConfig>(builder.Configuration.GetSection("vnPay"));
@@ -51,10 +55,10 @@ builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
 builder.Services.AddSingleton<IVnPayLibrary, VnPayLibrary>();
 builder.Services.AddSingleton<GoogleApiService>();
-builder.Services.AddSingleton<IScheduler>(provider =>
+builder.Services.AddSingleton<IScheduler>(_ =>
 {
     ISchedulerFactory schedulerFactory = new StdSchedulerFactory();
-    IScheduler scheduler = schedulerFactory.GetScheduler().Result;
+    var scheduler = schedulerFactory.GetScheduler().Result;
     return scheduler;
 });
 builder.Services.AddSingleton<IJobFactory, JobFactory>();
@@ -88,6 +92,7 @@ builder.Services.AddSession(options =>
 
 // orther
 builder.Services.AddHttpContextAccessor();
+builder.WebHost.ConfigureKestrel(serverOptions => { serverOptions.ListenLocalhost(5001); });
 
 var app = builder.Build();
 
