@@ -27,11 +27,6 @@ const BookingForm = ({ parkingZone }) => {
       book(parkingTransaction);
     });
   };
-  // const onClose = () => {
-  //   form.resetFields();
-  //   setPaymentResult({ ...paymentResult, isShow: false });
-  //   store.dispatch(setShowBookingForm({ isShowBookingForm: false }));
-  // };
   let connection = new HubConnectionBuilder()
     .withUrl(import.meta.env.VITE_API_GATEWAY + '/payment')
     .withAutomaticReconnect()

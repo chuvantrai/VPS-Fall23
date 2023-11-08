@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
 import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm.jsx';
 import FeedbackList from './FeedbackList';
+import { BookOutlined, BookTwoTone } from '@ant-design/icons';
+import { getListBookmarkParkingZone, setListBookmarkParkingZone } from '../../../../helpers/index.js';
 
 
 const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = '1' }) => {
@@ -103,6 +105,25 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
   const onChangeTabs = (key) => {
     setTab(key);
   };
+
+  const arrayBookmark = getListBookmarkParkingZone()??[];
+  const [isBookmark, setIsBookmark] = useState(isShow&&arrayBookmark.includes(parkingZone.id));
+
+  const ClickBookMark = () => {
+    let arrayBookmarkPzId = getListBookmarkParkingZone()??[];
+    if(!isBookmark){
+      // eslint-disable-next-line react/prop-types
+      arrayBookmarkPzId.push(parkingZone.id);
+      setIsBookmark(true);
+    }else {
+      // eslint-disable-next-line react/prop-types
+      arrayBookmarkPzId = arrayBookmarkPzId.filter(item => item !== parkingZone.id);
+      setIsBookmark(false);
+    }
+    setListBookmarkParkingZone(arrayBookmarkPzId);
+  }
+  const operations = <Button icon={isBookmark?<BookTwoTone/>:<BookOutlined/>} onClick={ClickBookMark}></Button>;
+
   return (
     <>
       <Modal
@@ -134,7 +155,8 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
             activeKey={tab}
             items={items}
             destroyInactiveTabPane={true}
-            onChange={onChangeTabs} />
+            onChange={onChangeTabs}
+            tabBarExtraContent={operations}/>
         </div>
       </Modal>
     </>
