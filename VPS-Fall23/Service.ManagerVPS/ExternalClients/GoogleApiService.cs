@@ -24,7 +24,7 @@ namespace Service.ManagerVPS.ExternalClients
                 var client = ImageAnnotatorClient.Create();
                 var response = await client.DetectTextAsync(image);
 
-                if (!response[0].Description.IsNullOrEmpty() || response != null)
+                if (!String.IsNullOrEmpty(response[0].Description) || response != null)
                 {
                     licensePlate = string.Join("", response[0].Description.Split(new string[] { "\n", "." }, StringSplitOptions.None));
                 }

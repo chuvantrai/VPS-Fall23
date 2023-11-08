@@ -14,15 +14,22 @@ public partial class VPS53 : ContentPage
 
     private readonly VPS53ViewModel _viewModel;
     private SKRect frameRect;
-
+    float frameWidth = 400;
+    float frameHeight = 235;
     public VPS53()
     {
-        frameRect = new SKRect(50, 50, 300, 200);
         VPS53ViewModel viewModel = new();
-        InitializeComponent();
+        Load();
         BindingContext = viewModel;
         _viewModel = viewModel;
+
+    }
+
+    public async void Load()
+    {
+        InitializeComponent();
         cameraView.Loaded += CameraView_CamerasLoaded;
+        canvasView.PaintSurface += OnPaintSurface;
     }
 
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
@@ -32,10 +39,6 @@ public partial class VPS53 : ContentPage
 
         canvas.Clear(SKColors.Transparent);
 
-        float frameWidth = 400;
-        float frameHeight = 235;
-
-        float frameSize = Math.Min(e.Info.Width, e.Info.Height) * 0.5f;
         float frameX = (e.Info.Width - frameWidth) / 2;
         float frameY = (e.Info.Height - frameHeight) / 2;
         float frameRight = frameX + frameWidth;
@@ -47,7 +50,7 @@ public partial class VPS53 : ContentPage
             paint.Color = SKColors.Black;
             paint.StrokeWidth = 5;
 
-            float dashLength = frameWidth * 0.125f;
+            float dashLength = 50f;
             float dashGapthWidth = frameWidth - dashLength * 2;
             float dashGapthHeight = frameHeight - dashLength * 2;
 
@@ -60,20 +63,8 @@ public partial class VPS53 : ContentPage
             canvas.DrawLine(frameX, frameY + dashLength + dashGapthHeight, frameX, frameY + 2 * dashLength + dashGapthHeight, paint);
             canvas.DrawLine(frameRight, frameY, frameRight, frameY + dashLength, paint);
             canvas.DrawLine(frameRight, frameY + dashLength + dashGapthHeight, frameRight, frameBottom, paint);
-        }
-    }
 
-    private void LoadCamera()
-    {
-        if (cameraView.Cameras.Count > 0)
-        {
-            cameraView.Camera = cameraView.Cameras.First();
-
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                await cameraView.StopCameraAsync();
-                await cameraView.StartCameraAsync();
-            });
+            frameRect = new SKRect(frameX, frameY, frameX + frameWidth, frameY + frameHeight);
         }
     }
 
@@ -85,10 +76,25 @@ public partial class VPS53 : ContentPage
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                await cameraView.StopCameraAsync();
                 await cameraView.StartCameraAsync();
             });
         }
+    }
+
+    private void FrameSwitch_Toggled(object sender, ToggledEventArgs e)
+    {
+        if (e.Value)
+        {
+            frameWidth = 590;
+            frameHeight = 180;
+        }
+        else
+        {
+            frameWidth = 400;
+            frameHeight = 235;
+        }
+        canvasView.InvalidateSurface();
+        canvasView.PaintSurface += OnPaintSurface;
     }
 
     private async void CameraButton_Clicked(object sender, EventArgs e)
@@ -103,58 +109,55 @@ public partial class VPS53 : ContentPage
             var imageBytes = await Logic.ConvertStreamToByteArray(imageSource);
 
             using (var bitmap = SKBitmap.Decode(imageBytes))
-            using (var croppedBitmap = new SKBitmap((int)frameRect.Width, (int)frameRect.Height))
+            using (var image = SKImage.FromBitmap(bitmap))
             {
-                using (var canvas = new SKCanvas(croppedBitmap))
-                {
-                    canvas.DrawBitmap(bitmap, new SKRect(0, 0, frameRect.Width, frameRect.Height), frameRect);
-                }
+                var frameImage = image.Subset(SKRectI.Create(300, 400, 235, 400));
 
-                byte[] croppedImageBytes;
-                using (var imageStream = new MemoryStream())
+                using (var frameBitmap = SKBitmap.FromImage(frameImage))
                 {
-                    croppedBitmap.Encode(imageStream, SKEncodedImageFormat.Png, 100);
-                    croppedImageBytes = imageStream.ToArray();
-                }
+                    byte[] frameImageBytes;
 
-                if (imageBytes != null)
-                {
-                    var checkLicensePlate = new LicensePlateScan
+                    using (var imageStream = new MemoryStream())
                     {
-                        Image = croppedImageBytes,
-                        CheckAt = DateTime.Now,
-                        CheckBy = Constant.USER
-                    };
+                        frameBitmap.Encode(imageStream, SKEncodedImageFormat.Png, 100);
+                        frameImageBytes = imageStream.ToArray();
+                    }
 
-
-                    await cameraView.StopCameraAsync();
-                    string response_1 = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
-                    LoadCamera();
-
-                    if (response_1 == Constant.CHECKOUT_CONFIRM || response_1.Contains(Constant.OVERTIME_CONFIRM))
+                    if (imageBytes != null)
                     {
-                        var answer = await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
-
-                        if (answer.ToString() == Constant.ACCEPT)
+                        var checkLicensePlate = new LicensePlateScan
                         {
-                            await cameraView.StopCameraAsync();
-                            string response_2 = await _viewModel.CheckOutScanConfirm(checkLicensePlate);
-                            LoadCamera();
+                            Image = frameImageBytes,
+                            CheckAt = DateTime.Now,
+                            CheckBy = Constant.USER
+                        };
 
-                            await DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
+                        string response_1 = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
+
+                        if (response_1 == Constant.CHECKOUT_CONFIRM || response_1.Contains(Constant.OVERTIME_CONFIRM))
+                        {
+                            var answer = await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
+
+                            if (answer.ToString() == Constant.ACCEPT)
+                            {
+                                string response_2 = await _viewModel.CheckOutScanConfirm(checkLicensePlate);
+
+                                await DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
+                            }
                         }
+                        else
+                        {
+                            await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
+                        }
+
                     }
                     else
                     {
-                        await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
+                        await DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
                     }
-
+                    await imageSource.DisposeAsync();                  
                 }
-                else
-                {
-                    await DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
-                }
-                await imageSource.DisposeAsync();
+                Load();
             }
         }
         catch (Exception ex)
@@ -191,9 +194,7 @@ public partial class VPS53 : ContentPage
                     CheckBy = Constant.USER
                 };
 
-                await cameraView.StopCameraAsync();
                 string response_1 = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
-                LoadCamera();
 
                 if (response_1 == Constant.CHECKOUT_CONFIRM)
                 {
@@ -203,9 +204,7 @@ public partial class VPS53 : ContentPage
 
                         if (answer.ToString() == Constant.ACCEPT)
                         {
-                            await cameraView.StopCameraAsync();
                             string response_2 = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
-                            LoadCamera();
 
                             await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
                         }

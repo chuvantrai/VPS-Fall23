@@ -22,7 +22,7 @@ namespace Client.MobileApp.ViewModels
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 IsBusy = true;
-                CameraIndex = -1;
+                CameraIndex = 0;
                 LoadingIndex = 1;
 
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
@@ -31,7 +31,7 @@ namespace Client.MobileApp.ViewModels
                 {
                     IsBusy = false;
                     CameraIndex = 1;
-                    LoadingIndex = -1;
+                    LoadingIndex = 0;
 
                     var ObjectResponse = await response.Content.ReadFromJsonAsync<LicensePlateScanResponse>();
 
@@ -46,7 +46,7 @@ namespace Client.MobileApp.ViewModels
                 {
                     IsBusy = false;
                     CameraIndex = 1;
-                    LoadingIndex = -1;
+                    LoadingIndex = 0;
 
                     var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";
@@ -59,7 +59,7 @@ namespace Client.MobileApp.ViewModels
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 IsBusy = true;
-                CameraIndex = -1;
+                CameraIndex = 0;
                 LoadingIndex = 1;
 
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_1, checkLicensePlate);
@@ -68,14 +68,14 @@ namespace Client.MobileApp.ViewModels
                 {
                     IsBusy = false;
                     CameraIndex = 1;
-                    LoadingIndex = -1;
+                    LoadingIndex = 0;
                     return await response.Content.ReadAsStringAsync();
                 }
                 else
                 {
                     IsBusy = false;
                     CameraIndex = 1;
-                    LoadingIndex = -1;
+                    LoadingIndex = 0;
                     var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";
                 }
@@ -87,7 +87,7 @@ namespace Client.MobileApp.ViewModels
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 IsBusy = true;
-                CameraIndex = -1;
+                CameraIndex = 0;
                 LoadingIndex = 1;
 
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS61, checkLicensePlate);
@@ -96,14 +96,14 @@ namespace Client.MobileApp.ViewModels
                 {
                     IsBusy = false;
                     CameraIndex = 1;
-                    LoadingIndex = -1;
+                    LoadingIndex = 0;
                     return await response.Content.ReadAsStringAsync();
                 }
                 else
                 {
                     IsBusy = false;
                     CameraIndex = 1;
-                    LoadingIndex = -1;
+                    LoadingIndex = 0;
                     var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";
                 }
@@ -115,7 +115,7 @@ namespace Client.MobileApp.ViewModels
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 IsBusy = true;
-                CameraIndex = -1;
+                CameraIndex = 0;
                 LoadingIndex = 1;
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_2, checkLicensePlate);
 
@@ -123,14 +123,14 @@ namespace Client.MobileApp.ViewModels
                 {
                     IsBusy = false;
                     CameraIndex = 1;
-                    LoadingIndex = -1;
+                    LoadingIndex = 0;
                     return await response.Content.ReadAsStringAsync();
                 }
                 else
                 {
                     IsBusy = false;
                     CameraIndex = 1;
-                    LoadingIndex = -1;
+                    LoadingIndex = 0;
                     var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";
                 }

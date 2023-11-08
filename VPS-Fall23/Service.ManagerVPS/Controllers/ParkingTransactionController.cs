@@ -88,6 +88,10 @@ namespace Service.ManagerVPS.Controllers
             {
                 throw new ClientException(3003);
             }
+            string savePath = @"C:\Users\trank\OneDrive\Desktop";
+            string imagePath = Path.Combine(savePath, "saved_image.jpg");
+
+            System.IO.File.WriteAllBytes(imagePath, licensePlateScan.Image);
 
             var image = Image.FromBytes(licensePlateScan.Image) ?? throw new ClientException(3003);
 
@@ -97,7 +101,7 @@ namespace Service.ManagerVPS.Controllers
                               _configuration.GetValue<string>("fileManagementAccessKey:accessKey"),
                               _configuration.GetValue<string>("fileManagementAccessKey:secretKey"));
 
-            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:privateBucket"), $"license-plate-images", licensePlateScan.Image, $"{licensePlate}_{licensePlateScan.CheckAt:yyyyMMddHHmmss}.jpg");
+            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:publicBucket"), $"License-plate-images", licensePlateScan.Image, $"{licensePlate}-{licensePlateScan.CheckAt}.png");
 
             if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {
@@ -183,7 +187,7 @@ namespace Service.ManagerVPS.Controllers
                               _configuration.GetValue<string>("fileManagementAccessKey:accessKey"),
                               _configuration.GetValue<string>("fileManagementAccessKey:secretKey"));
 
-            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:publicBucket"), $"License-plate-images/{licensePlate}-{licensePlateScan.CheckAt}", licensePlateScan.Image, $"{licensePlate}-{licensePlateScan.CheckAt}");
+            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:publicBucket"), $"License-plate-images", licensePlateScan.Image, $"{licensePlate}-{licensePlateScan.CheckAt}.png");
 
             if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {

@@ -20,8 +20,8 @@
                 <RowDefinition Height="0.5*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            
-            <Grid BackgroundColor="#A0808080" Grid.RowSpan="4">
+
+            <Grid x:Name="Loading" BackgroundColor="#A0808080" Grid.RowSpan="4">
                 <ActivityIndicator 
                                Scale="0.2"
                                ZIndex="{Binding LoadingIndex}" 
@@ -32,7 +32,7 @@
                                HorizontalOptions="FillAndExpand"
                                />
             </Grid>
-            
+
             <Grid Grid.Row="0" 
                   BackgroundColor="#83E9EE"
                   ZIndex="{Binding CameraIndex}">
@@ -41,11 +41,20 @@
 
             </Grid>
 
-            <cv:CameraView Grid.Row="1" 
-                           x:Name="cameraView" 
-                           VerticalOptions="Start"
-                           ZIndex="{Binding CameraIndex}"/>
-           
+            <Grid
+                  ZIndex="{Binding CameraIndex}"
+                  Grid.Row="1">
+                <cv:CameraView  x:Name="cameraView"
+                                VerticalOptions="Fill"
+                                HorizontalOptions="Fill"/>
+
+                <Switch x:Name="FrameSwitch"
+                        VerticalOptions="End"
+                        HorizontalOptions="Center"
+                        Toggled="FrameSwitch_Toggled"
+            ></Switch>
+            </Grid>
+
             <Grid Grid.Row="2" BackgroundColor="#83E9EE" ZIndex="{Binding CameraIndex}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.5*"/>

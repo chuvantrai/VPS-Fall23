@@ -7,7 +7,7 @@ namespace Client.MobileApp.ViewModels
     {
         bool isBusy = false;
         int cameraIndex = 1;
-        int loadingIndex = -1;
+        int loadingIndex = 0;
         string areaEntry = "";
         string licensePlateEntry = "";
 
