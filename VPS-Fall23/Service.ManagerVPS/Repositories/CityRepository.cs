@@ -5,8 +5,8 @@ namespace Service.ManagerVPS.Repositories
 {
     public class CityRepository : VpsRepository<City>, ICityRepository
     {
-        public CityRepository(FALL23_SWP490_G14Context fALL23_SWP490_G14Context)
-          : base(fALL23_SWP490_G14Context)
+        public CityRepository(FALL23_SWP490_G14Context fall23Swp490G14Context)
+          : base(fall23Swp490G14Context)
         {
 
         }

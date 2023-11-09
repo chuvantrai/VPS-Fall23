@@ -44,10 +44,10 @@ function Login() {
         if (rememberPassword) {
           Cookies.set(keyNameCookies.ACCOUNT_DATA, convertAccountDataToCode(values.username, values.password));
         }
-        let accountJwtModel = getAccountJwtModel();
-        accountJwtModel.Expires = null;
-        accountJwtModel.ModifiedAt = null;
-        store.dispatch(setAccountDataJwt({ accountDataJwt: accountJwtModel }));
+        // let accountJwtModel = getAccountJwtModel();
+        // accountJwtModel.Expires = null;
+        // accountJwtModel.ModifiedAt = null;
+        // store.dispatch(setAccountDataJwt({ accountDataJwt: accountJwtModel }));
         window.location.href = '/';
       })
       .catch(err => {

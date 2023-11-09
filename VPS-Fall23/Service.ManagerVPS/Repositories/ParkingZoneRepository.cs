@@ -139,4 +139,14 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .FirstOrDefault(x => x.Id.Equals(parkingZoneId));
         return parkingZone;
     }
+
+    public IEnumerable<ParkingZone>? GetParkingZoneByArrayParkingZoneId(Guid[]? parkingZoneIds)
+    {
+        if (parkingZoneIds == null || parkingZoneIds.Length == 0) return null;
+        return context.ParkingZones.Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(p => parkingZoneIds.Contains(p.Id) && p.IsApprove == true);
+    }
 }

@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", build => build.AllowAnyMethod()
-        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(hostName => true).Build());
+        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(_ => true).Build());
 });
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
@@ -32,6 +32,10 @@ builder.Services.AddControllersWithViews()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Config appsetting to model
+builder.Services.Configure<FileManagementConfig>(builder.Configuration.GetSection("fileManagementAccessKey"));
+builder.Services.AddOptions();
 
 //Config appsetting to model
 builder.Services.Configure<FileManagementConfig>(
@@ -75,6 +79,7 @@ builder.Services.AddSession(options =>
 
 // orther
 builder.Services.AddHttpContextAccessor();
+builder.WebHost.ConfigureKestrel(serverOptions => { serverOptions.ListenLocalhost(5001); });
 
 var app = builder.Build();
 

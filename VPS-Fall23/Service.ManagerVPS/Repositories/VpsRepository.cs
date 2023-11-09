@@ -12,9 +12,9 @@ namespace Service.ManagerVPS.Repositories
         protected DbSet<T> entities;
         protected FALL23_SWP490_G14Context context { get; set; }
 
-        public VpsRepository(FALL23_SWP490_G14Context fALL23_SWP490_G14Context)
+        public VpsRepository(FALL23_SWP490_G14Context fall23Swp490G14Context)
         {
-            context = fALL23_SWP490_G14Context;
+            context = fall23Swp490G14Context;
             entities = context.Set<T>();
         }
 

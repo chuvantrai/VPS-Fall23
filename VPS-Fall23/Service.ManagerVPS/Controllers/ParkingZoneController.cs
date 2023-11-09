@@ -10,7 +10,7 @@ using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.FileManagement;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
-using Service.ManagerVPS.DTO.Ouput;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
@@ -531,5 +531,11 @@ public class ParkingZoneController : VpsController<ParkingZone>
     {
         return await parkingTransactionRepository.GetBookedSlot(parkingZoneId,
             checkAt ?? DateTime.Now);
+    }
+    
+    [HttpPost]
+    public IEnumerable<ParkingZone>? GetDataParkingZoneByParkingZoneIds(Guid[]? parkingZoneIds)
+    {
+        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(parkingZoneIds);
     }
 }

@@ -24,6 +24,15 @@ builder.Services
     .UseMinvoiceMinIORepository<IBucketRepository, BucketRepository>()
     .UseMinvoiceMinIORepository<IObjectRepository, ObjectRepository>()
     .UseMinvoiceMinIORepository<IExternalRepository, ExternalRepository>();
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenLocalhost(7063, listenOptions =>
+    {
+        listenOptions.UseHttps();
+    });
+    serverOptions.ListenLocalhost(5193);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

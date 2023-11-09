@@ -63,7 +63,8 @@ namespace Service.ManagerVPS.Controllers
             {
                 var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
                 var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-                var list = ((IParkingZoneOwnerRepository)vpsRepository).GetOwnerByEmail(parameters, email);
+                var list =
+                    ((IParkingZoneOwnerRepository)vpsRepository).GetOwnerByEmail(parameters, email);
                 List<ParkingZoneOwner> res = new List<ParkingZoneOwner>();
 
                 if (userToken.RoleId == 3 || userToken.RoleId == 2) return NotFound();
@@ -80,6 +81,7 @@ namespace Service.ManagerVPS.Controllers
                         Dob = item.Dob,
                     });
                 }
+
                 var metadata = new
                 {
                     list.TotalCount,

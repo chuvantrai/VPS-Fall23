@@ -4,5 +4,4 @@ namespace Service.ManagerVPS.Repositories.Interfaces;
 
 public interface IAttendantRepository : IVpsRepository<ParkingZoneAttendant>
 {
-    
 }

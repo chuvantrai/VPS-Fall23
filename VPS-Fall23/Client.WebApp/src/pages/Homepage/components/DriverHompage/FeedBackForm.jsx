@@ -1,28 +1,26 @@
-import { Button, Form, Input, Rate, Space } from 'antd';
+import { Button, Form, Input, Rate } from 'antd';
 import { useState } from 'react';
 import TextArea from 'antd/es/input/TextArea.js';
-import feedBackServices from '@/services/FeedBackServices.js';
+import useFeedbackServices from '@/services/feedbackServices.js';
 
-const desc = ['Rất tệt', 'Tệt', 'Bình thường', 'Tốt', 'Rất tốt'];
+const desc = ['Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Rất tốt'];
 
+// eslint-disable-next-line react/prop-types
 const FeedBackForm = ({ parkingZoneId }) => {
   const [form] = Form.useForm();
   const [valueRate, setValueRate] = useState(3);
-  const feedBackService = feedBackServices();
+  const feedBackService = useFeedbackServices();
   const onChangeRate = (value) => {
     setValueRate(value);
-    form.setFieldValue('rate',value);
+    form.setFieldValue('rate', value);
   };
   const onFinish = (values) => {
-    feedBackService.createFeedBack(values,parkingZoneId);
+    feedBackService.createFeedBack(values, parkingZoneId);
   };
 
   return (
     <>
-      <Form
-        form={form}
-        onFinish={onFinish}
-      >
+      <Form form={form} onFinish={onFinish}>
         <Form.Item
           label='Email của bạn'
           name='email'
@@ -36,10 +34,7 @@ const FeedBackForm = ({ parkingZoneId }) => {
         >
           <Input placeholder='Email'></Input>
         </Form.Item>
-        <Form.Item
-          label='Sao'
-          name='rate'
-        >
+        <Form.Item label='Sao' name='rate'>
           <span>
             <Rate tooltips={desc} onChange={onChangeRate} value={valueRate} />
             {valueRate ? <span className='ant-rate-text'>{desc[valueRate - 1]}</span> : ''}
@@ -55,11 +50,14 @@ const FeedBackForm = ({ parkingZoneId }) => {
             },
           ]}
         >
-          <TextArea className={'max-h-[97px!important] min-h-[97px!important]'} rows={4}
-                    placeholder='Bình luận tối đa 100 ký tự!' />
+          <TextArea
+            className={'max-h-[97px!important] min-h-[97px!important]'}
+            rows={4}
+            placeholder='Bình luận tối đa 100 ký tự!'
+          />
         </Form.Item>
-        <Form.Item className={('flex justify-center m-0')}>
-          <Button className={('bg-[#1890FF] w-[200%]')} type='primary' htmlType={'submit'}>
+        <Form.Item className={'flex justify-center m-0'}>
+          <Button className={'bg-[#1890FF] w-[200%]'} type='primary' htmlType={'submit'}>
             Đánh giá
           </Button>
         </Form.Item>

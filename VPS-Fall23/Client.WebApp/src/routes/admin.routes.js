@@ -1,10 +1,11 @@
 import Header from '@/layouts/components/Header';
 import AccountProfile from '@/pages/AccountProfile';
 import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
-import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
 import ViewRequestedParkingZone from '@/pages/ViewRequestedParkingZones';
 import ManagerLayout from '../layouts/ManagerLayout';
 import guidGenerator from '../helpers/guidGenerator';
+import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
+
 export const adminRoutesConfig = {
   header: Header,
   footer: null,
@@ -13,12 +14,12 @@ export const adminRoutesConfig = {
     {
       key: guidGenerator(),
       path: 'user',
-      label: 'User',
+      label: 'Người dùng',
       children: [
         {
           key: guidGenerator(),
           path: 'profile',
-          label: 'Profile',
+          label: 'Thông tin cá nhân',
           component: AccountProfile,
           description: 'Mọi thông tin về tài khoản được hiển thị dưới đây',
         },
