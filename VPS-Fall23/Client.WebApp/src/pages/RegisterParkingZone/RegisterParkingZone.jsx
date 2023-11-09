@@ -114,21 +114,9 @@ const RegisterParkingZone = () => {
   };
 
   return (
-    <>
-      <Form
-        {...layout}
-        className="pt-[24px] pb-[24px]"
-        name="nest-messages"
-        onFinish={onFinish}
-        style={{
-          width: '100%',
-          minHeight: '484px',
-          paddingLeft: '64px',
-        }}
-        validateMessages={validateMessages}
-      >
+    <div className="w-full">
+      <Form {...layout} name="nest-messages" onFinish={onFinish} validateMessages={validateMessages}>
         <Form.Item
-          className="pb-[24px] m-0"
           name="name"
           label="Tên"
           rules={[
@@ -137,10 +125,9 @@ const RegisterParkingZone = () => {
             },
           ]}
         >
-          <Input className="w-[484px] h-[32px]" placeholder="Đặt tên cho parking zone" />
+          <Input className="w-2/5" placeholder="Đặt tên cho parking zone" />
         </Form.Item>
         <Form.Item
-          className="pb-[24px] m-0"
           name="pricePerHour"
           label="Giá tiền mỗi giờ"
           rules={[
@@ -149,10 +136,9 @@ const RegisterParkingZone = () => {
             },
           ]}
         >
-          <InputNumber className="w-[484px] h-[32px]" prefix="VND" />
+          <InputNumber className="w-2/5" prefix="VND" />
         </Form.Item>
         <Form.Item
-          className="pb-[24px] m-0"
           name="priceOverTimePerHour"
           label="Giá tiền quá giờ"
           rules={[
@@ -161,13 +147,12 @@ const RegisterParkingZone = () => {
             },
           ]}
         >
-          <InputNumber className="w-[484px] h-[32px]" prefix="VND" />
+          <InputNumber className="w-2/5" prefix="VND" />
         </Form.Item>
         <Form.Item name="workingTime" label="Thời gian làm việc" required>
-          <TimePicker.RangePicker onChange={handelChangeTime} />
+          <TimePicker.RangePicker className="w-2/5" onChange={handelChangeTime} />
         </Form.Item>
         <Form.Item
-          className="pb-[24px] m-0"
           name="slots"
           label="Slots"
           rules={[
@@ -176,16 +161,10 @@ const RegisterParkingZone = () => {
             },
           ]}
         >
-          <InputNumber className="w-[484px] h-[32px]" placeholder="Số slots của parking zone" />
+          <InputNumber className="w-2/5" placeholder="Số slots của parking zone" />
         </Form.Item>
-        <Form.Item
-          name="communeId"
-          label="Địa chỉ"
-          className="pb-[24px] m-0"
-          validateStatus={validateStatus}
-          help={help}
-        >
-          <div className="w-[484px] h-[32px]">
+        <Form.Item name="communeId" label="Địa chỉ" validateStatus={validateStatus} help={help}>
+          <div className="w-2/5">
             <AddressCascader cascaderProps={addressCascaderProps} onCascaderChangeCallback={onCascaderChange} />
           </div>
         </Form.Item>
@@ -198,14 +177,7 @@ const RegisterParkingZone = () => {
             },
           ]}
         >
-          <div className="w-[484px]">
-            <Input.TextArea
-              placeholder="Địa chỉ cụ thể"
-              style={{
-                height: '76px',
-              }}
-            />
-          </div>
+          <Input.TextArea className="w-2/5" placeholder="Địa chỉ cụ thể" />
         </Form.Item>
         <Form.Item
           name="parkingZoneImages"
@@ -216,7 +188,7 @@ const RegisterParkingZone = () => {
             },
           ]}
         >
-          <div className="w-[484px]">
+          <div className="w-2/5">
             <Upload
               accept="image/*"
               listType="picture-card"
@@ -250,7 +222,7 @@ const RegisterParkingZone = () => {
           src={previewImage}
         />
       </Modal>
-    </>
+    </div>
   );
 };
 export default RegisterParkingZone;

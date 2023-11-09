@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Service.ManagerVPS.Extensions.StaticLogic;
 
 namespace Service.ManagerVPS.Models
 {
@@ -42,13 +43,8 @@ namespace Service.ManagerVPS.Models
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https: //go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer(
-                    "server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!; trust server certificate = true;Encrypt=False");
+                    "server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!; TrustServerCertificate = True");
             }
-        }
-        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-        {
-            base.ConfigureConventions(configurationBuilder);
-            configurationBuilder.Properties<TimeOnly>().HaveConversion<TimeOnlyConverter>();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -381,6 +377,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.Email).HasColumnName("email");
 
+                entity.Property(e => e.ParentId).HasColumnName("parent_id");
+
                 entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
 
                 entity.Property(e => e.Rate)
@@ -391,6 +389,11 @@ namespace Service.ManagerVPS.Models
                     .ValueGeneratedOnAdd()
                     .HasColumnName("sub_id")
                     .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
+                entity.HasOne(d => d.Parent)
+                    .WithMany(p => p.InverseParent)
+                    .HasForeignKey(d => d.ParentId)
+                    .HasConstraintName("feedback_FK");
 
                 entity.HasOne(d => d.ParkingZone)
                     .WithMany(p => p.Feedbacks)
@@ -591,7 +594,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.WorkFrom)
                     .HasColumnName("work_from")
@@ -812,7 +816,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.Type).HasColumnName("type");
 

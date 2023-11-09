@@ -7,9 +7,7 @@ import { getAccountJwtModel } from '@/helpers';
 import useParkingZoneService from '@/services/parkingZoneService';
 import useParkingTransactionService from '@/services/parkingTransactionSerivce';
 
-
 function IncomeDashboard() {
-
   const parkingZoneService = useParkingZoneService();
   const parkingTransactionService = useParkingTransactionService();
   const { RangePicker } = DatePicker;
@@ -23,6 +21,7 @@ function IncomeDashboard() {
   const [ParkingZoneOptions, setParkingZoneOptions] = useState([]);
   const [selectedParkingZone, setSelectedParkingZone] = useState('');
   const [ParkingZoneData, setParkingZoneData] = useState([]);
+  const [remainingSlots, setRemainingSlots] = useState(0);
 
   const handleDateRangeChange = (value) => {
     setDateRange(value);
@@ -30,7 +29,8 @@ function IncomeDashboard() {
 
   const handleStatChange = (value) => {
     setSelectedParkingZone(value);
-    parkingTransactionService.getAllIncome(value)
+    parkingTransactionService
+      .getAllIncome(value)
       .then((response) => {
         setData(response.data);
         setParkingZoneData(response.data);
@@ -42,13 +42,25 @@ function IncomeDashboard() {
 
   useEffect(() => {
     const filteredData = ParkingZoneData.filter((item) => item.parkingZoneId === selectedParkingZone);
-    parkingZoneService.getAllParkingZoneByOwnerId(account.UserId)
+    parkingZoneService
+      .getAllParkingZoneByOwnerId(account.UserId)
       .then((response) => {
         setParkingZoneOptions(response.data);
       })
       .catch((error) => {
         console.error('Error fetching parking zones:', error);
       });
+
+    if (selectedParkingZone) {
+      parkingZoneService
+        .getAvailableSlots(selectedParkingZone)
+        .then((response) => {
+          setRemainingSlots(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching available slots:', error);
+        });
+    }
 
     if (dateRange === 'month') {
       const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
@@ -95,16 +107,10 @@ function IncomeDashboard() {
     setTotalIncome(totalIncome);
     setAverageMonthlyIncome(averageMonthlyIncome);
     setAverageYearlyIncome(averageYearlyIncome);
-
   }, [dateRange, selectedParkingZone, ParkingZoneData]);
   return (
-
     <div className={styles.dashboard}>
-      <Select
-        className={styles.selectBoxParking}
-        value={selectedParkingZone}
-        onChange={handleStatChange}
-      >
+      <Select className={styles.selectBoxParking} value={selectedParkingZone} onChange={handleStatChange}>
         {ParkingZoneOptions.map((option) => (
           <Option key={option.value} value={option.value}>
             {option.label}
@@ -130,11 +136,7 @@ function IncomeDashboard() {
         </Col>
       </Row>
       <Card className={styles.CardBelow} title="Thống kê thu nhập">
-        <Select
-          className={styles.selectBoxDate}
-          value={dateRange}
-          onChange={handleDateRangeChange}
-        >
+        <Select className={styles.selectBoxDate} value={dateRange} onChange={handleDateRangeChange}>
           <Option value="month">This Month</Option>
           <Option value="year">This Year</Option>
           <Option value="all">All Time</Option>
@@ -148,8 +150,6 @@ function IncomeDashboard() {
           <Bar dataKey="income" fill="#8884d8" />
         </BarChart>
       </Card>
-
-
     </div>
   );
 }
