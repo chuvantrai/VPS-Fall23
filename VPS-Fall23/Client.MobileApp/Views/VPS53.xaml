@@ -48,12 +48,20 @@
                                 VerticalOptions="Fill"
                                 HorizontalOptions="Fill"/>
 
-                <Switch x:Name="FrameSwitch"
+                <Frame CornerRadius="50" x:Name="FrameSwitch"
+                       Margin="5"
+                       WidthRequest="65"
+                       HeightRequest="35"
+                       BackgroundColor="#A0111111"
                         VerticalOptions="End"
-                        HorizontalOptions="Center"
-                        Toggled="FrameSwitch_Toggled"
-            ></Switch>
-            </Grid>
+                        HorizontalOptions="Center" Padding="0,0,0,0"
+                       BorderColor="Transparent">
+                    <Grid>
+                        <Button x:Name="DButton" Clicked="DButton_Clicked"  Text="D" VerticalOptions="Center" HorizontalOptions="Start" CornerRadius="15" BackgroundColor="#000000" TextColor="White"/>
+                        <Button x:Name="NButton" Clicked="NButton_Clicked" Text="N" VerticalOptions="Center" HorizontalOptions="End" CornerRadius="15" BackgroundColor="#000000" TextColor="White"/>
+                    </Grid>
+                </Frame>
+            </Grid> 
 
             <Grid Grid.Row="2" BackgroundColor="#83E9EE" ZIndex="{Binding CameraIndex}">
                 <Grid.ColumnDefinitions>

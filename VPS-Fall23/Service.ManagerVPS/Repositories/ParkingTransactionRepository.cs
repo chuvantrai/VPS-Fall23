@@ -173,7 +173,7 @@ namespace Service.ManagerVPS.Repositories
                                 ParkingTransaction = transaction,
                                 CreatedAt = DateTime.Now,
                                 ParkingTransactionId = transaction.Id,
-                                UnitPricePerHour = transaction.ParkingZone.PricePerHour,
+                                UnitPricePerHour = transaction.ParkingZone.PriceOverTimePerHour,
                                 Detail = "CHECK OUT AT " + checkAt
                             };
 

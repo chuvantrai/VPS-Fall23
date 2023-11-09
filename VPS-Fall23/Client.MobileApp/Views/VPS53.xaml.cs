@@ -14,22 +14,61 @@ public partial class VPS53 : ContentPage
 
     private readonly VPS53ViewModel _viewModel;
     private SKRect frameRect;
-    float frameWidth = 400;
-    float frameHeight = 235;
+    float frameWidth = 610;
+    int Frame = 0;
+    float frameHeight = 445;
+
     public VPS53()
     {
         VPS53ViewModel viewModel = new();
-        Load();
-        BindingContext = viewModel;
-        _viewModel = viewModel;
-
-    }
-
-    public async void Load()
-    {
         InitializeComponent();
         cameraView.Loaded += CameraView_CamerasLoaded;
         canvasView.PaintSurface += OnPaintSurface;
+        LoadFrame();
+        BindingContext = viewModel;
+        _viewModel = viewModel;
+    }
+
+    private void LoadFrame()
+    {
+        if (Frame == 0)
+        {
+            NButton.WidthRequest = 30;
+            NButton.HeightRequest = 30;
+            NButton.Padding = -15;
+            NButton.TextColor = Colors.Yellow;
+            NButton.FontSize = 14;
+
+
+            DButton.WidthRequest = 25;
+            DButton.HeightRequest = 25;
+            DButton.Padding = -5;
+            DButton.FontSize = 10;
+            DButton.TextColor = Colors.White;
+        }
+        else
+        {
+            DButton.WidthRequest = 30;
+            DButton.HeightRequest = 30;
+            DButton.Padding = -15;
+            DButton.FontSize = 14;
+            DButton.TextColor = Colors.Yellow;
+
+
+            NButton.WidthRequest = 25;
+            NButton.HeightRequest = 25;
+            NButton.Padding = -5;
+            NButton.FontSize = 10;
+            NButton.TextColor = Colors.White;
+        }
+    }
+
+    public void Load()
+    {
+        LoadCamera();
+        canvasView.PaintSurface += OnPaintSurface;
+        canvasView.InvalidateSurface();
+        LoadFrame();
     }
 
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
@@ -81,20 +120,17 @@ public partial class VPS53 : ContentPage
         }
     }
 
-    private void FrameSwitch_Toggled(object sender, ToggledEventArgs e)
+    public void LoadCamera()
     {
-        if (e.Value)
+        if (cameraView.Cameras.Count > 0)
         {
-            frameWidth = 590;
-            frameHeight = 180;
+            cameraView.Camera = cameraView.Cameras.First();
+
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                await cameraView.StartCameraAsync();
+            });
         }
-        else
-        {
-            frameWidth = 400;
-            frameHeight = 235;
-        }
-        canvasView.InvalidateSurface();
-        canvasView.PaintSurface += OnPaintSurface;
     }
 
     private async void CameraButton_Clicked(object sender, EventArgs e)
@@ -106,59 +142,38 @@ public partial class VPS53 : ContentPage
 
             var imageSource = await cameraView.TakePhotoAsync();
             imageSource.Seek(0, SeekOrigin.Begin);
-            var imageBytes = await Logic.ConvertStreamToByteArray(imageSource);
 
-            using (var bitmap = SKBitmap.Decode(imageBytes))
-            using (var image = SKImage.FromBitmap(bitmap))
+            using var image = SKImage.FromEncodedData(imageSource);
+            using (var frameImage = image.Subset(SKRectI.Round(frameRect)))
             {
-                var frameImage = image.Subset(SKRectI.Create(300, 400, 235, 400));
-
-                using (var frameBitmap = SKBitmap.FromImage(frameImage))
+                using MemoryStream imageSubsetStream = new MemoryStream();
+                frameImage.Encode().SaveTo(imageSubsetStream);
+                var checkLicensePlate = new LicensePlateScan
                 {
-                    byte[] frameImageBytes;
+                    Image = imageSubsetStream.ToArray(),
+                    CheckAt = DateTime.Now,
+                    CheckBy = Constant.USER
+                };
 
-                    using (var imageStream = new MemoryStream())
+                string response_1 = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
+
+                if (response_1 == Constant.CHECKOUT_CONFIRM || response_1.Contains(Constant.OVERTIME_CONFIRM))
+                {
+                    var answer = DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
+
+                    if (answer.ToString() == Constant.ACCEPT)
                     {
-                        frameBitmap.Encode(imageStream, SKEncodedImageFormat.Png, 100);
-                        frameImageBytes = imageStream.ToArray();
+                        string response_2 = await _viewModel.CheckOutScanConfirm(checkLicensePlate);
+                        DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
                     }
-
-                    if (imageBytes != null)
-                    {
-                        var checkLicensePlate = new LicensePlateScan
-                        {
-                            Image = frameImageBytes,
-                            CheckAt = DateTime.Now,
-                            CheckBy = Constant.USER
-                        };
-
-                        string response_1 = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
-
-                        if (response_1 == Constant.CHECKOUT_CONFIRM || response_1.Contains(Constant.OVERTIME_CONFIRM))
-                        {
-                            var answer = await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
-
-                            if (answer.ToString() == Constant.ACCEPT)
-                            {
-                                string response_2 = await _viewModel.CheckOutScanConfirm(checkLicensePlate);
-
-                                await DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
-                            }
-                        }
-                        else
-                        {
-                            await DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
-                        }
-
-                    }
-                    else
-                    {
-                        await DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
-                    }
-                    await imageSource.DisposeAsync();                  
+                }
+                else
+                {
+                    DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
                 }
                 Load();
             }
+
         }
         catch (Exception ex)
         {
@@ -200,17 +215,17 @@ public partial class VPS53 : ContentPage
                 {
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
-                        var answer = await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
+                        var answer = Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
 
                         if (answer.ToString() == Constant.ACCEPT)
                         {
                             string response_2 = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
 
-                            await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
+                            Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
                         }
                         else
                         {
-                            await Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
+                            Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
                         }
                     });
                 }
@@ -219,7 +234,7 @@ public partial class VPS53 : ContentPage
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    await Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
+                    Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
                 });
             }
         }
@@ -227,8 +242,56 @@ public partial class VPS53 : ContentPage
         {
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                await Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
+                Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
             });
         }
+    }
+
+    private void DButton_Clicked(object sender, EventArgs e)
+    {
+        DButton.WidthRequest = 30;
+        DButton.HeightRequest = 30;
+        DButton.Padding = -15;
+        DButton.FontSize = 14;
+        DButton.TextColor = Colors.Yellow;
+
+
+        NButton.WidthRequest = 25;
+        NButton.HeightRequest = 25;
+        NButton.Padding = -5;
+        NButton.FontSize = 10;
+        NButton.TextColor = Colors.White;
+
+        frameWidth = 800;
+        frameHeight = 390;
+
+        canvasView.InvalidateSurface();
+        canvasView.PaintSurface += OnPaintSurface;
+
+        Frame = 1;
+    }
+
+    private void NButton_Clicked(object sender, EventArgs e)
+    {
+        NButton.WidthRequest = 30;
+        NButton.HeightRequest = 30;
+        NButton.Padding = -15;
+        NButton.TextColor = Colors.Yellow;
+        NButton.FontSize = 14;
+
+
+        DButton.WidthRequest = 25;
+        DButton.HeightRequest = 25;
+        DButton.Padding = -5;
+        DButton.FontSize = 10;
+        DButton.TextColor = Colors.White;
+
+        frameWidth = 610;
+        frameHeight = 445;
+
+        canvasView.InvalidateSurface();
+        canvasView.PaintSurface += OnPaintSurface;
+
+        Frame = 0;
     }
 }
