@@ -204,7 +204,7 @@ function Register() {
                       color: '#1677ff',
                     }}
                   >
-                    Đã có tài khoản? Đăng nhập
+                    Đăng nhập
                   </Link>
                 </Form.Item>
               </Col>
@@ -212,7 +212,7 @@ function Register() {
           </Form>
         </div>
 
-        {account && <Navigate to={'verify-email'} replace={true} state={account} />}
+        {account && <Navigate to={'/verify-email'} replace={true} state={account} />}
       </div>
     </div>
   );

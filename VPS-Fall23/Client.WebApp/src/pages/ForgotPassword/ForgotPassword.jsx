@@ -1,4 +1,4 @@
-import { App, Button, Col, Form, Input, Row } from 'antd';
+import { App, Button, Col, Divider, Form, Input, Row } from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
@@ -196,7 +196,7 @@ function ForgotPassword() {
               />
             </Form.Item>
 
-            <Row className={'mb-[24px]'}>
+            {/* <Row className={'mb-[24px]'}>
               <Col span={12}>
 
               </Col>
@@ -206,10 +206,10 @@ function ForgotPassword() {
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >
-                  Quên mật khẩu
+                  Đăng nhập
                 </Link>
               </Col>
-            </Row>
+            </Row> */}
             <Row>
               <Col span={12}>
                 <Form.Item>
@@ -219,13 +219,21 @@ function ForgotPassword() {
                     htmlType='submit'
                     block
                   >
-                    Đăng nhập
+                    Quên mật khẩu
                   </Button>
                 </Form.Item>
               </Col>
               <Col span={4} className={'flex justify-center h-[32px] items-center'}>
                 <Link
-                  to={config.routes.register}
+                  to={'/login'}
+                  className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
+                    'shrink-0 rounded-sm text-[\'#1677ff\']')}
+                >
+                  Đăng nhập
+                </Link>
+                <Divider orientation='center' type='vertical' />
+                <Link
+                  to={'/register'}
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >
