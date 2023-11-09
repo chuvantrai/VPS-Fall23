@@ -1,9 +1,12 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import FoundedParkingZone from './FoundedParkingZone';
 import { useSelector } from 'react-redux';
+// eslint-disable-next-line no-undef
 const { Map } = await google.maps.importLibrary('maps');
+// eslint-disable-next-line no-undef
 const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
 let map;
+
 async function initMap(focusPosition) {
   // The location of Uluru
   const position = focusPosition;
@@ -21,9 +24,10 @@ const DriverHompage = () => {
   const [focusPosition, setFocusPosition] = useState({ lat: 20.98257, lng: 105.844949 });
   const { listFounded } = useSelector((state) => state.parkingZone);
   useEffect(() => {
-    if (map) { map.setCenter(focusPosition.lat, focusPosition.lng, map.getZoom()) }
-    else initMap(focusPosition)
-    listFounded.map((parkingZone, index) => {
+    if (map) {
+      map.setCenter(focusPosition.lat, focusPosition.lng, map.getZoom());
+    } else initMap(focusPosition);
+    listFounded.map((parkingZone) => {
       if (!parkingZone.lat || !parkingZone.lng) {
         return;
       }
@@ -35,7 +39,8 @@ const DriverHompage = () => {
         },
         title: parkingZone.name,
       });
-      const infoWindow = new google.maps.InfoWindow({
+      // eslint-disable-next-line no-undef
+      new google.maps.InfoWindow({
         content: parkingZone.name,
         disableAutoPan: false,
       });
@@ -57,6 +62,7 @@ const DriverHompage = () => {
       },
       title: parkingZone.name,
     });
+    // eslint-disable-next-line no-undef
     const infoWindow = new google.maps.InfoWindow({
       content: parkingZone.name,
       disableAutoPan: false,
@@ -66,7 +72,7 @@ const DriverHompage = () => {
   return (
     <Fragment>
       <div
-        id="map"
+        id='map'
         style={{
           width: '100vw',
           maxWidth: '100%',

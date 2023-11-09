@@ -151,6 +151,10 @@ const useParkingZoneService = () => {
     });
   };
 
+  const GetParkingZonesByParkingZoneIds = (parkingZoneIds) => {
+    return axios.post(`${BASE_URI}/GetDataParkingZoneByParkingZoneIds`, parkingZoneIds);
+  };
+
   return {
     getByAddress,
     register,
@@ -166,6 +170,7 @@ const useParkingZoneService = () => {
     getAllParkingZoneByOwnerId,
     getBookedSlot,
     closeParkingZone,
+    GetParkingZonesByParkingZoneIds
   };
 };
 
