@@ -33,6 +33,34 @@ namespace Service.ManagerVPS.Repositories
                  .CountAsync();
         }
 
+        public List<ParkingTransaction> GetBookedSlot(string parkingZoneName, DateTime? checkAt)
+        {
+            if (!checkAt.HasValue)
+            {
+                checkAt = DateTime.Now;
+            }
+            var list = this.entities
+                .Include(p => p.ParkingZone)
+                 .Where(p => p.ParkingZone.Name == parkingZoneName
+                 && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED)
+                 && (!p.ParkingTransactionDetails.Any())
+                 ).ToList();
+            return list;
+        }
+
+        //public async Task<int> GetMonthDoneTransaction(Guid parkingZoneId)
+        //{
+        //    DateTime dateTime = DateTime.Now;
+        //    return await this.entities
+        //         .Where(p => p.ParkingZoneId == parkingZoneId
+        //         && p.CreatedAt.Month == dateTime.Month
+        //         && (p.StatusId == 5)
+        //         && (!p.ParkingTransactionDetails.Any()
+        //         || p.ParkingTransactionDetails.OrderByDescending(pt => pt.CreatedAt).First().To >= checkAt
+        //         ))
+        //         .CountAsync();
+        //}
+
         public async Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy)
         {
             var transaction = await entities.Include(t => t.ParkingTransactionDetails)

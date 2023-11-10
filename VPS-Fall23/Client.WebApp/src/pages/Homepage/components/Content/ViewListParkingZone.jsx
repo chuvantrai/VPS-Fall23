@@ -31,6 +31,7 @@ import { getAccountJwtModel } from '@/helpers';
 import AddressCascader from '@/components/cascader/AddressCascader';
 import { useDebounce } from 'use-debounce';
 import CloseModalForm from './components/CloseModalForm';
+import { Link, Outlet } from 'react-router-dom';
 
 const onChange = (pagination, filters, sorter, extra) => {
   console.log('params', pagination, filters, sorter, extra);
@@ -117,6 +118,11 @@ function ViewListParkingZone() {
       title: 'Tên bãi đỗ xe',
       dataIndex: 'name',
       key: 'name',
+      render: (val) => (
+        <Fragment>
+          <Link to={`/${val}`}>{val}</Link>
+        </Fragment>
+      ),
     },
     {
       title: 'Chủ bãi đỗ xe',
@@ -390,6 +396,7 @@ function ViewListParkingZone() {
 
   return (
     <Fragment>
+      <Outlet></Outlet>
       <div className="w-full px-4">
         <AutoComplete style={{ width: 200 }} onSearch={handleSearch} placeholder="Tìm kiếm" className="mt-4 mb-4" />
         {data != undefined && (

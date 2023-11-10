@@ -8,6 +8,7 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         Task<string> CanLicensePlateCheckin(string licenseplate, DateTime checkAt, Guid checkBy);
         Task<string> CanLicensePlateCheckout(string licenseplate, DateTime checkAt, Guid checkBy);
         Task<int> GetBookedSlot(Guid parkingZoneId);
+        List<ParkingTransaction> GetBookedSlot(string parkingZoneName, DateTime? checkAt);
         Task<int> GetBookedSlot(Guid parkingZoneId, DateTime checkAt);
         Task<ParkingTransaction?> GetParkingTransactionByIdEmail(Guid id, string email);
         Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy);
