@@ -1,4 +1,5 @@
 ﻿using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
 
 namespace Service.ManagerVPS.Repositories.Interfaces
@@ -16,5 +17,6 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy);
         Task<string> CheckOutConfirm(string licenseplate, DateTime checkAt, Guid checkBy);
         Task<bool> IsAlreadyBooking(BookingSlot bookingSlot);
+        Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(Guid parkingZoneId);
     }
 }
