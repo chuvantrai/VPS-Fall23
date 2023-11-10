@@ -362,7 +362,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         {
             Id = Guid.NewGuid(),
             ParkingZoneId = (Guid)input.ParkingZoneId,
-            From = input.CloseFrom,
+            From = (DateTime)input.CloseFrom!,
             To = input.CloseTo,
             Reason = input.Reason,
             CreatedAt = DateTime.Now

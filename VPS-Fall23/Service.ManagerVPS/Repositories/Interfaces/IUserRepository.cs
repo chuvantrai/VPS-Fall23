@@ -28,8 +28,8 @@ public interface IUserRepository : IVpsRepository<Account>
 
     Task<Account?> GetAccountByIdAsync(Guid id);
 
-    PagedList<Account> GetListAttendantAccount(string ownerId, QueryStringParameters parameters);
+    PagedList<Account> GetListAttendantAccount(Guid ownerId, QueryStringParameters parameters);
 
-    PagedList<Account> SearchAttendantByName(string ownerId, string attendantName,
+    PagedList<Account> SearchAttendantByName(Guid ownerId, string attendantName,
         QueryStringParameters parameters);
 }
