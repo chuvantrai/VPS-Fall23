@@ -22,22 +22,6 @@ public class FeedBackController : VpsController<Feedback>
         _parkingTransactionRepository = parkingTransactionRepository;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateFeedBackParkingZone(
-        CreateFeedBackParkingZoneRequest request)
-    {
-        var parkingTransaction =
-            await _parkingTransactionRepository.GetParkingTransactionByIdEmail(
-                request.ParkingZoneId, request.Email);
-        if (parkingTransaction == null) throw new ClientException(5008);
-
-        var feedBackResult =
-            await ((IFeedBackRepository)vpsRepository).CreateFeedBack(request,
-                parkingTransaction.ParkingZone);
-        if (feedBackResult != 200) throw new ClientException(feedBackResult);
-        return Ok();
-    }
-
     [HttpGet("{parkingZoneId}")]
     public QueryResponseModel<Feedback> GetFeedbacksByParkingZone(Guid parkingZoneId, int page = 1,
         int pageSize = 10)
@@ -165,5 +149,22 @@ public class FeedBackController : VpsController<Feedback>
             Data = result
         };
         return Ok(metadata);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateFeedBackParkingZone(CreateFeedBackParkingZoneRequest request)
+    {
+        var parkingTransaction =
+            await _parkingTransactionRepository.GetParkingTransactionByIdEmail(request.ParkingZoneId, request.Email);
+        if (parkingTransaction.Id != 200) throw new ClientException(parkingTransaction.id);
+
+        var feedBackResult = await ((IFeedBackRepository)vpsRepository)
+            .CreateFeedBack(request, (ParkingZone)parkingTransaction.ParkingTransaction.ParkingZone);
+        
+        if (feedBackResult.Id != 200) throw new ClientException(feedBackResult.Id);
+        return Ok(new
+        {
+            FeedBackResult = feedBackResult.FeedBack
+        });
     }
 }

@@ -1,10 +1,11 @@
-import { Alert, Badge, Button, Carousel, Descriptions, Image, Modal, Tabs, Tag, Typography, notification } from 'antd';
+import { Button, Carousel, Descriptions, Image, Modal, Tabs, notification, Tooltip } from 'antd';
 import useParkingZoneService from '../../../../services/parkingZoneService';
 import { useEffect, useState } from 'react';
 import BookingForm from './BookingForm';
 import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm.jsx';
 import FeedbackList from './FeedbackList';
-
+import { BookOutlined, BookTwoTone } from '@ant-design/icons';
+import { getListBookmarkParkingZone, setListBookmarkParkingZone } from '../../../../helpers/index.js';
 
 
 const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = '1' }) => {
@@ -14,16 +15,19 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
   const [freeSlots, setFreeSlots] = useState(parkingZone?.slots ?? 0);
   const [tab, setTab] = useState('1');
   useEffect(() => {
-    setTab(defaultTab)
-  }, [defaultTab])
+    setTab(defaultTab);
+  }, [defaultTab]);
   useEffect(() => {
-
+    if (isShow && parkingZone !== undefined && parkingZone.id) {
+      const arrayBookmarkPzId = getListBookmarkParkingZone() ?? [];
+      setIsBookmark(arrayBookmarkPzId.includes(parkingZone?.id));
+    }
     if (!parkingZone) return;
     parkingZoneService.getImageLink(parkingZone.id).then((res) => setImageLinks(res?.data));
   }, [parkingZone?.id]);
   const onGetFreeSlot = (parkingZoneId) => {
     parkingZoneService.getBookedSlot(parkingZoneId).then(res => setFreeSlots(parkingZone.slots - res.data));
-  }
+  };
   const getDetailDescription = () => {
     if (!parkingZone) return [];
     return [
@@ -83,7 +87,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
     {
       key: '2',
       label: 'Xem đánh giá',
-      children: <FeedbackList parkingZoneId={parkingZone?.id} />
+      children: <FeedbackList parkingZoneId={parkingZone?.id} />,
     },
     {
       key: '3',
@@ -102,8 +106,33 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
     },
   ];
   const onChangeTabs = (key) => {
-    setTab(key)
+    setTab(key);
   };
+
+  const [isBookmark, setIsBookmark] = useState(false);
+  const ClickBookMark = () => {
+    let arrayBookmarkPzId = getListBookmarkParkingZone() ?? [];
+    if (!isBookmark) {
+      arrayBookmarkPzId.push(parkingZone.id);
+      setIsBookmark(true);
+      notification.success({
+        message: 'Lưu thành công',
+      });
+    } else {
+      arrayBookmarkPzId = arrayBookmarkPzId.filter(item => item !== parkingZone.id);
+      setIsBookmark(false);
+      notification.success({
+        message: 'Bỏ lưu thành công',
+      });
+    }
+    setListBookmarkParkingZone(arrayBookmarkPzId);
+  };
+  const operations = (
+    <>
+      <Tooltip placement='bottom' title={isBookmark ? 'Bỏ lưu bãi đỗ xe' : 'Lưu bãi đỗ xe'} zIndex={10000}>
+        <Button icon={isBookmark ? <BookTwoTone /> : <BookOutlined />} onClick={ClickBookMark}></Button>
+      </Tooltip>
+    </>);
 
   return (
     <>
@@ -136,10 +165,10 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
             activeKey={tab}
             items={items}
             destroyInactiveTabPane={true}
-            onChange={onChangeTabs} />
+            onChange={onChangeTabs}
+            tabBarExtraContent={operations} />
         </div>
       </Modal>
-
     </>
   );
 };

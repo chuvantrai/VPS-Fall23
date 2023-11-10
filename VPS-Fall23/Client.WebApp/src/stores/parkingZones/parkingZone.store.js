@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   listFounded: [],
   isShowBookingForm: false,
+  listDataBookmark: []
 };
 
 const parkingZoneSlice = createSlice({
@@ -15,8 +16,11 @@ const parkingZoneSlice = createSlice({
     setShowBookingForm(state, action) {
       state.isShowBookingForm = action.payload.isShowBookingForm;
     },
+    setListDataBookmark(state, action) {
+      state.listDataBookmark = action.payload.listDataBookmark;
+    },
   },
 });
 
-export const { setFoundedParkingZones, setShowBookingForm } = parkingZoneSlice.actions;
+export const { setFoundedParkingZones, setShowBookingForm, setListDataBookmark } = parkingZoneSlice.actions;
 export default parkingZoneSlice.reducer;

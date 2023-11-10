@@ -16,7 +16,6 @@ const Footer = () => {
         <div className={'flex justify-end'}><ModalReport contentBtn={contentBtnReport} /></div>
       </div>
     </AntdFooter>
-
   );
 };
 export default Footer;

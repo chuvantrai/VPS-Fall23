@@ -6,6 +6,7 @@ const items = [
   },
 ];
 
+// eslint-disable-next-line react/prop-types
 const ManagerRightHeader = ({ account }) => {
   return (
     <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
