@@ -34,36 +34,46 @@
             </Grid>
 
             <Grid Grid.Row="0" 
-                  BackgroundColor="#83E9EE"
-                  ZIndex="{Binding CameraIndex}">
-
+               BackgroundColor="White"
+                
+                  ZIndex="{Binding CameraIndex}"
+                
+                  >
                 <Image Source="logo.png"/>
 
             </Grid>
 
             <Grid
                   ZIndex="{Binding CameraIndex}"
-                  Grid.Row="1">
+                  Grid.Row="1"
+                  x:Name="cameraZone">
+                
                 <cv:CameraView  x:Name="cameraView"
-                                VerticalOptions="Fill"
-                                HorizontalOptions="Fill"/>
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="CenterAndExpand"/>
+                <skia:SKCanvasView Grid.Row="1" x:Name="canvasView" VerticalOptions="FillAndExpand" ZIndex="{Binding CameraIndex}" PaintSurface="OnPaintSurface" />
 
                 <Frame CornerRadius="50" x:Name="FrameSwitch"
                        Margin="5"
-                       WidthRequest="65"
-                       HeightRequest="35"
+                       ZIndex="{Binding CameraIndex}"
                        BackgroundColor="#A0111111"
-                        VerticalOptions="End"
-                        HorizontalOptions="Center" Padding="0,0,0,0"
+                       VerticalOptions="End"
+                       HorizontalOptions="Center" Padding="0,0,0,0"
                        BorderColor="Transparent">
                     <Grid>
-                        <Button x:Name="DButton" Clicked="DButton_Clicked"  Text="D" VerticalOptions="Center" HorizontalOptions="Start" CornerRadius="15" BackgroundColor="#000000" TextColor="White"/>
-                        <Button x:Name="NButton" Clicked="NButton_Clicked" Text="N" VerticalOptions="Center" HorizontalOptions="End" CornerRadius="15" BackgroundColor="#000000" TextColor="White"/>
+                        <Button x:Name="ChangePlateTypeButton" Clicked="ChangePlateType"  
+                                Text="Đổi loại biển" 
+                                VerticalOptions="Center" 
+                                HorizontalOptions="Start" 
+                                CornerRadius="50"
+                                BackgroundColor="Transparent"
+                                TextColor="White"/>
                     </Grid>
                 </Frame>
-            </Grid> 
 
-            <Grid Grid.Row="2" BackgroundColor="#83E9EE" ZIndex="{Binding CameraIndex}">
+            </Grid>
+
+            <Grid Grid.Row="2" BackgroundColor="White" ZIndex="{Binding CameraIndex}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.5*"/>
                     <ColumnDefinition Width="0.2*"/>
@@ -71,7 +81,7 @@
                     <ColumnDefinition Width="0.5*"/>
 
                 </Grid.ColumnDefinitions>
-                <Frame Margin="10" Grid.Column="0" Padding="10,0,10,-2">
+                <Frame Margin="10" Grid.Column="0">
 
                     <Entry x:Name="AreaCodeEntry"
                            IsSpellCheckEnabled="False"
@@ -89,7 +99,6 @@
                         TextColor="Black"/>
 
                 <Frame Margin="10" Grid.Column="2" Padding="10,0,10,-2">
-
                     <Entry x:Name="LicensePlateEntry" 
                            IsTextPredictionEnabled="False"
                            Text="{Binding LicensePlateEntry}"
@@ -98,11 +107,11 @@
                            HorizontalOptions="FillAndExpand"/>
 
                 </Frame>
-                <Button Clicked="OkButton_Clicked" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="3" CornerRadius="100"></Button>
+                <Button Clicked="OkButton_Clicked" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="3"></Button>
             </Grid>
 
             <Grid  Grid.Row="3" 
-                   BackgroundColor="#83E9EE"
+                   BackgroundColor="White"
                    ZIndex="{Binding CameraIndex}">
 
                 <Grid.ColumnDefinitions>
@@ -111,18 +120,17 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Button ImageSource="videocamera.png" 
-                        MaximumHeightRequest="80" 
-                        MaximumWidthRequest="80"
-                        BackgroundColor="#D9D9D9"
+                <ImageButton Source="aperture.svg"
+                             
+                        WidthRequest="60" 
+                        HeightRequest="60"
+                        BackgroundColor="Transparent"
                         Grid.Column="1" 
-                        BorderWidth="1"
-                        BorderColor="Black"
                         Clicked="CameraButton_Clicked" 
-                        CornerRadius="40"/>
+                       />
 
             </Grid>
-            <skia:SKCanvasView Grid.Row="1" x:Name="canvasView" VerticalOptions="FillAndExpand" ZIndex="{Binding CameraIndex}" PaintSurface="OnPaintSurface" />
+
         </Grid>
 
     </ScrollView>

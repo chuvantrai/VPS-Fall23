@@ -18,7 +18,6 @@ namespace Client.MobileApp
                     Android.Content.Res.ColorStateList.ValueOf(Colors.Transparent.ToAndroid());
             });
 #endif
-
         }
     }
 }

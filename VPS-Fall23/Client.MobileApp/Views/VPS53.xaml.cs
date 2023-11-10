@@ -13,98 +13,57 @@ public partial class VPS53 : ContentPage
 {
 
     private readonly VPS53ViewModel _viewModel;
-    private SKRect frameRect;
-    float frameWidth = 610;
-    int Frame = 0;
-    float frameHeight = 445;
+    private SKRect plateRect;
+    const float PLATE_LONG_H_W = 0.3f;
+    const float PLATE_SHORT_H_W = 0.74f;
+    const float SCREEN_COVERAGE = 0.8f;
+    bool isShortPlate = true;
 
     public VPS53()
     {
-        VPS53ViewModel viewModel = new();
         InitializeComponent();
-        cameraView.Loaded += CameraView_CamerasLoaded;
-        canvasView.PaintSurface += OnPaintSurface;
-        LoadFrame();
+        VPS53ViewModel viewModel = new();
         BindingContext = viewModel;
         _viewModel = viewModel;
-    }
-
-    private void LoadFrame()
-    {
-        if (Frame == 0)
-        {
-            NButton.WidthRequest = 30;
-            NButton.HeightRequest = 30;
-            NButton.Padding = -15;
-            NButton.TextColor = Colors.Yellow;
-            NButton.FontSize = 14;
-
-
-            DButton.WidthRequest = 25;
-            DButton.HeightRequest = 25;
-            DButton.Padding = -5;
-            DButton.FontSize = 10;
-            DButton.TextColor = Colors.White;
-        }
-        else
-        {
-            DButton.WidthRequest = 30;
-            DButton.HeightRequest = 30;
-            DButton.Padding = -15;
-            DButton.FontSize = 14;
-            DButton.TextColor = Colors.Yellow;
-
-
-            NButton.WidthRequest = 25;
-            NButton.HeightRequest = 25;
-            NButton.Padding = -5;
-            NButton.FontSize = 10;
-            NButton.TextColor = Colors.White;
-        }
-    }
-
-    public void Load()
-    {
-        LoadCamera();
+        cameraView.Loaded += CameraView_CamerasLoaded;
         canvasView.PaintSurface += OnPaintSurface;
-        canvasView.InvalidateSurface();
-        LoadFrame();
+        FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
+        ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
+
     }
 
+    Task LoadCanvasSurface()
+    {
+        return Task.Run(() =>
+        {
+            canvasView.InvalidateSurface();
+            canvasView.PaintSurface += OnPaintSurface;
+            canvasView.InvalidateSurface();
+        });
+    }
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
-        var surface = e.Surface;
-        var canvas = surface.Canvas;
-
+        var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
 
-        float frameX = (e.Info.Width - frameWidth) / 2;
-        float frameY = (e.Info.Height - frameHeight) / 2;
-        float frameRight = frameX + frameWidth;
-        float frameBottom = frameY + frameHeight;
+        var frameWidthFollowScreen = e.Info.Width * SCREEN_COVERAGE;
+        var frameHeightFollowScreen = frameWidthFollowScreen * (isShortPlate ? PLATE_SHORT_H_W : PLATE_LONG_H_W);
+        float frameX = (e.Info.Width - frameWidthFollowScreen) / 2;
+        float frameY = (e.Info.Height - frameHeightFollowScreen) / 2;
+        float frameRight = frameX + frameWidthFollowScreen;
+        float frameBottom = frameY + frameHeightFollowScreen;
+        SKRect allScreenRect = new SKRect(0, 0, e.Info.Width, e.Info.Height);
+        plateRect = new SKRect(frameX, frameY, frameRight, frameBottom);
+        using var paint = new SKPaint();
+        using SKRegion allScreenRegion = new SKRegion(SKRectI.Round(allScreenRect));
+        using SKRegion plateRegion = new SKRegion(SKRectI.Round(plateRect));
+        paint.Style = SKPaintStyle.Fill;
+        paint.Color = SKColors.Black.WithAlpha((byte)(0xFF * (1 - 0.5)));
+        paint.StrokeWidth = 5;
+        allScreenRegion.Op(plateRegion, SKRegionOperation.Difference);
+        canvas.DrawRegion(allScreenRegion, paint);
 
-        using (var paint = new SKPaint())
-        {
-            paint.Style = SKPaintStyle.Stroke;
-            paint.Color = SKColors.Black;
-            paint.StrokeWidth = 5;
 
-            float dashLength = 50f;
-            float dashGapthWidth = frameWidth - dashLength * 2;
-            float dashGapthHeight = frameHeight - dashLength * 2;
-
-            canvas.DrawLine(frameX, frameY, frameX + dashLength, frameY, paint);
-            canvas.DrawLine(frameX + dashLength + dashGapthWidth, frameY, frameX + 2 * dashLength + dashGapthWidth, frameY, paint);
-            canvas.DrawLine(frameX, frameBottom, frameX + dashLength, frameBottom, paint);
-            canvas.DrawLine(frameX + dashLength + dashGapthWidth, frameBottom, frameX + 2 * dashLength + dashGapthWidth, frameBottom, paint);
-
-            canvas.DrawLine(frameX, frameY, frameX, frameY + dashLength, paint);
-            canvas.DrawLine(frameX, frameY + dashLength + dashGapthHeight, frameX, frameY + 2 * dashLength + dashGapthHeight, paint);
-            canvas.DrawLine(frameRight, frameY, frameRight, frameY + dashLength, paint);
-            canvas.DrawLine(frameRight, frameY + dashLength + dashGapthHeight, frameRight, frameBottom, paint);
-
-            frameRect = new SKRect(frameX, frameY, frameX + frameWidth, frameY + frameHeight);
-        }
     }
 
     private void CameraView_CamerasLoaded(object sender, EventArgs e)
@@ -112,20 +71,6 @@ public partial class VPS53 : ContentPage
         if (cameraView.Cameras.Count > 0)
         {
             cameraView.Camera = cameraView.Cameras.First();
-
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                await cameraView.StartCameraAsync();
-            });
-        }
-    }
-
-    public void LoadCamera()
-    {
-        if (cameraView.Cameras.Count > 0)
-        {
-            cameraView.Camera = cameraView.Cameras.First();
-
             MainThread.BeginInvokeOnMainThread(async () =>
             {
                 await cameraView.StartCameraAsync();
@@ -142,38 +87,20 @@ public partial class VPS53 : ContentPage
 
             var imageSource = await cameraView.TakePhotoAsync();
             imageSource.Seek(0, SeekOrigin.Begin);
-
             using var image = SKImage.FromEncodedData(imageSource);
-            using (var frameImage = image.Subset(SKRectI.Round(frameRect)))
+            using var licensePlateImage = image.Subset(SKRectI.Round(plateRect));
+            using MemoryStream imageSubsetStream = new MemoryStream();
+            licensePlateImage.Encode().SaveTo(imageSubsetStream);
+            var checkLicensePlate = new LicensePlateScan
             {
-                using MemoryStream imageSubsetStream = new MemoryStream();
-                frameImage.Encode().SaveTo(imageSubsetStream);
-                var checkLicensePlate = new LicensePlateScan
-                {
-                    Image = imageSubsetStream.ToArray(),
-                    CheckAt = DateTime.Now,
-                    CheckBy = Constant.USER
-                };
+                Image = imageSubsetStream.ToArray(),
+                CheckAt = DateTime.Now,
+                CheckBy = Constant.USER
+            };
 
-                string response_1 = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
-
-                if (response_1 == Constant.CHECKOUT_CONFIRM || response_1.Contains(Constant.OVERTIME_CONFIRM))
-                {
-                    var answer = DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
-
-                    if (answer.ToString() == Constant.ACCEPT)
-                    {
-                        string response_2 = await _viewModel.CheckOutScanConfirm(checkLicensePlate);
-                        DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
-                    }
-                }
-                else
-                {
-                    DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
-                }
-                Load();
-            }
-
+            string autoCheckinResponse = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
+            var checkoutScanConfirm = new Task<string>(() => _viewModel.CheckOutScanConfirm(checkLicensePlate).Result);
+            await HandleResponse(autoCheckinResponse, checkoutScanConfirm);
         }
         catch (Exception ex)
         {
@@ -184,6 +111,36 @@ public partial class VPS53 : ContentPage
 
         }
     }
+    async Task HandleResponse(string response, Task<string> checkOutScanConfirmTask = null)
+    {
+        switch (response)
+        {
+            case Constant.CHECKOUT_CONFIRM:
+                {
+                    var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, response, Constant.ACCEPT, Constant.CANCEL);
+                    if (confirmAnswer.ToString() == Constant.ACCEPT)
+                        await HandleResponse(Constant.ACCEPT);
+                    break;
+                }
+            case Constant.ACCEPT:
+                {
+                    string checkinByConfirmResponse = await checkOutScanConfirmTask;
+                    await HandleResponse(checkinByConfirmResponse);
+                    break;
+                }
+            default:
+                {
+                    if (response.Contains(Constant.OVERTIME_CONFIRM))
+                    {
+                        await HandleResponse(Constant.CHECKOUT_CONFIRM);
+                        break;
+                    }
+                    await DisplayAlert(Constant.NOTIFICATION, response, Constant.CANCEL);
+                    break;
+                }
+        }
+    }
+
 
     private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
     {
@@ -247,51 +204,9 @@ public partial class VPS53 : ContentPage
         }
     }
 
-    private void DButton_Clicked(object sender, EventArgs e)
+    private void ChangePlateType(object sender, EventArgs e)
     {
-        DButton.WidthRequest = 30;
-        DButton.HeightRequest = 30;
-        DButton.Padding = -15;
-        DButton.FontSize = 14;
-        DButton.TextColor = Colors.Yellow;
-
-
-        NButton.WidthRequest = 25;
-        NButton.HeightRequest = 25;
-        NButton.Padding = -5;
-        NButton.FontSize = 10;
-        NButton.TextColor = Colors.White;
-
-        frameWidth = 800;
-        frameHeight = 390;
-
-        canvasView.InvalidateSurface();
-        canvasView.PaintSurface += OnPaintSurface;
-
-        Frame = 1;
-    }
-
-    private void NButton_Clicked(object sender, EventArgs e)
-    {
-        NButton.WidthRequest = 30;
-        NButton.HeightRequest = 30;
-        NButton.Padding = -15;
-        NButton.TextColor = Colors.Yellow;
-        NButton.FontSize = 14;
-
-
-        DButton.WidthRequest = 25;
-        DButton.HeightRequest = 25;
-        DButton.Padding = -5;
-        DButton.FontSize = 10;
-        DButton.TextColor = Colors.White;
-
-        frameWidth = 610;
-        frameHeight = 445;
-
-        canvasView.InvalidateSurface();
-        canvasView.PaintSurface += OnPaintSurface;
-
-        Frame = 0;
+        isShortPlate = !isShortPlate;
+        LoadCanvasSurface();
     }
 }

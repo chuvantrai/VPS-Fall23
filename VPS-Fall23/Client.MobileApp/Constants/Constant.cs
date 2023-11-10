@@ -14,14 +14,14 @@
         /// <summary>
         /// Notification Message
         /// </summary>
-        public static string NOTIFICATION = "THÔNG BÁO";
-        public static string ALERT = "CẢNH BÁO";
-        public static string CANCEL = "Thoát";
-        public static string ACCEPT = "Xác nhận trả";
-        public static string ALERT_ERROR = "Hãy đưa biển số xe vào đúng khu vực quét !!!";
-        public static string LOGIN_SUCCESS = "Đăng nhập thành công !";
-        public static string LOGIN_FAILED = "Mật khẩu hoặc tài khoản chưa chính xác !";
-        public static string CHECKOUT_CONFIRM = "Chưa trả tiền xe";
+        public const string NOTIFICATION = "THÔNG BÁO";
+        public const string ALERT = "CẢNH BÁO";
+        public const string CANCEL = "Thoát";
+        public const string ACCEPT = "Xác nhận trả";
+        public const string ALERT_ERROR = "Hãy đưa biển số xe vào đúng khu vực quét !!!";
+        public const string LOGIN_SUCCESS = "Đăng nhập thành công !";
+        public const string LOGIN_FAILED = "Mật khẩu hoặc tài khoản chưa chính xác !";
+        public const string CHECKOUT_CONFIRM = "Chưa trả tiền xe";
         public const string OVERTIME_CONFIRM = "Số tiền bạn phải trả là : ";
     }
 }

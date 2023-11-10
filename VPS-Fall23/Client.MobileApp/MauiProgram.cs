@@ -30,7 +30,6 @@ namespace Client.MobileApp
                 .RegisterAppServices()
                 .UseSkiaSharp()
                 ;
-
             builder.Services.AddSingleton<IBrowser>(Browser.Default);
             builder.Services.AddSingleton<IDeviceDisplay>(DeviceDisplay.Current);
 
