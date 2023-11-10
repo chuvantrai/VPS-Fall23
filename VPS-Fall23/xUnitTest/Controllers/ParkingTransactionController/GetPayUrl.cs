@@ -1,7 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Notifications;
+using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.ExternalClients;
@@ -72,7 +75,10 @@ namespace xUnitTest.Controllers.ParkingTransactionController
                 new Service.ManagerVPS.Controllers.ParkingTransactionController(
                     parkingTransactionRepository,
                 googleApiService,
+                   FakeItEasy.A.Fake<IOptions<FileManagementConfig>>(),
                 options,
+
+                FakeItEasy.A.Fake<IConfiguration>(),
                 parkingZoneRepository,
                 paymentTransactionRepository);
         }

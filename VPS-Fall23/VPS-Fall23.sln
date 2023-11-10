@@ -17,7 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{21428CC3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "xUnitTest", "xUnitTest\xUnitTest.csproj", "{79003443-2F26-4510-8D12-DC745301E271}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.WorkerVPS", "Service.WorkerVPS\Service.WorkerVPS.csproj", "{FECFBE52-B0EE-41AC-A161-D89BE91E559A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Service.WorkerVPS", "Service.WorkerVPS\Service.WorkerVPS.csproj", "{FECFBE52-B0EE-41AC-A161-D89BE91E559A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.BrokerApi", "Service.BrokerApi\Service.BrokerApi.csproj", "{BCB9E28A-7FCC-4B31-93DB-4FFAC38BA28F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{FECFBE52-B0EE-41AC-A161-D89BE91E559A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FECFBE52-B0EE-41AC-A161-D89BE91E559A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FECFBE52-B0EE-41AC-A161-D89BE91E559A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCB9E28A-7FCC-4B31-93DB-4FFAC38BA28F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCB9E28A-7FCC-4B31-93DB-4FFAC38BA28F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCB9E28A-7FCC-4B31-93DB-4FFAC38BA28F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCB9E28A-7FCC-4B31-93DB-4FFAC38BA28F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{80A267DB-ADD1-4896-B835-C35117C3E2EF} = {F3B30DE8-7862-4B58-B730-A90119796990}
 		{79003443-2F26-4510-8D12-DC745301E271} = {21428CC3-565F-4C4D-9493-B2A09190E393}
 		{FECFBE52-B0EE-41AC-A161-D89BE91E559A} = {45BDDD79-A768-4C60-B973-78E91D02FF93}
+		{BCB9E28A-7FCC-4B31-93DB-4FFAC38BA28F} = {45BDDD79-A768-4C60-B973-78E91D02FF93}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {42535E02-1427-4E6E-B4C2-57C4E1FF524E}

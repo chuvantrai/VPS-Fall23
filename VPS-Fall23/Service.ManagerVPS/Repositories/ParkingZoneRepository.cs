@@ -96,6 +96,7 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(d => d.City)
             .Where(p => p.Commune.District.CityId == cityId
             && p.IsFull == false
+                 && p.IsApprove == true
             && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
@@ -107,7 +108,8 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(d => d.City)
             .Where(p => p.CommuneId == communeId
             && p.IsFull == false
-            && !p.ParkingZoneAbsents.Any(pa => pa.From<= DateTime.Now && pa.To >= DateTime.Now));
+            && p.IsApprove == true
+            && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByDistrictId(Guid districtId)
@@ -117,6 +119,7 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City).Where(p => p.Commune.DistrictId == districtId
             && p.IsFull == false
+                 && p.IsApprove == true
             && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
@@ -135,5 +138,15 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .Include(x => x.ParkingZoneAbsents)
             .FirstOrDefault(x => x.Id.Equals(parkingZoneId));
         return parkingZone;
+    }
+
+    public IEnumerable<ParkingZone>? GetParkingZoneByArrayParkingZoneId(Guid[]? parkingZoneIds)
+    {
+        if (parkingZoneIds == null || parkingZoneIds.Length == 0) return null;
+        return context.ParkingZones.Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(p => parkingZoneIds.Contains(p.Id) && p.IsApprove == true);
     }
 }

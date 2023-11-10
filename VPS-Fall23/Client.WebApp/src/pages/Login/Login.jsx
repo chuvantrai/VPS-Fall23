@@ -44,10 +44,10 @@ function Login() {
         if (rememberPassword) {
           Cookies.set(keyNameCookies.ACCOUNT_DATA, convertAccountDataToCode(values.username, values.password));
         }
-        let accountJwtModel = getAccountJwtModel();
-        accountJwtModel.Expires = null;
-        accountJwtModel.ModifiedAt = null;
-        store.dispatch(setAccountDataJwt({ accountDataJwt: accountJwtModel }));
+        // let accountJwtModel = getAccountJwtModel();
+        // accountJwtModel.Expires = null;
+        // accountJwtModel.ModifiedAt = null;
+        // store.dispatch(setAccountDataJwt({ accountDataJwt: accountJwtModel }));
         window.location.href = '/';
       })
       .catch(err => {
@@ -135,7 +135,7 @@ function Login() {
               </Col>
               <Col span={4}>
                 <Link
-                  to={'forgot-password'}
+                  to={'/forgot-password'}
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >
@@ -158,7 +158,7 @@ function Login() {
               </Col>
               <Col span={4} className={'flex justify-center h-[32px] items-center'}>
                 <Link
-                  to={'register'}
+                  to={'/register'}
                   className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                     'shrink-0 rounded-sm text-[\'#1677ff\']')}
                 >

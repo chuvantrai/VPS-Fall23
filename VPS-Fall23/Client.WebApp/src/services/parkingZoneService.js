@@ -151,12 +151,8 @@ const useParkingZoneService = () => {
     });
   };
 
-  const getAvailableSlots = (parkingZoneId) => {
-    return axios.get(`${BASE_URI}/GetAvailableSlots`, {
-      params: {
-        parkingZoneId,
-      },
-    });
+  const GetParkingZonesByParkingZoneIds = (parkingZoneIds) => {
+    return axios.post(`${BASE_URI}/GetDataParkingZoneByParkingZoneIds`, parkingZoneIds);
   };
 
   return {
@@ -174,7 +170,7 @@ const useParkingZoneService = () => {
     getAllParkingZoneByOwnerId,
     getBookedSlot,
     closeParkingZone,
-    getAvailableSlots,
+    GetParkingZonesByParkingZoneIds
   };
 };
 
