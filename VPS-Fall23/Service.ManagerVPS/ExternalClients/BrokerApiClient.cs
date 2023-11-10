@@ -13,9 +13,11 @@ namespace Service.ManagerVPS.ExternalClients
             restClient = new RestClient(baseUrl);
         }
 
-        public async Task<bool> CreateDeletingPZJob(Guid parkingZoneAbsentId, Guid parkingZoneId, DateTime deleteAt)
+        public async Task<bool> CreateDeletingPZJob(Guid parkingZoneAbsentId, Guid parkingZoneId,
+            DateTime deleteAt)
         {
-            var response = await this.restClient.PostAsJsonAsync(CreateDeletingPZJobUri, new { parkingZoneAbsentId, parkingZoneId, deleteAt });
+            var response = await this.restClient.PostAsJsonAsync(CreateDeletingPZJobUri,
+                new { parkingZoneAbsentId, parkingZoneId, deleteAt });
             return response.IsSuccessStatusCode;
         }
 
@@ -25,7 +27,5 @@ namespace Service.ManagerVPS.ExternalClients
             var response = await this.restClient.DeleteAsync(uri);
             return response.IsSuccessStatusCode;
         }
-
-
     }
 }

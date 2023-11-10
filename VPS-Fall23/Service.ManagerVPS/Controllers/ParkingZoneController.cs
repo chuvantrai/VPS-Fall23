@@ -326,7 +326,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
         if (parkingZone.IsApprove is null or false)
         {
-            throw new ServerException("Bãi đỗ xe đang chờ duyệt hoặc bị từ chối không thể đóng cửa!");
+            throw new ServerException(
+                "Bãi đỗ xe đang chờ duyệt hoặc bị từ chối không thể đóng cửa!");
         }
 
         var absent = parkingZone.ParkingZoneAbsents.MaxBy(x => x.SubId);
@@ -334,11 +335,12 @@ public class ParkingZoneController : VpsController<ParkingZone>
         {
             throw new ServerException("Bãi đỗ xe đã đóng cửa!");
         }
+
         var newAbsent = new ParkingZoneAbsent
         {
             Id = Guid.NewGuid(),
             ParkingZoneId = (Guid)input.ParkingZoneId,
-            From = input.CloseFrom,
+            From = (DateTime)input.CloseFrom!,
             To = input.CloseTo,
             Reason = input.Reason,
             CreatedAt = DateTime.Now
@@ -346,11 +348,13 @@ public class ParkingZoneController : VpsController<ParkingZone>
         if (input.CloseTo is null)
         {
             var dayDelete = _config.GetValue<int>("parkingZone:removeAfterCloseInDay");
-            BrokerApiClient brokerApiClient = new BrokerApiClient(
+            var brokerApiClient = new BrokerApiClient(
                 _config.GetValue<string>("brokerApiBaseUrl")
-                );
-            await brokerApiClient.CreateDeletingPZJob(newAbsent.Id, newAbsent.ParkingZoneId, newAbsent.From.AddDays(dayDelete));
+            );
+            await brokerApiClient.CreateDeletingPZJob(newAbsent.Id, newAbsent.ParkingZoneId,
+                newAbsent.From.AddDays(dayDelete));
         }
+
         await _absentRepository.Create(newAbsent);
         await _absentRepository.SaveChange();
 
@@ -477,6 +481,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         {
             throw new ServerException("Bãi đỗ xe chưa đóng cửa!");
         }
+
         await vpsRepository.Delete(parkingZone);
         await vpsRepository.SaveChange();
         return Ok(ResponseNotification.UPDATE_SUCCESS);
@@ -532,10 +537,11 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return await parkingTransactionRepository.GetBookedSlot(parkingZoneId,
             checkAt ?? DateTime.Now);
     }
-    
+
     [HttpPost]
     public IEnumerable<ParkingZone>? GetDataParkingZoneByParkingZoneIds(Guid[]? parkingZoneIds)
     {
-        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(parkingZoneIds);
+        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(
+            parkingZoneIds);
     }
 }
