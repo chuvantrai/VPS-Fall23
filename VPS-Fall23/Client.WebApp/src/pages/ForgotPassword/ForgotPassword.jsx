@@ -197,21 +197,6 @@ function ForgotPassword() {
                     iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                 />
               </Form.Item>
-
-              {/* <Row className={'mb-[24px]'}>
-              <Col span={12}>
-
-              </Col>
-              <Col span={4}>
-                <Link
-                  to={'/login'}
-                  className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
-                    'shrink-0 rounded-sm text-[\'#1677ff\']')}
-                >
-                  Đăng nhập
-                </Link>
-              </Col>
-            </Row> */}
               <Row>
                 <Col span={12}>
                   <Form.Item>

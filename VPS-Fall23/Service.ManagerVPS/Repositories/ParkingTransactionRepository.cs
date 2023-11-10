@@ -2,6 +2,7 @@
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -174,7 +175,7 @@ namespace Service.ManagerVPS.Repositories
                                 ParkingTransaction = transaction,
                                 CreatedAt = DateTime.Now,
                                 ParkingTransactionId = transaction.Id,
-                                UnitPricePerHour = transaction.ParkingZone.PricePerHour,
+                                UnitPricePerHour = transaction.ParkingZone.PriceOverTimePerHour,
                                 Detail = "CHECK OUT AT " + checkAt
                             };
 
@@ -286,6 +287,36 @@ namespace Service.ManagerVPS.Repositories
                 ParkingTransaction = parkingTransaction,
                 Id = 200
             };
+        }
+
+        public async Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(Guid parkingZoneId)
+        {
+            var result = new List<IncomeParkingZoneResponse>();
+            var parkingTransactions = await entities.Where(pt =>
+                pt.ParkingZoneId == parkingZoneId && pt.CheckoutBy != null && pt.CheckinBy != null).ToListAsync();
+            foreach (var parkingTransaction in parkingTransactions)
+            {
+                decimal totalCost = 0;
+
+                foreach (var parkingTransactionDetail in parkingTransaction.ParkingTransactionDetails)
+                {
+                    var duration = parkingTransactionDetail.From - parkingTransactionDetail.To;
+                    var totalHours = duration.TotalHours;
+
+                    decimal costForDetail = (decimal)totalHours * parkingTransactionDetail.UnitPricePerHour;
+                    totalCost += costForDetail;
+                }
+
+                var incomeParkingZoneResponse = new IncomeParkingZoneResponse()
+                {
+                    Income = totalCost,
+                    IncomeDate = parkingTransaction.CheckinAt.Date
+                };
+
+                result.Add(incomeParkingZoneResponse);
+            }
+
+            return result;
         }
     }
 }

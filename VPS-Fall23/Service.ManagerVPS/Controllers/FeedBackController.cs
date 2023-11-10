@@ -102,12 +102,17 @@ public class FeedBackController : VpsController<Feedback>
 
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.FilterFeedback)]
-    public IActionResult FilterFeedback([FromQuery] Guid ownerId,
+    public IActionResult FilterFeedback([FromQuery] Guid? ownerId,
         [FromQuery] QueryStringParameters parameters, [FromQuery] string? parkingZoneId,
         [FromQuery] string? rate)
     {
+        if (ownerId is null)
+        {
+            throw new ServerException("ownerId cannot be null");
+        }
+
         var lstFeedback =
-            ((IFeedBackRepository)vpsRepository).FilterFeedbackForOwner(ownerId, parameters,
+            ((IFeedBackRepository)vpsRepository).FilterFeedbackForOwner((Guid)ownerId, parameters,
                 parkingZoneId, rate);
 
         var result = lstFeedback

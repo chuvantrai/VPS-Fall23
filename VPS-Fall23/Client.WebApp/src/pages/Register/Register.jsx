@@ -48,7 +48,6 @@ function Register() {
       >
         <div className={cx('bg-img w-full')}>
           <img src={bgImg} className={cx('w-full relative')} />
-
         </div>
         <div className={cx('absolute')}>
           <div className={cx('inline-flex flex-col items-center gap-3 w-full')}>

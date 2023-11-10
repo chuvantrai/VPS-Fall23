@@ -11,7 +11,7 @@ public class CloseParkingZoneInput
     public string Reason { get; set; } = null!;
 
     [Required]
-    public DateTime CloseFrom { get; set; }
+    public DateTime? CloseFrom { get; set; }
     
     public DateTime? CloseTo { get; set; }
 }
