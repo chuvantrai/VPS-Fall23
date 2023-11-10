@@ -74,7 +74,6 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
           store.dispatch(setListDataBookmark({ listDataBookmark: data.data ?? [] }));
         });
     }
-    setVisiblePopover(!visiblePopover);
   };
   const getFoundedParkingZonePopupContent = () => {
     return (
@@ -140,6 +139,9 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
         ></List>
       </>);
   };
+    const onOpenChangeTooltipBookmark = (value) => {
+        setVisiblePopover(value);
+    }
   return (
     <>
       <div className={'flex'}>
@@ -154,6 +156,7 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
         <Popover
           trigger={'click'}
           content={getListBookmark}
+          onOpenChange={onOpenChangeTooltipBookmark}
           placement='bottomLeft'
           title='Danh sách nhà xe đã được lưu'
           className={'ml-4'}

@@ -12,9 +12,9 @@ public class FeedBackRepository : VpsRepository<Feedback>, IFeedBackRepository
     {
     }
 
-    public async Task<dynamic> CreateFeedBack(CreateFeedBackParkingZoneRequest request, ParkingZone parkingZone)
+    public async Task<dynamic> CreateFeedBack(CreateFeedBackParkingZoneRequest request, Guid parkingZoneId)
     {
-        if (await context.Feedbacks.FirstOrDefaultAsync(x => x.ParkingZoneId.Equals(parkingZone.Id)
+        if (await context.Feedbacks.FirstOrDefaultAsync(x => x.ParkingZoneId.Equals(parkingZoneId)
                                                              && request.Email == x.Email) != null)
         {
             return new
@@ -26,7 +26,7 @@ public class FeedBackRepository : VpsRepository<Feedback>, IFeedBackRepository
         var feedBack = new Feedback()
         {
             Id = Guid.NewGuid(),
-            ParkingZoneId = parkingZone.Id,
+            ParkingZoneId = parkingZoneId,
             Content = request.Content ?? string.Empty,
             Rate = request.Rate,
             CreatedAt = DateTime.Now,

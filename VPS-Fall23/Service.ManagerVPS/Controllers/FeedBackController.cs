@@ -156,15 +156,16 @@ public class FeedBackController : VpsController<Feedback>
     {
         var parkingTransaction =
             await _parkingTransactionRepository.GetParkingTransactionByIdEmail(request.ParkingZoneId, request.Email);
-        if (parkingTransaction.Id != 200) throw new ClientException(parkingTransaction.id);
+        var parkingTransactionId = (int)parkingTransaction.Id;
+        if (parkingTransactionId != 200) throw new ClientException(parkingTransactionId);
 
         var feedBackResult = await ((IFeedBackRepository)vpsRepository)
-            .CreateFeedBack(request, (ParkingZone)parkingTransaction.ParkingTransaction.ParkingZone);
+            .CreateFeedBack(request, request.ParkingZoneId);
         
-        if (feedBackResult.Id != 200) throw new ClientException(feedBackResult.Id);
+        if ((int)feedBackResult.Id != 200) throw new ClientException((int)feedBackResult.Id);
         return Ok(new
         {
-            FeedBackResult = feedBackResult.FeedBack
+            FeedBackResult = (Feedback)feedBackResult.FeedBack
         });
     }
 }

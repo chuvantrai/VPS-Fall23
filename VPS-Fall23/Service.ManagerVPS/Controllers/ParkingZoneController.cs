@@ -538,11 +538,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return await parkingTransactionRepository.GetBookedSlot(parkingZoneId,
             checkAt ?? DateTime.Now);
     }
-
+    
     [HttpPost]
     public IEnumerable<ParkingZone>? GetDataParkingZoneByParkingZoneIds(Guid[]? parkingZoneIds)
     {
-        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(
-            parkingZoneIds);
+        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(parkingZoneIds);
     }
 }
