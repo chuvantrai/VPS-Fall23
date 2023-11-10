@@ -13,5 +13,5 @@ public interface IFeedBackRepository : IVpsRepository<Feedback>
     PagedList<Feedback> FilterFeedbackForOwner(Guid ownerId, QueryStringParameters parameters,
         string parkingZoneId, string rate);
 
-    Task<dynamic> CreateFeedBack(CreateFeedBackParkingZoneRequest request, ParkingZone parkingZone);
+    Task<dynamic> CreateFeedBack(CreateFeedBackParkingZoneRequest request, Guid parkingZoneId);
 }

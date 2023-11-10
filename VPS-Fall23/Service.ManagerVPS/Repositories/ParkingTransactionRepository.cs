@@ -260,8 +260,7 @@ namespace Service.ManagerVPS.Repositories
                 .Include(x => x.ParkingZone)
                 .Include(x => x.PaymentTransactions)
                 .Where(x => x.ParkingZoneId.Equals(id)
-                            && x.ParkingZone.IsApprove == true
-                            && x.Email == email).ToListAsync();
+                            && x.ParkingZone.IsApprove == true).ToListAsync();
             if (parkingTransactions.Count == 0)
             {
                 return new
