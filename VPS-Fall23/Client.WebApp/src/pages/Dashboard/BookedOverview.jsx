@@ -42,7 +42,7 @@ function BookedOverview() {
     console.log(parkingZoneName)
     getBookedData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [parkingZoneName]);
 
   const getBookedData = async () => {
     await parkingZoneService
@@ -86,7 +86,7 @@ function BookedOverview() {
       {(bookedData !== null || bookedData !== undefined) && (
         <div className="block">
           <div className="flex">
-            <Card title="Booked" bordered={true} style={{ width: 200 }}>
+            <Card title="Booked (tháng)" bordered={true} style={{ width: 200 }}>
               <p>Tổng vé xe: {bookedData.doneCheckInOut}</p>
               <Text strong>
                 Doanh thu:{' '}
