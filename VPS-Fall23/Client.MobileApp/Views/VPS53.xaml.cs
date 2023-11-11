@@ -27,6 +27,8 @@ public partial class VPS53 : ContentPage
         _viewModel = viewModel;
         FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
         ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
+        canvasView.WidthRequest = 400;
+        canvasView.HeightRequest = 238;
         LoadCanvasSurface();
 
         cameraView.Loaded += CameraView_CamerasLoaded;
