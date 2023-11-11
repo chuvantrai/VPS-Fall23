@@ -6,7 +6,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { UploadOutlined } from '@ant-design/icons';
 import AddressCascader from '@/components/cascader/AddressCascader.jsx';
 import AccountServices from '@/services/accountServices.js';
-
+import avatarImg from '@/assets/images/AvatarDefault.png';
 
 const cx = classNames.bind(styles);
 
@@ -248,7 +248,7 @@ function AccountProfile() {
                 ) :
                 <div className={cx('flex justify-center ')}>
                   <img
-                    src={form.getFieldValue('avatar')??'../src/assets/images/AvatarDefault.png'}
+                      src={form.getFieldValue('avatar') ?? avatarImg}
                     alt='Selected Image'
                     className={cx('object-cover rounded-[15px] w-3/5 aspect-[1] overflow-hidden')}
                   />
