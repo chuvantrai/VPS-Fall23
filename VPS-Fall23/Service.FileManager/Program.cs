@@ -26,10 +26,10 @@ builder.Services
     .UseMinvoiceMinIORepository<IExternalRepository, ExternalRepository>();
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenLocalhost(7063, listenOptions =>
-    {
-        listenOptions.UseHttps();
-    });
+    // serverOptions.ListenLocalhost(7063, listenOptions =>
+    // {
+    //     listenOptions.UseHttps();
+    // });
     serverOptions.ListenLocalhost(5193);
 });
 
