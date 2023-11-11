@@ -1,5 +1,5 @@
 import { Button, Form, Input, Result, Slider, Space } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import useParkingTransactionService from '../../../../services/parkingTransactionSerivce';
 
@@ -12,8 +12,10 @@ const BookingForm = ({ parkingZone }) => {
 
   const [form] = Form.useForm();
   const [paymentResult, setPaymentResult] = useState(defaultPaymentResult);
+  const [isSubmitBtnDisabled, disableSubmitBtn] = useState(false);
   const parkingTransactionService = useParkingTransactionService();
   const onSubmitClick = () => {
+
     form.validateFields().then(form => {
 
       let parkingTransaction = {
@@ -27,6 +29,13 @@ const BookingForm = ({ parkingZone }) => {
       book(parkingTransaction);
     });
   };
+  useEffect(() => {
+    return () => {
+      form.resetFields();
+      setPaymentResult(defaultPaymentResult);
+      disableSubmitBtn(false);
+    }
+  }, [])
   let connection = new HubConnectionBuilder()
     .withUrl(import.meta.env.VITE_API_GATEWAY + '/payment')
     .withAutomaticReconnect()
@@ -45,9 +54,10 @@ const BookingForm = ({ parkingZone }) => {
             ...paymentResult,
             isPaymentRequested: true,
             isShow: true,
-            paymentTransaction: paymentTransaction,
+            paymentTransaction: JSON.parse(paymentTransaction),
             parkingTransaction: parkingTransaction,
           });
+          disableSubmitBtn(false);
         });
         window.open(res.data, '_blank');
       });
@@ -60,19 +70,22 @@ const BookingForm = ({ parkingZone }) => {
     parkingTransactionService
       .bookingSlot(parkingTransaction)
       .then((res) => {
+        disableSubmitBtn(true);
         setPaymentResult({ ...paymentResult, parkingTransaction: res.data });
         requestPayment(res.data);
       });
   };
   const [bookingTime, setBookingTime] = useState();
   const getPaymentResultProps = () => {
-    const success = paymentResult?.paymentTransaction.responseCode == '00' && paymentResult?.paymentTransaction.transactionStatus == '00';
+    console.log(paymentResult);
+    const success = paymentResult?.paymentTransaction.ResponseCode == 0 && paymentResult?.paymentTransaction.TransactionStatus == 0;
     return {
       status: (success) ? 'success' : 'error',
       title: `Thanh toán đặt lịch gửi xe ${success ? 'thành công' : 'thất bại'}`,
       subTitle: (<>
-        <p>Số đơn hàng: {paymentResult?.paymentTransaction.txnRef}</p>
-        <p>Mã giao dịch: {paymentResult?.paymentTransaction.transactionNo}</p>
+        <p>Số đơn hàng: {paymentResult?.paymentTransaction.TxnRef}</p>
+        <p>Mã giao dịch: {paymentResult?.paymentTransaction.TransactionNo}</p>
+        <p>Nội dung giao dịch: {paymentResult?.paymentTransaction.OrderInfo}</p>
         <Button onClick={() => setPaymentResult(defaultPaymentResult)}>OK</Button>
       </>),
     };
@@ -153,6 +166,7 @@ const BookingForm = ({ parkingZone }) => {
       <Form.Item
         label='Thời gian vào/ra'
         name='checkinTime'
+
         rules={[{ required: true, message: 'Vui lòng chọn thời gian vào/ra' }]}
       >
         <Slider
@@ -160,11 +174,13 @@ const BookingForm = ({ parkingZone }) => {
           min={Number(parkingZone?.workFrom.split(':')[0]) ?? 6}
           max={Number(parkingZone?.workTo.split(':')[0]) ?? 23}
           step={TIME_STEP_IN_HOUR}
-          tooltip={{
-            autoAdjustOverflow: true,
-            formatter: (val) => `${val}h`,
-            placement: 'bottom',
-          }}
+          tooltip={
+            {
+              formatter: (val) => `232${val}h`,
+              placement: 'top',
+
+            }
+          }
           value={[bookingTime]}
           onChange={setBookingTime}
         >
@@ -174,15 +190,10 @@ const BookingForm = ({ parkingZone }) => {
       </Form.Item>
       <Form.Item className={('flex justify-center m-0')}>
         <Button className={('bg-[#1890FF]')}
-                type='primary'
-                onClick={onSubmitClick}
-                disabled={paymentResult?.paymentTransaction.responseCode == '00' && paymentResult?.paymentTransaction.transactionStatus == '00'}
+          type='primary'
+          onClick={onSubmitClick}
+          disabled={isSubmitBtnDisabled}
         >
-          Đặt chỗ
-        </Button>
-      </Form.Item>
-      <Form.Item className={('flex justify-center m-0')}>
-        <Button className={('bg-[#1890FF] w-[200%]')} type='primary' onClick={onSubmitClick}>
           Đặt chỗ
         </Button>
       </Form.Item>
