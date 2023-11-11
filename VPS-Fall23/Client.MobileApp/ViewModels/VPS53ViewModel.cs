@@ -23,14 +23,14 @@ namespace Client.MobileApp.ViewModels
             {
                 IsBusy = true;
                 CameraIndex = 0;
-                LoadingIndex = 1;
+                LoadingIndex = 2;
 
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
 
                 if (response.IsSuccessStatusCode)
                 {
                     IsBusy = false;
-                    CameraIndex = 1;
+                    CameraIndex = 2;
                     LoadingIndex = 0;
 
                     var ObjectResponse = await response.Content.ReadFromJsonAsync<LicensePlateScanResponse>();
@@ -45,7 +45,7 @@ namespace Client.MobileApp.ViewModels
                 else
                 {
                     IsBusy = false;
-                    CameraIndex = 1;
+                    CameraIndex = 2;
                     LoadingIndex = 0;
 
                     var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
@@ -60,21 +60,21 @@ namespace Client.MobileApp.ViewModels
             {
                 IsBusy = true;
                 CameraIndex = 0;
-                LoadingIndex = 1;
+                LoadingIndex = 2;
 
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_1, checkLicensePlate);
 
                 if (response.IsSuccessStatusCode)
                 {
                     IsBusy = false;
-                    CameraIndex = 1;
+                    CameraIndex = 2;
                     LoadingIndex = 0;
                     return await response.Content.ReadAsStringAsync();
                 }
                 else
                 {
                     IsBusy = false;
-                    CameraIndex = 1;
+                    CameraIndex = 2;
                     LoadingIndex = 0;
                     var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";
@@ -88,14 +88,14 @@ namespace Client.MobileApp.ViewModels
             {
                 IsBusy = true;
                 CameraIndex = 0;
-                LoadingIndex = 1;
+                LoadingIndex = 2;
 
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS61, checkLicensePlate);
 
                 if (response.IsSuccessStatusCode)
                 {
                     IsBusy = false;
-                    CameraIndex = 1;
+                    CameraIndex = 2;
                     LoadingIndex = 0;
                     return await response.Content.ReadAsStringAsync();
                 }
@@ -116,20 +116,20 @@ namespace Client.MobileApp.ViewModels
             {
                 IsBusy = true;
                 CameraIndex = 0;
-                LoadingIndex = 1;
+                LoadingIndex = 2;
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS80_2, checkLicensePlate);
 
                 if (response.IsSuccessStatusCode)
                 {
                     IsBusy = false;
-                    CameraIndex = 1;
+                    CameraIndex = 2;
                     LoadingIndex = 0;
                     return await response.Content.ReadAsStringAsync();
                 }
                 else
                 {
                     IsBusy = false;
-                    CameraIndex = 1;
+                    CameraIndex = 2;
                     LoadingIndex = 0;
                     var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";

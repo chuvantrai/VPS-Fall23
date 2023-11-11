@@ -6,7 +6,7 @@ namespace Client.MobileApp.ViewModels
     public class ViewModelBase : INotifyPropertyChanged
     {
         bool isBusy = false;
-        int cameraIndex = 1;
+        int cameraIndex = 2;
         int loadingIndex = 0;
         string areaEntry = "";
         string licensePlateEntry = "";

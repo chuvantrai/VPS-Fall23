@@ -8,21 +8,23 @@
              xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI">
     <ScrollView>
+        <AbsoluteLayout>
+            <cv:CameraView ZIndex="1" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  x:Name="cameraView"
+               />
+            <Grid ZIndex="{Binding CameraIndex}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
+                </Grid.GestureRecognizers>
 
-        <Grid>
-            <Grid.GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
-            </Grid.GestureRecognizers>
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="0.5*"/>
-                <RowDefinition Height="5*"/>
-                <RowDefinition Height="0.5*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
             <Grid x:Name="Loading" BackgroundColor="#A0808080" Grid.RowSpan="4">
-                <ActivityIndicator 
+                    <ActivityIndicator 
                                Scale="0.2"
                                ZIndex="{Binding LoadingIndex}" 
                                IsRunning="{Binding IsBusy}" 
@@ -31,101 +33,100 @@
                                VerticalOptions="FillAndExpand"
                                HorizontalOptions="FillAndExpand"
                                />
-            </Grid>
+                </Grid>
 
-            <Grid Grid.Row="0" 
+                <Grid Grid.Row="0" 
                BackgroundColor="Transparent"
                 
                   ZIndex="{Binding CameraIndex}"
                 
                   >
-                <Image Source="logo.png"/>
+                    <Image Source="logo.png"/>
 
-            </Grid>
+                </Grid>
 
-            <Grid
+                <Grid
                   ZIndex="{Binding CameraIndex}"
                   Grid.Row="1"
                   x:Name="cameraZone"
                 >
-                <AbsoluteLayout>
-                    <cv:CameraView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  x:Name="cameraView"
-                                   />
-                    <skia:SKCanvasView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" Grid.Row="1" x:Name="canvasView" ZIndex="{Binding CameraIndex}" PaintSurface="OnPaintSurface" />
+                    <AbsoluteLayout>
 
-                    <Frame AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" CornerRadius="50" x:Name="FrameSwitch"
+                        <skia:SKCanvasView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" Grid.Row="1" x:Name="canvasView" ZIndex="{Binding CameraIndex}" PaintSurface="OnPaintSurface" />
+
+                        <Frame AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" CornerRadius="50" x:Name="FrameSwitch"
                        Margin="5"
                        ZIndex="{Binding CameraIndex}"
-                       BackgroundColor="#A0111111"
+                       BackgroundColor="Transparent"
                        VerticalOptions="End"
                        HorizontalOptions="Center" Padding="0,0,0,0"
                        BorderColor="Transparent">
-                        <Grid>
-                            <Button x:Name="ChangePlateTypeButton" Clicked="ChangePlateType"  
+                            <Grid>
+                                <Button x:Name="ChangePlateTypeButton" Clicked="ChangePlateType"  
                                 Text="Đổi loại biển" 
                                 VerticalOptions="Center" 
                                 HorizontalOptions="Start" 
                                 CornerRadius="50"
                                 BackgroundColor="Transparent"
                                 TextColor="White"/>
-                        </Grid>
-                    </Frame>
-                </AbsoluteLayout>
-            </Grid>
-            <Border Grid.Row="2" BackgroundColor="White" StrokeThickness="0">
-                <Border.StrokeShape >
-                    <RoundRectangle StrokeThickness="0" CornerRadius="10,10,0,0"></RoundRectangle>
-                </Border.StrokeShape>
-                <Grid  BackgroundColor="Transparent" ZIndex="{Binding CameraIndex}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.5*"/>
-                        <ColumnDefinition Width="0.2*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="0.5*"/>
+                            </Grid>
+                        </Frame>
+                    </AbsoluteLayout>
+                </Grid>
+                <Border Grid.Row="2" BackgroundColor="White" StrokeThickness="0">
+                    <Border.StrokeShape >
+                        <RoundRectangle StrokeThickness="0" CornerRadius="10,10,0,0"></RoundRectangle>
+                    </Border.StrokeShape>
+                    <Grid  BackgroundColor="Transparent" ZIndex="{Binding CameraIndex}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.5*"/>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="0.5*"/>
 
-                    </Grid.ColumnDefinitions>
-                    <Frame Margin="10" Grid.Column="0">
+                        </Grid.ColumnDefinitions>
+                        <Frame Margin="10" Grid.Column="0">
 
-                        <Entry x:Name="AreaCodeEntry"
+                            <Entry x:Name="AreaCodeEntry"
                 IsSpellCheckEnabled="False"
                 Text="{Binding AreaEntry}"
                 HorizontalOptions="FillAndExpand"
                 PlaceholderColor="Black"
                 FontSize="14"/>
 
-                    </Frame>
-                    <Label  Grid.Column="1" 
+                        </Frame>
+                        <Label  Grid.Column="1" 
              Text="-"
              FontSize="Large"
              HorizontalOptions="CenterAndExpand" 
              VerticalOptions="CenterAndExpand"
              TextColor="Black"/>
 
-                    <Frame Margin="10" Grid.Column="2" Padding="10,0,10,-2">
-                        <Entry x:Name="LicensePlateEntry" 
+                        <Frame Margin="10" Grid.Column="2" Padding="10,0,10,-2">
+                            <Entry x:Name="LicensePlateEntry" 
                 IsTextPredictionEnabled="False"
                 Text="{Binding LicensePlateEntry}"
                 PlaceholderColor="Black"
                 FontSize="14"
                 HorizontalOptions="FillAndExpand"/>
 
-                    </Frame>
-                    <Button Clicked="OkButton_Clicked" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="3"></Button>
-                </Grid>
-            </Border>
+                        </Frame>
+                        <Button Clicked="OkButton_Clicked" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="3"></Button>
+                    </Grid>
+                </Border>
 
 
-            <Grid  Grid.Row="3" 
+                <Grid  Grid.Row="3" 
                    BackgroundColor="White"
                    ZIndex="{Binding CameraIndex}">
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                <ImageButton Source="aperture.svg"
+                    <ImageButton Source="aperture.svg"
                              
                         WidthRequest="60" 
                         HeightRequest="60"
@@ -134,9 +135,9 @@
                         Clicked="CameraButton_Clicked" 
                        />
 
+                </Grid>
+
             </Grid>
-
-        </Grid>
-
+        </AbsoluteLayout>
     </ScrollView>
 </ContentPage>
