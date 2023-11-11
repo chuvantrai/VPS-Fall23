@@ -140,7 +140,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetRequestedParkingZones)]
+    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZones)]
     public IActionResult GetByName([FromQuery] QueryStringParameters parameters, string name)
     {
         try
@@ -190,7 +190,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
+    //[FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
     public IActionResult GetAllParkingZoneByOwnerId([FromQuery] string ownerId)
     {
         var parkingZoneList =

@@ -24,9 +24,20 @@ const useParkingZoneService = () => {
     });
   };
 
+  const getBookedOverview = async ({ parkingZoneName }) => {
+    if (parkingZoneName !== null || parkingZoneName !== undefined || parkingZoneName !== '') {
+      return axios.get(`${BASE_URI}/GetBookedOverview`, {
+        params: {
+          parkingZoneName: parkingZoneName,
+        },
+      });
+    }
+  };
+
   return {
     getAllOwner,
     getOwnerByEmail,
+    getBookedOverview,
   };
 };
 
