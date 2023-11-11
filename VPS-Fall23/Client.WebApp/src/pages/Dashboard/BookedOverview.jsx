@@ -27,7 +27,7 @@ function BookedOverview() {
   });
 
   const [chartData, setChartData] = useState({
-    labels: ['1h', '1day', '1W', '1M', '1Y', 'Origin'],
+    labels: ['1h', '1day', '1W', '1M', '1Y'],
     datasets: [
       {
         label: 'Income',
@@ -49,25 +49,17 @@ function BookedOverview() {
       .then((res) => {
         setBookedData(res.data);
         const chart = {
-          // labels: ['1h', '1day', '1W', '1M', '1Y', 'Origin'],
           datasets: [
             {
               label: 'Daily Income',
-              data: [
-                res.data.hourCash,
-                res.data.dayCash,
-                res.data.weekCash,
-                res.data.monthCash,
-                res.data.yearCash,
-                res.data.hourCash,
-              ],
+              data: [res.data.hourCash, res.data.dayCash, res.data.weekCash, res.data.monthCash, res.data.yearCash],
               borderColor: 'rgba(75, 192, 192, 1)',
               fill: false,
             },
           ],
         };
         // console.log(chart);
-        // console.log(res.data);
+        console.log(res.data);
 
         setChartData(chart);
       })
@@ -80,7 +72,7 @@ function BookedOverview() {
     scales: {
       x: {
         type: 'category',
-        labels: ['1h', '1day', '1W', '1M', '1Y', 'Origin'],
+        labels: ['1h', '1day', '1W', '1M', '1Y'],
       },
       y: {
         beginAtZero: true,
@@ -129,7 +121,6 @@ function BookedOverview() {
           </div>
           <div className="mt-5">
             <h3>Daily View</h3>
-            {console.log(chartData)}
             <Line data={chartData} options={options} />
           </div>
         </div>

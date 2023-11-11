@@ -142,30 +142,35 @@ namespace Service.ManagerVPS.Controllers
 
                     TimeSpan timeDifference = (item.CheckoutAt - item.CheckinAt).Value;
 
-                    if (item.CreatedAt.Hour == now.Hour)
-                    {
-                        hourCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
-                    }
-                    if (item.CreatedAt.Day == now.Day)
-                    {
-                        dayCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
-                    }
-
                     DayOfWeek firstDayOfWeek = DayOfWeek.Monday; // You can adjust this to your preferred first day of the week
 
                     DateTime startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)firstDayOfWeek);
                     DateTime endOfWeek = startOfWeek.AddDays(6);
-                    if (item.CreatedAt >= startOfWeek && item.CreatedAt <= endOfWeek)
-                    {
-                        weekCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
-                    }
-                    if (item.CreatedAt.Month == now.Month)
-                    {
-                        monthCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
-                    }
+
+
                     if (item.CreatedAt.Year == now.Year)
                     {
                         yearCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+
+                        if (item.CreatedAt.Month == now.Month)
+                        {
+                            monthCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+
+                            if (item.CreatedAt >= startOfWeek && item.CreatedAt <= endOfWeek)
+                            {
+                                weekCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+
+                                if (item.CreatedAt.Day == now.Day)
+                                {
+                                    dayCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+
+                                    if (item.CreatedAt.Hour == now.Hour)
+                                    {
+                                        hourCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
