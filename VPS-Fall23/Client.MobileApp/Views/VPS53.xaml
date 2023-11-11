@@ -27,14 +27,14 @@
                                ZIndex="{Binding LoadingIndex}" 
                                IsRunning="{Binding IsBusy}" 
                                IsVisible="{Binding IsBusy}" 
-                               Color="#83E9EE" 
+                               Color="Transparent" 
                                VerticalOptions="FillAndExpand"
                                HorizontalOptions="FillAndExpand"
                                />
             </Grid>
 
             <Grid Grid.Row="0" 
-               BackgroundColor="White"
+               BackgroundColor="Transparent"
                 
                   ZIndex="{Binding CameraIndex}"
                 
@@ -46,69 +46,74 @@
             <Grid
                   ZIndex="{Binding CameraIndex}"
                   Grid.Row="1"
-                  x:Name="cameraZone">
-                
-                <cv:CameraView  x:Name="cameraView"
-                    VerticalOptions="CenterAndExpand"
-                    HorizontalOptions="CenterAndExpand"/>
-                <skia:SKCanvasView Grid.Row="1" x:Name="canvasView" VerticalOptions="FillAndExpand" ZIndex="{Binding CameraIndex}" PaintSurface="OnPaintSurface" />
+                  x:Name="cameraZone"
+                >
+                <AbsoluteLayout>
+                    <cv:CameraView  AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  x:Name="cameraView"
+                                   />
+                    <skia:SKCanvasView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" Grid.Row="1" x:Name="canvasView" ZIndex="{Binding CameraIndex}" PaintSurface="OnPaintSurface" />
 
-                <Frame CornerRadius="50" x:Name="FrameSwitch"
+                    <Frame AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" CornerRadius="50" x:Name="FrameSwitch"
                        Margin="5"
                        ZIndex="{Binding CameraIndex}"
                        BackgroundColor="#A0111111"
                        VerticalOptions="End"
                        HorizontalOptions="Center" Padding="0,0,0,0"
                        BorderColor="Transparent">
-                    <Grid>
-                        <Button x:Name="ChangePlateTypeButton" Clicked="ChangePlateType"  
+                        <Grid>
+                            <Button x:Name="ChangePlateTypeButton" Clicked="ChangePlateType"  
                                 Text="Đổi loại biển" 
                                 VerticalOptions="Center" 
                                 HorizontalOptions="Start" 
                                 CornerRadius="50"
                                 BackgroundColor="Transparent"
                                 TextColor="White"/>
-                    </Grid>
-                </Frame>
-
+                        </Grid>
+                    </Frame>
+                </AbsoluteLayout>
             </Grid>
+            <Border Grid.Row="2" BackgroundColor="White" StrokeThickness="0">
+                <Border.StrokeShape >
+                    <RoundRectangle StrokeThickness="0" CornerRadius="10,10,0,0"></RoundRectangle>
+                </Border.StrokeShape>
+                <Grid  BackgroundColor="Transparent" ZIndex="{Binding CameraIndex}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.5*"/>
+                        <ColumnDefinition Width="0.2*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="0.5*"/>
 
-            <Grid Grid.Row="2" BackgroundColor="White" ZIndex="{Binding CameraIndex}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.5*"/>
-                    <ColumnDefinition Width="0.2*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <Frame Margin="10" Grid.Column="0">
 
-                </Grid.ColumnDefinitions>
-                <Frame Margin="10" Grid.Column="0">
+                        <Entry x:Name="AreaCodeEntry"
+                IsSpellCheckEnabled="False"
+                Text="{Binding AreaEntry}"
+                HorizontalOptions="FillAndExpand"
+                PlaceholderColor="Black"
+                FontSize="14"/>
 
-                    <Entry x:Name="AreaCodeEntry"
-                           IsSpellCheckEnabled="False"
-                           Text="{Binding AreaEntry}"
-                           HorizontalOptions="FillAndExpand"
-                           PlaceholderColor="Black"
-                           FontSize="14"/>
+                    </Frame>
+                    <Label  Grid.Column="1" 
+             Text="-"
+             FontSize="Large"
+             HorizontalOptions="CenterAndExpand" 
+             VerticalOptions="CenterAndExpand"
+             TextColor="Black"/>
 
-                </Frame>
-                <Label  Grid.Column="1" 
-                        Text="-"
-                        FontSize="Large"
-                        HorizontalOptions="CenterAndExpand" 
-                        VerticalOptions="CenterAndExpand"
-                        TextColor="Black"/>
+                    <Frame Margin="10" Grid.Column="2" Padding="10,0,10,-2">
+                        <Entry x:Name="LicensePlateEntry" 
+                IsTextPredictionEnabled="False"
+                Text="{Binding LicensePlateEntry}"
+                PlaceholderColor="Black"
+                FontSize="14"
+                HorizontalOptions="FillAndExpand"/>
 
-                <Frame Margin="10" Grid.Column="2" Padding="10,0,10,-2">
-                    <Entry x:Name="LicensePlateEntry" 
-                           IsTextPredictionEnabled="False"
-                           Text="{Binding LicensePlateEntry}"
-                           PlaceholderColor="Black"
-                           FontSize="14"
-                           HorizontalOptions="FillAndExpand"/>
+                    </Frame>
+                    <Button Clicked="OkButton_Clicked" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="3"></Button>
+                </Grid>
+            </Border>
 
-                </Frame>
-                <Button Clicked="OkButton_Clicked" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="3"></Button>
-            </Grid>
 
             <Grid  Grid.Row="3" 
                    BackgroundColor="White"

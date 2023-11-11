@@ -25,13 +25,14 @@ public partial class VPS53 : ContentPage
         VPS53ViewModel viewModel = new();
         BindingContext = viewModel;
         _viewModel = viewModel;
-        cameraView.Loaded += CameraView_CamerasLoaded;
-        canvasView.PaintSurface += OnPaintSurface;
         FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
         ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
+        canvasView.WidthRequest = 500;
+        canvasView.HeightRequest =400;
+        LoadCanvasSurface();
 
+        cameraView.Loaded += CameraView_CamerasLoaded;
     }
-
     Task LoadCanvasSurface()
     {
         return Task.Run(() =>
@@ -70,14 +71,38 @@ public partial class VPS53 : ContentPage
     {
         if (cameraView.Cameras.Count > 0)
         {
-            cameraView.Camera = cameraView.Cameras.First();
-            MainThread.BeginInvokeOnMainThread(async () =>
+
+            cameraView.Camera = cameraView.Cameras[0];
+            var maxResolution = cameraView.Camera.AvailableResolutions[0];
+            foreach (var resolution in cameraView.Camera.AvailableResolutions)
             {
-                await cameraView.StartCameraAsync();
-            });
+                if (resolution.Width * resolution.Height > maxResolution.Width * maxResolution.Height)
+                {
+                    maxResolution = resolution;
+                }
+
+            }
+
+                var startCameraResult =  cameraView.StartCameraAsync().Result;
+                if (startCameraResult != 0)
+                {
+                     Application.Current.MainPage.DisplayAlert(Constant.ALERT, startCameraResult.ToString(), Constant.CANCEL);
+                }
+         
+
         }
     }
-
+    SKRectI GetImageSubsetArea(SKImage image)
+    {
+        float remainX = (float)(image.Width - cameraView.Width) / 2;
+        float remainY = (float)(image.Height - cameraView.Height) / 2;
+        float left = plateRect.Left + remainX;
+        float top = plateRect.Top * (float)(image.Height / cameraView.Height);
+        float right = plateRect.Right + remainX;
+        float bottom = plateRect.Bottom * (float)(image.Height / cameraView.Height);
+        SKRect scropRect = new SKRect(left, top, right, bottom);
+        return SKRectI.Floor(scropRect);
+    }
     private async void CameraButton_Clicked(object sender, EventArgs e)
     {
         try
@@ -87,10 +112,16 @@ public partial class VPS53 : ContentPage
 
             var imageSource = await cameraView.TakePhotoAsync();
             imageSource.Seek(0, SeekOrigin.Begin);
+            using (MemoryStream imageStream = new MemoryStream())
+            {
+                imageSource.CopyTo(imageStream);
+                File.WriteAllBytes("/storage/emulated/0/DCIM/Screenshots/img_full.jpg", imageStream.ToArray());
+            }
             using var image = SKImage.FromEncodedData(imageSource);
-            using var licensePlateImage = image.Subset(SKRectI.Round(plateRect));
+            using var licensePlateImage = image.Subset(GetImageSubsetArea(image));
             using MemoryStream imageSubsetStream = new MemoryStream();
-            licensePlateImage.Encode().SaveTo(imageSubsetStream);
+            licensePlateImage.Encode(SKEncodedImageFormat.Png, 100).SaveTo(imageSubsetStream);
+            File.WriteAllBytes("/storage/emulated/0/DCIM/Screenshots/img_cut.jpg", imageSubsetStream.ToArray());
             var checkLicensePlate = new LicensePlateScan
             {
                 Image = imageSubsetStream.ToArray(),
