@@ -9,14 +9,14 @@ namespace Service.ManagerVPS.Constants.Enums
         [Description("Đã Đặt Cọc")]
         DEPOSIT = 2,
         [Description("Chưa Trả Tiền")]
-        UNPAY = 3,
+        UNPAY = 12,
         [Description("Người dùng hủy")]
-        USERCANCEL = 4,
+        USERCANCEL = 13,
         [Description("Nhà xe hủy")]
-        PARKINGCANCEL = 5,
+        PARKINGCANCEL = 14,
         [Description("Đã Trả Tiền")]
-        PAYED = 6,
+        PAYED = 16,
         [Description("Thanh toán thất bại")]
-        BOOKING_PAID_FAILED = 7
+        BOOKING_PAID_FAILED = 18
     }
 }
