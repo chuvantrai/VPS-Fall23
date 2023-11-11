@@ -289,7 +289,8 @@ namespace Service.ManagerVPS.Repositories
                 .Include(x => x.ParkingZone)
                 .Include(x => x.PaymentTransactions)
                 .Where(x => x.ParkingZoneId.Equals(id)
-                            && x.ParkingZone.IsApprove == true).ToListAsync();
+                            && x.ParkingZone.IsApprove == true
+                            ).ToListAsync();
             if (parkingTransactions.Count == 0)
             {
                 return new
@@ -301,12 +302,12 @@ namespace Service.ManagerVPS.Repositories
 
             var parkingTransaction = parkingTransactions.FirstOrDefault(x => x.Email == email);
 
-            if (parkingTransaction != null)
+            if (parkingTransaction == null)
             {
                 return new
                 {
                     ParkingTransaction = parkingTransactions,
-                    id = 5010
+                    Id = 5008
                 };
             }
 
