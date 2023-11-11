@@ -7,6 +7,7 @@ import ManagerLayout from '../layouts/ManagerLayout';
 import guidGenerator from '../helpers/guidGenerator';
 import ListFeedback from '../pages/ListFeedback/ListFeedback';
 import IncomeDashboard from '@/pages/IncomeDashboard';
+import BookedOverview from '../pages/Dashboard/BookedOverview';
 
 export const ownerRoutesConfig = {
   header: Header,
@@ -15,10 +16,24 @@ export const ownerRoutesConfig = {
   routes: [
     {
       key: guidGenerator(),
-      path: '',
+      path: ':parkingZoneName',
       label: 'Trang chủ',
-      component: ListAttendant,
+      component: BookedOverview,
       description: '',
+    },
+    {
+      key: guidGenerator(),
+      path: 'dashboard',
+      label: 'Dashboard',
+      children: [
+        {
+          key: guidGenerator(),
+          path: 'booked-overview',
+          label: 'Booked Overview',
+          component: ListAttendant,
+          description: 'Thống kê linh tinh',
+        },
+      ],
     },
     {
       key: guidGenerator(),
@@ -45,6 +60,15 @@ export const ownerRoutesConfig = {
           label: 'Danh sách bãi đỗ xe',
           component: ViewListParkingZone,
           description: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
+          // children: [
+          //   {
+          //     key: guidGenerator(),
+          //     path: 'overview',
+          //     label: 'Overview',
+          //     component: BookedOverview,
+          //     description: 'Overview',
+          //   },
+          // ],
         },
         {
           key: guidGenerator(),

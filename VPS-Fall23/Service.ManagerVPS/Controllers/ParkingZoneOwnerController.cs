@@ -16,8 +16,10 @@ namespace Service.ManagerVPS.Controllers
         private readonly IConfiguration _config;
         private readonly FileManagementConfig _fileManagementConfig;
         private readonly IContractRepository _contractRepository;
+        readonly IParkingTransactionRepository parkingTransactionRepository;
 
         public ParkingZoneOwnerController(IParkingZoneOwnerRepository parkingZoneRepository,
+            IParkingTransactionRepository parkingTransactionRepository,
             IConfiguration config, IOptions<FileManagementConfig> options,
             IContractRepository contractRepository)
             : base(parkingZoneRepository)
@@ -25,6 +27,7 @@ namespace Service.ManagerVPS.Controllers
             _config = config;
             _fileManagementConfig = options.Value;
             _contractRepository = contractRepository;
+            this.parkingTransactionRepository = parkingTransactionRepository;
         }
 
         [HttpGet("GetAll")]
@@ -91,6 +94,98 @@ namespace Service.ManagerVPS.Controllers
                     list.HasNext,
                     list.HasPrev,
                     Data = res
+                };
+                return Ok(metadata);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex);
+            }
+        }
+
+        [HttpGet("GetBookedOverview")]
+        public IActionResult GetBookedOverview([FromQuery] string parkingZoneName)
+        {
+
+            try
+            {
+                var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
+                var userToken = JwtTokenExtension.ReadToken(accessToken)!;
+                //Guid id = new Guid(parkingZoneId);
+
+                //if (userToken.RoleId == 3 || userToken.RoleId == 1) return NotFound();
+
+                DateTime now = DateTime.Now;
+                var list = parkingTransactionRepository.GetBookedSlot(parkingZoneName, DateTime.Now);
+                var doneCheckInOut = 0;
+                var notCheckIn = 0;
+                var notCheckOut = 0;
+                decimal hourCash = 0;
+                decimal dayCash = 0;
+                decimal weekCash = 0;
+                decimal monthCash = 0;
+                decimal yearCash = 0;
+                foreach (var item in list)
+                {
+                    if (item.CheckinAt < DateTime.Now && item.CheckoutAt < DateTime.Now)
+                    {
+                        doneCheckInOut++;
+                    }
+                    if (item.CheckinAt > DateTime.Now || item.CheckinAt == null)
+                    {
+                        notCheckIn++;
+                    }
+                    if (item.CheckinAt <= DateTime.Now && (item.CheckoutAt > DateTime.Now || item.CheckoutAt == null))
+                    {
+                        notCheckOut++;
+                    }
+
+                    TimeSpan timeDifference = (item.CheckoutAt - item.CheckinAt).Value;
+
+                    DayOfWeek firstDayOfWeek = DayOfWeek.Monday; // You can adjust this to your preferred first day of the week
+
+                    DateTime startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)firstDayOfWeek);
+                    DateTime endOfWeek = startOfWeek.AddDays(6);
+
+
+                    if (item.CreatedAt.Year == now.Year)
+                    {
+                        yearCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+
+                        if (item.CreatedAt.Month == now.Month)
+                        {
+                            monthCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+
+                            if (item.CreatedAt >= startOfWeek && item.CreatedAt <= endOfWeek)
+                            {
+                                weekCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+
+                                if (item.CreatedAt.Day == now.Day)
+                                {
+                                    dayCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+
+                                    if (item.CreatedAt.Hour == now.Hour)
+                                    {
+                                        hourCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var metadata = new
+                {
+                    doneCheckInOut = doneCheckInOut,
+                    notCheckIn = notCheckIn,
+                    notCheckOut = notCheckOut,
+                    total = doneCheckInOut + notCheckOut + notCheckIn,
+                    hourCash = hourCash,
+                    dayCash = dayCash,
+                    weekCash = weekCash,
+                    monthCash = monthCash,
+                    yearCash = yearCash,
+                    //Data = list
                 };
                 return Ok(metadata);
             }

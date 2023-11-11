@@ -190,7 +190,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
+    //[FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
     public IActionResult GetAllParkingZoneByOwnerId([FromQuery] string ownerId)
     {
         var parkingZoneList =
