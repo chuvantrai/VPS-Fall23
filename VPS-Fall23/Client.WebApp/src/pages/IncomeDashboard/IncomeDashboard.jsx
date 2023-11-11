@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Select, DatePicker } from 'antd';
+import { Card, Row, Col, Select, DatePicker, Empty } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
 import styles from './IncomeDashboard.module.scss';
 import { getAccountJwtModel } from '@/helpers';
@@ -21,7 +21,6 @@ function IncomeDashboard() {
   const [ParkingZoneOptions, setParkingZoneOptions] = useState([]);
   const [selectedParkingZone, setSelectedParkingZone] = useState('');
   const [ParkingZoneData, setParkingZoneData] = useState([]);
-  const [remainingSlots, setRemainingSlots] = useState(0);
 
   const handleDateRangeChange = (value) => {
     setDateRange(value);
@@ -50,17 +49,6 @@ function IncomeDashboard() {
       .catch((error) => {
         console.error('Error fetching parking zones:', error);
       });
-
-    if (selectedParkingZone) {
-      parkingZoneService
-        .getAvailableSlots(selectedParkingZone)
-        .then((response) => {
-          setRemainingSlots(response.data);
-        })
-        .catch((error) => {
-          console.error('Error fetching available slots:', error);
-        });
-    }
 
     if (dateRange === 'month') {
       const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
@@ -110,7 +98,10 @@ function IncomeDashboard() {
   }, [dateRange, selectedParkingZone, ParkingZoneData]);
   return (
     <div className={styles.dashboard}>
-      <Select className={styles.selectBoxParking} value={selectedParkingZone} onChange={handleStatChange}>
+      <Select className={styles.selectBoxParking} value={selectedParkingZone === '' ? '' : selectedParkingZone} onChange={handleStatChange}>
+        <Option value="" disabled={selectedParkingZone !== ''}>
+          Chọn bãi đỗ xe
+        </Option>
         {ParkingZoneOptions.map((option) => (
           <Option key={option.value} value={option.value}>
             {option.label}
@@ -120,17 +111,17 @@ function IncomeDashboard() {
 
       <Row gutter={24}>
         <Col span={8}>
-          <Card className={styles.cardTitle} title="Tổng Thu Nhập">
+          <Card className={styles.cardTitle} title="Tổng Thu Nhập" style={{ backgroundColor: '#e8f0fe' }}>
             <p>{totalIncome} đồng</p>
           </Card>
         </Col>
         <Col span={8}>
-          <Card className={styles.cardTitle} title="Trung Bình Hàng Tháng">
+          <Card className={styles.cardTitle} title="Trung Bình Hàng Tháng" style={{ backgroundColor: '#f6e4d8' }}>
             <p>{averageMonthlyIncome} đồng</p>
           </Card>
         </Col>
         <Col span={8}>
-          <Card className={styles.cardTitle} title="Trung Bình Hàng Năm">
+          <Card className={styles.cardTitle} title="Trung Bình Hàng Năm" style={{ backgroundColor: '#e5f1da' }}>
             <p>{averageYearlyIncome} đồng</p>
           </Card>
         </Col>
@@ -141,14 +132,18 @@ function IncomeDashboard() {
           <Option value="year">This Year</Option>
           <Option value="all">All Time</Option>
         </Select>
-        <BarChart className={styles.chart} width={1000} height={300} data={data}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="income" fill="#8884d8" />
-        </BarChart>
+        {data.length === 0 ? (
+          <Empty description="No data available" />
+        ) : (
+          <BarChart className={styles.chart} width={1000} height={300} data={data}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="income" fill="#8884d8" />
+          </BarChart>
+        )}
       </Card>
     </div>
   );
