@@ -89,7 +89,7 @@ export const ownerRoutesConfig = {
     {
       key: guidGenerator(),
       path: 'IncomeDashboard',
-      label: 'thống kê',
+      label: 'Thống kê',
       children: [
         {
           key: guidGenerator(),
