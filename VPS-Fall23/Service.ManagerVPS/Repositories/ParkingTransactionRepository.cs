@@ -328,8 +328,7 @@ namespace Service.ManagerVPS.Repositories
         public async Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(Guid parkingZoneId)
         {
             var result = new List<IncomeParkingZoneResponse>();
-            var parkingTransactions = await entities.Where(pt =>
-                pt.ParkingZoneId == parkingZoneId && pt.CheckoutBy != null && pt.CheckinBy != null).ToListAsync();
+            var parkingTransactions = await entities.Where(pt => pt.ParkingZoneId == parkingZoneId && pt.CheckoutBy != null && pt.CheckinBy != null).ToListAsync();
             foreach (var parkingTransaction in parkingTransactions)
             {
                 decimal totalCost = 0;
@@ -347,6 +346,7 @@ namespace Service.ManagerVPS.Repositories
                 {
                     Income = totalCost,
                     IncomeDate = parkingTransaction.CheckinAt.Date
+
                 };
 
                 result.Add(incomeParkingZoneResponse);
