@@ -23,20 +23,6 @@ export const ownerRoutesConfig = {
     },
     {
       key: guidGenerator(),
-      path: 'dashboard',
-      label: 'Dashboard',
-      children: [
-        {
-          key: guidGenerator(),
-          path: 'booked-overview',
-          label: 'Booked Overview',
-          component: ListAttendant,
-          description: 'Thống kê linh tinh',
-        },
-      ],
-    },
-    {
-      key: guidGenerator(),
       path: 'user',
       label: 'Người dùng',
       children: [

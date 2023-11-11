@@ -104,7 +104,7 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpGet("GetBookedOverview")]
-        public IActionResult GetBookedOverview([FromQuery] string parkingZoneName)
+        public IActionResult GetBookedOverview([FromQuery] string? parkingZoneName)
         {
 
             try
