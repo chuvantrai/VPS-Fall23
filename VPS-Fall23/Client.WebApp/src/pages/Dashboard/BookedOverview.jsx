@@ -101,7 +101,6 @@ function BookedOverview() {
                 <Progress
                   type="circle"
                   percent={(bookedData.doneCheckInOut / bookedData.total) * 100}
-                  format={() => 'Done'}
                   size={60}
                 />
               </div>
