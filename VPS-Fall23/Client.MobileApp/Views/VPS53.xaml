@@ -9,9 +9,9 @@
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI">
     <ScrollView>
         <AbsoluteLayout>
-            <cv:CameraView ZIndex="1" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  x:Name="cameraView"
+            <cv:CameraView ZIndex="{Binding CameraIndex}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  x:Name="cameraView"
                />
-            <Grid ZIndex="{Binding CameraIndex}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
+            <Grid ZIndex="{Binding LayoutIndex}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
                 <Grid.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
                 </Grid.GestureRecognizers>
@@ -23,22 +23,22 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-            <Grid x:Name="Loading" BackgroundColor="#A0808080" Grid.RowSpan="4">
+                <Grid x:Name="Loading" BackgroundColor="#A0808080" Grid.RowSpan="4" ZIndex="{Binding LoadingIndex}" >
                     <ActivityIndicator 
                                Scale="0.2"
                                ZIndex="{Binding LoadingIndex}" 
                                IsRunning="{Binding IsBusy}" 
                                IsVisible="{Binding IsBusy}" 
-                               Color="Transparent" 
+                               Color="#83E9EE" 
                                VerticalOptions="FillAndExpand"
                                HorizontalOptions="FillAndExpand"
                                />
                 </Grid>
 
                 <Grid Grid.Row="0" 
-               BackgroundColor="Transparent"
+               BackgroundColor="#A0808080"
                 
-                  ZIndex="{Binding CameraIndex}"
+                  ZIndex="{Binding LayoutIndex}"
                 
                   >
                     <Image Source="logo.png"/>
@@ -46,17 +46,17 @@
                 </Grid>
 
                 <Grid
-                  ZIndex="{Binding CameraIndex}"
+                  ZIndex="{Binding LayoutIndex}"
                   Grid.Row="1"
                   x:Name="cameraZone"
                 >
                     <AbsoluteLayout>
 
-                        <skia:SKCanvasView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" Grid.Row="1" x:Name="canvasView" ZIndex="{Binding CameraIndex}" PaintSurface="OnPaintSurface" />
+                        <skia:SKCanvasView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" Grid.Row="1" x:Name="canvasView" ZIndex="{Binding LayoutIndex}"/>
 
                         <Frame AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" CornerRadius="50" x:Name="FrameSwitch"
                        Margin="5"
-                       ZIndex="{Binding CameraIndex}"
+                       ZIndex="{Binding LayoutIndex}"
                        BackgroundColor="Transparent"
                        VerticalOptions="End"
                        HorizontalOptions="Center" Padding="0,0,0,0"
@@ -77,7 +77,7 @@
                     <Border.StrokeShape >
                         <RoundRectangle StrokeThickness="0" CornerRadius="10,10,0,0"></RoundRectangle>
                     </Border.StrokeShape>
-                    <Grid  BackgroundColor="Transparent" ZIndex="{Binding CameraIndex}">
+                    <Grid  BackgroundColor="Transparent" ZIndex="{Binding LayoutIndex}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="0.5*"/>
                             <ColumnDefinition Width="0.2*"/>
@@ -118,7 +118,7 @@
 
                 <Grid  Grid.Row="3" 
                    BackgroundColor="White"
-                   ZIndex="{Binding CameraIndex}">
+                   ZIndex="{Binding LayoutIndex}">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

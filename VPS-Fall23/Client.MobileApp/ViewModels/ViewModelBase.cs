@@ -5,48 +5,7 @@ namespace Client.MobileApp.ViewModels
 {
     public class ViewModelBase : INotifyPropertyChanged
     {
-        bool isBusy = false;
-        int cameraIndex = 2;
-        int loadingIndex = 0;
-        string areaEntry = "";
-        string licensePlateEntry = "";
-
-        public bool IsBusy
-        {
-            get { return isBusy; }
-            set { SetProperty(ref isBusy, value); }
-        }
-
-        public string AreaEntry
-        {
-            get { return areaEntry; }
-            set { SetProperty(ref areaEntry, value); }
-        }
-
-        public string LicensePlateEntry
-        {
-            get { return licensePlateEntry; }
-            set { SetProperty(ref licensePlateEntry, value); }
-        }
-
-        public int CameraIndex
-        {
-            get { return cameraIndex; }
-            set { SetProperty(ref cameraIndex, value); }
-        }
-
-        public int LoadingIndex
-        {
-            get { return loadingIndex; }
-            set { SetProperty(ref loadingIndex, value); }
-        }
-
-        string title = string.Empty;
-        public string Title
-        {
-            get { return title; }
-            set { SetProperty(ref title, value); }
-        }
+        
 
         protected bool SetProperty<T>(ref T backingStore, T value,
             [CallerMemberName] string propertyName = "",

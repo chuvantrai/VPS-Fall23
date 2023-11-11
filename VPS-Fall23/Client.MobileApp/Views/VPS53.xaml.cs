@@ -33,6 +33,17 @@ public partial class VPS53 : ContentPage
 
         cameraView.Loaded += CameraView_CamerasLoaded;
     }
+
+    public void Load()
+    {
+        InitializeComponent();
+        FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
+        ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
+        canvasView.WidthRequest = 400;
+        canvasView.HeightRequest = 238;
+        cameraView.Loaded += CameraView_CamerasLoaded;
+        LoadCanvasSurface();
+    }
     Task LoadCanvasSurface()
     {
         return Task.Run(() =>
@@ -112,13 +123,10 @@ public partial class VPS53 : ContentPage
 
             var imageSource = await cameraView.TakePhotoAsync();
             imageSource.Seek(0, SeekOrigin.Begin);
-            using (MemoryStream imageStream = new MemoryStream())
-            {
-                imageSource.CopyTo(imageStream);
-                File.WriteAllBytes("/storage/emulated/0/DCIM/Screenshots/img_full.jpg", imageStream.ToArray());
-            }
             using var image = SKImage.FromEncodedData(imageSource);
-            using var licensePlateImage = image.Subset(GetImageSubsetArea(image));
+            var imageSubset = GetImageSubsetArea(image);
+
+            using var licensePlateImage = image.Subset(imageSubset);
             using MemoryStream imageSubsetStream = new MemoryStream();
             licensePlateImage.Encode(SKEncodedImageFormat.Png, 100).SaveTo(imageSubsetStream);
             File.WriteAllBytes("/storage/emulated/0/DCIM/Screenshots/img_cut.jpg", imageSubsetStream.ToArray());
@@ -128,10 +136,10 @@ public partial class VPS53 : ContentPage
                 CheckAt = DateTime.Now,
                 CheckBy = Constant.USER
             };
-
             string autoCheckinResponse = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
             var checkoutScanConfirm = new Task<string>(() => _viewModel.CheckOutScanConfirm(checkLicensePlate).Result);
             await HandleResponse(autoCheckinResponse, checkoutScanConfirm);
+            Load();
         }
         catch (Exception ex)
         {

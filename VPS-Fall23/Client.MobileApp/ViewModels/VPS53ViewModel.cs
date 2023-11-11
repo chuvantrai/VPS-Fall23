@@ -8,7 +8,55 @@ namespace Client.MobileApp.ViewModels
     public class VPS53ViewModel : ViewModelBase
     {
         private readonly HttpClient _client;
+        bool isBusy = false;
+        int cameraIndex = 0;
+        int loadingIndex = 0;
+        int layoutIndex = 2;
+        string areaEntry = "";
+        string licensePlateEntry = "";
 
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set { SetProperty(ref isBusy, value); }
+        }
+
+        public string AreaEntry
+        {
+            get { return areaEntry; }
+            set { SetProperty(ref areaEntry, value); }
+        }
+
+        public string LicensePlateEntry
+        {
+            get { return licensePlateEntry; }
+            set { SetProperty(ref licensePlateEntry, value); }
+        }
+
+        public int CameraIndex
+        {
+            get { return cameraIndex; }
+            set { SetProperty(ref cameraIndex, value); }
+        }
+        public int LayoutIndex
+        {
+            get { return layoutIndex; }
+            set { SetProperty(ref layoutIndex, value); }
+        }
+
+
+        public int LoadingIndex
+        {
+            get { return loadingIndex; }
+            set { SetProperty(ref loadingIndex, value); }
+        }
+
+        string title = string.Empty;
+        public string Title
+        {
+            get { return title; }
+            set { SetProperty(ref title, value); }
+        }
         public VPS53ViewModel()
         {
             _client = new HttpClient
@@ -22,7 +70,8 @@ namespace Client.MobileApp.ViewModels
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 IsBusy = true;
-                CameraIndex = 0;
+                LayoutIndex = 0;
+                CameraIndex = 2;
                 LoadingIndex = 2;
 
                 HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
@@ -30,8 +79,9 @@ namespace Client.MobileApp.ViewModels
                 if (response.IsSuccessStatusCode)
                 {
                     IsBusy = false;
-                    CameraIndex = 2;
-                    LoadingIndex = 0;
+                    LayoutIndex = 2;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
 
                     var ObjectResponse = await response.Content.ReadFromJsonAsync<LicensePlateScanResponse>();
 
@@ -45,8 +95,9 @@ namespace Client.MobileApp.ViewModels
                 else
                 {
                     IsBusy = false;
-                    CameraIndex = 2;
-                    LoadingIndex = 0;
+                    LayoutIndex = 2;
+                    CameraIndex = 1;
+                    LoadingIndex = -1;
 
                     var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";
@@ -123,7 +174,7 @@ namespace Client.MobileApp.ViewModels
                 {
                     IsBusy = false;
                     CameraIndex = 2;
-                    LoadingIndex = 0;
+                    LoadingIndex = -1;
                     return await response.Content.ReadAsStringAsync();
                 }
                 else
