@@ -95,9 +95,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
             .Where(p => p.Commune.District.CityId == cityId
-            && p.IsFull == false
-                 && p.IsApprove == true
-            && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
+                        && p.IsFull == false
+                        && p.IsApprove == true
+                        && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByCommuneId(Guid communeId)
@@ -107,9 +107,9 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
             .Where(p => p.CommuneId == communeId
-            && p.IsFull == false
-            && p.IsApprove == true
-            && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
+                        && p.IsFull == false
+                        && p.IsApprove == true
+                        && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByDistrictId(Guid districtId)
@@ -117,10 +117,12 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
         return entities.Include(p => p.Owner)
             .Include(p => p.Commune)
             .ThenInclude(c => c.District)
-            .ThenInclude(d => d.City).Where(p => p.Commune.DistrictId == districtId
-            && p.IsFull == false
-                 && p.IsApprove == true
-            && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
+            .ThenInclude(d => d.City)
+            .Where(p => p.Commune.DistrictId == districtId
+                        && p.IsFull == false
+                        && p.IsApprove == true
+                        && !p.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public PagedList<ParkingZone> GetRequestedParkingZones(QueryStringParameters parameters)

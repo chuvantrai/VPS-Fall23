@@ -9,7 +9,7 @@ const useFeedbackServices = () => {
       .post('/api/FeedBack/CreateFeedBackParkingZone', {
         ParkingZoneId: parkingZoneId,
         Content: values.comment ?? '',
-        Rate: values.rate,
+        Rate: values.rate ?? 3,
         Email: values.email,
       })
       .then(() => {

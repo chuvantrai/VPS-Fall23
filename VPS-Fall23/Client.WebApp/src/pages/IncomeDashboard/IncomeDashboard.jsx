@@ -135,14 +135,14 @@ function IncomeDashboard() {
         {data.length === 0 ? (
           <Empty description="No data available" />
         ) : (
-          <BarChart className={styles.chart} width={1000} height={300} data={data}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="income" fill="#8884d8" />
-          </BarChart>
+        <BarChart className={styles.chart} width={1000} height={300} data={data}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey="income" fill="#8884d8" />
+        </BarChart>
         )}
       </Card>
     </div>

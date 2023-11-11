@@ -35,6 +35,41 @@ namespace Service.ManagerVPS.Repositories
                 .CountAsync();
         }
 
+        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, DateTime? checkAt)
+        {
+            if (!checkAt.HasValue)
+            {
+                checkAt = DateTime.Now;
+            }
+            if (parkingZoneName == null || parkingZoneName.Trim() == "")
+            {
+                return this.entities
+                .Include(p => p.ParkingZone)
+                 .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED)
+                 && (!p.ParkingTransactionDetails.Any())
+                 ).ToList();
+            }
+            return this.entities
+                .Include(p => p.ParkingZone)
+                 .Where(p => p.ParkingZone.Name == parkingZoneName
+                 && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED)
+                 && (!p.ParkingTransactionDetails.Any())
+                 ).ToList(); ;
+        }
+
+        //public async Task<int> GetMonthDoneTransaction(Guid parkingZoneId)
+        //{
+        //    DateTime dateTime = DateTime.Now;
+        //    return await this.entities
+        //         .Where(p => p.ParkingZoneId == parkingZoneId
+        //         && p.CreatedAt.Month == dateTime.Month
+        //         && (p.StatusId == 5)
+        //         && (!p.ParkingTransactionDetails.Any()
+        //         || p.ParkingTransactionDetails.OrderByDescending(pt => pt.CreatedAt).First().To >= checkAt
+        //         ))
+        //         .CountAsync();
+        //}
+
         public async Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy)
         {
             var transaction = await entities.Include(t => t.ParkingTransactionDetails)
@@ -262,7 +297,7 @@ namespace Service.ManagerVPS.Repositories
                 .Include(x => x.PaymentTransactions)
                 .Where(x => x.ParkingZoneId.Equals(id)
                             && x.ParkingZone.IsApprove == true
-                            && x.Email == email).ToListAsync();
+                            ).ToListAsync();
             if (parkingTransactions.Count == 0)
             {
                 return new
@@ -274,12 +309,12 @@ namespace Service.ManagerVPS.Repositories
 
             var parkingTransaction = parkingTransactions.FirstOrDefault(x => x.Email == email);
 
-            if (parkingTransaction != null)
+            if (parkingTransaction == null)
             {
                 return new
                 {
                     ParkingTransaction = parkingTransactions,
-                    id = 5010
+                    Id = 5008
                 };
             }
 
