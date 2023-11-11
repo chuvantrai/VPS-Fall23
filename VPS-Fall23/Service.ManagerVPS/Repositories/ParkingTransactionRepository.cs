@@ -328,14 +328,14 @@ namespace Service.ManagerVPS.Repositories
         public async Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(Guid parkingZoneId)
         {
             var result = new List<IncomeParkingZoneResponse>();
-            var parkingTransactions = await entities.Where(pt => pt.ParkingZoneId == parkingZoneId && pt.CheckoutBy != null && pt.CheckinBy != null).ToListAsync();
+            var parkingTransactions = await entities.Include(pt => pt.ParkingTransactionDetails).Where(pt => pt.ParkingZoneId == parkingZoneId && pt.CheckoutBy != null && pt.CheckinBy != null).ToListAsync();
             foreach (var parkingTransaction in parkingTransactions)
             {
                 decimal totalCost = 0;
 
                 foreach (var parkingTransactionDetail in parkingTransaction.ParkingTransactionDetails)
                 {
-                    var duration = parkingTransactionDetail.From - parkingTransactionDetail.To;
+                    var duration = parkingTransactionDetail.To - parkingTransactionDetail.From;
                     var totalHours = duration.TotalHours;
 
                     decimal costForDetail = (decimal)totalHours * parkingTransactionDetail.UnitPricePerHour;
