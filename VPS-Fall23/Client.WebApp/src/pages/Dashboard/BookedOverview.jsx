@@ -1,6 +1,5 @@
 import { Fragment, useEffect } from 'react';
 import { Progress, Card, Typography } from 'antd';
-import { useParams } from 'react-router-dom';
 import useParkingZoneService from '@/services/parkingZoneOwnerService.js';
 import { useState } from 'react';
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
@@ -8,10 +7,9 @@ import { Line } from 'react-chartjs-2';
 
 const { Text } = Typography;
 
-function BookedOverview() {
+function BookedOverview({ parkingZoneName }) {
   Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title);
 
-  const { parkingZoneName } = useParams();
   const parkingZoneService = useParkingZoneService();
 
   const [bookedData, setBookedData] = useState({

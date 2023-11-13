@@ -7,7 +7,7 @@ import ManagerLayout from '../layouts/ManagerLayout';
 import guidGenerator from '../helpers/guidGenerator';
 import ListFeedback from '../pages/ListFeedback/ListFeedback';
 import IncomeDashboard from '@/pages/IncomeDashboard';
-import BookedOverview from '../pages/Dashboard/BookedOverview';
+import Overview from '../pages/Dashboard/Overview';
 
 export const ownerRoutesConfig = {
   header: Header,
@@ -16,9 +16,9 @@ export const ownerRoutesConfig = {
   routes: [
     {
       key: guidGenerator(),
-      path: ':parkingZoneName',
+      path: '',
       label: 'Trang chủ',
-      component: BookedOverview,
+      component: Overview,
       description: '',
     },
     {

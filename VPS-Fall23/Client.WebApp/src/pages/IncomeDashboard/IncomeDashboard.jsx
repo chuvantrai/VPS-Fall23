@@ -1,52 +1,17 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { Card, Row, Col, Select, DatePicker, Empty, Progress, Typography } from 'antd';
-import { useParams } from 'react-router-dom';
+import { Fragment, useState, useEffect } from 'react';
+import { Card, Row, Col, Select, DatePicker, Empty, Typography } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from 'recharts';
-import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import styles from './IncomeDashboard.module.scss';
 import { getAccountJwtModel } from '@/helpers';
 
 import useParkingZoneService from '@/services/parkingZoneService';
-import useParkingZoneOwnerService from '@/services/parkingZoneOwnerService';
 import useParkingTransactionService from '@/services/parkingTransactionSerivce';
 
-function IncomeDashboard() {
+function IncomeDashboard({ selectedParkingZone, ParkingZoneData }) {
 
-  const { Text } = Typography;
-
-
-  Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title);
-
-  const { parkingZoneName } = useParams();
-
-  const [bookedData, setBookedData] = useState({
-    doneCheckInOut: 0,
-    notCheckIn: 0,
-    notCheckOut: 0,
-    total: 0,
-    hourCash: 0,
-    dayCash: 0,
-    weekCash: 0,
-    monthCash: 0,
-    yearCash: 0,
-  });
-
-  const [chartData, setChartData] = useState({
-    labels: ['1h', '1day', '1W', '1M', '1Y'],
-    datasets: [
-      {
-        label: 'Income',
-        data: [0, 0, 0, 0, 0, 0],
-        borderColor: 'rgba(75, 192, 192, 1)',
-        fill: false,
-      },
-    ],
-  });
 
   const parkingZoneService = useParkingZoneService();
   const parkingTransactionService = useParkingTransactionService();
-  const parkingZoneOwnerService = useParkingZoneOwnerService();
   const { RangePicker } = DatePicker;
   const { Option } = Select;
   const account = getAccountJwtModel();
@@ -55,27 +20,25 @@ function IncomeDashboard() {
   const [averageYearlyIncome, setAverageYearlyIncome] = useState(0);
   const [dateRange, setDateRange] = useState('all');
   const [data, setData] = useState([]);
-  const [ParkingZoneOptions, setParkingZoneOptions] = useState([]);
-  const [selectedParkingZone, setSelectedParkingZone] = useState('');
-  const [ParkingZoneData, setParkingZoneData] = useState([]);
+  // const [ParkingZoneOptions, setParkingZoneOptions] = useState([]);
+  // const [ParkingZoneData, setParkingZoneData] = useState([]);
 
   const handleDateRangeChange = (value) => {
     setDateRange(value);
   };
 
-  const handleStatChange = (value, label) => {
-    setSelectedParkingZone(value);
-    parkingTransactionService
-      .getAllIncome(value)
-      .then((response) => {
-        setData(response.data);
-        setParkingZoneData(response.data);
-        getBookedData(label);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  };
+  // const handleStatChange = (value) => {
+  //   setSelectedParkingZone(value);
+  //   parkingTransactionService
+  //     .getAllIncome(value)
+  //     .then((response) => {
+  //       setData(response.data);
+  //       setParkingZoneData(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching data:', error);
+  //     });
+  // };
 
   useEffect(() => {
     const filteredData = ParkingZoneData.filter((item) => item.parkingZoneId === selectedParkingZone);
@@ -135,102 +98,18 @@ function IncomeDashboard() {
     setAverageYearlyIncome(averageYearlyIncome);
   }, [dateRange, selectedParkingZone, ParkingZoneData]);
 
-  const getBookedData = async (value) => {
-    await parkingZoneOwnerService
-      .getBookedOverview({ value })
-      .then((res) => {
-        setBookedData(res.data);
-        const chart = {
-          datasets: [
-            {
-              label: 'Daily Income',
-              data: [res.data.hourCash, res.data.dayCash, res.data.weekCash, res.data.monthCash, res.data.yearCash],
-              borderColor: 'rgba(75, 192, 192, 1)',
-              fill: false,
-            },
-          ],
-        };
-        // console.log(chart);
-        console.log(res.data);
-
-        setChartData(chart);
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  };
-
-  const options = {
-    scales: {
-      x: {
-        type: 'category',
-        labels: ['1h', '1day', '1W', '1M', '1Y'],
-      },
-      y: {
-        beginAtZero: true,
-      },
-    },
-  };
-
   return (
-    <div className={styles.dashboard}>
-      <Select className={styles.selectBoxParking} value={selectedParkingZone === '' ? '' : selectedParkingZone} onChange={handleStatChange}>
+    <Fragment>
+      {/* <Select className={styles.selectBoxParking} value={selectedParkingZone === '' ? '' : selectedParkingZone} onChange={handleStatChange}>
         <Option value="" disabled={selectedParkingZone !== ''}>
-          Chọn bãi đỗ xe
+          Tất cả bãi đỗ xe
         </Option>
         {ParkingZoneOptions.map((option) => (
           <Option key={option.value} value={option.value}>
             {option.label}
           </Option>
         ))}
-      </Select>
-      <Fragment>
-        {(bookedData !== null || bookedData !== undefined) && (
-          <div className="block">
-            <div className="flex">
-              <Card title="Booked (tháng)" bordered={true} style={{ width: 200 }}>
-                <p>Tổng vé xe: {bookedData.doneCheckInOut}</p>
-                <Text strong>
-                  Doanh thu:{' '}
-                  {bookedData.monthCash.toLocaleString('vi-VN', {
-                    style: 'currency',
-                    currency: 'VND',
-                  })}
-                </Text>
-              </Card>
-              <Card title="Đã hoàn thành" className="ml-5" bordered={true} style={{ width: 200 }}>
-                <div className="flex justify-between items-center">
-                  {bookedData.doneCheckInOut}
-                  <Progress
-                    type="circle"
-                    percent={((bookedData.doneCheckInOut / bookedData.total) * 100).toFixed(1)}
-                    size={60}
-                  />
-                </div>
-              </Card>
-              <Card title="Chưa Check In" className="ml-5" bordered={true} style={{ width: 200 }}>
-                <div className="flex justify-between items-center">
-                  {bookedData.notCheckIn}
-                  <Progress type="circle" percent={((bookedData.notCheckIn / bookedData.total) * 100).toFixed(1)} size={60} />
-                </div>
-              </Card>
-              <Card title="Chưa Check Out" className="ml-5" bordered={true} style={{ width: 200 }}>
-                <div className="flex justify-between items-center">
-                  {bookedData.notCheckOut}
-                  <Progress type="circle" percent={((bookedData.notCheckOut / bookedData.total) * 100).toFixed(1)} size={60} />
-                </div>
-              </Card>
-            </div>
-            <div className="mt-5">
-              <h3>Thống kê thu nhập theo giờ</h3>
-              <Line data={chartData} options={options} />
-            </div>
-          </div>
-        )}
-      </Fragment>
-
-
-
+      </Select> */}
       <Row style={{ marginTop: '50px' }} gutter={24}>
         <Col span={8}>
           <Card className={styles.cardTitle} title="Tổng Thu Nhập" style={{ backgroundColor: '#e8f0fe' }}>
@@ -267,7 +146,7 @@ function IncomeDashboard() {
           </BarChart>
         )}
       </Card>
-    </div>
+    </Fragment>
   );
 }
 

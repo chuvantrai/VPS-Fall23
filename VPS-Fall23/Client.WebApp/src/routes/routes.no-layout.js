@@ -3,6 +3,7 @@ import VerifyEmail from '@/pages/VerifyEmail';
 import Login from '@/pages/Login';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ChangePassword from '@/pages/ChangePassword/index.js';
+import Overview from '../pages/Dashboard/Overview';
 
 export const noLayoutRouteConfigs = [
   {
@@ -24,5 +25,9 @@ export const noLayoutRouteConfigs = [
   {
     path: '/change-password',
     component: ChangePassword,
+  },
+  {
+    path: '/:parkingZoneName',
+    component: Overview,
   },
 ];
