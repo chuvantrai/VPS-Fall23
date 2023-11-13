@@ -1,13 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Quartz;
-using Quartz.Impl;
-using Quartz.Spi;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
-using Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories;
@@ -20,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", build => build.AllowAnyMethod()
-        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(hostName => true).Build());
+        .AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(_ => true).Build());
 });
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
@@ -38,6 +34,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Config appsetting to model
+builder.Services.Configure<FileManagementConfig>(builder.Configuration.GetSection("fileManagementAccessKey"));
+builder.Services.AddOptions();
+
+//Config appsetting to model
 builder.Services.Configure<FileManagementConfig>(
     builder.Configuration.GetSection("fileManagementAccessKey"));
 builder.Services.Configure<VnPayConfig>(builder.Configuration.GetSection("vnPay"));
@@ -51,15 +51,6 @@ builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
 builder.Services.AddSingleton<IVnPayLibrary, VnPayLibrary>();
 builder.Services.AddSingleton<GoogleApiService>();
-builder.Services.AddSingleton<IScheduler>(provider =>
-{
-    ISchedulerFactory schedulerFactory = new StdSchedulerFactory();
-    IScheduler scheduler = schedulerFactory.GetScheduler().Result;
-    return scheduler;
-});
-builder.Services.AddSingleton<IJobFactory, JobFactory>();
-builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-builder.Services.AddSingleton<QuartzServices>();
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -88,16 +79,17 @@ builder.Services.AddSession(options =>
 
 // orther
 builder.Services.AddHttpContextAccessor();
+builder.WebHost.ConfigureKestrel(serverOptions => { serverOptions.ListenLocalhost(5001); });
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseHsts();
-}
+// }
 
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
@@ -108,9 +100,5 @@ app.MapRazorPages();
 app.UseExceptionHandler("/error");
 app.UseSession();
 app.UseStaticFiles();
-
-var serviceProvider = app.Services;
-var quartzServices = serviceProvider.GetRequiredService<QuartzServices>();
-quartzServices.Start().GetAwaiter().GetResult();
 
 app.Run();

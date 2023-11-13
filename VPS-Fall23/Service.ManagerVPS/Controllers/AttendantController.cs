@@ -90,10 +90,14 @@ public class AttendantController : VpsController<ParkingZoneAttendant>
 
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.GetListAttendant)]
-    public IActionResult GetListAttendant(string ownerId,
-        [FromQuery] QueryStringParameters parameters)
+    public IActionResult GetListAttendant(Guid? ownerId, [FromQuery] QueryStringParameters parameters)
     {
-        var attendantAccounts = _userRepository.GetListAttendantAccount(ownerId, parameters);
+        if (ownerId is null)
+        {
+            throw new ServerException("ownerId cannot be null!");
+        }
+
+        var attendantAccounts = _userRepository.GetListAttendantAccount((Guid)ownerId, parameters);
         var result = attendantAccounts.Select((x, ind) => new
         {
             Key = ind + 1,
@@ -120,11 +124,16 @@ public class AttendantController : VpsController<ParkingZoneAttendant>
 
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.SearchAttendantByName)]
-    public IActionResult SearchAttendantByName(string ownerId, string attendantName,
+    public IActionResult SearchAttendantByName(Guid? ownerId, string attendantName,
         [FromQuery] QueryStringParameters parameters)
     {
+        if (ownerId is null)
+        {
+            throw new ServerException("ownerId cannot be null!");
+        }
+
         var attendantAccounts =
-            _userRepository.SearchAttendantByName(ownerId, attendantName, parameters);
+            _userRepository.SearchAttendantByName((Guid)ownerId, attendantName, parameters);
         var result = attendantAccounts.Select((x, ind) => new
         {
             Key = ind + 1,

@@ -13,6 +13,7 @@ using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.AppSetting;
 using Microsoft.AspNetCore.Identity;
+using Service.ManagerVPS.DTO.Output;
 
 namespace Service.ManagerVPS.Controllers
 {
@@ -197,5 +198,11 @@ namespace Service.ManagerVPS.Controllers
             return await ((IParkingTransactionRepository)vpsRepository).CheckOutConfirm(licensePlate, licensePlateScan.CheckAt, licensePlateScan.CheckBy) ?? throw new ClientException(3002);
         }
 
+        [HttpGet("{parkingZoneId}")]
+        public async Task<List<IncomeParkingZoneResponse>> GetAllIncome(Guid parkingZoneId)
+        {
+            var transaction = await ((IParkingTransactionRepository)vpsRepository).GetAllIncomeByParkingZoneId(parkingZoneId);
+            return transaction;
+        }
     }
 }

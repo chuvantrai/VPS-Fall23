@@ -129,20 +129,20 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return account;
     }
 
-    public PagedList<Account> GetListAttendantAccount(string ownerId,
+    public PagedList<Account> GetListAttendantAccount(Guid ownerId,
         QueryStringParameters parameters)
     {
         var attendants = entities
             .Include(x => x.ParkingZoneAttendant)
             .ThenInclude(x => x!.ParkingZone)
             .Where(x =>
-                x.ParkingZoneAttendant!.ParkingZone.OwnerId.ToString().Equals(ownerId) &&
+                x.ParkingZoneAttendant!.ParkingZone.OwnerId.Equals(ownerId) &&
                 x.TypeId == (int)UserRoleEnum.ATTENDANT);
         return PagedList<Account>.ToPagedList(attendants, parameters.PageNumber,
             parameters.PageSize);
     }
 
-    public PagedList<Account> SearchAttendantByName(string ownerId, string attendantName,
+    public PagedList<Account> SearchAttendantByName(Guid ownerId, string attendantName,
         QueryStringParameters parameters)
     {
         var attendants = entities

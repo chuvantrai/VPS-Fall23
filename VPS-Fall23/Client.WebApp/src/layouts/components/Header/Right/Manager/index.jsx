@@ -1,4 +1,6 @@
 import { Dropdown, Space } from 'antd';
+import avatarImg from '@/assets/images/AvatarDefault.png';
+
 const items = [
   {
     label: <a href="/login">Đăng xuất</a>,
@@ -6,6 +8,7 @@ const items = [
   },
 ];
 
+// eslint-disable-next-line react/prop-types
 const ManagerRightHeader = ({ account }) => {
   return (
     <Dropdown menu={{ items }} trigger={['click']} placement="bottomRight">
@@ -13,7 +16,7 @@ const ManagerRightHeader = ({ account }) => {
         <Space>
           <img
             className={'w-[50px] h-[50px!important] rounded-[10px] object-cover'}
-            src={account.Avatar === '' ? '../src/assets/images/AvatarDefault.png' : account.Avatar}
+            src={account.Avatar === '' ? avatarImg : account.Avatar}
           />
         </Space>
       </span>
