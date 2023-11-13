@@ -6,11 +6,9 @@
              x:DataType="viewmodel:VPS79ViewModel"
              xmlns:system="clr-namespace:System;assembly=netstandard"
              xmlns:local="clr-namespace:Client.MobileApp">
+    <Grid>
 
-    <Grid ColumnDefinitions="0.5*, 0.5*"
-          RowDefinitions="0.3*, 0.7*" BackgroundColor="White">
-
-        <Grid  BackgroundColor="#A0808080" Grid.RowSpan="2" Grid.ColumnSpan="2">
+        <Grid  BackgroundColor="#A0808080" Grid.RowSpan="2" Grid.ColumnSpan="2" ZIndex="{Binding LoadingIndex}">
             <ActivityIndicator ZIndex="{Binding LoadingIndex}"
                            IsRunning="{Binding IsBusy}"
                            IsVisible="{Binding IsBusy}"
@@ -20,70 +18,79 @@
                            HorizontalOptions="FillAndExpand"/>
         </Grid>
 
-        <Border  Grid.ColumnSpan="2"
+        <Grid ColumnDefinitions="0.5*, 0.5*"
+          RowDefinitions="0.3*, 0.7*" BackgroundColor="White">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
+            </Grid.GestureRecognizers>
+            
+            <Border  Grid.ColumnSpan="2"
                  ZIndex="{Binding CameraIndex}"
                  Stroke="Transparent"
                  Background="#83E9EE" 
                  Grid.RowSpan="1">
-            <Border.StrokeShape>
-                <RoundRectangle CornerRadius="0,0,100,100"/>
-            </Border.StrokeShape>
-            <Image Source="logo.png" 
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="0,0,100,100"/>
+                </Border.StrokeShape>
+                <Image Source="logo.png" 
                    Grid.Row="0"  
                    Grid.Column="0"  
                    HorizontalOptions="Center" 
                    Aspect="AspectFit"/>
-        </Border>
+            </Border>
 
-        <Frame CornerRadius="10" 
+            <Frame CornerRadius="10" 
                Grid.Column="0"  
                BorderColor="White" 
                HeightRequest="420" 
-               Background="White"
                Grid.Row="1" 
                WidthRequest="380" VerticalOptions="Start"
                Grid.ColumnSpan="2" 
                Grid.RowSpan="1"
                ZIndex="{Binding CameraIndex}">
 
-            <Grid IsClippedToBounds="True" 
+                <Grid IsClippedToBounds="True" 
                   HeightRequest="420" >
+                    
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
+                    </Grid.GestureRecognizers>
+                    
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="90"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="40"/>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="90"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="10"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="40"/>
-                    <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
 
-                </Grid.RowDefinitions>
-
-                <Label Padding="0,10,0,0" 
+                    <Label Padding="0,10,0,0" 
                        HorizontalOptions="Center" 
                        HorizontalTextAlignment="Center" 
                        VerticalTextAlignment="Start">
 
-                    <Label.FormattedText>
-                        <FormattedString>
-                            <Span Text="Welcome back" 
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Welcome back" 
                                   FontSize="32"  
                                   FontAttributes="Bold"/>
 
-                            <Span Text="{x:Static system:Environment.NewLine}"/>
+                                <Span Text="{x:Static system:Environment.NewLine}"/>
 
-                            <Span Text="Login to your account"
+                                <Span Text="Login to your account"
                                   FontSize="14"/>
-                        </FormattedString>
-                    </Label.FormattedText>
+                            </FormattedString>
+                        </Label.FormattedText>
 
-                </Label>
+                    </Label>
 
-                <Frame Grid.Row="2" Padding="10,3,10,0">
+                    <Frame Grid.Row="2" Padding="10,3,10,0">
 
-                    <Entry  
+                        <Entry  
                             x:Name="UserName"
                             IsSpellCheckEnabled="False"
                             Placeholder="nhập tài khoản"
@@ -91,11 +98,11 @@
                             PlaceholderColor="Black"
                             FontSize="14"/>
 
-                </Frame>
+                    </Frame>
 
-                <Frame Grid.Row="4" Padding="10,3,10,0">
+                    <Frame Grid.Row="4" Padding="10,3,10,0">
 
-                    <Entry  
+                        <Entry  
                             x:Name="Password" 
                             IsTextPredictionEnabled="False"
                             Placeholder="nhập mật khẩu"
@@ -104,17 +111,17 @@
                             HorizontalOptions="FillAndExpand"
                             IsPassword="True"/>
 
-                </Frame>
+                    </Frame>
 
-                <Grid ColumnDefinitions="0.5*,0.5*" Grid.Row="5" Padding="12,0,0,0" VerticalOptions="Start">
-                    <HorizontalStackLayout VerticalOptions="Center" Padding="10,0,0,0" >
-                        <CheckBox Color="#83E9EE"/>
-                        <Label  Text="Remember me" FontSize="12" VerticalOptions="Center" />
-                    </HorizontalStackLayout>
-                    <Label Text="Forgot password?" Grid.Column="1" TextColor="#83E9EE" HorizontalTextAlignment="Center" Padding="10,0,0,0" FontSize="12" VerticalOptions="Center" />
-                </Grid>
+                    <Grid ColumnDefinitions="0.5*,0.5*" Grid.Row="5" Padding="12,0,0,0" VerticalOptions="Start">
+                        <HorizontalStackLayout VerticalOptions="Center" Padding="10,0,0,0" >
+                            <CheckBox Color="#83E9EE"/>
+                            <Label  Text="Remember me" FontSize="12" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Label Text="Forgot password?" Grid.Column="1" TextColor="#83E9EE" HorizontalTextAlignment="Center" Padding="10,0,0,0" FontSize="12" VerticalOptions="Center" />
+                    </Grid>
 
-                <Button Text="LOGIN" 
+                    <Button Text="LOGIN" 
                         Clicked="loginButton_Clicked"
                         x:Name="loginButton" 
                         TextColor="Black"
@@ -128,8 +135,8 @@
                         Grid.Row="6" 
                         Background="#83E9EE"/>
 
-            </Grid>
-        </Frame>
+                </Grid>
+            </Frame>
+        </Grid>
     </Grid>
-
 </ContentPage>

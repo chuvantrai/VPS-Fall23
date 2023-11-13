@@ -6,18 +6,16 @@
     xmlns:views="clr-namespace:Client.MobileApp.Views"
     Shell.FlyoutBehavior="Disabled">
 
-
-    <ShellContent
-    ContentTemplate="{DataTemplate views:VPS53}"
-    Route="VPS53" />
-    
     <ShellContent
     ContentTemplate="{DataTemplate views:VPS79}"
     Route="VPS79" />
 
-
+    <ShellContent
+    ContentTemplate="{DataTemplate views:VPS53}"
+    Route="VPS53" />
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" IsEnabled="False" />
     </Shell.BackButtonBehavior>
+    
 </Shell>

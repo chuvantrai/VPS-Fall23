@@ -6,6 +6,9 @@ using Client.MobileApp.Extensions;
 using CommunityToolkit.Maui.Core.Platform;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using Microsoft.Maui.Graphics;
+using System.IO;
+
 
 namespace Client.MobileApp.Views;
 
@@ -25,20 +28,16 @@ public partial class VPS53 : ContentPage
         VPS53ViewModel viewModel = new();
         BindingContext = viewModel;
         _viewModel = viewModel;
-        FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
-        ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
+        FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.2;
+        ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.2;
+        LogoImage.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.3;
         LoadCanvasSurface();
-
         cameraView.Loaded += CameraView_CamerasLoaded;
     }
 
     public void Load()
     {
         InitializeComponent();
-        FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
-        ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
-        cameraView.Loaded += CameraView_CamerasLoaded;
-        LoadCanvasSurface();
     }
     Task LoadCanvasSurface()
     {
@@ -46,7 +45,6 @@ public partial class VPS53 : ContentPage
         {
             canvasView.InvalidateSurface();
             canvasView.PaintSurface += OnPaintSurface;
-            canvasView.InvalidateSurface();
         });
     }
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
@@ -70,54 +68,30 @@ public partial class VPS53 : ContentPage
         paint.StrokeWidth = 5;
         allScreenRegion.Op(plateRegion, SKRegionOperation.Difference);
         canvas.DrawRegion(allScreenRegion, paint);
-
-
     }
 
     private void CameraView_CamerasLoaded(object sender, EventArgs e)
     {
-        if (cameraView.Cameras.Count > 0)
+        cameraView.Camera = cameraView.Cameras.First();
+
+        MainThread.BeginInvokeOnMainThread(async () =>
         {
-
-            cameraView.Camera = cameraView.Cameras[0];
-            var maxResolution = cameraView.Camera.AvailableResolutions[0];
-            foreach (var resolution in cameraView.Camera.AvailableResolutions)
-            {
-                if (resolution.Width * resolution.Height > maxResolution.Width * maxResolution.Height)
-                {
-                    maxResolution = resolution;
-                }
-
-            }
-
-            double widthRatio = maxResolution.Width / DeviceDisplay.MainDisplayInfo.Width;
-            double heightRatio = maxResolution.Height / DeviceDisplay.MainDisplayInfo.Height;
-
-            double minRatio = Math.Min(widthRatio, heightRatio);
-
-            cameraView.WidthRequest = maxResolution.Width / minRatio;
-            cameraView.HeightRequest = maxResolution.Height / minRatio;
-
-            var startCameraResult = cameraView.StartCameraAsync().Result;
-            if (startCameraResult != 0)
-            {
-                Application.Current.MainPage.DisplayAlert(Constant.ALERT, startCameraResult.ToString(), Constant.CANCEL);
-            }
-
-
-        }
+            await cameraView.StopCameraAsync();
+            await cameraView.StartCameraAsync();
+        });
     }
+
     SKRectI GetImageSubsetArea(SKImage image)
     {
-        float remainX = (float)(image.Width - cameraView.Width) / 2;
-        float remainY = (float)(image.Height - cameraView.Height) / 2;
-        float left = plateRect.Left + remainX;
-        float top = plateRect.Top * (float)(image.Height / cameraView.Height);
-        float right = plateRect.Right + remainX;
-        float bottom = plateRect.Bottom * (float)(image.Height / cameraView.Height);
+        var remainY = LicenseInputFrame.Height + ButtonFrame.Height - Logo.Height;
+        float left = plateRect.Left;
+        float top = plateRect.Top + (float)remainY;
+        float right = plateRect.Right;
+        float bottom = plateRect.Bottom + (float)remainY;
         SKRect scropRect = new SKRect(left, top, right, bottom);
         return SKRectI.Floor(scropRect);
     }
+
     private async void CameraButton_Clicked(object sender, EventArgs e)
     {
         try
@@ -125,15 +99,17 @@ public partial class VPS53 : ContentPage
             string licensePlate = String.Empty;
             string path = String.Empty;
 
-            var imageSource = await cameraView.TakePhotoAsync();
-            imageSource.Seek(0, SeekOrigin.Begin);
-            using var image = SKImage.FromEncodedData(imageSource);
-            var imageSubset = GetImageSubsetArea(image);
-
-            using var licensePlateImage = image.Subset(imageSubset);
+            var imageSource = cameraView.GetSnapShot(Camera.MAUI.ImageFormat.PNG);
+            StreamImageSource streamImageSource = (StreamImageSource)imageSource;
+            CancellationToken cancellationToken = CancellationToken.None;
+            Task<Stream> task = streamImageSource.Stream(cancellationToken);
+            Stream stream = task.Result;
+            stream.Seek(0, SeekOrigin.Begin);
+            var newImage = SKImage.FromEncodedData(stream);
+            var imageSubset = GetImageSubsetArea(newImage);
+            var licensePlateImage = newImage.Subset(imageSubset);
             using MemoryStream imageSubsetStream = new MemoryStream();
-            licensePlateImage.Encode(SKEncodedImageFormat.Png, 100).SaveTo(imageSubsetStream);
-            File.WriteAllBytes("/storage/emulated/0/DCIM/Screenshots/img_cut.jpg", imageSubsetStream.ToArray());
+
             var checkLicensePlate = new LicensePlateScan
             {
                 Image = imageSubsetStream.ToArray(),
@@ -143,7 +119,6 @@ public partial class VPS53 : ContentPage
             string autoCheckinResponse = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
             var checkoutScanConfirm = new Task<string>(() => _viewModel.CheckOutScanConfirm(checkLicensePlate).Result);
             await HandleResponse(autoCheckinResponse, checkoutScanConfirm);
-            Load();
         }
         catch (Exception ex)
         {
@@ -151,9 +126,9 @@ public partial class VPS53 : ContentPage
             {
                 await Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
             });
-
         }
     }
+
     async Task HandleResponse(string response, Task<string> checkOutScanConfirmTask = null)
     {
         switch (response)
@@ -184,21 +159,18 @@ public partial class VPS53 : ContentPage
         }
     }
 
-
     private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
     {
         await LicensePlateEntry.HideKeyboardAsync(CancellationToken.None);
-        await AreaCodeEntry.HideKeyboardAsync(CancellationToken.None);
 
         LicensePlateEntry.Unfocus();
-        AreaCodeEntry.Unfocus();
     }
 
     private async void OkButton_Clicked(object sender, EventArgs e)
     {
         try
         {
-            string licensePlate = AreaCodeEntry.Text + "-" + LicensePlateEntry.Text;
+            string licensePlate = LicensePlateEntry.Text;
 
             if (!String.IsNullOrEmpty(licensePlate))
             {

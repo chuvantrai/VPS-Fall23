@@ -1,6 +1,7 @@
 using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
 using Client.MobileApp.ViewModels;
+using CommunityToolkit.Maui.Core.Platform;
 
 namespace Client.MobileApp.Views;
 
@@ -13,6 +14,15 @@ public partial class VPS79 : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
         _viewModel = viewModel;
+    }
+
+    private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
+    {
+        await UserName.HideKeyboardAsync(CancellationToken.None);
+        await Password.HideKeyboardAsync(CancellationToken.None);
+
+        UserName.Unfocus();
+        Password.Unfocus();
     }
 
     private async void loginButton_Clicked(object sender, EventArgs e)

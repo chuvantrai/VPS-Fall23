@@ -66,14 +66,14 @@ namespace Client.MobileApp.ViewModels
                 IsBusy = true;
                 CameraIndex = -1;
                 LoadingIndex = 1;
-                HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS79, loginRequest);
-
-                if (response.IsSuccessStatusCode)
+                var apiTask = _client.PostAsJsonAsync(Constant.API_PATH_VPS79, loginRequest);
+                var completedTask = await Task.WhenAny(apiTask, Task.Delay(2000));
+                if (completedTask == apiTask && apiTask.Result.IsSuccessStatusCode)
                 {
                     IsBusy = false;
                     CameraIndex = 1;
                     LoadingIndex = -1;
-                    Constant.USER = await response.Content.ReadFromJsonAsync<Guid>();
+                    Constant.USER = await apiTask.Result.Content.ReadFromJsonAsync<Guid>();
                     return Constant.LOGIN_SUCCESS;
                 }
                 else
@@ -81,7 +81,13 @@ namespace Client.MobileApp.ViewModels
                     IsBusy = false;
                     CameraIndex = 1;
                     LoadingIndex = -1;
-                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+
+                    if (!apiTask.Wait(0))
+                    {
+                        return "API call timed out.";
+                    }
+
+                    var errorResponse = await apiTask.Result.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";
                 }
             });

@@ -9,8 +9,8 @@ namespace Client.MobileApp.ViewModels
     {
         private readonly HttpClient _client;
         bool isBusy = false;
-        int cameraIndex = 0;
-        int loadingIndex = 0;
+        int cameraIndex = 1;
+        int loadingIndex = -1;
         int layoutIndex = 2;
         string areaEntry = "";
         string licensePlateEntry = "";
@@ -70,20 +70,18 @@ namespace Client.MobileApp.ViewModels
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 IsBusy = true;
-                LayoutIndex = 0;
-                CameraIndex = 2;
+                LayoutIndex = 1;
                 LoadingIndex = 2;
 
-                HttpResponseMessage response = await _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
-
-                if (response.IsSuccessStatusCode)
+                var apiTask = _client.PostAsJsonAsync(Constant.API_PATH_VPS53, checkLicensePlate);
+                var completedTask = await Task.WhenAny(apiTask, Task.Delay(2000));
+                if (completedTask == apiTask && apiTask.Result.IsSuccessStatusCode)
                 {
                     IsBusy = false;
                     LayoutIndex = 2;
-                    CameraIndex = 1;
                     LoadingIndex = -1;
 
-                    var ObjectResponse = await response.Content.ReadFromJsonAsync<LicensePlateScanResponse>();
+                    var ObjectResponse = await apiTask.Result.Content.ReadFromJsonAsync<LicensePlateScanResponse>();
 
                     string[] licensePlate = ObjectResponse.LicensePlate.Split('-');
 
@@ -96,10 +94,14 @@ namespace Client.MobileApp.ViewModels
                 {
                     IsBusy = false;
                     LayoutIndex = 2;
-                    CameraIndex = 1;
                     LoadingIndex = -1;
 
-                    var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+                    if (!apiTask.Wait(0))
+                    {
+                        return "API call timed out.";
+                    }
+
+                    var errorResponse = await apiTask.Result.Content.ReadFromJsonAsync<ErrorResponse>();
                     return $"{errorResponse.Message}";
                 }
             });

@@ -9,9 +9,22 @@
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI">
     <ScrollView>
         <AbsoluteLayout>
-            <cv:CameraView ZIndex="{Binding CameraIndex}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  x:Name="cameraView"
-               />
-            <Grid ZIndex="{Binding LayoutIndex}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
+            <cv:CameraView ZIndex="{Binding CameraIndex}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  x:Name="cameraView" CamerasLoaded="CameraView_CamerasLoaded"/>
+
+            <Grid x:Name="Loading" BackgroundColor="#7F000000" ZIndex="{Binding LoadingIndex}" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
+                <ActivityIndicator 
+                               x:Name="LoadingIndicator"
+                               Scale="0.2"
+                               ZIndex="{Binding LoadingIndex}"
+                               IsRunning="{Binding IsBusy}" 
+                               IsVisible="{Binding IsBusy}" 
+                               Color="#83E9EE" 
+                               VerticalOptions="FillAndExpand"
+                               HorizontalOptions="FillAndExpand"
+                               />
+            </Grid>
+
+            <Grid x:Name="Layout" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  ZIndex="{Binding LayoutIndex}">
                 <Grid.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
                 </Grid.GestureRecognizers>
@@ -23,22 +36,19 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid x:Name="Loading" BackgroundColor="#A0808080" Grid.RowSpan="4" ZIndex="{Binding LoadingIndex}" >
-                    <ActivityIndicator 
-                               Scale="0.2"
-                               ZIndex="{Binding LoadingIndex}" 
-                               IsRunning="{Binding IsBusy}" 
-                               IsVisible="{Binding IsBusy}" 
-                               Color="#83E9EE" 
-                               VerticalOptions="FillAndExpand"
-                               HorizontalOptions="FillAndExpand"
-                               />
-                </Grid>
-
-                <Grid Grid.Row="0"
-                
+                <Grid x:Name="Logo" Grid.Row="0"               
                   ZIndex="{Binding LayoutIndex}" BackgroundColor="#7F000000">
-                    <Image Source="logo.png"/>
+                    <Border x:Name="LogoImage"
+                        ZIndex="{Binding CameraIndex}"
+                        Stroke="Transparent"
+                        BackgroundColor="White">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="0,0,100,100"/>
+                        </Border.StrokeShape>
+                        <Image Source="logo.png" 
+                               HorizontalOptions="Center" 
+                               Aspect="AspectFit"/>
+                    </Border>
                 </Grid>
 
                 <Grid
@@ -48,15 +58,15 @@
                 >
                     <AbsoluteLayout>
 
-                        <skia:SKCanvasView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" Grid.Row="1" x:Name="canvasView" ZIndex="{Binding LayoutIndex}"/>
+                        <skia:SKCanvasView PaintSurface="OnPaintSurface" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" Grid.Row="1" x:Name="canvasView" ZIndex="{Binding LayoutIndex}"/>
 
                         <Frame AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1" CornerRadius="50" x:Name="FrameSwitch"
-                       Margin="5"
-                       ZIndex="{Binding LayoutIndex}"
-                       BackgroundColor="Transparent"
-                       VerticalOptions="End"
-                       HorizontalOptions="Center" Padding="0,0,0,0"
-                       BorderColor="Transparent">
+                               Margin="5"
+                               ZIndex="{Binding LayoutIndex}"
+                               BackgroundColor="Transparent"
+                               VerticalOptions="End"
+                               HorizontalOptions="Center" Padding="0,0,0,0"
+                               BorderColor="Transparent">
                             <Grid>
                                 <Button x:Name="ChangePlateTypeButton" Clicked="ChangePlateType"  
                                 Text="Đổi loại biển" 
@@ -69,52 +79,36 @@
                         </Frame>
                     </AbsoluteLayout>
                 </Grid>
-                <Border Grid.Row="2" BackgroundColor="White" StrokeThickness="0">
-                    <Border.StrokeShape >
-                        <RoundRectangle StrokeThickness="0" CornerRadius="10,10,0,0"></RoundRectangle>
-                    </Border.StrokeShape>
-                    <Grid  BackgroundColor="Transparent" ZIndex="{Binding LayoutIndex}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.5*"/>
-                            <ColumnDefinition Width="0.2*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="0.5*"/>
+                <Grid BackgroundColor="#7F000000" Grid.Row="2">
+                    <Border x:Name="LicenseInputFrame" BackgroundColor="White" StrokeThickness="0" ZIndex="{Binding LayoutIndex}">
+                        <Border.StrokeShape >
+                            <RoundRectangle StrokeThickness="0" CornerRadius="10,10,0,0"></RoundRectangle>
+                        </Border.StrokeShape>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="0.5*"/>
 
-                        </Grid.ColumnDefinitions>
-                        <Frame Margin="10" Grid.Column="0">
+                            </Grid.ColumnDefinitions>
 
-                            <Entry x:Name="AreaCodeEntry"
-                IsSpellCheckEnabled="False"
-                Text="{Binding AreaEntry}"
-                HorizontalOptions="FillAndExpand"
-                PlaceholderColor="Black"
-                FontSize="14"/>
+                            <Frame Margin="20,10,10,10" Grid.Column="0" Padding="10,0,10,-5">
+                                <Entry x:Name="LicensePlateEntry" 
+                                   IsTextPredictionEnabled="False"
+                                   Text="{Binding LicensePlateEntry}"
+                                   PlaceholderColor="Black"
+                                   FontSize="12"
+                                   HorizontalOptions="FillAndExpand"/>
 
-                        </Frame>
-                        <Label  Grid.Column="1" 
-             Text="-"
-             FontSize="Large"
-             HorizontalOptions="CenterAndExpand" 
-             VerticalOptions="CenterAndExpand"
-             TextColor="Black"/>
+                            </Frame>
+                            <Button Clicked="OkButton_Clicked" Padding="10,0,10,0" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="1"></Button>
+                        </Grid>
+                    </Border>
+                </Grid>
 
-                        <Frame Margin="10" Grid.Column="2" Padding="10,0,10,-2">
-                            <Entry x:Name="LicensePlateEntry" 
-                IsTextPredictionEnabled="False"
-                Text="{Binding LicensePlateEntry}"
-                PlaceholderColor="Black"
-                FontSize="14"
-                HorizontalOptions="FillAndExpand"/>
-
-                        </Frame>
-                        <Button Clicked="OkButton_Clicked" Margin="10" Text="OK" TextColor="Black" WidthRequest="50" BackgroundColor="#D9D9D9" BorderWidth="1" BorderColor="Black" Grid.Column="3"></Button>
-                    </Grid>
-                </Border>
-
-
-                <Grid  Grid.Row="3" 
-                   BackgroundColor="White"
-                   ZIndex="{Binding LayoutIndex}">
+                <Grid  x:Name="ButtonFrame"
+                       Grid.Row="3" 
+                       BackgroundColor="White"
+                       ZIndex="{Binding LayoutIndex}">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
