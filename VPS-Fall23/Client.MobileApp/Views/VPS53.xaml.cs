@@ -27,8 +27,6 @@ public partial class VPS53 : ContentPage
         _viewModel = viewModel;
         FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
         ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
-        canvasView.WidthRequest = 400;
-        canvasView.HeightRequest = 238;
         LoadCanvasSurface();
 
         cameraView.Loaded += CameraView_CamerasLoaded;
@@ -39,8 +37,6 @@ public partial class VPS53 : ContentPage
         InitializeComponent();
         FrameSwitch.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
         ChangePlateTypeButton.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.1;
-        canvasView.WidthRequest = 400;
-        canvasView.HeightRequest = 238;
         cameraView.Loaded += CameraView_CamerasLoaded;
         LoadCanvasSurface();
     }
@@ -94,12 +90,20 @@ public partial class VPS53 : ContentPage
 
             }
 
-                var startCameraResult =  cameraView.StartCameraAsync().Result;
-                if (startCameraResult != 0)
-                {
-                     Application.Current.MainPage.DisplayAlert(Constant.ALERT, startCameraResult.ToString(), Constant.CANCEL);
-                }
-         
+            double widthRatio = maxResolution.Width / DeviceDisplay.MainDisplayInfo.Width;
+            double heightRatio = maxResolution.Height / DeviceDisplay.MainDisplayInfo.Height;
+
+            double minRatio = Math.Min(widthRatio, heightRatio);
+
+            cameraView.WidthRequest = maxResolution.Width / minRatio;
+            cameraView.HeightRequest = maxResolution.Height / minRatio;
+
+            var startCameraResult = cameraView.StartCameraAsync().Result;
+            if (startCameraResult != 0)
+            {
+                Application.Current.MainPage.DisplayAlert(Constant.ALERT, startCameraResult.ToString(), Constant.CANCEL);
+            }
+
 
         }
     }

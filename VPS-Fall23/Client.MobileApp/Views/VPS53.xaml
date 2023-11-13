@@ -35,14 +35,10 @@
                                />
                 </Grid>
 
-                <Grid Grid.Row="0" 
-               BackgroundColor="#A0808080"
+                <Grid Grid.Row="0"
                 
-                  ZIndex="{Binding LayoutIndex}"
-                
-                  >
+                  ZIndex="{Binding LayoutIndex}" BackgroundColor="#7F000000">
                     <Image Source="logo.png"/>
-
                 </Grid>
 
                 <Grid
