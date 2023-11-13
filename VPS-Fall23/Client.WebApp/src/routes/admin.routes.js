@@ -14,12 +14,12 @@ export const adminRoutesConfig = {
     {
       key: guidGenerator(),
       path: 'user',
-      label: 'User',
+      label: 'Người dùng',
       children: [
         {
           key: guidGenerator(),
           path: 'profile',
-          label: 'Profile',
+          label: 'Thông tin cá nhân',
           component: AccountProfile,
           description: 'Mọi thông tin về tài khoản được hiển thị dưới đây',
         },

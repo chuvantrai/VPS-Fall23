@@ -9,7 +9,7 @@ const useFeedbackServices = () => {
       .post('/api/FeedBack/CreateFeedBackParkingZone', {
         ParkingZoneId: parkingZoneId,
         Content: values.comment ?? '',
-        Rate: values.rate,
+        Rate: values.rate ?? 3,
         Email: values.email,
       })
       .then(() => {
@@ -41,7 +41,19 @@ const useFeedbackServices = () => {
     });
   };
 
-  return { createFeedBack, getByParkingZone, getFeedbackForOwner, addReplyToFeedback };
+  const filterFeedback = (ownerId, pageNumber, pageSize, parkingZoneId, rate) => {
+    return axios.get(`api/FeedBack/FilterFeedback`, {
+      params: {
+        ownerId,
+        pageNumber,
+        pageSize,
+        parkingZoneId,
+        rate,
+      },
+    });
+  };
+
+  return { createFeedBack, getByParkingZone, getFeedbackForOwner, addReplyToFeedback, filterFeedback };
 };
 
 export default useFeedbackServices;

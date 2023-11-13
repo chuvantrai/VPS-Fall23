@@ -370,7 +370,17 @@ function ViewListParkingZone() {
       });
 
       // parkingZoneService.updateParkingZone(formData);
-      console.log(values);
+      // console.log(values);
+      console.log('parkingZoneId: ' + formData.get('parkingZoneId'));
+      console.log('parkingZoneName: ' + formData.get('parkingZoneName'));
+      console.log('pricePerHour: ' + formData.get('pricePerHour'));
+      console.log('priceOverTimePerHour: ' + formData.get('priceOverTimePerHour'));
+      console.log('slots: ' + formData.get('slots'));
+      console.log('workFrom: ' + formData.get('workFrom'));
+      console.log('workTo' + formData.get('workTo'));
+      console.log('communeId: ' + formData.get('communeId'));
+      console.log('detailAddress: ' + formData.get('detailAddress'));
+      console.log('parkingZoneImages: ' + formData.get('parkingZoneImages'));
     }
   };
 

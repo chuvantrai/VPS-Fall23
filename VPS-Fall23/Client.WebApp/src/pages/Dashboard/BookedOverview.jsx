@@ -39,9 +39,10 @@ function BookedOverview() {
   });
 
   useEffect(() => {
+    console.log(parkingZoneName)
     getBookedData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [parkingZoneName]);
 
   const getBookedData = async () => {
     await parkingZoneService
@@ -85,7 +86,7 @@ function BookedOverview() {
       {(bookedData !== null || bookedData !== undefined) && (
         <div className="block">
           <div className="flex">
-            <Card title="Booked" bordered={true} style={{ width: 200 }}>
+            <Card title="Booked (tháng)" bordered={true} style={{ width: 200 }}>
               <p>Tổng vé xe: {bookedData.doneCheckInOut}</p>
               <Text strong>
                 Doanh thu:{' '}
@@ -100,8 +101,7 @@ function BookedOverview() {
                 {bookedData.doneCheckInOut}
                 <Progress
                   type="circle"
-                  percent={(bookedData.doneCheckInOut / bookedData.total) * 100}
-                  format={() => 'Done'}
+                  percent={((bookedData.doneCheckInOut / bookedData.total) * 100).toFixed(1)}
                   size={60}
                 />
               </div>
@@ -109,13 +109,13 @@ function BookedOverview() {
             <Card title="Chưa Check In" className="ml-5" bordered={true} style={{ width: 200 }}>
               <div className="flex justify-between items-center">
                 {bookedData.notCheckIn}
-                <Progress type="circle" percent={(bookedData.notCheckIn / bookedData.total) * 100} size={60} />
+                <Progress type="circle" percent={((bookedData.notCheckIn / bookedData.total) * 100).toFixed(1)} size={60} />
               </div>
             </Card>
             <Card title="Chưa Check Out" className="ml-5" bordered={true} style={{ width: 200 }}>
               <div className="flex justify-between items-center">
                 {bookedData.notCheckOut}
-                <Progress type="circle" percent={(bookedData.notCheckOut / bookedData.total) * 100} size={60} />
+                <Progress type="circle" percent={((bookedData.notCheckOut / bookedData.total) * 100).toFixed(1)} size={60} />
               </div>
             </Card>
           </div>

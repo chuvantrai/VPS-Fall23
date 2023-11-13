@@ -25,6 +25,9 @@ const useParkingZoneService = () => {
   };
 
   const getBookedOverview = async ({ parkingZoneName }) => {
+    if (parkingZoneName === ':parkingZoneName') {
+      parkingZoneName = '';
+    }
     if (parkingZoneName !== null || parkingZoneName !== undefined || parkingZoneName !== '') {
       return axios.get(`${BASE_URI}/GetBookedOverview`, {
         params: {
