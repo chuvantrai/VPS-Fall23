@@ -26,15 +26,18 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             parameters.PageSize);
     }
 
-    public PagedList<ParkingZone> GetOwnerParkingZoneByName(QueryStringParameters parameters, string name, Guid id)
+    public PagedList<ParkingZone> GetOwnerParkingZoneByName(QueryStringParameters parameters,
+        string name, Guid id)
     {
-        var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name) && x.OwnerId == id);
+        var parkingZone = entities.Include(o => o.Owner)
+            .Where(x => x.Name.Contains(name) && x.OwnerId == id);
 
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
             parameters.PageSize);
     }
 
-    public PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters, string name)
+    public PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters,
+        string name)
     {
         var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name));
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
@@ -54,6 +57,14 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
         var list = entities.Where(x => x.OwnerId.ToString().ToLower().Equals(ownerId)).ToList();
         return list;
+    }
+
+    public List<ParkingZone> GetApprovedParkingZonesByOwnerId(Guid ownerId)
+    {
+        var parkingZoneLst = entities
+            .Where(x => x.OwnerId.Equals(ownerId) && x.IsApprove == true)
+            .ToList();
+        return parkingZoneLst;
     }
 
     public ParkingZone? GetParkingZoneById(Guid id)
@@ -97,7 +108,8 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .Where(p => p.Commune.District.CityId == cityId
                         && p.IsFull == false
                         && p.IsApprove == true
-                        && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
+                        && !p.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByCommuneId(Guid communeId)
@@ -109,7 +121,8 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .Where(p => p.CommuneId == communeId
                         && p.IsFull == false
                         && p.IsApprove == true
-                        && !p.ParkingZoneAbsents.Any(pa => pa.From <= DateTime.Now && pa.To >= DateTime.Now));
+                        && !p.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now));
     }
 
     public IQueryable<ParkingZone> GetByDistrictId(Guid districtId)

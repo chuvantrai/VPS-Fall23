@@ -28,5 +28,6 @@ public enum ActionFilterEnum
     DeleteParkingZoneAndAbsent,
     AddReplyToFeedback,
     FilterFeedback,
-    BlockUserAccount
+    BlockUserAccount,
+    GetApprovedParkingZoneByOwnerId
 }

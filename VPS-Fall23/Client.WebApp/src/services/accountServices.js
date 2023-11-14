@@ -4,11 +4,11 @@ import Cookies from 'js-cookie';
 import { keyNameCookies } from '@/helpers/index.js';
 import { notification } from 'antd';
 
-
 const AccountServices = () => {
   const axios = useAxios();
   const getAccountProfile = (form, test123) => {
-    axios.get('/api/Auth/GetAccountProfile')
+    axios
+      .get('/api/Auth/GetAccountProfile')
       .then((res) => {
         if (res.status === 200) {
           const profile = res.data;
@@ -23,7 +23,7 @@ const AccountServices = () => {
             role: profile.role,
             dob: moment(profile.dob).format('DD-MM-YYYY'),
             roleId: profile.roleId,
-            avatar: profile.avatar
+            avatar: profile.avatar,
           });
         }
       })
@@ -40,11 +40,12 @@ const AccountServices = () => {
     formData.append('address', values.address);
     if (communeId !== undefined) formData.append('communeId', communeId);
     formData.append('avatarImages', fileImg);
-    axios.put('/api/Auth/UpdateProfileAccount', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+    axios
+      .put('/api/Auth/UpdateProfileAccount', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       .then((res) => {
         if (res.status === 200) {
           Cookies.set(keyNameCookies.ACCESS_TOKEN, res.data.accessToken);
@@ -62,7 +63,11 @@ const AccountServices = () => {
       });
   };
 
-  return { getAccountProfile, updateAccountProfile };
+  const blockAccount = (input) => {
+    return axios.put(`/api/Auth/BlockUserAccount`, input);
+  };
+
+  return { getAccountProfile, updateAccountProfile, blockAccount };
 };
 
 export default AccountServices;

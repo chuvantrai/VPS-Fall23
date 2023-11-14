@@ -100,7 +100,7 @@ public static class ActionFilter
         new ActionModel
         {
             Action = ActionFilterEnum.GetAllParkingZoneByOwnerId,
-            UserRole = new[] { UserRoleEnum.OWNER }
+            UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
         },
         new ActionModel
         {
@@ -141,6 +141,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.BlockUserAccount,
             UserRole = new[] { UserRoleEnum.ADMIN, UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetApprovedParkingZoneByOwnerId,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 

@@ -28,7 +28,7 @@ function ModalAdd({ open, onCreate, onCancel }) {
 
   useEffect(() => {
     parkingZoneService
-      .getAllParkingZoneByOwnerId(account.UserId)
+      .getApprovedParkingZoneByOwnerId(account.UserId)
       .then((res) => {
         setParkingZoneList(res.data);
       })
