@@ -129,6 +129,12 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return account;
     }
 
+    public Account? GetAccountToBlockById(Guid id)
+    {
+        var account = entities.FirstOrDefault(x => x.Id.Equals(id));
+        return account;
+    }
+
     public PagedList<Account> GetListAttendantAccount(Guid ownerId,
         QueryStringParameters parameters)
     {

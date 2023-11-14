@@ -38,7 +38,8 @@ public class AuthController : VpsController<Account>
     [HttpPost]
     public async Task<IActionResult> AuthLogin(LoginRequest request)
     {
-        var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
+        var account =
+            await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
         if (account == null)
         {
             throw new ClientException(5001);
@@ -89,14 +90,17 @@ public class AuthController : VpsController<Account>
 
         var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
         var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-        var oldAccount = await ((IUserRepository)vpsRepository).GetAccountByIdAsync(Guid.Parse(userToken.UserId));
+        var oldAccount =
+            await ((IUserRepository)vpsRepository).GetAccountByIdAsync(
+                Guid.Parse(userToken.UserId));
         if (!BCrypt.Net.BCrypt.EnhancedVerify(request.OldPassword, oldAccount?.Password))
         {
             throw new ClientException(5006);
         }
 
         var account =
-            await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(Guid.Parse(userToken.UserId),
+            await ((IUserRepository)vpsRepository).ChangePasswordByUserIdAsync(
+                Guid.Parse(userToken.UserId),
                 request.NewPassword);
         if (account == null) throw new ClientException();
         return Ok();
@@ -285,7 +289,8 @@ public class AuthController : VpsController<Account>
 
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.UpdateProfileAccount)]
-    public async Task<IActionResult> UpdateProfileAccount([FromForm] UpdateProfileAccountRequest request)
+    public async Task<IActionResult> UpdateProfileAccount(
+        [FromForm] UpdateProfileAccountRequest request)
     {
         var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
         var userToken = JwtTokenExtension.ReadToken(accessToken)!;
@@ -294,7 +299,8 @@ public class AuthController : VpsController<Account>
         if (request.AvatarImages?[0] != null)
         {
             var fileManager =
-                new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                new FileManagementClient(
+                    _config.GetValue<string>("fileManagementAccessKey:baseUrl"),
                     _config.GetValue<string>("fileManagementAccessKey:accessKey"),
                     _config.GetValue<string>("fileManagementAccessKey:secretKey"));
             var avatarImg = new MultipartFormDataContent();
@@ -309,7 +315,8 @@ public class AuthController : VpsController<Account>
                 $"/account-images/avatar-account/{Guid.Parse(userToken.UserId)}/" +
                 $"{Guid.Parse(userToken.UserId)}-{0}{Path.GetExtension(request.AvatarImages[0].FileName)}";
 
-            await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+            await fileManager.Upload(
+                _config.GetValue<string>("fileManagementAccessKey:publicBucket"),
                 $"account-images/avatar-account/{Guid.Parse(userToken.UserId)}", avatarImg);
         }
 
@@ -329,7 +336,9 @@ public class AuthController : VpsController<Account>
     {
         var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
         var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-        var account = await ((IUserRepository)vpsRepository).GetAccountByIdAsync(Guid.Parse(userToken.UserId));
+        var account =
+            await ((IUserRepository)vpsRepository).GetAccountByIdAsync(
+                Guid.Parse(userToken.UserId));
         if (account == null) throw new ClientException();
         var commune = account.Commune;
         var district = commune?.District;
@@ -344,10 +353,13 @@ public class AuthController : VpsController<Account>
             District = district?.Id,
             Commune = commune?.Id,
             Address = account.Address,
-            Role = EnumExtension.GetEnumDescription(EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId)),
+            Role = EnumExtension.GetEnumDescription(
+                EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId)),
             Dob = account.ParkingZoneOwner?.Dob,
             Avatar = account.Avatar,
-            AddressArray = commune == null ? null : new[] { city!.Name, district!.Name, commune.Name },
+            AddressArray = commune == null
+                ? null
+                : new[] { city!.Name, district!.Name, commune.Name },
             RoleId = account.TypeId
         });
     }
@@ -355,7 +367,8 @@ public class AuthController : VpsController<Account>
     [HttpPost]
     public async Task<IActionResult> AttendanceLogin(LoginRequest request)
     {
-        var account = await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
+        var account =
+            await ((IUserRepository)vpsRepository).GetAccountByUserNameAsync(request.Username);
         if (account == null)
         {
             throw new ClientException(5001);
@@ -376,11 +389,37 @@ public class AuthController : VpsController<Account>
             throw new ClientException(5002);
         }
 
-        if (account.TypeId != (int)UserRoleEnum.ADMIN && account.TypeId != (int)UserRoleEnum.ATTENDANT)
+        if (account.TypeId != (int)UserRoleEnum.ADMIN &&
+            account.TypeId != (int)UserRoleEnum.ATTENDANT)
         {
             throw new ClientException(5001);
         }
 
         return Ok(account.Id);
+    }
+
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.BlockUserAccount)]
+    public async Task<IActionResult> BlockUserAccount([FromBody] BlockUserAccountInput input)
+    {
+        var account =
+            ((IUserRepository)vpsRepository).GetAccountToBlockById((Guid)input.AccountId!);
+        if (account is null)
+        {
+            throw new ServerException(2);
+        }
+
+        if (input is { IsBlock: true, BlockReason: null })
+        {
+            throw new ServerException("Không thể khóa tài khoản mà không có lý do!");
+        }
+
+        account.IsBlock = (bool)input.IsBlock!;
+        account.BlockReason = input.BlockReason;
+
+        await ((IUserRepository)vpsRepository).Update(account);
+        await ((IUserRepository)vpsRepository).SaveChange();
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 }
