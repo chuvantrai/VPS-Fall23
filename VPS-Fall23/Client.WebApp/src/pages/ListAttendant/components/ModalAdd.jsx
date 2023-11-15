@@ -18,7 +18,7 @@ const validateMessages = {
   },
 };
 
-function ModalAdd({ open, onCreate, onCancel }) {
+function ModalAdd({ open, confirmLoading, onCreate, onCancel }) {
   const [form] = Form.useForm();
   const parkingZoneService = useParkingZoneService();
   const account = getAccountJwtModel();
@@ -28,7 +28,7 @@ function ModalAdd({ open, onCreate, onCancel }) {
 
   useEffect(() => {
     parkingZoneService
-      .getAllParkingZoneByOwnerId(account.UserId)
+      .getApprovedParkingZoneByOwnerId(account.UserId)
       .then((res) => {
         setParkingZoneList(res.data);
       })
@@ -50,6 +50,7 @@ function ModalAdd({ open, onCreate, onCancel }) {
   return (
     <Modal
       open={open}
+      confirmLoading={confirmLoading}
       title="Thêm tài khoản"
       centered
       okText="Tạo"
@@ -180,6 +181,7 @@ function ModalAdd({ open, onCreate, onCancel }) {
 
 ModalAdd.propTypes = {
   open: PropTypes.bool.isRequired,
+  confirmLoading: PropTypes.bool.isRequired,
   onCreate: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };

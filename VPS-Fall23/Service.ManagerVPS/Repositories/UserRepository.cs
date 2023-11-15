@@ -129,6 +129,12 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return account;
     }
 
+    public Account? GetAccountToBlockById(Guid id)
+    {
+        var account = entities.FirstOrDefault(x => x.Id.Equals(id));
+        return account;
+    }
+
     public PagedList<Account> GetListAttendantAccount(Guid ownerId,
         QueryStringParameters parameters)
     {
@@ -149,11 +155,22 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
             .Include(x => x.ParkingZoneAttendant)
             .ThenInclude(x => x!.ParkingZone)
             .Where(x =>
-                x.ParkingZoneAttendant!.ParkingZone.OwnerId.ToString().Equals(ownerId) &&
-                (x.FirstName.ToLower().Contains(attendantName) ||
-                 x.LastName.ToLower().Contains(attendantName)) &&
+                x.ParkingZoneAttendant!.ParkingZone.OwnerId.Equals(ownerId) &&
+                (x.FirstName.ToLower().Contains(attendantName) || x.LastName.ToLower().Contains(attendantName)) &&
                 x.TypeId == (int)UserRoleEnum.ATTENDANT);
         return PagedList<Account>.ToPagedList(attendants, parameters.PageNumber,
             parameters.PageSize);
+    }
+
+    public int GetCustomerAccountAmount(Guid id)
+    {
+        return 1;
+        //var parkingZone = entities.Where(a => a.);
+
+        //var data = new
+        //{
+
+        //};
+        //return parkingZone;
     }
 }

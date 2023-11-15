@@ -190,12 +190,26 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    //[FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
+    [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneByOwnerId)]
     public IActionResult GetAllParkingZoneByOwnerId([FromQuery] string ownerId)
     {
         var parkingZoneList =
             ((IParkingZoneRepository)vpsRepository).GetParkingZoneByOwnerId(ownerId);
         var result = parkingZoneList.Select(x => new
+        {
+            Value = x.Id,
+            Label = x.Name
+        }).ToList();
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetApprovedParkingZoneByOwnerId)]
+    public IActionResult GetApprovedParkingZoneByOwnerId([FromQuery] Guid ownerId)
+    {
+        var parkingZoneLst =
+            ((IParkingZoneRepository)vpsRepository).GetApprovedParkingZonesByOwnerId(ownerId);
+        var result = parkingZoneLst.Select(x => new
         {
             Value = x.Id,
             Label = x.Name
@@ -249,6 +263,15 @@ public class ParkingZoneController : VpsController<ParkingZone>
         };
 
         return Ok(metadata);
+    }
+
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
+    public async Task<IActionResult> GetAdminOverview()
+    {
+        
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
     [HttpPut]
@@ -538,10 +561,11 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return await parkingTransactionRepository.GetBookedSlot(parkingZoneId,
             checkAt ?? DateTime.Now);
     }
-    
+
     [HttpPost]
     public IEnumerable<ParkingZone>? GetDataParkingZoneByParkingZoneIds(Guid[]? parkingZoneIds)
     {
-        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(parkingZoneIds);
+        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(
+            parkingZoneIds);
     }
 }

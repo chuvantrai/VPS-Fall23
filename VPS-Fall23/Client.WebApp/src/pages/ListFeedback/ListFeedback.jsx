@@ -99,7 +99,7 @@ function ListFeedback() {
   };
 
   const loadParkingZoneOptions = () => {
-    parkingZoneService.getAllParkingZoneByOwnerId(account.UserId).then((res) => {
+    parkingZoneService.getApprovedParkingZoneByOwnerId(account.UserId).then((res) => {
       setParkingZoneOptions(res.data);
     });
   };

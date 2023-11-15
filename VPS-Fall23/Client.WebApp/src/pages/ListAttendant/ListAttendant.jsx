@@ -1,63 +1,135 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react';
-import { Button, Table, notification, Pagination, Input, Row, Col, Tooltip } from 'antd';
-import { LockFilled, UnlockFilled, UserAddOutlined, QuestionCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Button, Table, notification, Pagination, Input, Row, Col, Tooltip, Popconfirm } from 'antd';
+import { LockFilled, UnlockFilled, UserAddOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import { useDebounce } from 'use-debounce';
 
 import useAttendantService from '@/services/attendantServices';
+import AccountServices from '@/services/accountServices';
 import { getAccountJwtModel } from '@/helpers';
 import ModalAdd from './components/ModalAdd';
-
-const columns = [
-  {
-    title: 'Username',
-    dataIndex: 'username',
-    key: 'username'
-  },
-  {
-    title: 'Họ và Tên',
-    dataIndex: 'fullName',
-    key: 'fullName',
-  },
-  {
-    title: 'Địa chỉ',
-    dataIndex: 'address',
-    key: 'address',
-  },
-  {
-    title: 'Số điện thoại',
-    key: 'phoneNumber',
-    dataIndex: 'phoneNumber'
-  },
-  {
-    title: 'Bãi đỗ xe làm việc',
-    key: 'parkingZone',
-    dataIndex: 'parkingZone'
-  },
-  {
-    title: '',
-    key: 'action',
-    render: (_, record) => (
-      <>
-        {record.isBlock === false && <Button className='bg-red-600 flex items-center'><LockFilled className='text-white' /></Button>}
-        {record.isBlock === true && <Button className='bg-green-600 flex items-center'><UnlockFilled className='text-white' /></Button>}
-      </>
-    ),
-  },
-];
+import ModalBlockReason from './components/ModalBlockReason';
 
 function ListAttendant() {
   const service = useAttendantService();
   const account = getAccountJwtModel();
+  const accountService = AccountServices();
 
   const [open, setOpen] = useState(false);
+  const [blockOpen, setBlockOpen] = useState(false);
   const [data, setData] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [searchText, setSearchText] = useState('')
+  const [blockAccountId, setBlockAccountId] = useState('');
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [debounceValue] = useDebounce(searchText, 500);
+
+  const columns = [
+    {
+      title: 'Username',
+      dataIndex: 'username',
+      key: 'username'
+    },
+    {
+      title: 'Họ và Tên',
+      dataIndex: 'fullName',
+      key: 'fullName',
+    },
+    {
+      title: 'Địa chỉ',
+      dataIndex: 'address',
+      key: 'address',
+    },
+    {
+      title: 'Số điện thoại',
+      key: 'phoneNumber',
+      dataIndex: 'phoneNumber'
+    },
+    {
+      title: 'Bãi đỗ xe làm việc',
+      key: 'parkingZone',
+      dataIndex: 'parkingZone'
+    },
+    {
+      title: '',
+      key: 'action',
+      render: (_, record) => (
+        <>
+          {record.isBlock === false ?
+            <Tooltip title="Khóa tài khoản">
+              <Popconfirm
+                title="Khóa tài khoản"
+                description="Bạn chắc chắn muốn khóa tài khoản này?"
+                icon={
+                  <QuestionCircleOutlined
+                    style={{
+                      color: 'red',
+                    }}
+                  />
+                }
+                onConfirm={() => handleOpenBlockModal(record)}
+              >
+                <Button className='bg-red-600 flex items-center'>
+                  <LockFilled className='text-white' />
+                </Button>
+              </Popconfirm>
+            </Tooltip>
+            :
+            <Tooltip title="Mở khóa tài khoản">
+              <Popconfirm
+                title="Mở khóa tài khoản"
+                description="Bạn chắc chắn muốn mở khóa tài khoản này?"
+                icon={
+                  <QuestionCircleOutlined
+                    style={{
+                      color: 'green',
+                    }}
+                  />
+                }
+                onConfirm={() => handleUnblockAccount(record)}
+              >
+                <Button className='bg-green-600 flex items-center'>
+                  <UnlockFilled className='text-white' />
+                </Button>
+              </Popconfirm>
+            </Tooltip>
+          }
+        </>
+      ),
+    },
+  ];
+
+  const handleOpenBlockModal = (record) => {
+    setBlockOpen(true)
+    setBlockAccountId(record.id)
+  }
+  const onBlock = (values) => {
+    accountService.blockAccount(values)
+      .then(res => {
+        notification.success({
+          message: res.data
+        })
+        getData()
+      })
+    setBlockOpen(false)
+  }
+
+  const handleUnblockAccount = (record) => {
+    let input = {
+      accountId: record.id,
+      isBlock: false
+    }
+    accountService.blockAccount(input)
+      .then(res => {
+        notification.success({
+          message: res.data
+        })
+        getData()
+      })
+  }
 
   const getData = () => {
     service.getListAttendant(account.UserId, pageNumber)
@@ -97,12 +169,15 @@ function ListAttendant() {
     setOpen(true);
   };
   const onCreate = (values) => {
+    setConfirmLoading(true)
     service.createAccount(values).then((res) => {
       notification.success({
         message: res.data,
       });
+      getData()
+      setConfirmLoading(false)
+      setOpen(false);
     });
-    setOpen(false);
   };
 
   return (
@@ -136,9 +211,19 @@ function ListAttendant() {
 
       <ModalAdd
         open={open}
+        confirmLoading={confirmLoading}
         onCreate={onCreate}
         onCancel={() => {
           setOpen(false);
+        }}
+      />
+
+      <ModalBlockReason
+        open={blockOpen}
+        accountId={blockAccountId}
+        onBlock={onBlock}
+        onCancel={() => {
+          setBlockOpen(false);
         }}
       />
     </div>

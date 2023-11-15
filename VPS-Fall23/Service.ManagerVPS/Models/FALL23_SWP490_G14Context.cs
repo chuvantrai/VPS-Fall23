@@ -66,6 +66,10 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.Avatar).HasMaxLength(255);
 
+                entity.Property(e => e.BlockReason)
+                    .HasColumnType("ntext")
+                    .HasColumnName("block_reason");
+
                 entity.Property(e => e.CommuneId).HasColumnName("commune_id");
 
                 entity.Property(e => e.CreatedAt)
@@ -466,7 +470,7 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("phone");
 
                 entity.Property(e => e.StatusId).HasColumnName("status_id");
-                
+
                 entity.HasOne(d => d.CheckinByNavigation)
                     .WithMany(p => p.ParkingTransactionCheckinByNavigations)
                     .HasForeignKey(d => d.CheckinBy)
@@ -594,7 +598,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.WorkFrom)
                     .HasColumnName("work_from")
@@ -802,14 +807,6 @@ namespace Service.ManagerVPS.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-                
-                entity.Property(e => e.Email).HasColumnName("email");
-
-                entity.Property(e => e.PaymentCode)
-                    .HasMaxLength(100)
-                    .HasColumnName("payment_code");
-
-                entity.Property(e => e.Phone).HasColumnName("phone");
 
                 entity.Property(e => e.Email).HasColumnName("email");
 
@@ -825,8 +822,6 @@ namespace Service.ManagerVPS.Models
                     .ValueGeneratedOnAdd()
                     .HasColumnName("sub_id")
                     .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
-
-                entity.Property(e => e.Type).HasColumnName("type");
 
                 entity.Property(e => e.Type).HasColumnName("type");
 
