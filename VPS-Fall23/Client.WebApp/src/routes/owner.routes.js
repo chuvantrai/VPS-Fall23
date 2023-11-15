@@ -6,7 +6,6 @@ import ListAttendant from '@/pages/ListAttendant';
 import ManagerLayout from '../layouts/ManagerLayout';
 import guidGenerator from '../helpers/guidGenerator';
 import ListFeedback from '../pages/ListFeedback/ListFeedback';
-import IncomeDashboard from '@/pages/IncomeDashboard';
 import Overview from '../pages/Dashboard/Overview';
 
 export const ownerRoutesConfig = {
@@ -83,20 +82,6 @@ export const ownerRoutesConfig = {
           label: 'Danh sách nhân viên',
           component: ListAttendant,
           description: 'Toàn bộ danh sách nhân viên hiển thị dưới đây',
-        },
-      ],
-    },
-    {
-      key: guidGenerator(),
-      path: 'IncomeDashboard',
-      label: 'Thống kê',
-      children: [
-        {
-          key: guidGenerator(),
-          path: 'income-dashboard',
-          label: 'Thống kê doanh thu',
-          component: IncomeDashboard,
-          description: 'Toàn bộ thống kê doanh thu hiển thị ở đây',
         },
       ],
     },

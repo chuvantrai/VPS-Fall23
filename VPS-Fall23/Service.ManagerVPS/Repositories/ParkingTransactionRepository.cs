@@ -35,7 +35,7 @@ namespace Service.ManagerVPS.Repositories
                 .CountAsync();
         }
 
-        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, DateTime? checkAt)
+        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, Guid ownerId,DateTime? checkAt)
         {
             if (!checkAt.HasValue)
             {
@@ -45,8 +45,10 @@ namespace Service.ManagerVPS.Repositories
             {
                 return this.entities
                 .Include(p => p.ParkingZone)
+                .Include(o => o.ParkingZone.Owner)
                  .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED)
                  && (!p.ParkingTransactionDetails.Any())
+                 && (p.ParkingZone.OwnerId == ownerId)
                  ).ToList();
             }
             return this.entities

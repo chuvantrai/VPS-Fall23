@@ -26,8 +26,4 @@ export const noLayoutRouteConfigs = [
     path: '/change-password',
     component: ChangePassword,
   },
-  {
-    path: '/:parkingZoneName',
-    component: Overview,
-  },
 ];

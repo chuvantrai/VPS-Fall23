@@ -80,7 +80,7 @@ public class AuthController : VpsController<Account>
     }
 
     [HttpPut]
-    [FilterPermission(Action = ActionFilterEnum.ChangePassword)]
+    //[FilterPermission(Action = ActionFilterEnum.ChangePassword)]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
     {
         if (request.NewPassword == request.OldPassword)

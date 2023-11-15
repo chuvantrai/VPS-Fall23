@@ -123,13 +123,11 @@ namespace Service.ManagerVPS.Controllers
             {
                 var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
                 var userToken = JwtTokenExtension.ReadToken(accessToken)!;
-                //Guid id = new Guid(parkingZoneId);
 
-                //if (userToken.RoleId == 3 || userToken.RoleId == 1) return NotFound();
+                Guid ownerId = new Guid(userToken.UserId);
 
                 DateTime now = DateTime.Now;
-                var list =
-                    parkingTransactionRepository.GetBookedSlot(parkingZoneName, DateTime.Now);
+                var list = parkingTransactionRepository.GetBookedSlot(parkingZoneName, ownerId, DateTime.Now);
                 var doneCheckInOut = 0;
                 var notCheckIn = 0;
                 var notCheckOut = 0;

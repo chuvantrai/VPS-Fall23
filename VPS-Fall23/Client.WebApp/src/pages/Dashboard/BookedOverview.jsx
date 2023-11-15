@@ -2,13 +2,15 @@ import { Fragment, useEffect } from 'react';
 import { Progress, Card, Typography } from 'antd';
 import useParkingZoneService from '@/services/parkingZoneOwnerService.js';
 import { useState } from 'react';
-import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
+import {
+  Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend,
+} from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
 const { Text } = Typography;
 
 function BookedOverview({ parkingZoneName }) {
-  Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title);
+  Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
   const parkingZoneService = useParkingZoneService();
 
@@ -77,6 +79,26 @@ function BookedOverview({ parkingZoneName }) {
         beginAtZero: true,
       },
     },
+    plugins: {
+      tooltip: {
+        enabled: true,
+        mode: 'index',
+        intersect: false,
+        callbacks: {
+          label: (context) => {
+            const label = context.dataset.label || '';
+            if (label) {
+              return `${label}: ${context.parsed.y.toLocaleString('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+              })}`;
+            }
+            return null;
+          },
+        },
+      },
+
+    }
   };
 
   return (
@@ -118,12 +140,12 @@ function BookedOverview({ parkingZoneName }) {
             </Card>
           </div>
           <div className="mt-5">
-            <h3>Daily View</h3>
             <Line data={chartData} options={options} />
           </div>
         </div>
-      )}
-    </Fragment>
+      )
+      }
+    </Fragment >
   );
 }
 

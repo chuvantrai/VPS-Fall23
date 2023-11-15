@@ -161,4 +161,16 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         return PagedList<Account>.ToPagedList(attendants, parameters.PageNumber,
             parameters.PageSize);
     }
+
+    public int GetCustomerAccountAmount(Guid id)
+    {
+        return 1;
+        //var parkingZone = entities.Where(a => a.);
+
+        //var data = new
+        //{
+
+        //};
+        //return parkingZone;
+    }
 }
