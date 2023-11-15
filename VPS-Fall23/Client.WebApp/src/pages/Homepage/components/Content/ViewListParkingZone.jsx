@@ -172,25 +172,45 @@ function ViewListParkingZone() {
             <FormOutlined />
           </a>
 
-          <Popconfirm
-            title="Đóng cửa bãi đỗ xe"
-            description="Bạn có chắc muốn đóng cửa bãi đỗ xe này?"
-            onConfirm={() => {
-              handleOpenCloseModal(record.key);
-            }}
-            onCancel={() => {
-              console.log('cancel');
-            }}
-            icon={
-              <QuestionCircleOutlined
-                style={{
-                  color: 'red',
-                }}
-              />
-            }
-          >
-            <Button danger>Đóng cửa</Button>
-          </Popconfirm>
+          {record.status === true ?
+            <Popconfirm
+              title="Đóng cửa bãi đỗ xe"
+              description="Bạn có chắc muốn đóng cửa bãi đỗ xe này?"
+              onConfirm={() => {
+                handleOpenCloseModal(record.key);
+              }}
+              onCancel={() => {
+                console.log('cancel');
+              }}
+              icon={
+                <QuestionCircleOutlined
+                  style={{
+                    color: 'red',
+                  }}
+                />
+              }
+            >
+              <Button danger>Đóng cửa</Button>
+            </Popconfirm> :
+            <Popconfirm
+              title="Đóng cửa bãi đỗ xe"
+              description="Bạn có chắc muốn đóng cửa bãi đỗ xe này?"
+              onConfirm={() => {
+                handleOpenCloseModal(record.key);
+              }}
+              onCancel={() => {
+                console.log('cancel');
+              }}
+              icon={
+                <QuestionCircleOutlined
+                  style={{
+                    color: 'red',
+                  }}
+                />
+              }
+            >
+              <Button danger disabled>Đóng cửa</Button>
+            </Popconfirm>}
         </Space>
       ),
     },

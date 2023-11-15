@@ -48,6 +48,14 @@ const useParkingZoneService = () => {
     });
   };
 
+  const getApprovedParkingZoneByOwnerId = (ownerId) => {
+    return axios.get(`${BASE_URI}/GetApprovedParkingZoneByOwnerId`, {
+      params: {
+        ownerId,
+      },
+    });
+  };
+
   const register = (values) => {
     axios
       .post(REGISTER, values, {
@@ -170,7 +178,8 @@ const useParkingZoneService = () => {
     getAllParkingZoneByOwnerId,
     getBookedSlot,
     closeParkingZone,
-    GetParkingZonesByParkingZoneIds
+    GetParkingZonesByParkingZoneIds,
+    getApprovedParkingZoneByOwnerId,
   };
 };
 

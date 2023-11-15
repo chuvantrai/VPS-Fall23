@@ -1,4 +1,5 @@
-﻿using Service.ManagerVPS.DTO.OtherModels;
+﻿using Microsoft.EntityFrameworkCore;
+using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -12,7 +13,8 @@ public class ParkingZoneOwnerRepository : VpsRepository<ParkingZoneOwner>, IPark
 
     public PagedList<ParkingZoneOwner> GetAllOwner(QueryStringParameters parameters)
     {
-        var list = entities;
+        var list = entities
+            .Include(x => x.IdNavigation);
         return PagedList<ParkingZoneOwner>.ToPagedList(list, parameters.PageNumber, parameters.PageSize); ;
     }
 
