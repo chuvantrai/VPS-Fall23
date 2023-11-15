@@ -23,6 +23,7 @@ function ListAttendant() {
   const [totalItems, setTotalItems] = useState(0);
   const [searchText, setSearchText] = useState('')
   const [blockAccountId, setBlockAccountId] = useState('');
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [debounceValue] = useDebounce(searchText, 500);
 
@@ -58,39 +59,43 @@ function ListAttendant() {
       render: (_, record) => (
         <>
           {record.isBlock === false ?
-            <Popconfirm
-              title="Khóa tài khoản"
-              description="Bạn chắc chắn muốn khóa tài khoản này?"
-              icon={
-                <QuestionCircleOutlined
-                  style={{
-                    color: 'red',
-                  }}
-                />
-              }
-              onConfirm={() => handleOpenBlockModal(record)}
-            >
-              <Button className='bg-red-600 flex items-center'>
-                <LockFilled className='text-white' />
-              </Button>
-            </Popconfirm>
+            <Tooltip title="Khóa tài khoản">
+              <Popconfirm
+                title="Khóa tài khoản"
+                description="Bạn chắc chắn muốn khóa tài khoản này?"
+                icon={
+                  <QuestionCircleOutlined
+                    style={{
+                      color: 'red',
+                    }}
+                  />
+                }
+                onConfirm={() => handleOpenBlockModal(record)}
+              >
+                <Button className='bg-red-600 flex items-center'>
+                  <LockFilled className='text-white' />
+                </Button>
+              </Popconfirm>
+            </Tooltip>
             :
-            <Popconfirm
-              title="Mở khóa tài khoản"
-              description="Bạn chắc chắn muốn mở khóa tài khoản này?"
-              icon={
-                <QuestionCircleOutlined
-                  style={{
-                    color: 'green',
-                  }}
-                />
-              }
-              onConfirm={() => handleUnblockAccount(record)}
-            >
-              <Button className='bg-green-600 flex items-center'>
-                <UnlockFilled className='text-white' />
-              </Button>
-            </Popconfirm>
+            <Tooltip title="Mở khóa tài khoản">
+              <Popconfirm
+                title="Mở khóa tài khoản"
+                description="Bạn chắc chắn muốn mở khóa tài khoản này?"
+                icon={
+                  <QuestionCircleOutlined
+                    style={{
+                      color: 'green',
+                    }}
+                  />
+                }
+                onConfirm={() => handleUnblockAccount(record)}
+              >
+                <Button className='bg-green-600 flex items-center'>
+                  <UnlockFilled className='text-white' />
+                </Button>
+              </Popconfirm>
+            </Tooltip>
           }
         </>
       ),
@@ -164,13 +169,15 @@ function ListAttendant() {
     setOpen(true);
   };
   const onCreate = (values) => {
+    setConfirmLoading(true)
     service.createAccount(values).then((res) => {
       notification.success({
         message: res.data,
       });
       getData()
+      setConfirmLoading(false)
+      setOpen(false);
     });
-    setOpen(false);
   };
 
   return (
@@ -204,6 +211,7 @@ function ListAttendant() {
 
       <ModalAdd
         open={open}
+        confirmLoading={confirmLoading}
         onCreate={onCreate}
         onCancel={() => {
           setOpen(false);

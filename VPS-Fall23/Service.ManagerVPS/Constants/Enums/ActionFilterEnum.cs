@@ -29,5 +29,6 @@ public enum ActionFilterEnum
     AddReplyToFeedback,
     FilterFeedback,
     BlockUserAccount,
-    GetApprovedParkingZoneByOwnerId
+    GetApprovedParkingZoneByOwnerId,
+    GetAllParkingZoneOwner
 }

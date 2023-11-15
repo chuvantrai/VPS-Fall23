@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -31,16 +33,27 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpGet("GetAll")]
+        [FilterPermission(Action = ActionFilterEnum.GetAllParkingZoneOwner)]
         public IActionResult GetAll([FromQuery] QueryStringParameters parameters)
         {
             try
             {
-                var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
-                var userToken = JwtTokenExtension.ReadToken(accessToken)!;
                 var list = ((IParkingZoneOwnerRepository)vpsRepository).GetAllOwner(parameters);
-
-                //if (userToken.RoleId == 3 || userToken.RoleId == 2) return NotFound();
-
+                var result = list
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.Email,
+                        x.Phone,
+                        x.Dob,
+                        x.CreatedAt,
+                        x.ModifiedAt,
+                        x.IdNavigation.Username,
+                        FullName = x.IdNavigation.FirstName + " " + x.IdNavigation.LastName,
+                        x.IdNavigation.Address,
+                        x.IdNavigation.IsBlock
+                    })
+                    .ToList();
                 var metadata = new
                 {
                     list.TotalCount,
@@ -49,7 +62,7 @@ namespace Service.ManagerVPS.Controllers
                     list.TotalPages,
                     list.HasNext,
                     list.HasPrev,
-                    Data = list
+                    Data = result
                 };
                 return Ok(metadata);
             }
@@ -106,7 +119,6 @@ namespace Service.ManagerVPS.Controllers
         [HttpGet("GetBookedOverview")]
         public IActionResult GetBookedOverview([FromQuery] string? parkingZoneName)
         {
-
             try
             {
                 var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
@@ -116,7 +128,8 @@ namespace Service.ManagerVPS.Controllers
                 //if (userToken.RoleId == 3 || userToken.RoleId == 1) return NotFound();
 
                 DateTime now = DateTime.Now;
-                var list = parkingTransactionRepository.GetBookedSlot(parkingZoneName, DateTime.Now);
+                var list =
+                    parkingTransactionRepository.GetBookedSlot(parkingZoneName, DateTime.Now);
                 var doneCheckInOut = 0;
                 var notCheckIn = 0;
                 var notCheckOut = 0;
@@ -131,18 +144,24 @@ namespace Service.ManagerVPS.Controllers
                     {
                         doneCheckInOut++;
                     }
+
                     if (item.CheckinAt > DateTime.Now || item.CheckinAt == null)
                     {
                         notCheckIn++;
                     }
-                    if (item.CheckinAt <= DateTime.Now && (item.CheckoutAt > DateTime.Now || item.CheckoutAt == null))
+
+                    if (item.CheckinAt <= DateTime.Now &&
+                        (item.CheckoutAt > DateTime.Now || item.CheckoutAt == null))
                     {
                         notCheckOut++;
                     }
 
                     TimeSpan timeDifference = (item.CheckoutAt - item.CheckinAt).Value;
 
-                    DayOfWeek firstDayOfWeek = DayOfWeek.Monday; // You can adjust this to your preferred first day of the week
+                    DayOfWeek
+                        firstDayOfWeek =
+                            DayOfWeek
+                                .Monday; // You can adjust this to your preferred first day of the week
 
                     DateTime startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)firstDayOfWeek);
                     DateTime endOfWeek = startOfWeek.AddDays(6);
@@ -150,23 +169,28 @@ namespace Service.ManagerVPS.Controllers
 
                     if (item.CreatedAt.Year == now.Year)
                     {
-                        yearCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+                        yearCash += item.ParkingZone.PricePerHour *
+                                    (decimal)timeDifference.TotalHours;
 
                         if (item.CreatedAt.Month == now.Month)
                         {
-                            monthCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+                            monthCash += item.ParkingZone.PricePerHour *
+                                         (decimal)timeDifference.TotalHours;
 
                             if (item.CreatedAt >= startOfWeek && item.CreatedAt <= endOfWeek)
                             {
-                                weekCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+                                weekCash += item.ParkingZone.PricePerHour *
+                                            (decimal)timeDifference.TotalHours;
 
                                 if (item.CreatedAt.Day == now.Day)
                                 {
-                                    dayCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+                                    dayCash += item.ParkingZone.PricePerHour *
+                                               (decimal)timeDifference.TotalHours;
 
                                     if (item.CreatedAt.Hour == now.Hour)
                                     {
-                                        hourCash += item.ParkingZone.PricePerHour * (decimal)timeDifference.TotalHours;
+                                        hourCash += item.ParkingZone.PricePerHour *
+                                                    (decimal)timeDifference.TotalHours;
                                     }
                                 }
                             }
