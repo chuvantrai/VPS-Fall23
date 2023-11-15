@@ -1,6 +1,7 @@
 using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
 using Client.MobileApp.ViewModels;
+using CommunityToolkit.Maui.Core.Platform;
 
 namespace Client.MobileApp.Views;
 
@@ -15,6 +16,15 @@ public partial class VPS79 : ContentPage
         _viewModel = viewModel;
     }
 
+    private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
+    {
+        await UserName.HideKeyboardAsync(CancellationToken.None);
+        await Password.HideKeyboardAsync(CancellationToken.None);
+
+        UserName.Unfocus();
+        Password.Unfocus();
+    }
+
     private async void loginButton_Clicked(object sender, EventArgs e)
     {
         if (!String.IsNullOrEmpty(UserName.Text) && !String.IsNullOrEmpty(Password.Text))
@@ -27,8 +37,6 @@ public partial class VPS79 : ContentPage
             {
                 if (response.Equals(Constant.LOGIN_SUCCESS))
                 {
-                    await DisplayAlert(Constant.NOTIFICATION, response, Constant.CANCEL);
-                    await Task.Delay(1000);
                     await Shell.Current.GoToAsync(nameof(VPS53));
                 }
                 else

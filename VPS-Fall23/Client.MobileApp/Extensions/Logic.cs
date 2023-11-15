@@ -1,4 +1,4 @@
-namespace Client.MobileApp.Extensions
+﻿namespace Client.MobileApp.Extensions
 {
     public static class Logic
     {
@@ -55,12 +55,12 @@ namespace Client.MobileApp.Extensions
         public static async Task<byte[]> ConvertStreamToByteArray(Stream stream)
         {
             try
-            {
-                byte[] imageBytes;
+            { 
+            
+           
                 using MemoryStream memoryStream = new();
                 await stream.CopyToAsync(memoryStream);
-                imageBytes = memoryStream.ToArray();
-                return imageBytes;
+                               return memoryStream.ToArray(); 
             }
             catch (Exception ex)
             {
@@ -68,5 +68,6 @@ namespace Client.MobileApp.Extensions
                 return null;
             }
         }
+
     }
 }
