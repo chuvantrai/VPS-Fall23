@@ -72,9 +72,9 @@ namespace Service.ManagerVPS.Repositories
 
         public async Task<string> CheckLicesePlate(string licenseplate, DateTime checkAt, Guid checkBy)
         {
-            var transaction = await entities.Include(t => t.ParkingTransactionDetails)
+            var transaction = await entities.Include(pt => pt.ParkingTransactionDetails).Include(pt => pt.ParkingZone)
                 .FirstOrDefaultAsync(pt => pt.LicensePlate.Contains(licenseplate)
-                && pt.CheckinAt <= checkAt && pt.CheckoutAt >= checkAt
+                && pt.CheckinAt  <= checkAt && pt.CheckoutAt >= checkAt
                 && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
 
             if (transaction != null)
