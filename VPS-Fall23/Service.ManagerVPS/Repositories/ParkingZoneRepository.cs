@@ -151,4 +151,15 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(d => d.City)
             .Where(p => parkingZoneIds.Contains(p.Id) && p.IsApprove == true);
     }
+
+    //public ParkingZone? GetAdminOverview(Guid id)
+    //{
+    //    var parkingZone = entities.;
+
+    //    var data = new
+    //    {
+
+    //    };
+    //    return parkingZone;
+    //}
 }

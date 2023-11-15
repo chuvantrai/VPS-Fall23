@@ -253,6 +253,15 @@ public class ParkingZoneController : VpsController<ParkingZone>
 
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
+    public async Task<IActionResult> GetAdminOverview()
+    {
+        
+
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
+    }
+
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
     public async Task<IActionResult> ChangeParkingZoneStat([FromBody] ChangeParkingZoneStat input)
     {
         var output =

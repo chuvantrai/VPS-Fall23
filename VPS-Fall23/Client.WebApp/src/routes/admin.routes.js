@@ -5,12 +5,20 @@ import ViewRequestedParkingZone from '@/pages/ViewRequestedParkingZones';
 import ManagerLayout from '../layouts/ManagerLayout';
 import guidGenerator from '../helpers/guidGenerator';
 import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
+import AdminOverview from '../pages/Dashboard/AdminOverview';
 
 export const adminRoutesConfig = {
   header: Header,
   footer: null,
   layout: ManagerLayout,
   routes: [
+    {
+      key: guidGenerator(),
+      path: '',
+      label: 'Trang chủ',
+      component: AdminOverview,
+      description: '',
+    },
     {
       key: guidGenerator(),
       path: 'user',
