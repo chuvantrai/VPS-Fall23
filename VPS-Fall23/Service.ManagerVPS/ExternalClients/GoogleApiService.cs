@@ -29,7 +29,7 @@ namespace Service.ManagerVPS.ExternalClients
                     licensePlate = string.Join("", response[0].Description.Split(new string[] { "\n", "." }, StringSplitOptions.None));
                 }
 
-                return licensePlate;
+                return new string(licensePlate.Where(c => Char.IsLetterOrDigit(c)).ToArray());
             }
             catch { throw new ClientException(3000); }
         }

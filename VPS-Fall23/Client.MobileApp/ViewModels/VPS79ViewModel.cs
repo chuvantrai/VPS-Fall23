@@ -67,7 +67,7 @@ namespace Client.MobileApp.ViewModels
                 CameraIndex = -1;
                 LoadingIndex = 1;
                 var apiTask = _client.PostAsJsonAsync(Constant.API_PATH_VPS79, loginRequest);
-                var completedTask = await Task.WhenAny(apiTask, Task.Delay(2000));
+                var completedTask = await Task.WhenAny(apiTask, Task.Delay(100000));
                 if (completedTask == apiTask && apiTask.Result.IsSuccessStatusCode)
                 {
                     IsBusy = false;

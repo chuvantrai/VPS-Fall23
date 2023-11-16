@@ -109,6 +109,8 @@ public partial class VPS53 : ContentPage
             var imageSubset = GetImageSubsetArea(newImage);
             var licensePlateImage = newImage.Subset(imageSubset);
             using MemoryStream imageSubsetStream = new MemoryStream();
+            licensePlateImage.Encode(SKEncodedImageFormat.Png, 100)
+              .SaveTo(imageSubsetStream);
 
             var checkLicensePlate = new LicensePlateScan
             {
@@ -170,43 +172,26 @@ public partial class VPS53 : ContentPage
     {
         try
         {
-            string licensePlate = LicensePlateEntry.Text;
+            string licensePlate = new string(LicensePlateEntry.Text.Where(c => Char.IsLetterOrDigit(c)).ToArray());
 
             if (!String.IsNullOrEmpty(licensePlate))
             {
                 var checkLicensePlate = new LicensePlateInput
                 {
-                    LicensePlate = licensePlate,
+                    LicensePlate = licensePlate.ToUpper(),
                     CheckAt = DateTime.Now,
                     CheckBy = Constant.USER
                 };
 
-                string response_1 = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
-
-                if (response_1 == Constant.CHECKOUT_CONFIRM)
-                {
-                    MainThread.BeginInvokeOnMainThread(async () =>
-                    {
-                        var answer = Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.ACCEPT, Constant.CANCEL);
-
-                        if (answer.ToString() == Constant.ACCEPT)
-                        {
-                            string response_2 = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
-
-                            Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_2, Constant.CANCEL);
-                        }
-                        else
-                        {
-                            Application.Current.MainPage.DisplayAlert(Constant.NOTIFICATION, response_1, Constant.CANCEL);
-                        }
-                    });
-                }
+                string autoCheckinResponse = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
+                var checkoutInputConfirm = new Task<string>(() => _viewModel.CheckOutInputConfirm(checkLicensePlate).Result);
+                await HandleResponse(autoCheckinResponse, checkoutInputConfirm);
             }
             else
             {
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.ALERT_ERROR, Constant.CANCEL);
+                    Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.INPUT_FAILED, Constant.CANCEL);
                 });
             }
         }

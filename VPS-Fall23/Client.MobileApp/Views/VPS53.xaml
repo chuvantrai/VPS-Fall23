@@ -91,7 +91,7 @@
 
                             </Grid.ColumnDefinitions>
 
-                            <Frame Margin="20,10,10,10" Grid.Column="0" Padding="10,0,10,-5">
+                            <Frame Margin="20,10,10,10" Grid.Column="0" Padding="10,-11 ,10,-20">
                                 <Entry x:Name="LicensePlateEntry" 
                                    IsTextPredictionEnabled="False"
                                    Text="{Binding LicensePlateEntry}"
