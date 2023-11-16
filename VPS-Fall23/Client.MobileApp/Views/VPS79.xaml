@@ -88,7 +88,7 @@
 
                     </Label>
 
-                    <Frame Grid.Row="2" Padding="10,3,10,0">
+                    <Frame Margin="30,0,30,0" Grid.Row="2" Padding="10,3,10,0">
 
                         <Entry  
                             x:Name="UserName"
@@ -100,7 +100,7 @@
 
                     </Frame>
 
-                    <Frame Grid.Row="4" Padding="10,3,10,0">
+                    <Frame Margin="30,0,30,0" Grid.Row="4" Padding="10,3,10,0">
 
                         <Entry  
                             x:Name="Password" 

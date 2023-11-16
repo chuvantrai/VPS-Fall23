@@ -109,7 +109,7 @@ namespace Service.ManagerVPS.Controllers
                 throw new ClientException(3001);
             }
 
-            var result = await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate, licensePlateScan.CheckAt, licensePlateScan.CheckBy) ?? throw new ClientException(3002);
+            var result = await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate.ToUpper(), licensePlateScan.CheckAt, licensePlateScan.CheckBy) ?? throw new ClientException(3002);
 
             return Ok(new
             {
