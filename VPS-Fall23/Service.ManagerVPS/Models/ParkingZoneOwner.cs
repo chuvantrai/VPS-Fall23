@@ -8,6 +8,7 @@ namespace Service.ManagerVPS.Models
         public ParkingZoneOwner()
         {
             ParkingZones = new HashSet<ParkingZone>();
+            PromoCodes = new HashSet<PromoCode>();
         }
 
         public Guid Id { get; set; }
@@ -19,5 +20,6 @@ namespace Service.ManagerVPS.Models
 
         public virtual Account IdNavigation { get; set; } = null!;
         public virtual ICollection<ParkingZone> ParkingZones { get; set; }
+        public virtual ICollection<PromoCode> PromoCodes { get; set; }
     }
 }

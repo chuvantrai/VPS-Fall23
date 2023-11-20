@@ -11,4 +11,7 @@ public static class KeyHtmlEmail
     public const string DESCRIPTRION = "@{DESCRIPTRION}";
     public const string PAYMENTCODE = "@{PAYMENTCODE}";
     public const string CSS_PAYMENTCODE = "@{CSS_PAYMENTCODE}";
+    public const string FROM_DATE = "@{FROM_DATE}";
+    public const string TO_DATE = "@{TO_DATE}";
+    public const string PROMO_CODE = "@{PROMO_CODE}";
 }

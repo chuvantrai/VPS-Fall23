@@ -67,6 +67,8 @@ builder.Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
 builder.Services.AddScoped<IContractRepository, ContractRepository>();
 builder.Services.AddScoped<IAttendantRepository, AttendantRepository>();
 builder.Services.AddScoped<IParkingZoneAbsentRepository, ParkingZoneAbsentRepository>();
+builder.Services.AddScoped<IPromoCodeRepository, PromoCodeRepository>();
+builder.Services.AddScoped<IPromoCodeParkingZoneRepository, PromoCodeParkingZoneRepository>();
 
 //Session
 builder.Services.AddDistributedMemoryCache();

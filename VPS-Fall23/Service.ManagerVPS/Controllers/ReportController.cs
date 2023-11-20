@@ -108,7 +108,7 @@ public class ReportController : VpsController<Report>
             });
         }
 
-        var templateEmail = _generalVps.CreateTemplateEmail(keyValuesTemplate);
+        var templateEmail = _generalVps.CreateTemplateEmail(keyValuesTemplate, "templateEmailNotification.html");
         var toEmail = new[] { "traicvhe153014@fpt.edu.vn", "0362351671trai@gmail.com" };
         var titleEmail = $"Thông báo người dùng gửi báo cáo về {report.TypeNavigation.Description}";
         await _generalVps.SendListEmailAsync(toEmail, titleEmail, templateEmail);

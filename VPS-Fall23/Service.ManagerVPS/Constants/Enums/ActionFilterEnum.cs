@@ -30,5 +30,8 @@ public enum ActionFilterEnum
     FilterFeedback,
     BlockUserAccount,
     GetApprovedParkingZoneByOwnerId,
-    GetAllParkingZoneOwner
+    GetAllParkingZoneOwner,
+    GetListPromoCode,
+    CreateNewPromoCode,
+    GetPromoCodeDetail
 }

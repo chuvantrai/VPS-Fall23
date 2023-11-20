@@ -376,5 +376,11 @@ namespace Service.ManagerVPS.Repositories
 
             return result;
         }
+
+        public List<ParkingTransaction> GetParkingTransactions()
+        {
+            var lstParkingTransaction = entities.ToList();
+            return lstParkingTransaction;
+        }
     }
 }
