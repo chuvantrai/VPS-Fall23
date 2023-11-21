@@ -11,6 +11,9 @@ public class NewPromoCodeInput
     [StringLength(6)]
     public string Code { get; set; } = null!;
 
+    [Required]
+    public int Discount { get; set; }
+
     [Required] 
     public List<Guid> ParkingZoneIds { get; set; } = new();
 

@@ -60,7 +60,8 @@ public class PromoCodeController : VpsController<PromoCode>
             ToDate = (DateTime)input.ToDate!,
             CreatedAt = DateTime.Now,
             ModifiedAt = DateTime.Now,
-            OwnerId = (Guid)input.OwnerId!
+            OwnerId = (Guid)input.OwnerId!,
+            Discount = input.Discount
         };
         await ((IPromoCodeRepository)vpsRepository).Create(newPromoCode);
 
@@ -94,7 +95,8 @@ public class PromoCodeController : VpsController<PromoCode>
         templateString = templateString
             .Replace("@{PROMO_CODE}", newPromoCode.Code)
             .Replace("@{FROM_DATE}", $"{newPromoCode.FromDate: dd-MM-yyyy}")
-            .Replace("@{TO_DATE}", $"{newPromoCode.ToDate: dd-MM-yyyy}");
+            .Replace("@{TO_DATE}", $"{newPromoCode.ToDate: dd-MM-yyyy}")
+            .Replace("@{DISCOUNT}", newPromoCode.Discount.ToString());
         var brokerApiClient =
             new BrokerApiClient(_configuration.GetValue<string>("brokerApiBaseUrl"));
         await brokerApiClient.SendMail(usersEmail.ToArray(), "[VPS]Ưu đãi", templateString);
@@ -122,6 +124,7 @@ public class PromoCodeController : VpsController<PromoCode>
             promoCode.Code,
             promoCode.FromDate,
             promoCode.ToDate,
+            promoCode.Discount,
             ParkingZoneLst = promoCode.PromoCodeParkingZones
                 .Select(x => new
                 {
@@ -141,6 +144,7 @@ public class PromoCodeController : VpsController<PromoCode>
             ?? throw new ServerException(2);
 
         promoCode.Code = input.PromoCode;
+        promoCode.Discount = input.Discount;
         promoCode.FromDate = (DateTime)input.FromDate!;
         promoCode.ToDate = (DateTime)input.ToDate!;
         promoCode.ModifiedAt = DateTime.Now;
@@ -177,7 +181,8 @@ public class PromoCodeController : VpsController<PromoCode>
         templateString = templateString
             .Replace("@{PROMO_CODE}", input.PromoCode)
             .Replace("@{FROM_DATE}", $"{input.FromDate: dd-MM-yyyy}")
-            .Replace("@{TO_DATE}", $"{input.ToDate: dd-MM-yyyy}");
+            .Replace("@{TO_DATE}", $"{input.ToDate: dd-MM-yyyy}")
+            .Replace("@{DISCOUNT}", input.Discount.ToString());
         var brokerApiClient =
             new BrokerApiClient(_configuration.GetValue<string>("brokerApiBaseUrl"));
         await brokerApiClient.SendMail(usersEmail.ToArray(), "[VPS] Cập nhật ưu đãi",

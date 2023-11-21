@@ -11,6 +11,9 @@ public class UpdatePromoCodeInput
     public string PromoCode { get; set; } = null!;
 
     [Required]
+    public int Discount { get; set; }
+
+    [Required]
     public DateTime? FromDate { get; set; }
 
     [Required]
