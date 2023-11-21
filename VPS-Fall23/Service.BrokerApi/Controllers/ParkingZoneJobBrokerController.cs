@@ -6,6 +6,7 @@ using Service.BrokerApi.Services;
 
 namespace Service.BrokerApi.Controllers
 {
+    [Route("api/parking-zone")]
     public class ParkingZoneJobBrokerController : ApiBrokerController<IRabbitMQClient>
     {
         public ParkingZoneJobBrokerController(IRabbitMQClient rabbitMQClient, IOptions<RabbitMQProfile> options)

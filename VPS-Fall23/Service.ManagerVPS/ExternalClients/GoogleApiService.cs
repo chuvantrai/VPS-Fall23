@@ -1,6 +1,5 @@
 ﻿using Service.ManagerVPS.Constants.FileManagement;
 using Google.Cloud.Vision.V1;
-using Microsoft.IdentityModel.Tokens;
 using Service.ManagerVPS.DTO.Exceptions;
 
 namespace Service.ManagerVPS.ExternalClients

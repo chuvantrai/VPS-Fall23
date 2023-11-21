@@ -19,5 +19,6 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         Task<string> CheckOutConfirm(string licenseplate, DateTime checkAt, Guid checkBy);
         Task<bool> IsAlreadyBooking(BookingSlot bookingSlot);
         Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(Guid parkingZoneId);
+        Task SendBookedEmail(ParkingTransaction parkingTransaction, PaymentTransaction paymentTransaction);
     }
 }

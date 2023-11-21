@@ -3,6 +3,8 @@ using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.Output;
+using Service.ManagerVPS.Extensions.ILogic;
+using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -10,9 +12,13 @@ namespace Service.ManagerVPS.Repositories
 {
     public class ParkingTransactionRepository : VpsRepository<ParkingTransaction>, IParkingTransactionRepository
     {
-        public ParkingTransactionRepository(FALL23_SWP490_G14Context fall23Swp490G14Context)
+        readonly IConfiguration configuration;
+        public ParkingTransactionRepository(
+            FALL23_SWP490_G14Context fall23Swp490G14Context,
+        IConfiguration configuration)
             : base(fall23Swp490G14Context)
         {
+            this.configuration = configuration;
         }
 
         public async Task<int> GetBookedSlot(Guid parkingZoneId)
@@ -375,6 +381,24 @@ namespace Service.ManagerVPS.Repositories
             }
 
             return result;
+        }
+
+        public async Task SendBookedEmail(ParkingTransaction parkingTransaction, PaymentTransaction paymentTransaction)
+        {
+            var parkingZone = this.context.ParkingZones.Find(parkingTransaction.ParkingZoneId);
+            var fileName = $"booking-info.html";
+            fileName = Path.Combine(Directory.GetCurrentDirectory(), "Constants", "FileHtml", fileName);
+            var templateString = await File.ReadAllTextAsync(fileName);
+            templateString = templateString
+            .Replace("@{parkingZoneName}", parkingTransaction.ParkingZone.Name)
+            .Replace("@{transactionCode}", paymentTransaction.TxnRef)
+            .Replace("@{Vnp_Amount}", paymentTransaction.Amount.ToString())
+            .Replace("@{from}", parkingTransaction.CheckinAt.ToString("hh:mm:ss dd/MM/yyyy"))
+            .Replace("@{to}", parkingTransaction.CheckoutAt?.ToString("hh:mm:ss dd/MM/yyyy"))
+            .Replace("@{Vnp_OrderInfo}", paymentTransaction.OrderInfo);
+            string subject = "Đăng ký gửi xe thành công";
+            BrokerApiClient brokerApiClient = new BrokerApiClient(this.configuration.GetValue<string>("brokerApiBaseUrl"));
+            await brokerApiClient.SendMail(new string[1] { parkingTransaction.Email }, subject, templateString);
         }
     }
 }
