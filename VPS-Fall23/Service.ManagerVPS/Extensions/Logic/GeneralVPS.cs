@@ -88,6 +88,16 @@ public class GeneralVPS : IGeneralVPS
         return rnd.Next(100000, 999999);
     }
 
+    public string CreateTemplateEmail(IEnumerable<KeyValue> keyValues)
+    {
+        const string fileName = "templateEmailNotification.html";
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+            "Constants", "FileHtml", fileName);
+        var htmlContent = File.ReadAllText(filePath);
+        return keyValues.Aggregate(htmlContent,
+            (current, keyValue) => current.Replace(keyValue.Key, keyValue.Value));
+    }
+
     public string CreateTemplateEmail(IEnumerable<KeyValue> keyValues, string fileName)
     {
         var filePath = Path.Combine(Directory.GetCurrentDirectory(),
