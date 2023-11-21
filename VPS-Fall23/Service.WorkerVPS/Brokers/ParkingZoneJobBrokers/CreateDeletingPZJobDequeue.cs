@@ -11,15 +11,17 @@ namespace Service.WorkerVPS.Brokers.ParkingZoneJobBrokers
     internal class CreateDeletingPZJobDequeue : RabbitMQClient<AutoDeleteParkingZoneDto>
     {
         protected QuartzServices quartzServices;
-        public CreateDeletingPZJobDequeue(IOptions<RabbitMQProfile> rabbitMQProfileConfig, QuartzServices quartzServices)
-            : base(rabbitMQProfileConfig.Value, rabbitMQProfileConfig.Value.QueueInfo.CreateDeletingPZJobQueueName)
+        public CreateDeletingPZJobDequeue(IOptions<RabbitMQProfile> rabbitMQProfileConfig,
+            QuartzServices quartzServices,
+            ILogger<CreateDeletingPZJobDequeue> logger)
+            : base(rabbitMQProfileConfig.Value, rabbitMQProfileConfig.Value.QueueInfo.CreateDeletingPZJobQueueName, logger)
         {
             this.quartzServices = quartzServices;
         }
 
         public override async Task DequeueHandle(AutoDeleteParkingZoneDto autoDeleteParkingZoneDto)
         {
-            var job = JobBuilder.Create<AutoDeleteParkingZoneJob>()
+            var job = JobBuilder.Create<AutoDeleteParkingZone>()
 
                    .WithIdentity(autoDeleteParkingZoneDto.ParkingZoneAbsentId.ToString(), Extensions.Constant.ParkingZoneAbsentJobGroupName)
                    .UsingJobData("parkingZoneId", autoDeleteParkingZoneDto.ParkingZoneId)
