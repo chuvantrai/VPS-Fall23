@@ -49,7 +49,7 @@ namespace Service.BrokerApi.Services
           
             string jsonMsg = JsonSerializer.Serialize(message);
             var msgBytes = Encoding.UTF8.GetBytes(jsonMsg);
-            channel.BasicPublish(queueIn, string.Empty, null, msgBytes);
+            channel.BasicPublish("", queueIn, null, msgBytes);
             return Task.CompletedTask;
         }
 

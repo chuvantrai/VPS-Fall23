@@ -12,7 +12,6 @@ using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.AppSetting;
-using Microsoft.AspNetCore.Identity;
 using Service.ManagerVPS.DTO.Output;
 
 namespace Service.ManagerVPS.Controllers
