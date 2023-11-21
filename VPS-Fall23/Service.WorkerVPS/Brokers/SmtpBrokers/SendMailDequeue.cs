@@ -16,7 +16,7 @@ namespace Service.WorkerVPS.Brokers.SmtpBrokers
 
         public override async Task DequeueHandle(SmtpMessageDto message)
         {
-            var smtpMessage = smtpService.CreateMailMessage(message.Subject, message.Message, message.Attachments);
+            var smtpMessage = smtpService.CreateMailMessage(message.Receivers, message.Subject, message.Message, message.Attachments);
             await smtpService.Send(smtpMessage);
         }
     }

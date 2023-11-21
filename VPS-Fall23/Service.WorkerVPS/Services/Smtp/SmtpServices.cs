@@ -24,7 +24,7 @@ namespace Service.WorkerVPS.Services.Smtp
             this.useSsl = useSsl;
         }
         public SmtpServices(IOptions<HostEmailProfile> hostEmailProfile, ILogger<SmtpServices> logger)
-            : this(logger, hostEmailProfile.Value.Host, hostEmailProfile.Value.Account, hostEmailProfile.Value.Account, hostEmailProfile.Value.Port, hostEmailProfile.Value.UseSSL)
+            : this(logger, hostEmailProfile.Value.Host, hostEmailProfile.Value.Account, hostEmailProfile.Value.Password, hostEmailProfile.Value.Port, hostEmailProfile.Value.UseSSL)
         {
 
         }
