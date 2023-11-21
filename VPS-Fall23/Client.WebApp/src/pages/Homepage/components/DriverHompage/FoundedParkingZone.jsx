@@ -3,11 +3,11 @@ import { Button, Descriptions, Input, List, Popover } from 'antd';
 import { useSelector } from 'react-redux';
 import ButtonGroup from 'antd/es/button/button-group';
 import { useCallback, useEffect, useState } from 'react';
-import ParkingZoneDetail from './ParkingZoneDetail';
-import { getListBookmarkParkingZone } from '../../../../helpers/index.js';
-import useParkingZoneService from '../../../../services/parkingZoneService.js';
-import { setListDataBookmark } from '../../../../stores/parkingZones/parkingZone.store.js';
-import store from '../../../../stores/index.jsx';
+import ParkingZoneDetail from './ParkingZoneDetail/index';
+import { getListBookmarkParkingZone } from '@/helpers/index.js';
+import useParkingZoneService from '@/services/parkingZoneService.js';
+import { setListDataBookmark } from '@/stores/parkingZones/parkingZone.store.js';
+import store from '@/stores/index.jsx';
 
 const viewOnGoogleMapCallback = (parkingZone) => {
   window.open(`https://maps.google.com/?q=${parkingZone.lat},${parkingZone.lng}`, '_blank');
@@ -30,9 +30,9 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
       span: 2,
       label: <Button onClick={() => viewDetailInfo(parkingZone, '3')} type='primary' danger>Đặt vé</Button>,
       children: (<ButtonGroup>
-          <Button onClick={() => viewDetailInfo(parkingZone)}>{parkingZone.name}</Button>
+        <Button onClick={() => viewDetailInfo(parkingZone)}>{parkingZone.name}</Button>
 
-        </ButtonGroup>
+      </ButtonGroup>
       ),
     },
     {
@@ -49,7 +49,7 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
       key: 4,
 
       label: <>Địa chỉ <Button onClick={() => viewOnThisMapCallback(parkingZone)}
-                               icon={<EnvironmentOutlined />}></Button></>,
+        icon={<EnvironmentOutlined />}></Button></>,
       children: <Button onClick={() => viewOnGoogleMapCallback(parkingZone)}> {parkingZone.detailAddress}</Button>,
     },
   ];
@@ -67,7 +67,7 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
   };
   const parkingZoneService = useParkingZoneService();
   const getListDataBookmark = () => {
-    if(!visiblePopover){
+    if (!visiblePopover) {
       let arrayBookmarkPzId = getListBookmarkParkingZone() ?? [];
       parkingZoneService.GetParkingZonesByParkingZoneIds(arrayBookmarkPzId)
         .then((data) => {
@@ -139,9 +139,9 @@ const FoundedParkingZone = ({ viewOnThisMapCallback }) => {
         ></List>
       </>);
   };
-    const onOpenChangeTooltipBookmark = (value) => {
-        setVisiblePopover(value);
-    }
+  const onOpenChangeTooltipBookmark = (value) => {
+    setVisiblePopover(value);
+  }
   return (
     <>
       <div className={'flex'}>

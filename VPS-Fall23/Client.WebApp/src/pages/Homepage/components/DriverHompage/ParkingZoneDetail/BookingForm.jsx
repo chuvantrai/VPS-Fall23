@@ -1,8 +1,16 @@
-import { Button, Form, Input, Result, Slider, Space } from 'antd';
+import { Alert, Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag } from 'antd';
 import { useEffect, useState } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
-import useParkingTransactionService from '../../../../services/parkingTransactionSerivce';
-
+import useParkingTransactionService from '@/services/parkingTransactionSerivce';
+import dayjs from 'dayjs';
+import useParkingZoneAbsentServices from '@/services/parkingZoneAbsentServices';
+const range = (start, end) => {
+  const result = [];
+  for (let i = start; i < end; i++) {
+    result.push(i);
+  }
+  return result;
+};
 const TIME_STEP_IN_HOUR = 1;
 const defaultPaymentResult = {
   isPaymentRequested: false, isShow: false, paymentTransaction: {}, parkingTransaction: {},
@@ -13,7 +21,38 @@ const BookingForm = ({ parkingZone }) => {
   const [form] = Form.useForm();
   const [paymentResult, setPaymentResult] = useState(defaultPaymentResult);
   const [isSubmitBtnDisabled, disableSubmitBtn] = useState(false);
+  const [absents, setAbsents] = useState([]);
+  const [bookingTime, setBookingTime] = useState([null, null]);
+  const [promoCode, setPromoCode] = useState(null);
   const parkingTransactionService = useParkingTransactionService();
+  const parkingZoneAbsentService = useParkingZoneAbsentServices();
+
+  useEffect(() => {
+    parkingZoneAbsentService
+      .getAbsents(parkingZone.id)
+      .then(res => setAbsents(res.data))
+
+    return () => {
+      form.resetFields();
+      setPaymentResult(defaultPaymentResult);
+      disableSubmitBtn(false);
+    }
+  }, [])
+  const getDisabledDate = (date) => {
+    var absentToBool = absents.map((a) => {
+      return (!a.from || dayjs(a.from)) <= date && (!a.to || date <= dayjs(a.to))
+    })
+    return date && date < dayjs().startOf('day') || absentToBool.includes(true);
+  }
+  const getDisableTime = () => {
+    return {
+      disabledHours: () => {
+        let startTime = Number(parkingZone?.workFrom.split(':')[0]) ?? 6
+        let endTime = Number(parkingZone?.workTo.split(':')[0]) ?? 23
+        return [...range(0, startTime), ...range(endTime, 24)]
+      },
+    }
+  }
   const onSubmitClick = () => {
 
     form.validateFields().then(form => {
@@ -22,20 +61,14 @@ const BookingForm = ({ parkingZone }) => {
         ...form,
         // eslint-disable-next-line react/prop-types
         parkingZoneId: parkingZone.id,
-        checkinAt: `${bookingTime[0]}:00:00`,
-        checkoutAt: `${bookingTime[1]}:00:00`,
-        licensePlate: `${form.licensePlatePre.trim()}-${form.licensePlateMid.trim()}${form.licensePlateEnd.trim()}`.toUpperCase(),
+        checkinAt: form.ioTime[0],
+        checkoutAt: form.ioTime[1],
+        licensePlate: form.licensePlate.toUpperCase(),
       };
       book(parkingTransaction);
     });
   };
-  useEffect(() => {
-    return () => {
-      form.resetFields();
-      setPaymentResult(defaultPaymentResult);
-      disableSubmitBtn(false);
-    }
-  }, [])
+
   let connection = new HubConnectionBuilder()
     .withUrl(import.meta.env.VITE_API_GATEWAY + '/payment')
     .withAutomaticReconnect()
@@ -75,7 +108,7 @@ const BookingForm = ({ parkingZone }) => {
         requestPayment(res.data);
       });
   };
-  const [bookingTime, setBookingTime] = useState();
+
   const getPaymentResultProps = () => {
     console.log(paymentResult);
     const success = paymentResult?.paymentTransaction.ResponseCode == 0 && paymentResult?.paymentTransaction.TransactionStatus == 0;
@@ -90,7 +123,12 @@ const BookingForm = ({ parkingZone }) => {
       </>),
     };
   };
-  return (<    >
+  const getTotalAmount = () => {
+    if (!bookingTime[0] || !bookingTime[1]) return 0;
+    const timeInHour = Math.abs(dayjs(bookingTime[0]).diff(dayjs(bookingTime[1]), "hours"))
+    return timeInHour * parkingZone.pricePerHour
+  }
+  return (<>
     <Form
       labelCol={{ span: 6 }}
       wrapperCol={{ span: 14 }}
@@ -108,7 +146,7 @@ const BookingForm = ({ parkingZone }) => {
           },
         ]}
       >
-        <Input></Input>
+        <Input placeholder='Email của bạn'></Input>
       </Form.Item>
       <Form.Item
         label='Số điện thoại'
@@ -125,68 +163,68 @@ const BookingForm = ({ parkingZone }) => {
           ]
         }
       >
-        <Input></Input>
+        <Input placeholder='Số điện thoại của bạn'></Input>
       </Form.Item>
       <Form.Item
         label='Biển số xe'
-        rules={[{ required: true }]}
+        name='licensePlate'
+        rules={[
+          { required: true, message: "Vui lòng nhập biển số xe cần gửi" },
+          { pattern: /^[a-zA-Z0-9\-\.]/g, message: "Biển số xe không hợp lệ" }
+        ]}
       >
-        <Space.Compact>
-          <Form.Item
-            name='licensePlatePre'
-            noStyle
-            rules={[
-              { required: true, message: 'Vui lòng nhập biển số xe' },
-              { pattern: /^[0-9]{2}/gm, message: '' },
-            ]}
-          >
-            <Input style={{ width: '30%' }} required addonAfter='-' />
-          </Form.Item>
-          <Form.Item
-            name='licensePlateMid'
-            noStyle
-            rules={[
-              { required: true, message: 'Vui lòng nhập biển số xe' },
-              { pattern: /^[0-9A-Za-z]/gm, message: '' },
-            ]}
-          >
-            <Input style={{ width: '30%' }} required />
-          </Form.Item>
-          <Form.Item
-            name='licensePlateEnd'
-            noStyle
-            rules={[
-              { required: true, message: 'Vui lòng nhập biển số xe' },
-            ]}
-          >
-            <Input style={{ width: '40%' }} type='number' required />
-          </Form.Item>
-        </Space.Compact>
+        <Input placeholder='Nhập biển số xe cần gửi' />
+      </Form.Item>
+      <Form.Item
+        label='Đơn giá/giờ'
+
+      >
+        <Input disabled={true} value={`${parkingZone.pricePerHour} VNĐ`} style={{ textAlign: 'end' }}></Input>
       </Form.Item>
       <Form.Item
         label='Thời gian vào/ra'
-        name='checkinTime'
+        name='ioTime'
+        rules={[
+          { required: true, message: 'Vui lòng chọn thời gian vào/ra' },
 
-        rules={[{ required: true, message: 'Vui lòng chọn thời gian vào/ra' }]}
+        ]}
       >
-        <Slider
-          range={{ draggableTrack: true }}
-          min={Number(parkingZone?.workFrom.split(':')[0]) ?? 6}
-          max={Number(parkingZone?.workTo.split(':')[0]) ?? 23}
-          step={TIME_STEP_IN_HOUR}
-          tooltip={
-            {
-              formatter: (val) => `232${val}h`,
-              placement: 'top',
+        <DatePicker.RangePicker
+          placement='bottomLeft'
+          showTime={{ format: 'HH', hourStep: 1 }}
+          format="YYYY-MM-DD HH"
+          placeholder={["Thời gian gửi xe vào", "Thời gian lấy xe ra"]}
+          disabledDate={getDisabledDate}
+          disabledTime={getDisableTime}
+          onChange={(values) => setBookingTime([values[0], values[1]])}
+        />
+      </Form.Item>
+      <Form.Item
+        label='Mã giảm giá'
+        name='promoCode'
 
-            }
-          }
-          value={[bookingTime]}
-          onChange={setBookingTime}
+      >
+        <Input
+          type='search'
+          placeholder='Nhập mã giảm giá (nếu có)'
+          onChange={({ target }) => setPromoCode(target.value)}
         >
 
-        </Slider>
-
+        </Input>
+        <Tag hidden={!promoCode} color="success">success</Tag>
+      </Form.Item>
+      <Divider></Divider>
+      <Form.Item
+        label='Tổng cộng'
+      >
+        <Statistic
+          value={getTotalAmount()}
+          precision={0}
+          suffix="VNĐ"
+          style={{
+            textAlign: "end"
+          }}
+        />
       </Form.Item>
       <Form.Item className={('flex justify-center m-0')}>
         <Button className={('bg-[#1890FF]')}

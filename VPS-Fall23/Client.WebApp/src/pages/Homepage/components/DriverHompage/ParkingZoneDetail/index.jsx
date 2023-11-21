@@ -1,18 +1,19 @@
 import { Button, Carousel, Descriptions, Image, Modal, Tabs, notification, Tooltip } from 'antd';
-import useParkingZoneService from '../../../../services/parkingZoneService';
+import useParkingZoneService from '@/services/parkingZoneService.js';
 import { useEffect, useState } from 'react';
-import BookingForm from './BookingForm';
-import FeedBackForm from '@/pages/Homepage/components/DriverHompage/FeedBackForm.jsx';
-import FeedbackList from './FeedbackList';
+import BookingForm from './BookingForm.jsx';
+import FeedBackForm from './FeedBackForm.jsx';
+import FeedbackList from './FeedbackList.jsx';
 import { BookOutlined, BookTwoTone } from '@ant-design/icons';
-import { getListBookmarkParkingZone, setListBookmarkParkingZone } from '../../../../helpers/index.js';
+import { getListBookmarkParkingZone, setListBookmarkParkingZone } from '@/helpers/index.js';
+import Detail from './Detail.jsx';
 
 
 const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = '1' }) => {
 
   const parkingZoneService = useParkingZoneService();
   const [imageLinks, setImageLinks] = useState([]);
-  const [freeSlots, setFreeSlots] = useState(parkingZone?.slots ?? 0);
+
   const [tab, setTab] = useState('1');
   useEffect(() => {
     setTab(defaultTab);
@@ -25,64 +26,13 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
     if (!parkingZone) return;
     parkingZoneService.getImageLink(parkingZone.id).then((res) => setImageLinks(res?.data));
   }, [parkingZone?.id]);
-  const onGetFreeSlot = (parkingZoneId) => {
-    parkingZoneService.getBookedSlot(parkingZoneId).then(res => setFreeSlots(parkingZone.slots - res.data));
-  };
-  const getDetailDescription = () => {
-    if (!parkingZone) return [];
-    return [
-      {
-        key: 1,
-        label: 'Địa chỉ',
-        children: parkingZone.detailAddress,
-      },
-      {
-        key: 2,
-        label: 'Xã/Phường',
-        children: parkingZone.commune.name,
-      },
-      {
-        key: 3,
-        label: 'Quận/Huyện',
-        children: parkingZone.commune.district.name,
-      },
-      {
-        key: 4,
-        label: 'Tỉnh/Thành phố',
-        children: parkingZone.commune.district.city.name,
-      },
-      {
-        key: 5,
-        label: 'Giá thành mỗi giờ (VNĐ)',
-        children: parkingZone.pricePerHour ?? 0,
-      },
-      {
-        key: 6,
-        label: 'Giá khi đỗ quá giờ (VNĐ)',
-        children: parkingZone.priceOverTimePerHour ?? 0,
-      },
-      {
-        key: 5,
-        label: 'Số chỗ trống',
-        children: (
-          <Button
-            onClick={() => onGetFreeSlot(parkingZone.id)}
-          >{freeSlots ?? parkingZone.slots}</Button>
-        ),
-      },
-    ];
-  };
+
   const items = [
     {
 
       key: '1',
       label: 'Chi tiết',
-      children: (<Descriptions
-        bordered
-        items={getDetailDescription()}
-        size='small'
-        column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
-      />),
+      children: (<Detail parkingZone={parkingZone}></Detail>),
     },
     {
       key: '2',
@@ -139,7 +89,8 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
       <Modal
         open={isShow}
         onCancel={onCloseCallback}
-        zIndex={2000}
+        zIndex={1}
+        centered={true}
         okButtonProps={{
           style: {
             display: 'none',
@@ -152,6 +103,7 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
         }}
         closable={true}
         title={parkingZone?.name}
+        destroyOnClose={true}
       >
         <Image.PreviewGroup>
           <Carousel autoplay dotPosition='top' style={{}}>
