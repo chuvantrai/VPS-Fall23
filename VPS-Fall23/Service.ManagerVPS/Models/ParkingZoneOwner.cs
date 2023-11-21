@@ -1,10 +1,14 @@
-﻿namespace Service.ManagerVPS.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace Service.ManagerVPS.Models
 {
     public partial class ParkingZoneOwner
     {
         public ParkingZoneOwner()
         {
             ParkingZones = new HashSet<ParkingZone>();
+            PromoCodes = new HashSet<PromoCode>();
         }
 
         public Guid Id { get; set; }
@@ -16,5 +20,6 @@
 
         public virtual Account IdNavigation { get; set; } = null!;
         public virtual ICollection<ParkingZone> ParkingZones { get; set; }
+        public virtual ICollection<PromoCode> PromoCodes { get; set; }
     }
 }

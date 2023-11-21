@@ -9,6 +9,8 @@ namespace Service.ManagerVPS.Repositories.Interfaces
 
         Task<TEntity> Create(TEntity entity);
 
+        Task CreateRange(List<TEntity> listEntity);
+
         Task Delete<TKeyType>(params TKeyType[] keyType)
             where TKeyType : struct;
 

@@ -151,6 +151,26 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.GetAllParkingZoneOwner,
             UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetListPromoCode,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CreateNewPromoCode,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetPromoCodeDetail,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.UpdatePromoCode,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 

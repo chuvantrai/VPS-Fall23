@@ -81,12 +81,8 @@ public class FeedBackController : VpsController<Feedback>
     public async Task<IActionResult> AddReplyToFeedback([FromBody] AddReplyToFeedbackInput input)
     {
         var feedback =
-            ((IFeedBackRepository)vpsRepository).GetFeedbackById((Guid)input.FeedbackId!);
-        if (feedback is null)
-        {
+            ((IFeedBackRepository)vpsRepository).GetFeedbackById((Guid)input.FeedbackId!) ??
             throw new ServerException(2);
-        }
-
         var reply = new Feedback
         {
             Id = Guid.NewGuid(),
@@ -152,16 +148,18 @@ public class FeedBackController : VpsController<Feedback>
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateFeedBackParkingZone(CreateFeedBackParkingZoneRequest request)
+    public async Task<IActionResult> CreateFeedBackParkingZone(
+        CreateFeedBackParkingZoneRequest request)
     {
         var parkingTransaction =
-            await _parkingTransactionRepository.GetParkingTransactionByIdEmail(request.ParkingZoneId, request.Email);
+            await _parkingTransactionRepository.GetParkingTransactionByIdEmail(
+                request.ParkingZoneId, request.Email);
         var parkingTransactionId = (int)parkingTransaction.Id;
         if (parkingTransactionId != 200) throw new ClientException(parkingTransactionId);
 
         var feedBackResult = await ((IFeedBackRepository)vpsRepository)
             .CreateFeedBack(request, request.ParkingZoneId);
-        
+
         if ((int)feedBackResult.Id != 200) throw new ClientException((int)feedBackResult.Id);
         return Ok(new
         {
