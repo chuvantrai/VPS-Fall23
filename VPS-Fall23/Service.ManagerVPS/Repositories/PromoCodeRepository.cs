@@ -27,4 +27,12 @@ public class PromoCodeRepository : VpsRepository<PromoCode>, IPromoCodeRepositor
             .FirstOrDefault(x => x.Id.Equals(id));
         return promoCode;
     }
+
+    public PromoCode? GetPromoCodeById(Guid id)
+    {
+        var promoCode = entities
+            .Include(x => x.PromoCodeParkingZones)
+            .FirstOrDefault(x => x.Id.Equals(id));
+        return promoCode;
+    }
 }

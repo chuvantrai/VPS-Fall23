@@ -268,8 +268,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
     [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
     public async Task<IActionResult> GetAdminOverview()
     {
-        
-
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
@@ -354,7 +352,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
         }
 
         var absent = parkingZone.ParkingZoneAbsents.MaxBy(x => x.SubId);
-        if (absent is not null && (absent.To < DateTime.Now || absent.To is null))
+        if (absent is not null && ((absent.From <= DateTime.Now && DateTime.Now <= absent.To) ||
+                                   (absent.From <= DateTime.Now && absent.To is null)))
         {
             throw new ServerException("Bãi đỗ xe đã đóng cửa!");
         }

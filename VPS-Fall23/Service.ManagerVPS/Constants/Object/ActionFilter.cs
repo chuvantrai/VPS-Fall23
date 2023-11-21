@@ -166,6 +166,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.GetPromoCodeDetail,
             UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.UpdatePromoCode,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 

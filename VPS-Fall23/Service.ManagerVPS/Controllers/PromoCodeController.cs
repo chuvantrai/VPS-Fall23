@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.ManagerVPS.Constants.Enums;
-using Service.ManagerVPS.Constants.KeyValue;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
-using Service.ManagerVPS.Extensions.ILogic;
+using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -17,16 +16,16 @@ public class PromoCodeController : VpsController<PromoCode>
 {
     private readonly IPromoCodeParkingZoneRepository _promoCodeParkingZoneRepository;
     private readonly IParkingTransactionRepository _transactionRepository;
-    private readonly IGeneralVPS _generalVps;
+    private readonly IConfiguration _configuration;
 
     public PromoCodeController(IPromoCodeRepository promoCodeRepository,
         IPromoCodeParkingZoneRepository promoCodeParkingZoneRepository,
-        IParkingTransactionRepository transactionRepository, IGeneralVPS generalVps)
+        IParkingTransactionRepository transactionRepository, IConfiguration configuration)
         : base(promoCodeRepository)
     {
         _promoCodeParkingZoneRepository = promoCodeParkingZoneRepository;
         _transactionRepository = transactionRepository;
-        _generalVps = generalVps;
+        _configuration = configuration;
     }
 
     [HttpGet]
@@ -77,27 +76,8 @@ public class PromoCodeController : VpsController<PromoCode>
             .ToList();
         await _promoCodeParkingZoneRepository.CreateRange(lstPromoCodeParkingZone);
 
-        var keyValuesTemplate = new List<KeyValue>
-        {
-            new()
-            {
-                Key = KeyHtmlEmail.PROMO_CODE,
-                Value = newPromoCode.Code
-            },
-            new()
-            {
-                Key = KeyHtmlEmail.FROM_DATE,
-                Value = $"{newPromoCode.FromDate:dd/MM/yyyy}"
-            },
-            new()
-            {
-                Key = KeyHtmlEmail.TO_DATE,
-                Value = $"{newPromoCode.ToDate:dd/MM/yyyy}"
-            }
-        };
-        var templateEmail =
-            _generalVps.CreateTemplateEmail(keyValuesTemplate, "templatePromoCode.html");
         var transactions = _transactionRepository.GetParkingTransactions();
+        var usersEmail = new List<string>();
         foreach (var parkingZoneId in input.ParkingZoneIds)
         {
             var emailLst = transactions
@@ -105,8 +85,19 @@ public class PromoCodeController : VpsController<PromoCode>
                 .Select(x => x.Email)
                 .Distinct()
                 .ToList();
-            await _generalVps.SendListEmailAsync(emailLst, "[VPS]Ưu đãi", templateEmail);
+            usersEmail.AddRange(emailLst);
         }
+
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Constants", "FileHtml",
+            "templatePromoCode.html");
+        var templateString = await System.IO.File.ReadAllTextAsync(filePath);
+        templateString = templateString
+            .Replace("@{PROMO_CODE}", newPromoCode.Code)
+            .Replace("@{FROM_DATE}", $"{newPromoCode.FromDate: dd-MM-yyyy}")
+            .Replace("@{TO_DATE}", $"{newPromoCode.ToDate: dd-MM-yyyy}");
+        var brokerApiClient =
+            new BrokerApiClient(_configuration.GetValue<string>("brokerApiBaseUrl"));
+        await brokerApiClient.SendMail(usersEmail.ToArray(), "[VPS]Ưu đãi", templateString);
 
         await ((IPromoCodeRepository)vpsRepository).SaveChange();
         return Ok(ResponseNotification.ADD_SUCCESS);
@@ -139,5 +130,60 @@ public class PromoCodeController : VpsController<PromoCode>
                 })
                 .ToList()
         });
+    }
+
+    [HttpPut]
+    [FilterPermission(Action = ActionFilterEnum.UpdatePromoCode)]
+    public async Task<IActionResult> UpdatePromoCode([FromBody] UpdatePromoCodeInput input)
+    {
+        var promoCode =
+            ((IPromoCodeRepository)vpsRepository).GetPromoCodeById((Guid)input.PromoCodeId!)
+            ?? throw new ServerException(2);
+
+        promoCode.Code = input.PromoCode;
+        promoCode.FromDate = (DateTime)input.FromDate!;
+        promoCode.ToDate = (DateTime)input.ToDate!;
+        promoCode.ModifiedAt = DateTime.Now;
+        await ((IPromoCodeRepository)vpsRepository).Update(promoCode);
+
+        await _promoCodeParkingZoneRepository.DeleteRange(promoCode.PromoCodeParkingZones.ToList());
+        var lstPromoCodeParkingZone = input.ParkingZoneIds
+            .Select(parkingZoneId =>
+                new PromoCodeParkingZone
+                {
+                    PromoCodeId = promoCode.Id,
+                    ParkingZoneId = parkingZoneId,
+                    CreatedAt = DateTime.Now,
+                    ModifiedAt = DateTime.Now
+                })
+            .ToList();
+        await _promoCodeParkingZoneRepository.CreateRange(lstPromoCodeParkingZone);
+
+        var transactions = _transactionRepository.GetParkingTransactions();
+        var usersEmail = new List<string>();
+        foreach (var parkingZoneId in input.ParkingZoneIds)
+        {
+            var emailLst = transactions
+                .Where(x => x.ParkingZoneId.Equals(parkingZoneId))
+                .Select(x => x.Email)
+                .Distinct()
+                .ToList();
+            usersEmail.AddRange(emailLst);
+        }
+
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Constants", "FileHtml",
+            "templatePromoCode.html");
+        var templateString = await System.IO.File.ReadAllTextAsync(filePath);
+        templateString = templateString
+            .Replace("@{PROMO_CODE}", input.PromoCode)
+            .Replace("@{FROM_DATE}", $"{input.FromDate: dd-MM-yyyy}")
+            .Replace("@{TO_DATE}", $"{input.ToDate: dd-MM-yyyy}");
+        var brokerApiClient =
+            new BrokerApiClient(_configuration.GetValue<string>("brokerApiBaseUrl"));
+        await brokerApiClient.SendMail(usersEmail.ToArray(), "[VPS] Cập nhật ưu đãi",
+            templateString);
+
+        await ((IPromoCodeRepository)vpsRepository).SaveChange();
+        return Ok(promoCode);
     }
 }

@@ -33,5 +33,6 @@ public enum ActionFilterEnum
     GetAllParkingZoneOwner,
     GetListPromoCode,
     CreateNewPromoCode,
-    GetPromoCodeDetail
+    GetPromoCodeDetail,
+    UpdatePromoCode
 }

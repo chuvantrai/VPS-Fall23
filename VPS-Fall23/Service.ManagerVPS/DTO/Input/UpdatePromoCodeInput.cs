@@ -2,21 +2,20 @@
 
 namespace Service.ManagerVPS.DTO.Input;
 
-public class NewPromoCodeInput
+public class UpdatePromoCodeInput
 {
     [Required]
-    public Guid? OwnerId { get; set; }
+    public Guid? PromoCodeId { get; set; }
 
     [Required]
-    [StringLength(6)]
-    public string Code { get; set; } = null!;
-
-    [Required] 
-    public List<Guid> ParkingZoneIds { get; set; } = new();
+    public string PromoCode { get; set; } = null!;
 
     [Required]
     public DateTime? FromDate { get; set; }
 
     [Required]
     public DateTime? ToDate { get; set; }
+
+    [Required] 
+    public List<Guid> ParkingZoneIds { get; set; } = new();
 }

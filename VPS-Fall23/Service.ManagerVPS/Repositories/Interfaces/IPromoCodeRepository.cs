@@ -8,4 +8,6 @@ public interface IPromoCodeRepository : IVpsRepository<PromoCode>
     PagedList<PromoCode> GetListPromoCodeByOwnerId(Guid? ownerId, QueryStringParameters parameters);
 
     PromoCode? GetPromoCodeDetailById(Guid id);
+
+    PromoCode? GetPromoCodeById(Guid id);
 }
