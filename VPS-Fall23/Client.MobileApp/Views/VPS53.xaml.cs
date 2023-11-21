@@ -2,7 +2,6 @@
 using CommunityToolkit.Maui.Views;
 using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
-using Client.MobileApp.Extensions;
 using CommunityToolkit.Maui.Core.Platform;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
@@ -208,5 +207,11 @@ public partial class VPS53 : ContentPage
     {
         isShortPlate = !isShortPlate;
         LoadCanvasSurface();
+    }
+
+    private async void LogOutButton_Clicked(object sender, EventArgs e)
+    {
+        SecureStorage.Remove("UserToken");
+        await Navigation.PushAsync(new VPS79());
     }
 }

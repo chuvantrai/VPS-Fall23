@@ -14,6 +14,7 @@ public partial class VPS79 : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
         _viewModel = viewModel;
+        CheckLoginStatus();
     }
 
     private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
@@ -25,13 +26,31 @@ public partial class VPS79 : ContentPage
         Password.Unfocus();
     }
 
+    private async void CheckLoginStatus()
+    {
+        var storedToken = await SecureStorage.GetAsync("UserToken");
+
+        if (!string.IsNullOrEmpty(storedToken))
+        {
+            await Shell.Current.GoToAsync(nameof(VPS53));
+        }
+    }
+
     private async void loginButton_Clicked(object sender, EventArgs e)
     {
+        string response = String.Empty;
         if (!String.IsNullOrEmpty(UserName.Text) && !String.IsNullOrEmpty(Password.Text))
         {
             LoginRequest loginRequest = new() { Username = UserName.Text, Password = Password.Text };
 
-            var response = await _viewModel.CheckAccount(loginRequest);
+            if (Remember.IsChecked == true)
+            {
+                response = await _viewModel.CheckAccount(loginRequest, true);
+            }
+            else
+            {
+                response = await _viewModel.CheckAccount(loginRequest, false);
+            }
 
             if (response != null)
             {
