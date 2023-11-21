@@ -1,13 +1,9 @@
 ﻿using Client.MobileApp.ViewModels;
-using CommunityToolkit.Maui.Views;
 using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
-using Client.MobileApp.Extensions;
 using CommunityToolkit.Maui.Core.Platform;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using Microsoft.Maui.Graphics;
-using System.IO;
 
 
 namespace Client.MobileApp.Views;

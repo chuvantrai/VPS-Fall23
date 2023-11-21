@@ -1,0 +1,47 @@
+{
+    "configurations": [
+        {
+            "name": "ReactJS: Client web app",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "dev"
+            ],
+            "runtimeExecutable": "npm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node",
+            "localRoot": "${workspaceFolder}/VPS-Fall23/Client.WebApp"
+        },
+
+        {
+            "name": "C#: Service.FileManager",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\VPS-Fall23\\Service.FileManager\\Service.FileManager.csproj",
+            "launchConfigurationId": "TargetFramework=;Service.FileManager",
+        },
+        {
+            "name": "C#: Service.ManagerVPS",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\VPS-Fall23\\Service.ManagerVPS\\Service.ManagerVPS.csproj",
+            "launchConfigurationId": "TargetFramework=;Service.ManagerVPS"
+        },
+        {
+            "name": "C#: Service.BrokerApi",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\VPS-Fall23\\Service.BrokerApi\\Service.BrokerApi.csproj",
+            "launchConfigurationId": "TargetFramework=;Service.BrokerApi"
+        },
+        {
+            "name": "C#: Service.WorkerVPS",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\VPS-Fall23\\Service.WorkerVPS\\Service.WorkerVPS.csproj",
+            "launchConfigurationId": "TargetFramework=;Service.WorkerVPS",
+        }
+    ]
+}

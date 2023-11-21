@@ -3,11 +3,11 @@ using Service.WorkerVPS.ExternalClients;
 
 namespace Service.WorkerVPS.Scheduler.ParkingZoneSchedulerJobs;
 
-public class AutoDeleteParkingZoneJob : IJob
+public class AutoDeleteParkingZone : IJob
 {
     readonly VpsClient vpsClient;
     
-    public AutoDeleteParkingZoneJob(IConfiguration configuration)
+    public AutoDeleteParkingZone(IConfiguration configuration)
     {
         vpsClient = new(configuration.GetValue<string>("VpsClientBaseUrl"));
     }
