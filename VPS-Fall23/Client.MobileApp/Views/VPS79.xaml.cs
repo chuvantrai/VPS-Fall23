@@ -2,6 +2,7 @@ using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
 using Client.MobileApp.ViewModels;
 using CommunityToolkit.Maui.Core.Platform;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Client.MobileApp.Views;
 
@@ -14,6 +15,7 @@ public partial class VPS79 : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
         _viewModel = viewModel;
+        CheckLoginStatus();
     }
 
     private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
@@ -25,13 +27,47 @@ public partial class VPS79 : ContentPage
         Password.Unfocus();
     }
 
+    private void CheckLoginStatus()
+    {
+        var storedToken = SecureStorage.GetAsync("UserToken").Result;
+
+        if (!string.IsNullOrEmpty(storedToken))
+        {
+            Constant.USER = new Guid(ReadUserId(storedToken));
+            Shell.Current.GoToAsync(nameof(VPS53));
+        }
+    }
+
+    public string ReadUserId(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+        if (jsonToken == null)
+        {
+            throw new ArgumentException("Invalid JWT token");
+        }
+
+        var userIdClaim = jsonToken.Claims.FirstOrDefault(c => c.Type == nameof(UserData.UserId));
+
+        return userIdClaim?.Value;
+    }
+
     private async void loginButton_Clicked(object sender, EventArgs e)
     {
+        string response = String.Empty;
         if (!String.IsNullOrEmpty(UserName.Text) && !String.IsNullOrEmpty(Password.Text))
         {
             LoginRequest loginRequest = new() { Username = UserName.Text, Password = Password.Text };
 
-            var response = await _viewModel.CheckAccount(loginRequest);
+            if (Remember.IsChecked == true)
+            {
+                response = await _viewModel.CheckAccount(loginRequest, true);
+            }
+            else
+            {
+                response = await _viewModel.CheckAccount(loginRequest, false);
+            }
 
             if (response != null)
             {

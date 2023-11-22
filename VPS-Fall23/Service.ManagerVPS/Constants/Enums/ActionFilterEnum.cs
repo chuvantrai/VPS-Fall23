@@ -34,5 +34,8 @@ public enum ActionFilterEnum
     GetListPromoCode,
     CreateNewPromoCode,
     GetPromoCodeDetail,
-    UpdatePromoCode
+    UpdatePromoCode,
+    GetReportForAdmin,
+    GetTypeReport,
+    FilterReport
 }

@@ -1,6 +1,7 @@
 ﻿using Client.MobileApp.Models;
 using System.Net.Http.Json;
 using Client.MobileApp.Constants;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Client.MobileApp.ViewModels
 {
@@ -215,5 +216,12 @@ namespace Client.MobileApp.ViewModels
                 }
             });
         }
+
+        public string LoadSlot()
+        {
+            var apiTask = _client.GetAsync(Constant.API_PATH_VPS117 + "/" + Constant.USER).Result;
+            return apiTask.Content.ReadAsStringAsync().Result;
+        }
     }
 }
+    

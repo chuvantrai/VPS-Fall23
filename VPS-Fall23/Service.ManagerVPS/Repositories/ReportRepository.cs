@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.Input;
+using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using System.Net.WebSockets;
 
 namespace Service.ManagerVPS.Repositories;
 
@@ -16,7 +18,7 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
     {
         request.Email ??= string.Empty;
         request.Phone ??= string.Empty;
-        
+
         var report = new Report
         {
             Id = Guid.NewGuid(),
@@ -39,7 +41,38 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
         return reportResult!;
     }
 
-    public async Task<int?> CheckPaymentCodeInReport(string paymentCode,int type)
+    public PagedList<Report> GetListReportForAdmin(QueryStringParameters parameters)
+    {
+        var listReport = entities
+             .Include(r => r.StatusNavigation)
+             .Include(r => r.TypeNavigation)
+             .Include(r => r.CreatedByNavigation)
+             .OrderBy(r => r.SubId);
+
+        return PagedList<Report>.ToPagedList(listReport, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public List<GlobalStatus> GetTypeReport()
+    {
+        var result = context.GlobalStatuses.Where(gs => gs.Name.Contains("ERROR")).ToList();
+        return result;
+    }
+
+    public PagedList<Report> FilterReportForAdmin(QueryStringParameters parameters, int typeId)
+    {
+        var listReport = entities
+             .Include(r => r.StatusNavigation)
+             .Include(r => r.TypeNavigation)
+             .Include(r => r.CreatedByNavigation)
+             .Where(r => r.Type == typeId)
+             .OrderBy(r => r.SubId);
+
+        return PagedList<Report>.ToPagedList(listReport, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public async Task<int?> CheckPaymentCodeInReport(string paymentCode, int type)
     {
         var reportResult = await context.Reports
             .FirstOrDefaultAsync(x => x.PaymentCode != null && x.PaymentCode.Equals(paymentCode) && x.Type == type);
@@ -53,7 +86,7 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
                     return 5013;
             }
         }
-        
+
         var payment = await context.PaymentTransactions
             .FirstOrDefaultAsync(x => x.TxnRef.Equals(paymentCode));
         if (payment == null)

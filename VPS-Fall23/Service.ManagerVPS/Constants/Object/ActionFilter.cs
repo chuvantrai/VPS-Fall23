@@ -171,6 +171,21 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.UpdatePromoCode,
             UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetReportForAdmin,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetTypeReport,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.FilterReport,
+            UserRole = new[] { UserRoleEnum.ADMIN }
         }
     };
 

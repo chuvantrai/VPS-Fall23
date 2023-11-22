@@ -58,7 +58,7 @@ namespace Client.MobileApp.ViewModels
             };
         }
 
-        public async Task<string> CheckAccount(LoginRequest loginRequest)
+        public async Task<string> CheckAccount(LoginRequest loginRequest,bool isRemember)
         {
             return await MainThread.InvokeOnMainThreadAsync(async () =>
             {
@@ -72,7 +72,12 @@ namespace Client.MobileApp.ViewModels
                     IsBusy = false;
                     CameraIndex = 1;
                     LoadingIndex = -1;
-                    Constant.USER = await apiTask.Result.Content.ReadFromJsonAsync<Guid>();
+                    var token = await apiTask.Result.Content.ReadFromJsonAsync<LoginResponse>();
+                    Constant.USER = token.UserData.UserId;
+                    if(isRemember == true)
+                    {
+                       SecureStorage.SetAsync("UserToken", token.AccessToken);
+                    }
                     return Constant.LOGIN_SUCCESS;
                 }
                 else

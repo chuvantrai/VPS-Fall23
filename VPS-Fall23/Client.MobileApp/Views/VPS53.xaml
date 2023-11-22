@@ -39,15 +39,32 @@
                 <Grid x:Name="Logo" Grid.Row="0"               
                   ZIndex="{Binding LayoutIndex}" BackgroundColor="#7F000000">
                     <Border x:Name="LogoImage"
-                        ZIndex="{Binding CameraIndex}"
+                        ZIndex="{Binding LayoutIndex}"
                         Stroke="Transparent"
                         BackgroundColor="White">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="0,0,100,100"/>
                         </Border.StrokeShape>
-                        <Image Source="logo.png" 
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label x:Name="Slot" Grid.Column="0" TextColor="Black" HorizontalTextAlignment="Center" FontSize="12" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="SlotLabel_Tapped" />
+                                </Label.GestureRecognizers>
+                            </Label>
+
+                            <Image Source="logo.png" 
                                HorizontalOptions="Center" 
+                               Grid.Column="1"
                                Aspect="AspectFit"/>
+
+                            <ImageButton Grid.Column="2" Clicked="LogOutButton_Clicked" WidthRequest="40" HeightRequest="40" Source="logout.svg"/>
+                        </Grid>
                     </Border>
                 </Grid>
 
@@ -93,6 +110,8 @@
 
                             <Frame Margin="20,10,10,10" Grid.Column="0" Padding="10,-11 ,10,-20">
                                 <Entry x:Name="LicensePlateEntry" 
+                                   TextChanged="LicensePlateEntry_TextChanged"
+                                       IsSpellCheckEnabled="False"
                                    IsTextPredictionEnabled="False"
                                    Text="{Binding LicensePlateEntry}"
                                    PlaceholderColor="Black"

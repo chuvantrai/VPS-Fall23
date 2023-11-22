@@ -566,4 +566,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(
             parkingZoneIds);
     }
+
+    [HttpGet("{attendantId}")]
+    public string GetFreeSlotByAttendantId(Guid attendantId)
+    {
+        return ((IParkingZoneRepository)vpsRepository).GetFreeSlotByAttendantId(attendantId);
+    }
 }
