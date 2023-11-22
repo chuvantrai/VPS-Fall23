@@ -471,6 +471,11 @@ namespace Service.ManagerVPS.Models
                     .HasMaxLength(15)
                     .HasColumnName("phone");
 
+                entity.Property(e => e.PromoCode)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("promo_code");
+
                 entity.Property(e => e.StatusId).HasColumnName("status_id");
 
                 entity.HasOne(d => d.CheckinByNavigation)
@@ -821,6 +826,10 @@ namespace Service.ManagerVPS.Models
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.NumberOfUses)
+                    .HasColumnName("number_of_uses")
+                    .HasDefaultValueSql("((50))");
 
                 entity.Property(e => e.OwnerId).HasColumnName("ownerId");
 

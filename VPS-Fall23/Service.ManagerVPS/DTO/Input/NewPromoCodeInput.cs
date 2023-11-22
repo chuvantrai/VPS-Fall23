@@ -9,13 +9,16 @@ public class NewPromoCodeInput
 
     [Required]
     [StringLength(6)]
-    public string Code { get; set; } = null!;
+    public string? Code { get; set; }
 
     [Required]
-    public int Discount { get; set; }
+    public int? Discount { get; set; }
+
+    [Required]
+    public int? NumberOfUses { get; set; }
 
     [Required] 
-    public List<Guid> ParkingZoneIds { get; set; } = new();
+    public List<Guid> ParkingZoneIds { get; set; }
 
     [Required]
     public DateTime? FromDate { get; set; }

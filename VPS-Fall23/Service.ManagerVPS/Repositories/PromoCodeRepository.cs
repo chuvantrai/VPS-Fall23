@@ -11,12 +11,10 @@ public class PromoCodeRepository : VpsRepository<PromoCode>, IPromoCodeRepositor
     {
     }
 
-    public PagedList<PromoCode> GetListPromoCodeByOwnerId(Guid? ownerId,
-        QueryStringParameters parameters)
+    public PagedList<PromoCode> GetListPromoCodeByOwnerId(Guid ownerId, QueryStringParameters parameters)
     {
         var promoCodeLst = entities.Where(x => x.OwnerId.Equals(ownerId));
-        return PagedList<PromoCode>.ToPagedList(promoCodeLst, parameters.PageNumber,
-            parameters.PageSize);
+        return PagedList<PromoCode>.ToPagedList(promoCodeLst, parameters.PageNumber, parameters.PageSize);
     }
 
     public PromoCode? GetPromoCodeDetailById(Guid id)
