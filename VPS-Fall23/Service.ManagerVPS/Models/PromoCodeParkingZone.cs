@@ -3,16 +3,14 @@ using System.Collections.Generic;
 
 namespace Service.ManagerVPS.Models
 {
-    public partial class ParkingZoneAbsent
+    public partial class PromoCodeParkingZone
     {
-        public Guid Id { get; set; }
-        public int SubId { get; set; }
+        public Guid PromoCodeId { get; set; }
         public Guid ParkingZoneId { get; set; }
-        public DateTime From { get; set; }
-        public DateTime? To { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string Reason { get; set; } = null!;
+        public DateTime ModifiedAt { get; set; }
 
         public virtual ParkingZone ParkingZone { get; set; } = null!;
+        public virtual PromoCode PromoCode { get; set; } = null!;
     }
 }
