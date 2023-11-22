@@ -29,12 +29,14 @@ public partial class VPS53 : ContentPage
         LogoImage.WidthRequest = DeviceDisplay.MainDisplayInfo.Width * 0.3;
         LoadCanvasSurface();
         cameraView.Loaded += CameraView_CamerasLoaded;
+        Slot.Text = _viewModel.LoadSlot();
     }
 
     public void Load()
     {
         InitializeComponent();
     }
+
     Task LoadCanvasSurface()
     {
         return Task.Run(() =>
@@ -43,6 +45,7 @@ public partial class VPS53 : ContentPage
             canvasView.PaintSurface += OnPaintSurface;
         });
     }
+
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
@@ -148,7 +151,9 @@ public partial class VPS53 : ContentPage
                 {
                     if (response.Contains(Constant.OVERTIME_CONFIRM))
                     {
-                        await HandleResponse(Constant.CHECKOUT_CONFIRM);
+                        var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, response, Constant.ACCEPT, Constant.CANCEL);
+                        if (confirmAnswer.ToString() == Constant.ACCEPT)
+                            await HandleResponse(Constant.ACCEPT);
                         break;
                     }
                     await DisplayAlert(Constant.NOTIFICATION, response, Constant.CANCEL);
@@ -210,5 +215,23 @@ public partial class VPS53 : ContentPage
     {
         SecureStorage.Remove("UserToken");
         await Navigation.PushAsync(new VPS79());
+    }
+
+    private void LicensePlateEntry_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        string enteredText = e.NewTextValue;
+
+        foreach (char c in enteredText)
+        {
+            if (!char.IsLetterOrDigit(c))
+            {
+                LicensePlateEntry.Text = LicensePlateEntry.Text.Remove(LicensePlateEntry.Text.IndexOf(c), 1);
+            }
+        }
+    }
+
+    private void SlotLabel_Tapped(object sender, TappedEventArgs e)
+    {
+        _viewModel.LoadSlot();
     }
 }

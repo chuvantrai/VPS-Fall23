@@ -115,4 +115,82 @@ public class ReportController : VpsController<Report>
 
         return Ok();
     }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetReportForAdmin)]
+    public IActionResult GetReportForAdmin([FromQuery] QueryStringParameters parameters)
+    {
+        var listReport =
+            ((IReportRepository)vpsRepository).GetListReportForAdmin(parameters);
+
+        var result = listReport
+            .Select((x, index) => new
+            {
+                Key = index + 1,
+                x.SubId,
+                x.Id,
+                TypeName = x.TypeNavigation.Name,
+                x.Email,
+                CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
+                x.Content,
+                Status = x.StatusNavigation.Name,
+            }).ToList();
+
+        var metadata = new
+        {
+            listReport.TotalCount,
+            listReport.PageSize,
+            listReport.CurrentPage,
+            listReport.TotalPages,
+            listReport.HasNext,
+            listReport.HasPrev,
+            Data = result
+        };
+        return Ok(metadata);
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.GetTypeReport)]
+    public IActionResult GetTypeReport()
+    {
+        var listType =
+            ((IReportRepository)vpsRepository).GetTypeReport();
+        var result = listType.Select(lt => new { Value = lt.Id, Label = lt.Name }).ToList();
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [FilterPermission(Action = ActionFilterEnum.FilterReport)]
+    public IActionResult FilterReport([FromQuery] QueryStringParameters parameters, [FromQuery] int typeId)
+    {
+
+        var listReport =
+            ((IReportRepository)vpsRepository).FilterReportForAdmin(parameters, typeId);
+
+        var result = listReport
+            .Select((x, index) => new
+            {
+                Key = index + 1,
+                x.SubId,
+                x.Id,
+                TypeName = x.TypeNavigation.Name,
+                x.Email,
+                CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
+                x.Content,
+                Status = x.StatusNavigation.Name,
+            }).ToList();
+
+        var metadata = new
+        {
+            listReport.TotalCount,
+            listReport.PageSize,
+            listReport.CurrentPage,
+            listReport.TotalPages,
+            listReport.HasNext,
+            listReport.HasPrev,
+            Data = result
+        };
+        return Ok(metadata);
+    }
 }

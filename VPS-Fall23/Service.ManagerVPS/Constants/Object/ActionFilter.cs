@@ -151,7 +151,22 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.GetAllParkingZoneOwner,
             UserRole = new[] { UserRoleEnum.ADMIN }
-        }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetReportForAdmin,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetTypeReport,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.FilterReport,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        }       
     };
 
     public static ActionModel? GetAllActionModel(ActionFilterEnum action)

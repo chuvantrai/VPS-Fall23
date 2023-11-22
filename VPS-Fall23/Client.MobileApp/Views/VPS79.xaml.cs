@@ -2,6 +2,7 @@ using Client.MobileApp.Constants;
 using Client.MobileApp.Models;
 using Client.MobileApp.ViewModels;
 using CommunityToolkit.Maui.Core.Platform;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Client.MobileApp.Views;
 
@@ -26,14 +27,30 @@ public partial class VPS79 : ContentPage
         Password.Unfocus();
     }
 
-    private async void CheckLoginStatus()
+    private void CheckLoginStatus()
     {
-        var storedToken = await SecureStorage.GetAsync("UserToken");
+        var storedToken = SecureStorage.GetAsync("UserToken").Result;
 
         if (!string.IsNullOrEmpty(storedToken))
         {
-            await Shell.Current.GoToAsync(nameof(VPS53));
+            Constant.USER = new Guid(ReadUserId(storedToken));
+            Shell.Current.GoToAsync(nameof(VPS53));
         }
+    }
+
+    public string ReadUserId(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+        if (jsonToken == null)
+        {
+            throw new ArgumentException("Invalid JWT token");
+        }
+
+        var userIdClaim = jsonToken.Claims.FirstOrDefault(c => c.Type == nameof(UserData.UserId));
+
+        return userIdClaim?.Value;
     }
 
     private async void loginButton_Clicked(object sender, EventArgs e)
