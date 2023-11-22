@@ -2,7 +2,6 @@ import { useAxios } from '@/hooks/index.js';
 import { notification } from 'antd';
 
 const reportServices = () => {
-
   const axios = useAxios();
 
   const createReport = (values) => {
@@ -20,7 +19,30 @@ const reportServices = () => {
         });
       });
   };
-  return { createReport };
+
+  const getReportForAdmin = (pageNumber, pageSize) => {
+    return axios.get(`api/Report/GetReportForAdmin`, {
+      params: {
+        pageNumber,
+        pageSize,
+      },
+    });
+  };
+
+  const loadReportType = () => {
+    return axios.get(`api/Report/GetTypeReport`);
+  };
+
+  const filterReport = (pageNumber, pageSize, typeId) => {
+    return axios.get(`api/Report/FilterReport`, {
+      params: {
+        pageNumber,
+        pageSize,
+        typeId,
+      },
+    });
+  };
+  return { createReport, getReportForAdmin, loadReportType, filterReport };
 };
 
 export default reportServices;
