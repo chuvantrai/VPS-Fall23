@@ -464,6 +464,9 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.LicensePlate)
                     .HasMaxLength(20)
                     .HasColumnName("license_plate");
+                entity.Property(e => e.PromoCode)
+                    .HasMaxLength(100)
+                    .HasColumnName("promo_code");
 
                 entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
 

@@ -1,7 +1,7 @@
 import { Button, Carousel, Descriptions, Image, Modal, Tabs, notification, Tooltip } from 'antd';
 import useParkingZoneService from '@/services/parkingZoneService.js';
 import { useEffect, useState } from 'react';
-import BookingForm from './BookingForm.jsx';
+import BookingForm from './Booking/BookingForm.jsx';
 import FeedBackForm from './FeedBackForm.jsx';
 import FeedbackList from './FeedbackList.jsx';
 import { BookOutlined, BookTwoTone } from '@ant-design/icons';
@@ -85,43 +85,43 @@ const ParkingZoneDetail = ({ parkingZone, isShow, onCloseCallback, defaultTab = 
     </>);
 
   return (
-    <>
-      <Modal
-        open={isShow}
-        onCancel={onCloseCallback}
-        zIndex={1}
-        centered={true}
-        okButtonProps={{
-          style: {
-            display: 'none',
-          },
-        }}
-        cancelButtonProps={{
-          style: {
-            display: 'none',
-          },
-        }}
-        closable={true}
-        title={parkingZone?.name}
-        destroyOnClose={true}
-      >
-        <Image.PreviewGroup>
-          <Carousel autoplay dotPosition='top' style={{}}>
-            {imageLinks.map((val, index) => {
-              return <Image key={index} src={val}></Image>;
-            })}
-          </Carousel>
-        </Image.PreviewGroup>
-        <div className={('pt-[10px]')}>
-          <Tabs
-            activeKey={tab}
-            items={items}
-            destroyInactiveTabPane={true}
-            onChange={onChangeTabs}
-            tabBarExtraContent={operations} />
-        </div>
-      </Modal>
-    </>
+    <Modal
+      open={isShow}
+      onCancel={onCloseCallback}
+      zIndex={1}
+      centered={true}
+      okButtonProps={{
+        style: {
+          display: 'none',
+        },
+      }}
+      cancelButtonProps={{
+        style: {
+          display: 'none',
+        },
+      }}
+      closable={true}
+      title={parkingZone?.name}
+      destroyOnClose={true}
+    >
+
+      <Image.PreviewGroup>
+        <Carousel adaptiveHeight={true} autoplay dotPosition='top'>
+          {imageLinks.map((val, index) => {
+            return <Image width={'100%'} style={{ objectFit: "cover" }} key={index} src={val}></Image>;
+          })}
+        </Carousel>
+      </Image.PreviewGroup>
+
+      <div className={('pt-[10px]')}>
+        <Tabs
+          activeKey={tab}
+          items={items}
+          destroyInactiveTabPane={true}
+          onChange={onChangeTabs}
+          tabBarExtraContent={operations} />
+      </div>
+    </Modal>
   );
 };
 export default ParkingZoneDetail;

@@ -35,4 +35,8 @@ public class PromoCodeRepository : VpsRepository<PromoCode>, IPromoCodeRepositor
             .FirstOrDefault(x => x.Id.Equals(id));
         return promoCode;
     }
+    public async Task<PromoCode?> GetByCode(string promoCode, Guid parkingZoneId)
+    {
+        return await entities.FirstOrDefaultAsync(p => promoCode.Equals(p.Code) && p.PromoCodeParkingZones.Any(pcpz => pcpz.ParkingZoneId == parkingZoneId));
+    }
 }

@@ -1,9 +1,13 @@
-import { Alert, Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag } from 'antd';
+import { Alert, Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import useParkingTransactionService from '@/services/parkingTransactionSerivce';
 import dayjs from 'dayjs';
 import useParkingZoneAbsentServices from '@/services/parkingZoneAbsentServices';
+import usePromoService from '@/services/promoService';
+import Search from 'antd/es/input/Search';
+import BookingDescription from './BookingDescription';
+const { Text } = Typography;
 const range = (start, end) => {
   const result = [];
   for (let i = start; i < end; i++) {
@@ -11,10 +15,11 @@ const range = (start, end) => {
   }
   return result;
 };
-const TIME_STEP_IN_HOUR = 1;
 const defaultPaymentResult = {
   isPaymentRequested: false, isShow: false, paymentTransaction: {}, parkingTransaction: {},
 };
+
+
 // eslint-disable-next-line react/prop-types
 const BookingForm = ({ parkingZone }) => {
 
@@ -23,10 +28,20 @@ const BookingForm = ({ parkingZone }) => {
   const [isSubmitBtnDisabled, disableSubmitBtn] = useState(false);
   const [absents, setAbsents] = useState([]);
   const [bookingTime, setBookingTime] = useState([null, null]);
-  const [promoCode, setPromoCode] = useState(null);
+  const [promoCode, setPromoCode] = useState({ info: null, message: null });
   const parkingTransactionService = useParkingTransactionService();
   const parkingZoneAbsentService = useParkingZoneAbsentServices();
-
+  const promoService = usePromoService();
+  const searchPromo = (promoCode) => {
+    promoService
+      .getByCode(promoCode, parkingZone.id)
+      .then(res => {
+        setPromoCode({
+          info: res.data
+        })
+      })
+      .catch(error => setPromoCode({ info: null, message: error.message }))
+  }
   useEffect(() => {
     parkingZoneAbsentService
       .getAbsents(parkingZone.id)
@@ -35,6 +50,8 @@ const BookingForm = ({ parkingZone }) => {
     return () => {
       form.resetFields();
       setPaymentResult(defaultPaymentResult);
+      setBookingTime([null, null]);
+      setPromoCode({ info: null, message: null })
       disableSubmitBtn(false);
     }
   }, [])
@@ -44,11 +61,13 @@ const BookingForm = ({ parkingZone }) => {
     })
     return date && date < dayjs().startOf('day') || absentToBool.includes(true);
   }
-  const getDisableTime = () => {
+  const getDisableTime = (date, partial) => {
     return {
       disabledHours: () => {
         let startTime = Number(parkingZone?.workFrom.split(':')[0]) ?? 6
         let endTime = Number(parkingZone?.workTo.split(':')[0]) ?? 23
+        var hour = dayjs().hour()
+        if (startTime <= hour && (date && date <= dayjs().endOf('day')) && partial == 'start') startTime = hour
         return [...range(0, startTime), ...range(endTime, 24)]
       },
     }
@@ -65,6 +84,7 @@ const BookingForm = ({ parkingZone }) => {
         checkoutAt: form.ioTime[1],
         licensePlate: form.licensePlate.toUpperCase(),
       };
+      console.log(parkingTransaction);
       book(parkingTransaction);
     });
   };
@@ -73,6 +93,7 @@ const BookingForm = ({ parkingZone }) => {
     .withUrl(import.meta.env.VITE_API_GATEWAY + '/payment')
     .withAutomaticReconnect()
     .build();
+
   const requestPayment = (parkingTransaction) => {
     parkingTransactionService
       .getPaymentUrl(parkingTransaction.id)
@@ -123,11 +144,6 @@ const BookingForm = ({ parkingZone }) => {
       </>),
     };
   };
-  const getTotalAmount = () => {
-    if (!bookingTime[0] || !bookingTime[1]) return 0;
-    const timeInHour = Math.abs(dayjs(bookingTime[0]).diff(dayjs(bookingTime[1]), "hours"))
-    return timeInHour * parkingZone.pricePerHour
-  }
   return (<>
     <Form
       labelCol={{ span: 6 }}
@@ -176,12 +192,6 @@ const BookingForm = ({ parkingZone }) => {
         <Input placeholder='Nhập biển số xe cần gửi' />
       </Form.Item>
       <Form.Item
-        label='Đơn giá/giờ'
-
-      >
-        <Input disabled={true} value={`${parkingZone.pricePerHour} VNĐ`} style={{ textAlign: 'end' }}></Input>
-      </Form.Item>
-      <Form.Item
         label='Thời gian vào/ra'
         name='ioTime'
         rules={[
@@ -191,12 +201,18 @@ const BookingForm = ({ parkingZone }) => {
       >
         <DatePicker.RangePicker
           placement='bottomLeft'
-          showTime={{ format: 'HH', hourStep: 1 }}
+          showTime={{ format: 'HH', hourStep: 1, hideDisabledOptions: true }}
           format="YYYY-MM-DD HH"
           placeholder={["Thời gian gửi xe vào", "Thời gian lấy xe ra"]}
           disabledDate={getDisabledDate}
           disabledTime={getDisableTime}
-          onChange={(values) => setBookingTime([values[0], values[1]])}
+          onChange={(values) => {
+            if (values == null) {
+              setBookingTime([null, null])
+              return;
+            }
+            setBookingTime([values[0], values[1]])
+          }}
         />
       </Form.Item>
       <Form.Item
@@ -204,28 +220,22 @@ const BookingForm = ({ parkingZone }) => {
         name='promoCode'
 
       >
-        <Input
+        <Input.Search
           type='search'
+          name='promoCode'
           placeholder='Nhập mã giảm giá (nếu có)'
-          onChange={({ target }) => setPromoCode(target.value)}
-        >
-
-        </Input>
-        <Tag hidden={!promoCode} color="success">success</Tag>
-      </Form.Item>
-      <Divider></Divider>
-      <Form.Item
-        label='Tổng cộng'
-      >
-        <Statistic
-          value={getTotalAmount()}
-          precision={0}
-          suffix="VNĐ"
-          style={{
-            textAlign: "end"
-          }}
+          onSearch={(value) => searchPromo(value)}
+          onChange={() => setPromoCode({ info: null, message: null })}
         />
       </Form.Item>
+      <Divider></Divider>
+      <BookingDescription
+        pricePerHour={parkingZone.pricePerHour}
+        ioTime={bookingTime}
+        discount={promoCode?.info?.discount ?? 0}
+      >
+
+      </BookingDescription>
       <Form.Item className={('flex justify-center m-0')}>
         <Button className={('bg-[#1890FF]')}
           type='primary'
