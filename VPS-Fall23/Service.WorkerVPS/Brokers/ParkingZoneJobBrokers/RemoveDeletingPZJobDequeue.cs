@@ -1,20 +1,15 @@
 ﻿using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Extensions.StaticLogic.Scheduler;
 using Service.WorkerVPS.Models;
-using Service.WorkerVPS.Models.ParkingZoneJob;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.WorkerVPS.Brokers.ParkingZoneJobBrokers
 {
     internal class RemoveDeletingPZJobDequeue : RabbitMQClient<Guid>
     {
         protected QuartzServices quartzServices;
-        public RemoveDeletingPZJobDequeue(IOptions<RabbitMQProfile> rabbitMQProfileConfig, QuartzServices quartzServices)
-            : base(rabbitMQProfileConfig.Value, rabbitMQProfileConfig.Value.QueueInfo.RemoveDeletingPZJobQueueName)
+        public RemoveDeletingPZJobDequeue(IOptions<RabbitMQProfile> rabbitMQProfileConfig, QuartzServices quartzServices,
+            ILogger<RemoveDeletingPZJobDequeue> logger)
+            : base(rabbitMQProfileConfig.Value, rabbitMQProfileConfig.Value.QueueInfo.RemoveDeletingPZJobQueueName, logger)
         {
             this.quartzServices = quartzServices;
         }

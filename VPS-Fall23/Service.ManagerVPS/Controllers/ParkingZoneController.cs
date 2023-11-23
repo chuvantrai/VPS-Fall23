@@ -15,7 +15,6 @@ using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
-using Service.ManagerVPS.Repositories;
 using Service.ManagerVPS.Repositories.Interfaces;
 
 namespace Service.ManagerVPS.Controllers;
@@ -436,7 +435,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
         }
 
         var absent = parkingZone.ParkingZoneAbsents.MaxBy(x => x.SubId);
-        if (absent is not null && (absent.To < DateTime.Now || absent.To is null))
+        if (absent is not null && ((absent.From <= DateTime.Now && DateTime.Now <= absent.To) ||
+                                   (absent.From <= DateTime.Now && absent.To is null)))
         {
             throw new ServerException("Bãi đỗ xe đã đóng cửa!");
         }
@@ -648,5 +648,11 @@ public class ParkingZoneController : VpsController<ParkingZone>
     {
         return ((IParkingZoneRepository)vpsRepository).GetParkingZoneByArrayParkingZoneId(
             parkingZoneIds);
+    }
+
+    [HttpGet("{attendantId}")]
+    public string GetFreeSlotByAttendantId(Guid attendantId)
+    {
+        return ((IParkingZoneRepository)vpsRepository).GetFreeSlotByAttendantId(attendantId);
     }
 }

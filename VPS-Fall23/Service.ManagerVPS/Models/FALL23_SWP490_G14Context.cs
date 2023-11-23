@@ -34,6 +34,8 @@ namespace Service.ManagerVPS.Models
         public virtual DbSet<ParkingZoneAttendant> ParkingZoneAttendants { get; set; } = null!;
         public virtual DbSet<ParkingZoneOwner> ParkingZoneOwners { get; set; } = null!;
         public virtual DbSet<PaymentTransaction> PaymentTransactions { get; set; } = null!;
+        public virtual DbSet<PromoCode> PromoCodes { get; set; } = null!;
+        public virtual DbSet<PromoCodeParkingZone> PromoCodeParkingZones { get; set; } = null!;
         public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Type> Types { get; set; } = null!;
 
@@ -469,6 +471,11 @@ namespace Service.ManagerVPS.Models
                     .HasMaxLength(15)
                     .HasColumnName("phone");
 
+                entity.Property(e => e.PromoCode)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("promo_code");
+
                 entity.Property(e => e.StatusId).HasColumnName("status_id");
 
                 entity.HasOne(d => d.CheckinByNavigation)
@@ -787,6 +794,88 @@ namespace Service.ManagerVPS.Models
                     .HasForeignKey(d => d.BookingId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__payment_t__booki__1F98B2C1");
+            });
+
+            modelBuilder.Entity<PromoCode>(entity =>
+            {
+                entity.ToTable("promo_code");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("code");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Discount)
+                    .HasColumnName("discount")
+                    .HasDefaultValueSql("((10))");
+
+                entity.Property(e => e.FromDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("from_date");
+
+                entity.Property(e => e.ModifiedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("modified_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.NumberOfUses)
+                    .HasColumnName("number_of_uses")
+                    .HasDefaultValueSql("((50))");
+
+                entity.Property(e => e.OwnerId).HasColumnName("ownerId");
+
+                entity.Property(e => e.ToDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("to_date");
+
+                entity.HasOne(d => d.Owner)
+                    .WithMany(p => p.PromoCodes)
+                    .HasForeignKey(d => d.OwnerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("promo_code_FK");
+            });
+
+            modelBuilder.Entity<PromoCodeParkingZone>(entity =>
+            {
+                entity.HasKey(e => new { e.PromoCodeId, e.ParkingZoneId })
+                    .HasName("promoCode_parkingZone_PK");
+
+                entity.ToTable("promoCode_parkingZone");
+
+                entity.Property(e => e.PromoCodeId).HasColumnName("promo_code_id");
+
+                entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.ModifiedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("modified_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.HasOne(d => d.ParkingZone)
+                    .WithMany(p => p.PromoCodeParkingZones)
+                    .HasForeignKey(d => d.ParkingZoneId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("promoCode_parkingZone_FK");
+
+                entity.HasOne(d => d.PromoCode)
+                    .WithMany(p => p.PromoCodeParkingZones)
+                    .HasForeignKey(d => d.PromoCodeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("promoCode_parkingZone_FK_1");
             });
 
             modelBuilder.Entity<Report>(entity =>

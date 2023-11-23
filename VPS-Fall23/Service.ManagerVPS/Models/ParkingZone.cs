@@ -12,6 +12,7 @@ namespace Service.ManagerVPS.Models
             ParkingTransactions = new HashSet<ParkingTransaction>();
             ParkingZoneAbsents = new HashSet<ParkingZoneAbsent>();
             ParkingZoneAttendants = new HashSet<ParkingZoneAttendant>();
+            PromoCodeParkingZones = new HashSet<PromoCodeParkingZone>();
         }
 
         public Guid Id { get; set; }
@@ -40,5 +41,6 @@ namespace Service.ManagerVPS.Models
         public virtual ICollection<ParkingTransaction> ParkingTransactions { get; set; }
         public virtual ICollection<ParkingZoneAbsent> ParkingZoneAbsents { get; set; }
         public virtual ICollection<ParkingZoneAttendant> ParkingZoneAttendants { get; set; }
+        public virtual ICollection<PromoCodeParkingZone> PromoCodeParkingZones { get; set; }
     }
 }

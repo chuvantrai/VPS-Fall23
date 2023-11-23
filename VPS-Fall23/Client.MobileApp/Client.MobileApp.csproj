@@ -35,7 +35,7 @@
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\vps_splash.svg" Color="#FFFFFF" BaseSize="128,256" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -47,28 +47,29 @@
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 		<None Remove="appsettings.json" />
+		<None Remove="Resources\Splash\vps_splash.svg" />
 
 		<BundleResource Include="Resources\Raw\googleKey.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Camera.MAUI" Version="1.4.4" />
+		<PackageReference Include="Camera.MAUI" Version="1.2.1" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="6.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="7.0.1" />
 		<PackageReference Include="Google.Cloud.Vision.V1" Version="3.3.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
-		<PackageReference Include="Syncfusion.Maui.DataForm" Version="23.1.42" />
-		<PackageReference Include="System.Net.Http" Version="4.3.4" />
+		<PackageReference Include="SkiaSharp" Version="2.88.6" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="2.88.6" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Core" Version="2.88.6" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.8.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Compile Update="Views\VPS79.xaml.cs">
 	    <DependentUpon>VPS79.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\VPS61.xaml.cs">
-	    <DependentUpon>VPS61.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\VPS53.xaml.cs">
 	    <DependentUpon>VPS53.xaml</DependentUpon>
@@ -77,9 +78,6 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Views\VPS79.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\VPS61.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\VPS53.xaml">

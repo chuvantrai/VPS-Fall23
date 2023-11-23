@@ -12,7 +12,6 @@ using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.AppSetting;
-using Microsoft.AspNetCore.Identity;
 using Service.ManagerVPS.DTO.Output;
 
 namespace Service.ManagerVPS.Controllers
@@ -82,29 +81,40 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPost]
-        public async Task<string> CheckLicensePlateScan(LicensePlateScan licensePlateScan)
+        public async Task<IActionResult> CheckLicensePlateScan(LicensePlateScan licensePlateScan)
         {
-            var fileManager = new FileManagementClient(_configuration.GetValue<string>("fileManagementAccessKey:baseUrl"),
-                              _configuration.GetValue<string>("fileManagementAccessKey:accessKey"),
-                              _configuration.GetValue<string>("fileManagementAccessKey:secretKey"));
 
             if (licensePlateScan.Image == null || licensePlateScan.Image.Length == 0)
             {
                 throw new ClientException(3003);
             }
+            string savePath = @"C:\Users\trank\OneDrive\Desktop";
+            string imagePath = Path.Combine(savePath, "saved_image.jpg");
+
+            System.IO.File.WriteAllBytes(imagePath, licensePlateScan.Image);
 
             var image = Image.FromBytes(licensePlateScan.Image) ?? throw new ClientException(3003);
 
             var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);
 
-            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:privateBucket"), $"license-plate-images", licensePlateScan.Image, $"{licensePlate}_{licensePlateScan.CheckAt:yyyyMMddHHmmss}.jpg");
+            var fileManager = new FileManagementClient(_configuration.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                              _configuration.GetValue<string>("fileManagementAccessKey:accessKey"),
+                              _configuration.GetValue<string>("fileManagementAccessKey:secretKey"));
+
+            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:publicBucket"), $"License-plate-images", licensePlateScan.Image, $"{licensePlate}-{licensePlateScan.CheckAt}.png");
 
             if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {
                 throw new ClientException(3001);
             }
 
-            return await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate, licensePlateScan.CheckAt, licensePlateScan.CheckBy) ?? throw new ClientException(3002);
+            var result = await ((IParkingTransactionRepository)vpsRepository).CheckLicesePlate(licensePlate.ToUpper(), licensePlateScan.CheckAt, licensePlateScan.CheckBy) ?? throw new ClientException(3002);
+
+            return Ok(new
+            {
+                Notification = result,
+                LicensePlate = licensePlate
+            });
         }
 
         [HttpPost]
@@ -163,9 +173,6 @@ namespace Service.ManagerVPS.Controllers
         [HttpPost]
         public async Task<string> CheckOutScanConfirm(LicensePlateScan licensePlateScan)
         {
-            var fileManager = new FileManagementClient(_configuration.GetValue<string>("fileManagementAccessKey:baseUrl"),
-                              _configuration.GetValue<string>("fileManagementAccessKey:accessKey"),
-                              _configuration.GetValue<string>("fileManagementAccessKey:secretKey"));
 
             if (licensePlateScan.Image == null || licensePlateScan.Image.Length == 0)
             {
@@ -176,7 +183,11 @@ namespace Service.ManagerVPS.Controllers
 
             var licensePlate = await _googleApiService.GetLicensePlateFromImage(image) ?? throw new ClientException(3000);
 
-            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:publicBucket"), $"License-plate-images/{licensePlate}-{licensePlateScan.CheckAt}", licensePlateScan.Image, $"{licensePlate}-{licensePlateScan.CheckAt}");
+            var fileManager = new FileManagementClient(_configuration.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                              _configuration.GetValue<string>("fileManagementAccessKey:accessKey"),
+                              _configuration.GetValue<string>("fileManagementAccessKey:secretKey"));
+
+            await fileManager.Upload(_configuration.GetValue<string>("fileManagementAccessKey:publicBucket"), $"License-plate-images", licensePlateScan.Image, $"{licensePlate}-{licensePlateScan.CheckAt}.png");
 
             if (!GeneralExtension.IsLicensePlateValid(licensePlate))
             {

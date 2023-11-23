@@ -389,13 +389,27 @@ public class AuthController : VpsController<Account>
             throw new ClientException(5002);
         }
 
-        if (account.TypeId != (int)UserRoleEnum.ADMIN &&
-            account.TypeId != (int)UserRoleEnum.ATTENDANT)
+        if (account.TypeId != (int)UserRoleEnum.ATTENDANT)
         {
             throw new ClientException(5001);
         }
 
-        return Ok(account.Id);
+        var userToken = new UserTokenHeader
+        {
+            UserId = account.Id.ToString(),
+            Email = account.Email,
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            RoleId = account.TypeId,
+            RoleName = EnumExtension.CoverIntToEnum<UserRoleEnum>(account.TypeId).ToString(),
+            Expires = DateTime.Now.AddMinutes(30),
+            ModifiedAt = account.ModifiedAt
+        };
+        return Ok(new
+        {
+            AccessToken = JwtTokenExtension.WriteToken(userToken),
+            UserData = userToken
+        });
     }
 
     [HttpPut]

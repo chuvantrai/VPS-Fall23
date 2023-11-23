@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
@@ -168,6 +170,30 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
             .Where(p => parkingZoneIds.Contains(p.Id) && p.IsApprove == true);
+    }
+
+    public string GetFreeSlotByAttendantId(Guid attendantId)
+    {
+        var parkingZone = context.ParkingZoneAttendants.Include(parkingZoneAttendant => parkingZoneAttendant.ParkingZone).FirstOrDefault(pza => pza.Id == attendantId)?.ParkingZone;
+        if (parkingZone != null)
+        {
+            var bookedslot = context.ParkingTransactions
+                    .Where(p => p.ParkingZoneId == parkingZone.Id
+                                && p.CheckinAt <= DateTime.Now
+                                && p.CheckoutAt >= DateTime.Now
+                                && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED ||
+                                    p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
+                                && (!p.ParkingTransactionDetails.Any()
+                                    || p.ParkingTransactionDetails.OrderByDescending(pt => pt.CreatedAt).First().To >=
+                                    DateTime.Now
+                                ))
+                    .Count();
+            return $"{parkingZone.Slots - bookedslot}/{parkingZone.Slots}";
+        }
+        else
+        {
+            return ResponseNotification.NO_DATA;
+        }
     }
 
     //public ParkingZone? GetAdminOverview(Guid id)

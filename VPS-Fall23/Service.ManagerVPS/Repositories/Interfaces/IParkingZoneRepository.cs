@@ -37,4 +37,5 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
     ParkingZone? GetParkingZoneAndAbsentById(Guid parkingZoneId);
 
     IEnumerable<ParkingZone>? GetParkingZoneByArrayParkingZoneId(Guid[]? parkingZoneIds);
+    string GetFreeSlotByAttendantId(Guid attendantId);
 }

@@ -14,7 +14,8 @@ public class GeneralVPS : IGeneralVPS
         using (var client = new SmtpClient("smtp.gmail.com", 587))
         {
             client.EnableSsl = true;
-            client.Credentials = new NetworkCredential(config["EmailSetting:Email"], config["EmailSetting:Password"]);
+            client.Credentials = new NetworkCredential(config["EmailSetting:Email"],
+                config["EmailSetting:Password"]);
 
             var message = new MailMessage
             {
@@ -43,14 +44,16 @@ public class GeneralVPS : IGeneralVPS
         }
     }
 
-    public async Task<bool> SendListEmailAsync(IEnumerable<string> recipients, string subject, string body)
+    public async Task<bool> SendListEmailAsync(IEnumerable<string> recipients, string subject,
+        string body)
     {
         try
         {
             var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             using var client = new SmtpClient("smtp.gmail.com", 587);
             client.EnableSsl = true;
-            client.Credentials = new NetworkCredential(config["EmailSetting:Email"], config["EmailSetting:Password"]);
+            client.Credentials = new NetworkCredential(config["EmailSetting:Email"],
+                config["EmailSetting:Password"]);
 
             var message = new MailMessage
             {
@@ -91,6 +94,16 @@ public class GeneralVPS : IGeneralVPS
         var filePath = Path.Combine(Directory.GetCurrentDirectory(),
             "Constants", "FileHtml", fileName);
         var htmlContent = File.ReadAllText(filePath);
-        return keyValues.Aggregate(htmlContent, (current, keyValue) => current.Replace(keyValue.Key, keyValue.Value));
+        return keyValues.Aggregate(htmlContent,
+            (current, keyValue) => current.Replace(keyValue.Key, keyValue.Value));
+    }
+
+    public string CreateTemplateEmail(IEnumerable<KeyValue> keyValues, string fileName)
+    {
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+            "Constants", "FileHtml", fileName);
+        var htmlContent = File.ReadAllText(filePath);
+        return keyValues.Aggregate(htmlContent,
+            (current, keyValue) => current.Replace(keyValue.Key, keyValue.Value));
     }
 }

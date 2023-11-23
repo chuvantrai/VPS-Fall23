@@ -1,5 +1,6 @@
 ﻿using Service.ManagerVPS.Constants.FileManagement;
 using Google.Cloud.Vision.V1;
+using Service.ManagerVPS.DTO.Exceptions;
 
 namespace Service.ManagerVPS.ExternalClients
 {
@@ -14,18 +15,22 @@ namespace Service.ManagerVPS.ExternalClients
 
         public async Task<string> GetLicensePlateFromImage(Google.Cloud.Vision.V1.Image image)
         {
-            string licensePlate = String.Empty;
-            string GoogleAppCredentials = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constant.GOOGLEAPPCREDENTIALS);
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", GoogleAppCredentials);
-            var client = ImageAnnotatorClient.Create();
-            var response = await client.DetectTextAsync(image);
-
-            if (response[0].Description != null)
+            try
             {
-                licensePlate = string.Join("", response[0].Description.Split(new string[] { "\n", "." }, StringSplitOptions.None));
-            }
+                string licensePlate = String.Empty;
+                string GoogleAppCredentials = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, Constant.GOOGLEAPPCREDENTIALS);
+                Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", GoogleAppCredentials);
+                var client = ImageAnnotatorClient.Create();
+                var response = await client.DetectTextAsync(image);
 
-            return licensePlate;
+                if (!String.IsNullOrEmpty(response[0].Description) || response != null)
+                {
+                    licensePlate = string.Join("", response[0].Description.Split(new string[] { "\n", "." }, StringSplitOptions.None));
+                }
+
+                return new string(licensePlate.Where(c => Char.IsLetterOrDigit(c)).ToArray());
+            }
+            catch { throw new ClientException(3000); }
         }
     }
 }

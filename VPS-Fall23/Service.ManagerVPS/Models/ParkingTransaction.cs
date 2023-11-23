@@ -22,6 +22,7 @@ namespace Service.ManagerVPS.Models
         public int? StatusId { get; set; }
         public string Email { get; set; } = null!;
         public string Phone { get; set; } = null!;
+        public string? PromoCode { get; set; }
 
         public virtual Account? CheckinByNavigation { get; set; }
         public virtual Account? CheckoutByNavigation { get; set; }
