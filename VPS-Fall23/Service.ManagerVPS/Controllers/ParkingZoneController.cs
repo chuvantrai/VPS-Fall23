@@ -8,6 +8,7 @@ using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.FileManagement;
+using Service.ManagerVPS.DTO.GoongMap;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
@@ -26,12 +27,13 @@ public class ParkingZoneController : VpsController<ParkingZone>
     private readonly IContractRepository _contractRepository;
     readonly IParkingTransactionRepository parkingTransactionRepository;
     private readonly IParkingZoneAbsentRepository _absentRepository;
-
+    readonly ParkingZoneConfig parkingZoneConfig;
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
         IContractRepository contractRepository,
         IParkingTransactionRepository parkingTransactionRepository,
-        IParkingZoneAbsentRepository absentRepository)
+        IParkingZoneAbsentRepository absentRepository,
+        IOptions<ParkingZoneConfig> pzConfigOption)
         : base(parkingZoneRepository)
     {
         _config = config;
@@ -39,6 +41,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         _contractRepository = contractRepository;
         this.parkingTransactionRepository = parkingTransactionRepository;
         _absentRepository = absentRepository;
+        this.parkingZoneConfig = pzConfigOption.Value;
     }
 
     [HttpPost]
@@ -59,7 +62,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
             Slots = input.Slots,
             WorkFrom = (TimeSpan)input.WorkFrom!,
             WorkTo = (TimeSpan)input.WorkTo!,
-            IsFull = false
+            IsFull = false,
+            Location = input.Location.GetTopologyPoint()
         };
 
         var fileManager =
@@ -244,8 +248,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 PriceOverTimePerHour =
                     string.Format(new CultureInfo("vi-VN"), "{0:C}", item.PriceOverTimePerHour),
                 Slots = item.Slots,
-                Lat = item.Lat,
-                Lng = item.Lng,
+/*                Lat = item.Lat,
+                Lng = item.Lng,*/
                 ParkingZoneImages = itemImgs
             });
         }
@@ -410,8 +414,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
             parkingZone.PricePerHour,
             parkingZone.PriceOverTimePerHour,
             parkingZone.Slots,
-            parkingZone.Lat,
-            parkingZone.Lng,
+/*            parkingZone.Lat,
+            parkingZone.Lng,*/
             parkingZone.WorkFrom,
             parkingZone.WorkTo,
             parkingZone.IsFull,
@@ -520,6 +524,13 @@ public class ParkingZoneController : VpsController<ParkingZone>
             AddressType.City => ((IParkingZoneRepository)vpsRepository).GetByCityId(id),
             _ => throw new ClientException(1002)
         };
+    }
+    [HttpGet]
+    public IEnumerable<ParkingZone> GetNearAround([FromQuery] Position position)
+    {
+
+        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneNearAround(position, parkingZoneConfig.RadiusFindNearAround);
+
     }
 
     [HttpGet("{parkingZoneId}")]

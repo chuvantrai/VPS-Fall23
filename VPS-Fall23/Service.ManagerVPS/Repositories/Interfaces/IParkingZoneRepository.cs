@@ -1,4 +1,5 @@
-﻿using Service.ManagerVPS.DTO.OtherModels;
+﻿using Service.ManagerVPS.DTO.GoongMap;
+using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
 
@@ -36,4 +37,5 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
     ParkingZone? GetParkingZoneAndAbsentById(Guid parkingZoneId);
 
     IEnumerable<ParkingZone>? GetParkingZoneByArrayParkingZoneId(Guid[]? parkingZoneIds);
+    IEnumerable<ParkingZone> GetParkingZoneNearAround(Position position, int radiusFindNearAround = 5);
 }

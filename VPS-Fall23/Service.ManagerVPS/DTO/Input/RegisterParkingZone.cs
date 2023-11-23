@@ -33,4 +33,6 @@ public class RegisterParkingZone
     
     [Required]
     public IFormFileCollection ParkingZoneImages { get; set; } = null!;
+    [Required]
+    public DTO.GoongMap.Position Location { get; set; } = null!;
 }

@@ -1,6 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
+using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.DTO.Exceptions;
+using Service.ManagerVPS.DTO.GoongMap;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
+using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -163,6 +168,22 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
             .Where(p => parkingZoneIds.Contains(p.Id) && p.IsApprove == true);
+    }
+
+    public IEnumerable<ParkingZone> GetParkingZoneNearAround(DTO.GoongMap.Position position, int radiusFindNearAround = 5)
+    {
+        Point point = position.GetTopologyPoint();
+        return entities
+            .Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(pz => pz.Location.Distance(point) <= radiusFindNearAround && pz.IsFull == false
+                        && pz.IsApprove == true
+                        && !pz.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now)).AsEnumerable();
+
+
     }
 
     //public ParkingZone? GetAdminOverview(Guid id)

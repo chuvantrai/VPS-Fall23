@@ -3,7 +3,7 @@ import useParkingZoneService from '@/services/parkingZoneService.js';
 import { ReloadOutlined } from '@ant-design/icons';
 import { Button, Descriptions, Divider, Space, Tag } from 'antd';
 import { useEffect, useState } from 'react';
-const Detail = ({ parkingZone }) => {
+const Information = ({ parkingZone }) => {
     const onGetFreeSlot = (parkingZoneId) => {
         parkingZoneService.getBookedSlot(parkingZoneId).then(res => setFreeSlots(parkingZone.slots - res.data));
     };
@@ -71,4 +71,4 @@ const Detail = ({ parkingZone }) => {
         column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }}
     />)
 }
-export default Detail
+export default Information

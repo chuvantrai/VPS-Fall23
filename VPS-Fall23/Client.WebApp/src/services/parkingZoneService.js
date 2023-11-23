@@ -162,7 +162,14 @@ const useParkingZoneService = () => {
   const GetParkingZonesByParkingZoneIds = (parkingZoneIds) => {
     return axios.post(`${BASE_URI}/GetDataParkingZoneByParkingZoneIds`, parkingZoneIds);
   };
-
+  const getParkingZoneNearAround = ({ lat, lng }) => {
+    return axios.get(`${BASE_URI}/GetNearAround`, {
+      params: {
+        lat: lat,
+        lng: lng
+      }
+    })
+  }
   return {
     getByAddress,
     register,
@@ -180,6 +187,7 @@ const useParkingZoneService = () => {
     closeParkingZone,
     GetParkingZonesByParkingZoneIds,
     getApprovedParkingZoneByOwnerId,
+    getParkingZoneNearAround
   };
 };
 

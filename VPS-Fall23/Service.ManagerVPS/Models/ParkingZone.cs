@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NetTopologySuite.Geometries;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Service.ManagerVPS.Models
 {
@@ -16,6 +18,7 @@ namespace Service.ManagerVPS.Models
         }
 
         public Guid Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SubId { get; set; }
         public Guid CommuneId { get; set; }
         public string Name { get; set; } = null!;
@@ -28,10 +31,9 @@ namespace Service.ManagerVPS.Models
         public bool? IsApprove { get; set; }
         public string? RejectReason { get; set; }
         public int? Slots { get; set; }
-        public decimal? Lat { get; set; }
-        public decimal? Lng { get; set; }
         public TimeSpan WorkFrom { get; set; }
         public TimeSpan WorkTo { get; set; }
+        public Point Location { get; set; }
         public bool? IsFull { get; set; }
 
         public virtual Commune Commune { get; set; } = null!;

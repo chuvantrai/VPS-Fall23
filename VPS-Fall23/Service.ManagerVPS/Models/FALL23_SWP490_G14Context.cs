@@ -45,7 +45,8 @@ namespace Service.ManagerVPS.Models
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https: //go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer(
-                    "server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!; TrustServerCertificate = True");
+                    "server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!; TrustServerCertificate = True",
+                    op => op.UseNetTopologySuite());
             }
         }
 
@@ -568,14 +569,6 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("is_full")
                     .HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.Lat)
-                    .HasColumnType("decimal(18, 10)")
-                    .HasColumnName("lat");
-
-                entity.Property(e => e.Lng)
-                    .HasColumnType("decimal(18, 10)")
-                    .HasColumnName("lng");
-
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
@@ -613,6 +606,10 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.WorkTo)
                     .HasColumnName("work_to")
                     .HasDefaultValueSql("('23:00:00')");
+
+                entity.Property(e => e.Location)
+                .HasColumnName("location")
+                .HasColumnType("geometry");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
