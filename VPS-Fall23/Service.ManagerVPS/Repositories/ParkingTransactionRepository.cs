@@ -15,6 +15,11 @@ namespace Service.ManagerVPS.Repositories
         {
         }
 
+        public async Task<List<ParkingTransaction>> GetAll()
+        {
+            return await this.entities.ToListAsync();
+        }
+
         public async Task<int> GetBookedSlot(Guid parkingZoneId)
         {
             return await GetBookedSlot(parkingZoneId, DateTime.Now);
@@ -35,7 +40,7 @@ namespace Service.ManagerVPS.Repositories
                 .CountAsync();
         }
 
-        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, Guid ownerId,DateTime? checkAt)
+        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, Guid ownerId, DateTime? checkAt)
         {
             if (!checkAt.HasValue)
             {

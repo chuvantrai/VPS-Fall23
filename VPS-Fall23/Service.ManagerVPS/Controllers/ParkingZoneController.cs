@@ -26,12 +26,14 @@ public class ParkingZoneController : VpsController<ParkingZone>
     private readonly FileManagementConfig _fileManagementConfig;
     private readonly IContractRepository _contractRepository;
     readonly IParkingTransactionRepository parkingTransactionRepository;
+    readonly IUserRepository userRepository;
     private readonly IParkingZoneAbsentRepository _absentRepository;
 
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
         IContractRepository contractRepository,
         IParkingTransactionRepository parkingTransactionRepository,
+        IUserRepository userRepository,
         IParkingZoneAbsentRepository absentRepository)
         : base(parkingZoneRepository)
     {
@@ -39,6 +41,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         _fileManagementConfig = options.Value;
         _contractRepository = contractRepository;
         this.parkingTransactionRepository = parkingTransactionRepository;
+        this.userRepository = userRepository;
         _absentRepository = absentRepository;
     }
 
@@ -265,13 +268,91 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return Ok(metadata);
     }
 
-    [HttpPut]
-    [FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
+    [HttpGet]
+    //[FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
     public async Task<IActionResult> GetAdminOverview()
     {
-        
+        var now = DateTime.Now;
+        var list = await parkingTransactionRepository.GetAll();
 
-        return Ok(ResponseNotification.UPDATE_SUCCESS);
+        var customerList = list.GroupBy(x => x.Phone).Select(group => group.Key).ToList();
+        var phonesWithTransactionsThisMonth = list.Where(t => t.CreatedAt.Month == now.Month && t.CreatedAt.Year == now.Year)
+            .Select(x => x.Phone).Distinct().ToList();
+        var phonesWithFirstTimeTransactions = list.GroupBy(t => t.Phone)
+                                        .Where(group => group.Min(t => t.CreatedAt) == group.Min(t => t.CreatedAt)) // Find the earliest transaction for each phone number
+                                        .Select(group => group.Key)
+                                            .ToList();
+        var listOwner = userRepository.GetAllOwnerAccount();
+        var listParkingZone = await ((IParkingZoneRepository)vpsRepository).GetAllParkingZone();
+
+        DateTime currentDate = DateTime.Now;
+        DayOfWeek startOfWeek = DayOfWeek.Monday; // Define the start day of the week
+
+        DateTime startDate = currentDate.Date;
+        while (startDate.DayOfWeek != startOfWeek)
+        {
+            startDate = startDate.AddDays(-1);
+        }
+
+        DateTime endDate = startDate.AddDays(7).AddSeconds(-1);
+
+        var done = 0;
+        var notCheckIn = 0;
+        var notCheckout = 0;
+        foreach (var item in list)
+        {
+            if (item.CheckinBy != null && item.CheckoutBy != null)
+            {
+                done++;
+            }
+            if (item.CheckinBy != null && item.CheckoutBy == null)
+            {
+                notCheckout++;
+            }
+        }
+
+        var customerData = new
+        {
+            totalCustomer = list.Count,
+            oneHours = list.Where(x => x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneDay = list.Where(x => x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneWeek = list.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate).ToList().Count,
+            oneMonth = list.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneYear = list.Where(x => x.CreatedAt.Year == now.Year).ToList().Count,
+        };
+        var ownerData = new
+        {
+            totalOwner = listOwner.Count,
+            oneHours = listOwner.Where(x => x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneDay = listOwner.Where(x => x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneWeek = listOwner.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate).ToList().Count,
+            oneMonth = listOwner.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneYear = listOwner.Where(x => x.CreatedAt.Year == now.Year).ToList().Count,
+        };
+        var parkingZoneData = new
+        {
+            totalParkingZone = listParkingZone.Count,
+            oneHours = listParkingZone.Where(x => x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneDay = listParkingZone.Where(x => x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneWeek = listParkingZone.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate).ToList().Count,
+            oneMonth = listParkingZone.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneYear = listParkingZone.Where(x => x.CreatedAt.Year == now.Year).ToList().Count,
+        };
+
+        var data = new
+        {
+            customerTotal = customerList.Count,
+            customerData = customerData,
+            activeCustomer = phonesWithTransactionsThisMonth.Count,
+            newCustomer = phonesWithFirstTimeTransactions.Count,
+            ownerData = ownerData,
+            parkingZoneData = parkingZoneData,
+            done = done,
+            notCheckIn = list.Count() - notCheckout - done,
+            notCheckout = notCheckout,
+        };
+
+        return Ok(data);
     }
 
     [HttpPut]

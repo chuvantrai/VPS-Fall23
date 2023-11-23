@@ -162,15 +162,9 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
             parameters.PageSize);
     }
 
-    public int GetCustomerAccountAmount(Guid id)
+    public List<Account> GetAllOwnerAccount()
     {
-        return 1;
-        //var parkingZone = entities.Where(a => a.);
-
-        //var data = new
-        //{
-
-        //};
-        //return parkingZone;
+        var accounts = entities.Where(a => a.TypeId == 2).ToList();
+        return accounts;
     }
 }

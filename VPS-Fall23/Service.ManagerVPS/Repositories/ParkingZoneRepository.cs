@@ -12,6 +12,11 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
     }
 
+    public async Task<List<ParkingZone>> GetAllParkingZone()
+    {
+        return await entities.ToListAsync();
+    }
+    
     public PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters)
     {
         var parkingZone = entities.Include(o => o.Owner);

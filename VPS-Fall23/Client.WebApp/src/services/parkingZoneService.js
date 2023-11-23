@@ -163,6 +163,10 @@ const useParkingZoneService = () => {
     return axios.post(`${BASE_URI}/GetDataParkingZoneByParkingZoneIds`, parkingZoneIds);
   };
 
+  const getAdminOverview = () => {
+    return axios.get(`${BASE_URI}/GetAdminOverview`);
+  };
+
   return {
     getByAddress,
     register,
@@ -180,6 +184,7 @@ const useParkingZoneService = () => {
     closeParkingZone,
     GetParkingZonesByParkingZoneIds,
     getApprovedParkingZoneByOwnerId,
+    getAdminOverview,
   };
 };
 
