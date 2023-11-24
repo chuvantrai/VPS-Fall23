@@ -68,7 +68,7 @@ const useParkingZoneService = () => {
           message: res?.data,
         });
         setTimeout(() => {
-          navigate('/listParkingZone');
+          navigate('/list-parking-zone');
         }, 1000);
       })
       .catch((err) => {
@@ -170,6 +170,9 @@ const useParkingZoneService = () => {
       }
     })
   }
+  const updateParkingZoneAddress = (data) => {
+    return axios.patch(`${BASE_URI}/UpdateParkingZoneAddress`, data)
+  }
   return {
     getByAddress,
     register,
@@ -187,7 +190,8 @@ const useParkingZoneService = () => {
     closeParkingZone,
     GetParkingZonesByParkingZoneIds,
     getApprovedParkingZoneByOwnerId,
-    getParkingZoneNearAround
+    getParkingZoneNearAround,
+    updateParkingZoneAddress
   };
 };
 

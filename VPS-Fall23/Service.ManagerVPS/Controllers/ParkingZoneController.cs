@@ -51,7 +51,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         var newParkingZone = new ParkingZone
         {
             Id = Guid.NewGuid(),
-            CommuneId = (Guid)input.CommuneId!,
+            CommuneId = input.CommuneId,
             Name = input.Name,
             CreatedAt = DateTime.Now,
             ModifiedAt = DateTime.Now,
@@ -120,7 +120,9 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     Name = item.Name,
                     Owner = item.Owner.Email,
                     Created = item.CreatedAt,
-                    Status = item.IsApprove
+                    Status = item.IsApprove,
+                    Location = item.Location,
+                    DetailAddress = item.DetailAddress
                 });
             }
 
@@ -248,8 +250,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 PriceOverTimePerHour =
                     string.Format(new CultureInfo("vi-VN"), "{0:C}", item.PriceOverTimePerHour),
                 Slots = item.Slots,
-/*                Lat = item.Lat,
-                Lng = item.Lng,*/
+                /*                Lat = item.Lat,
+                                Lng = item.Lng,*/
                 ParkingZoneImages = itemImgs
             });
         }
@@ -414,8 +416,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
             parkingZone.PricePerHour,
             parkingZone.PriceOverTimePerHour,
             parkingZone.Slots,
-/*            parkingZone.Lat,
-            parkingZone.Lng,*/
+            /*            parkingZone.Lat,
+                        parkingZone.Lng,*/
             parkingZone.WorkFrom,
             parkingZone.WorkTo,
             parkingZone.IsFull,
@@ -424,7 +426,21 @@ public class ParkingZoneController : VpsController<ParkingZone>
         };
         return Ok(result);
     }
-
+    [HttpPatch()]
+    [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
+    public async Task<ParkingZone> UpdateParkingZoneAddress([FromBody] UpdateParkingZoneAddressInput updateParkingZoneAddressInput)
+    {
+        var parkingZone = ((IParkingZoneRepository)vpsRepository).GetParkingZoneById(updateParkingZoneAddressInput.ParkingZoneId) ?? throw new ServerException(2);
+        if (parkingZone.IsApprove == true)
+        {
+            throw new ServerException("Bãi đỗ xe đã xác thực. Không thể thay đổi thông tin!");
+        }
+        parkingZone.Location = updateParkingZoneAddressInput.Location.GetTopologyPoint();
+        parkingZone.DetailAddress = updateParkingZoneAddressInput.DetailAddress;
+        await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
+        await ((IParkingZoneRepository)vpsRepository).SaveChange();
+        return parkingZone;
+    }
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
     public async Task<IActionResult> UpdateParkingZone([FromForm] UpdateParkingZoneInput input)
@@ -447,8 +463,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
         parkingZone.Slots = (int)input.Slots!;
         parkingZone.WorkFrom = input.WorkFrom;
         parkingZone.WorkTo = input.WorkTo;
-        parkingZone.CommuneId = (Guid)input.CommuneId!;
-        parkingZone.DetailAddress = input.DetailAddress;
         parkingZone.IsApprove = null;
         parkingZone.ModifiedAt = DateTime.Now;
 

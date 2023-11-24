@@ -181,14 +181,14 @@ const RegisterParkingZone = () => {
       formData.append('pricePerHour', values.pricePerHour);
       formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
       formData.append('slots', values.slots);
-      formData.append('communeId', null);
       formData.append('detailAddress', selectedLocationDetail.formattedAddress);
       values.parkingZoneImages.forEach((item) => {
         formData.append('parkingZoneImages', item.originFileObj);
       });
       formData.append('workFrom', workingTime[0]);
       formData.append('workTo', workingTime[1]);
-      formData.append('location', selectedLocationDetail.geometry.position);
+      formData.append('location.lat', selectedLocationDetail.geometry.position.lat);
+      formData.append('location.lng', selectedLocationDetail.geometry.position.lng);
 
       parkingZoneService.register(formData);
     }

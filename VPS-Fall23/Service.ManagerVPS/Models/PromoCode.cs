@@ -18,6 +18,7 @@ namespace Service.ManagerVPS.Models
         public DateTime ModifiedAt { get; set; }
         public Guid OwnerId { get; set; }
         public int Discount { get; set; }
+        public int NumberOfUses { get; set; }
 
         public virtual ParkingZoneOwner Owner { get; set; } = null!;
         public virtual ICollection<PromoCodeParkingZone> PromoCodeParkingZones { get; set; }

@@ -24,8 +24,6 @@ public class RegisterParkingZone
 
     [Required]
     public int? Slots { get; set; }
-
-    [Required]
     public Guid? CommuneId { get; set; }
 
     [Required]

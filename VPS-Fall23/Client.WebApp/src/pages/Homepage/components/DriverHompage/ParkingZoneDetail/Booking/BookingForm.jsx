@@ -1,13 +1,11 @@
-import { Alert, Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag, Typography } from 'antd';
+import { Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import useParkingTransactionService from '@/services/parkingTransactionSerivce';
 import dayjs from 'dayjs';
 import useParkingZoneAbsentServices from '@/services/parkingZoneAbsentServices';
 import usePromoService from '@/services/promoService';
-import Search from 'antd/es/input/Search';
 import BookingDescription from './BookingDescription';
-const { Text } = Typography;
 const range = (start, end) => {
   const result = [];
   for (let i = start; i < end; i++) {

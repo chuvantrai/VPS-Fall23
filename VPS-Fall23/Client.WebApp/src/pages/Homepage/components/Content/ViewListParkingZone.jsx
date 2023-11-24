@@ -24,7 +24,7 @@ import {
   Popconfirm,
   notification,
 } from 'antd';
-import { FormOutlined, UploadOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { FormOutlined, UploadOutlined, QuestionCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
 import useParkingZoneService from '@/services/parkingZoneService';
 import { getAccountJwtModel } from '@/helpers';
@@ -32,6 +32,7 @@ import AddressCascader from '@/components/cascader/AddressCascader';
 import { useDebounce } from 'use-debounce';
 import CloseModalForm from './components/CloseModalForm';
 import { Link, Outlet } from 'react-router-dom';
+import ParkingZoneAddressModal from './ParkingZoneAddressModal';
 
 const onChange = (pagination, filters, sorter, extra) => {
   console.log('params', pagination, filters, sorter, extra);
@@ -48,11 +49,7 @@ function ViewListParkingZone() {
   const [checkedState, setCheckedState] = useState(false);
   const [parkingZoneDetail, setParkingZoneDetail] = useState({});
   const [fileList, setFileList] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [validateStatus, setValidateStatus] = useState('null');
-  const [help, setHelp] = useState('');
-  const [address, setAddress] = useState([]);
-  const [workingTime, setWorkingTime] = useState('');
+  const [workingTime, setWorkingTime] = useState([]);
   const [openCloseModal, setOpenCloseModal] = useState(false);
   const [parkingZoneId, setParkingZoneId] = useState('');
 
@@ -61,7 +58,6 @@ function ViewListParkingZone() {
       const data = res.data;
       setParkingZoneDetail(data);
       form.setFieldsValue({ ...data, workingTime: [dayjs(data.workFrom, 'HH:mm:ss'), dayjs(data.workTo, 'HH:mm:ss')] });
-      setAddress([data.city, data.district, data.commune]);
       setCheckedState(data.isFull);
 
       let files = [];
@@ -97,7 +93,7 @@ function ViewListParkingZone() {
     setIsModalViewOpen(false);
   };
 
-  const [data, setData] = useState([{ key: '', id: '', name: '', owner: '', status: 'null', created: Date }]);
+  const [data, setData] = useState([{ key: '', id: '', name: '', owner: '', status: 'null', created: Date, location: null }]);
 
   const [inputValue, setInputValue] = useState('');
 
@@ -112,17 +108,17 @@ function ViewListParkingZone() {
     searchDataByName(e);
     setInputValue(e);
   };
-
+  const [detailInfo, setDetailInfo] = useState({ isShow: false, parkingZone: null });
+  useEffect(() => {
+    return () => {
+      setDetailInfo({ isShow: false, parkingZone: null })
+    }
+  }, [])
   const columns = [
     {
       title: 'Tên bãi đỗ xe',
       dataIndex: 'name',
       key: 'name',
-      render: (val) => (
-        <Fragment>
-          <Link to={`/${val}`}>{val}</Link>
-        </Fragment>
-      ),
     },
     {
       title: 'Chủ bãi đỗ xe',
@@ -162,15 +158,23 @@ function ViewListParkingZone() {
       title: '',
       key: 'action',
       render: (_, record) => (
+
         <Space split={<Divider type="vertical" />}>
-          <a
+          <Button
             onClick={(e) => {
               e.preventDefault();
               handleGetParkingZoneDetail(record.key, record.status);
             }}
+            icon={<FormOutlined />}
           >
-            <FormOutlined />
-          </a>
+            Cập nhật thông tin
+          </Button>
+          <Button
+            icon={<EnvironmentOutlined />}
+            onClick={() => { console.log(record); setDetailInfo({ isShow: true, parkingZone: record }) }}
+          >
+            Cập nhật địa chỉ
+          </Button>
 
           {record.status === true ?
             <Popconfirm
@@ -232,6 +236,8 @@ function ViewListParkingZone() {
             owner: val.owner,
             status: val.status,
             created: val.created,
+            location: val.location,
+            detailAddress: val.detailAddress
           }));
           setData(obj);
           setTotalItems(res?.data.totalCount);
@@ -253,6 +259,8 @@ function ViewListParkingZone() {
             owner: val.owner,
             status: val.status,
             created: val.created,
+            location: val.location,
+            detailAddress: val.detailAddress
           }));
           setData(obj);
           console.log(obj);
@@ -342,16 +350,6 @@ function ViewListParkingZone() {
     },
   ];
 
-  const addressCascaderProps = {
-    style: { width: '100%' },
-    placeholder: 'Chọn địa chỉ',
-  };
-
-  const onCascaderChange = useCallback((value, selectedOptions) => {
-    setSelectedAddress(selectedOptions ? selectedOptions[selectedOptions.length - 1] : null);
-    setValidateStatus('');
-    setHelp('');
-  }, []);
 
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
@@ -369,39 +367,32 @@ function ViewListParkingZone() {
   };
 
   const handleSubmitForm = (values) => {
-    if (!selectedAddress) {
-      setValidateStatus('error');
-      setHelp('Vui lòng chọn địa chỉ của bãi đỗ xe');
-    } else {
-      values = { ...values, parkingZoneImages: fileList, communeId: selectedAddress?.id };
 
-      const formData = new FormData();
-      formData.append('parkingZoneId', values.id);
-      formData.append('parkingZoneName', values.name);
-      formData.append('pricePerHour', values.pricePerHour);
-      formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
-      formData.append('slots', values.slots);
-      formData.append('workFrom', workingTime[0]);
-      formData.append('workTo', workingTime[1]);
-      formData.append('communeId', values.communeId);
-      formData.append('detailAddress', values.detailAddress);
-      values.parkingZoneImages.forEach((item) => {
-        formData.append('parkingZoneImages', item.originFileObj);
-      });
+    values = { ...values, parkingZoneImages: fileList };
 
-      // parkingZoneService.updateParkingZone(formData);
-      // console.log(values);
-      console.log('parkingZoneId: ' + formData.get('parkingZoneId'));
-      console.log('parkingZoneName: ' + formData.get('parkingZoneName'));
-      console.log('pricePerHour: ' + formData.get('pricePerHour'));
-      console.log('priceOverTimePerHour: ' + formData.get('priceOverTimePerHour'));
-      console.log('slots: ' + formData.get('slots'));
-      console.log('workFrom: ' + formData.get('workFrom'));
-      console.log('workTo' + formData.get('workTo'));
-      console.log('communeId: ' + formData.get('communeId'));
-      console.log('detailAddress: ' + formData.get('detailAddress'));
-      console.log('parkingZoneImages: ' + formData.get('parkingZoneImages'));
-    }
+    const formData = new FormData();
+    formData.append('parkingZoneId', values.id);
+    formData.append('parkingZoneName', values.name);
+    formData.append('pricePerHour', values.pricePerHour);
+    formData.append('priceOverTimePerHour', values.priceOverTimePerHour);
+    formData.append('slots', values.slots);
+    formData.append('workFrom', workingTime[0]);
+    formData.append('workTo', workingTime[1]);
+    values.parkingZoneImages.forEach((item) => {
+      formData.append('parkingZoneImages', item.originFileObj);
+    });
+
+    parkingZoneService.updateParkingZone(formData);
+    // console.log(values);
+    console.log('parkingZoneId: ' + formData.get('parkingZoneId'));
+    console.log('parkingZoneName: ' + formData.get('parkingZoneName'));
+    console.log('pricePerHour: ' + formData.get('pricePerHour'));
+    console.log('priceOverTimePerHour: ' + formData.get('priceOverTimePerHour'));
+    console.log('slots: ' + formData.get('slots'));
+    console.log('workFrom: ' + formData.get('workFrom'));
+    console.log('workTo' + formData.get('workTo'));
+    console.log('parkingZoneImages: ' + formData.get('parkingZoneImages'));
+
   };
 
   const handleSubmitCloseParkingZoneForm = (values) => {
@@ -423,7 +414,17 @@ function ViewListParkingZone() {
     parkingZoneService.closeParkingZone(input);
     setOpenCloseModal(false);
   };
+  const tablePagination = {
+    current: currentPage,
+    onChange: handleChangePage,
+    total: totalItems,
+    showSizeChanger: false,
+  }
 
+
+  const onAddressModalClose = useCallback(() => {
+    setDetailInfo({ isShow: false, parkingZone: null })
+  }, [])
   return (
     <Fragment>
       <Outlet></Outlet>
@@ -431,15 +432,12 @@ function ViewListParkingZone() {
         <AutoComplete style={{ width: 200 }} onSearch={handleSearch} placeholder="Tìm kiếm" className="mt-4 mb-4" />
         {data != undefined && (
           <Fragment>
-            <Table columns={columns} dataSource={data} onChange={onChange} pagination={false} />
-            <div className="py-[16px] flex flex-row-reverse pr-[24px]">
-              <Pagination
-                current={currentPage}
-                onChange={handleChangePage}
-                total={totalItems}
-                showSizeChanger={false}
-              />
-            </div>
+            <Table
+              columns={columns}
+              dataSource={data}
+              onChange={onChange}
+              pagination={tablePagination}
+            />
           </Fragment>
         )}
       </div>
@@ -536,41 +534,6 @@ function ViewListParkingZone() {
             <TimePicker.RangePicker className="w-[100%]" onChange={handelChangeTime} />
           </Form.Item>
           <Form.Item
-            name="communeId"
-            label="Địa chỉ"
-            validateStatus={validateStatus}
-            help={help}
-            rules={[
-              {
-                required: true,
-                message: 'Không thể để trống',
-              },
-            ]}
-          >
-            <AddressCascader
-              cascaderProps={addressCascaderProps}
-              onCascaderChangeCallback={onCascaderChange}
-              defaultAddress={address}
-            />
-          </Form.Item>
-          <Form.Item
-            name="detailAddress"
-            label="Địa chỉ cụ thể"
-            rules={[
-              {
-                required: true,
-                message: 'Không thể để trống',
-              },
-            ]}
-          >
-            <Input.TextArea
-              placeholder="Địa chỉ cụ thể"
-              style={{
-                height: '76px',
-              }}
-            />
-          </Form.Item>
-          <Form.Item
             name="parkingZoneImages"
             label="Ảnh bãi đỗ xe"
             rules={[
@@ -624,7 +587,12 @@ function ViewListParkingZone() {
         </Image.PreviewGroup>
         <Descriptions bordered items={descItems} column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }} />
       </Modal>
-
+      {detailInfo.parkingZone &&
+        <ParkingZoneAddressModal
+          isShow={detailInfo.isShow}
+          parkingZone={detailInfo.parkingZone}
+          onCloseCallback={onAddressModalClose}
+        />}
       <CloseModalForm
         open={openCloseModal}
         parkingZoneId={parkingZoneId}
