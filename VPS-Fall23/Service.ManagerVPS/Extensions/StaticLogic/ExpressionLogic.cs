@@ -9,7 +9,7 @@ namespace Service.ManagerVPS.Extensions.StaticLogic;
 
 public static class ExpressionLogic
 {
-    public static Expression And<T>(this Expression<Func<T, bool>> a, Expression<Func<T, bool>> b)
+    public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> a, Expression<Func<T, bool>> b)
     {
         var p = a.Parameters[0];
 

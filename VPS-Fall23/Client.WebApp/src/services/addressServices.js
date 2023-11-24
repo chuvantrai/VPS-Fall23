@@ -1,5 +1,4 @@
 import { useAxios } from '@/hooks';
-import { useCallback } from 'react';
 
 
 const CITY_URI = "api/City"
@@ -34,8 +33,25 @@ const useAddressServices = () => {
         if (cityId) districtUri += `/GetByCity/${cityId}`
         return axios.get(districtUri)
     }
+
+    const getAddressManager = (pageNumber = 1, pageSize = 10, cityFilter, districtFilter, textSearch) => {
+        let addressManager = COMMUNE_URI + `/GetAddressListParkingZone?`;
+        addressManager += `pageNumber=${pageNumber}`;
+        addressManager += `&pageSize=${pageSize}`;
+        if (textSearch !== '') {
+            addressManager += `&textAddress=${textSearch}`;
+        }
+        if (cityFilter !== undefined) {
+            addressManager += `&cityFilter=${cityFilter}`;
+        }
+        if (districtFilter !== undefined) {
+            addressManager += `&districtFilter=${districtFilter}`;
+        }
+        return axios.get(addressManager);
+    };
+
     return {
-        getCities, getCommunes, getDistricts, getDistrictById, getCommuneById
+        getCities, getCommunes, getDistricts, getDistrictById, getCommuneById, getAddressManager
     }
 
 }

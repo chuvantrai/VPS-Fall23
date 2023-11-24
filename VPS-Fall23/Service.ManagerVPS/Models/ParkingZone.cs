@@ -17,7 +17,7 @@ namespace Service.ManagerVPS.Models
 
         public Guid Id { get; set; }
         public int SubId { get; set; }
-        public Guid CommuneId { get; set; }
+        public Guid? CommuneId { get; set; }
         public string Name { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAt { get; set; }
@@ -28,13 +28,13 @@ namespace Service.ManagerVPS.Models
         public bool? IsApprove { get; set; }
         public string? RejectReason { get; set; }
         public int? Slots { get; set; }
-        public decimal? Lat { get; set; }
-        public decimal? Lng { get; set; }
         public TimeSpan WorkFrom { get; set; }
         public TimeSpan WorkTo { get; set; }
         public bool? IsFull { get; set; }
+        public decimal? Lat { get; set; }
+        public decimal? Lng { get; set; }
 
-        public virtual Commune Commune { get; set; } = null!;
+        public virtual Commune? Commune { get; set; }
         public virtual ParkingZoneOwner Owner { get; set; } = null!;
         public virtual ICollection<Contract> Contracts { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }

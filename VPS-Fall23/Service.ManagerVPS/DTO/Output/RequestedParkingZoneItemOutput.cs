@@ -6,7 +6,7 @@ public class RequestedParkingZoneItemOutput
 
     public int Key { get; set; }
 
-    public Guid CommuneId { get; set; }
+    public Guid? CommuneId { get; set; }
 
     public string Name { get; set; } = null!;
 

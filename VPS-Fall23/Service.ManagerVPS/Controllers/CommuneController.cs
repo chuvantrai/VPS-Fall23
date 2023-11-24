@@ -17,7 +17,7 @@ namespace Service.ManagerVPS.Controllers
         {
             return await ((ICommuneRepository)this.vpsRepository).GetByDistrict(districtId);
         }
-        
+
         [HttpGet("GetAddressListParkingZone")]
         public async Task<IActionResult> GetAddressListParkingZone([FromQuery] GetAddressListParkingZoneRequest request)
         {
@@ -28,15 +28,19 @@ namespace Service.ManagerVPS.Controllers
             {
                 ListAddress = dataGetListDistrict.Item1.Select(x => new
                 {
-                    CommuneId = x.Id,
+                    
                     CityCode = x.District.City.Code,
                     CityId = x.District.City.Id,
                     CityName = x.District.City.Name,
                     DistrictCode = x.District.Code,
                     DistrictId = x.District.Id,
                     DistrictName = x.District.Name,
+                    CommuneCode = x.Code,
+                    CommuneId = x.Id,
+                    CommuneName = x.Name,
                     x.CreatedAt,
-                    x.ModifiedAt
+                    x.ModifiedAt,
+                    IsBlock = x.IsBlock ?? false
                 }).AsEnumerable(),
                 TotalPages = dataGetListDistrict.Item2
             });
