@@ -111,20 +111,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     ownerId);
             }
 
-            List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
-            foreach (ParkingZone item in list)
-            {
-                res.Add(new ParkingZoneItemOutput
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Owner = item.Owner.Email,
-                    Created = item.CreatedAt,
-                    Status = item.IsApprove,
-                    Location = item.Location,
-                    DetailAddress = item.DetailAddress
-                });
-            }
+
 
             var metadata = new
             {
@@ -134,7 +121,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 list.TotalPages,
                 list.HasNext,
                 list.HasPrev,
-                Data = res
+                Data = list
             };
             return Ok(metadata);
         }
@@ -164,17 +151,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     name, ownerId);
             }
 
-            foreach (ParkingZone item in list)
-            {
-                res.Add(new ParkingZoneItemOutput
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Owner = item.Owner.Email,
-                    Created = item.CreatedAt,
-                    Status = item.IsApprove
-                });
-            }
 
             var metadata = new
             {
@@ -184,7 +160,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 list.TotalPages,
                 list.HasNext,
                 list.HasPrev,
-                Data = res
+                Data = list
             };
             return Ok(metadata);
         }
@@ -437,6 +413,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         }
         parkingZone.Location = updateParkingZoneAddressInput.Location.GetTopologyPoint();
         parkingZone.DetailAddress = updateParkingZoneAddressInput.DetailAddress;
+        parkingZone.IsApprove = null;
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
         return parkingZone;

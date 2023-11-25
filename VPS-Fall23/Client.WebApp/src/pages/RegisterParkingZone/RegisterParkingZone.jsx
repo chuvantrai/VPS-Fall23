@@ -291,8 +291,9 @@ const RegisterParkingZone = () => {
                   onPreview={handlePreview}
                   onChange={handleChange}
                   beforeUpload={() => false}
+                  maxCount={8}
                 >
-                  {fileList.length >= 8 ? null : uploadButton}
+                  {uploadButton}
                 </Upload>
               </div>
             </Form.Item>

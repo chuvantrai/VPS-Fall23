@@ -19,14 +19,14 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
 
     public PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters)
     {
-        var parkingZone = entities.Include(o => o.Owner);
+        var parkingZone = entities.Include(o => o.Owner).ThenInclude(o => o.IdNavigation);
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
             parameters.PageSize);
     }
 
     public PagedList<ParkingZone> GetOwnerParkingZone(QueryStringParameters parameters, Guid id)
     {
-        var parkingZone = entities.Include(o => o.Owner).Where(x => x.OwnerId == id);
+        var parkingZone = entities.Include(o => o.Owner).ThenInclude(o => o.IdNavigation).Where(x => x.OwnerId == id);
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
             parameters.PageSize);
     }

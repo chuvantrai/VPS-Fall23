@@ -8,6 +8,7 @@ namespace Service.ManagerVPS.DTO.Output
         public string? Name { get; set; }
         
         public string? Owner { get; set; }
+        public Models.ParkingZoneOwner? OwnerNavigation { get; set; }
         
         public DateTime? Created { get; set; }
 

@@ -123,12 +123,14 @@ const useParkingZoneService = () => {
         notification.success({
           message: res?.data,
         });
+        return Promise.resolve(res);
       })
       .catch((err) => {
         notification.error({
           message: 'Có lỗi xảy ra!',
           description: err.message,
         });
+        return Promise.reject(err)
       });
   };
 
@@ -156,6 +158,7 @@ const useParkingZoneService = () => {
       notification.success({
         message: res?.data,
       });
+      return Promise.resolve(res);
     });
   };
 
