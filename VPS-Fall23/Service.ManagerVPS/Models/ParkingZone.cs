@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
+using Service.ManagerVPS.Extensions.DbContext;
 
 namespace Service.ManagerVPS.Models
 {
-    public partial class ParkingZone
+    public partial class ParkingZone : ISoftDeleteEntity
     {
         public ParkingZone()
         {

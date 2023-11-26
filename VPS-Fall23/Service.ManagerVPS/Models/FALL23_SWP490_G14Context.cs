@@ -609,6 +609,10 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("work_to")
                     .HasDefaultValueSql("('23:00:00')");
 
+                entity.Property(e => e.IsDeleted)
+                    .HasColumnName("is_delete")
+                    .HasDefaultValueSql("((0))");
+
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
                     .HasForeignKey(d => d.CommuneId)
@@ -619,6 +623,9 @@ namespace Service.ManagerVPS.Models
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__parking_z__owner__0D7A0286");
+
+                entity.HasQueryFilter(p => !p.IsDeleted);
+
             });
 
             modelBuilder.Entity<ParkingZoneAbsent>(entity =>
