@@ -197,4 +197,17 @@ public class PromoCodeController : VpsController<PromoCode>
         await ((IPromoCodeRepository)vpsRepository).SaveChange();
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
+    [HttpGet("{promoCode}")]
+    public async Task<PromoCode> GetPromoCode(string promoCode, Guid parkingZoneId)
+    {
+        var promo = await ((IPromoCodeRepository)vpsRepository).GetByCode(promoCode, parkingZoneId);
+        if (promo == null) throw new ClientException(1006);
+        if (promo.FromDate > DateTime.Now
+            || promo.ToDate < DateTime.Now)
+        {
+            throw new ClientException(1007);
+        }
+
+        return promo;
+    }
 }

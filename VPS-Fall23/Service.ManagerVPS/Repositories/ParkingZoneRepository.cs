@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
+using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 
@@ -21,14 +23,14 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     
     public PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters)
     {
-        var parkingZone = entities.Include(o => o.Owner);
+        var parkingZone = entities.Include(o => o.Owner).ThenInclude(o => o.IdNavigation);
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
             parameters.PageSize);
     }
 
     public PagedList<ParkingZone> GetOwnerParkingZone(QueryStringParameters parameters, Guid id)
     {
-        var parkingZone = entities.Include(o => o.Owner).Where(x => x.OwnerId == id);
+        var parkingZone = entities.Include(o => o.Owner).ThenInclude(o => o.IdNavigation).Where(x => x.OwnerId == id);
         return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
             parameters.PageSize);
     }
@@ -170,6 +172,20 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
             .Where(p => parkingZoneIds.Contains(p.Id) && p.IsApprove == true);
+    }
+
+    public IEnumerable<ParkingZone> GetParkingZoneNearAround(DTO.GoongMap.Position position, int radiusFindNearAround = 5)
+    {
+        Point point = position.GetTopologyPoint();
+        return entities
+            .Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(pz => pz.Location.Distance(point) <= radiusFindNearAround && pz.IsFull == false
+                        && pz.IsApprove == true
+                        && !pz.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now)).AsEnumerable();
     }
 
     public string GetFreeSlotByAttendantId(Guid attendantId)

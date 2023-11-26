@@ -24,7 +24,7 @@ namespace Service.ManagerVPS.Controllers
         private readonly GoogleApiService _googleApiService;
         private readonly FileManagementConfig _fileManagementConfig;
         private readonly IConfiguration _configuration;
-
+        private readonly IPromoCodeRepository promoCodeRepository;
         public ParkingTransactionController(
             IParkingTransactionRepository parkingTransactionRepository,
             GoogleApiService googleApiService,
@@ -32,7 +32,8 @@ namespace Service.ManagerVPS.Controllers
             IOptions<VnPayConfig> vnPayConfig,
             IConfiguration configuration,
             IParkingZoneRepository parkingZoneRepository,
-            IPaymentTransactionRepository paymentTransaction)
+            IPaymentTransactionRepository paymentTransaction,
+            IPromoCodeRepository promoCodeRepository)
             : base(parkingTransactionRepository)
         {
             this.vnPayConfig = vnPayConfig.Value;
@@ -41,6 +42,7 @@ namespace Service.ManagerVPS.Controllers
             _googleApiService = googleApiService;
             _fileManagementConfig = fileManagementConfig.Value;
             _configuration = configuration;
+            this.promoCodeRepository = promoCodeRepository;
         }
         [HttpPost]
         public async Task<ParkingTransaction> Booking(BookingSlot bookingSlot)
@@ -66,12 +68,13 @@ namespace Service.ManagerVPS.Controllers
                 Id = Guid.NewGuid(),
                 ParkingZoneId = bookingSlot.ParkingZoneId,
                 CreatedAt = DateTime.Now,
-                CheckinAt = bookingSlot.CheckinAt,
-                CheckoutAt = bookingSlot.CheckoutAt,
+                CheckinAt = bookingSlot.CheckinAt.ToLocalTime(),
+                CheckoutAt = bookingSlot.CheckoutAt.ToLocalTime(),
                 Email = bookingSlot.Email,
                 StatusId = (int)ParkingTransactionStatusEnum.BOOKED,
                 Phone = bookingSlot.Phone,
-                LicensePlate = bookingSlot.LicensePlate
+                LicensePlate = bookingSlot.LicensePlate,
+                PromoCode = bookingSlot.PromoCode,
             };
             parkingTransaction.Id = Guid.NewGuid();
             parkingTransaction.CreatedAt = DateTime.Now;
@@ -134,16 +137,20 @@ namespace Service.ManagerVPS.Controllers
         {
             ParkingTransaction transaction = await vpsRepository.Find(parkingTransactionId);
             _ = await parkingZoneRepository.Find(transaction.ParkingZoneId);
-            decimal totalMoney = (decimal)(transaction.CheckoutAt - transaction.CheckinAt).Value.TotalHours * transaction.ParkingZone.PricePerHour;
+            decimal totalMoney = (decimal)Math.Round((transaction.CheckoutAt - transaction.CheckinAt).Value.TotalHours) * transaction.ParkingZone.PricePerHour;
+            if (!string.IsNullOrEmpty(transaction.PromoCode))
+            {
+                var promoInfo = await promoCodeRepository.GetByCode(transaction.PromoCode, transaction.ParkingZoneId);
+                if (promoInfo != null)
+                {
+                    totalMoney -= totalMoney * promoInfo.Discount / 100;
+                }
+            }
+            totalMoney = decimal.Round(totalMoney, 2);
             string orderInfo = $"Thanh toan gui xe bien so {transaction.LicensePlate} tu {transaction.CheckinAt} den {transaction.CheckoutAt}";
             string url = new VNPayClient(vnPayConfig)
-                .InitRequestParams(GetIpAddress(),
-                out string txnRef)
-                .CreateRequestUrl(vnPayConfig.Url,
-                totalMoney,
-                vnPayConfig.ExpireMinutes,
-                out string secureHash,
-             orderInfo);
+                .InitRequestParams(GetIpAddress(), out string txnRef)
+                .CreateRequestUrl(vnPayConfig.Url, totalMoney, vnPayConfig.ExpireMinutes, out string secureHash, orderInfo);
             PaymentTransaction paymentTransaction = new()
             {
                 BookingId = parkingTransactionId,

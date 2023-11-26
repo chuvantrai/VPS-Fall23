@@ -14,7 +14,7 @@ function Header() {
         <Col md={8} sm={0} xs={0} className={cx('nav-left')}>
           <HeaderLeft></HeaderLeft>
         </Col>
-        <Col md={8} sm={24}>
+        <Col md={8} sm={24} style={{ textAlign: "center" }}>
           <HeaderCenter></HeaderCenter>
         </Col>
         <Col md={8} sm={24}>

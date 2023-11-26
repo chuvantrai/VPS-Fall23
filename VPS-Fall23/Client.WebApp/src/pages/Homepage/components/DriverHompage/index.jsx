@@ -1,74 +1,57 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import FoundedParkingZone from './FoundedParkingZone';
 import { useSelector } from 'react-redux';
-// eslint-disable-next-line no-undef
-const { Map } = await google.maps.importLibrary('maps');
-// eslint-disable-next-line no-undef
-const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
-let map;
 
+let map;
+let centerMarker;
 async function initMap(focusPosition) {
-  // The location of Uluru
-  const position = focusPosition;
-  // Request needed libraries.
-  //@ts-ignore
-  map = new Map(document.getElementById('map'), {
-    zoom: 12,
-    center: position,
-    mapId: 'DEMO_MAP_ID',
+  map = new goongjs.Map({
+    container: 'map', // container id
+    style: 'https://tiles.goong.io/assets/goong_map_web.json', // stylesheet location
+    center: focusPosition, // starting position [lng, lat]
+    zoom: 18
   });
+}
+const defaultSelectedLocation = {
+  geometry: {
+    position: {
+      lat: 20.98257,
+      lng: 105.844949
+    }
+  }
 }
 
 
 const DriverHompage = () => {
-  const [focusPosition, setFocusPosition] = useState({ lat: 20.98257, lng: 105.844949 });
-  const { listFounded } = useSelector((state) => state.parkingZone);
+  let { selectedLocation } = useSelector((state) => state.parkingZone);
+  const getLocation = () => {
+    if (!selectedLocation) {
+      selectedLocation = defaultSelectedLocation
+    }
+    return { lng: selectedLocation.geometry.position.lng, lat: selectedLocation.geometry.position.lat }
+  }
   useEffect(() => {
-    if (map) {
-      map.setCenter(focusPosition.lat, focusPosition.lng, map.getZoom());
-    } else initMap(focusPosition);
-    listFounded.map((parkingZone) => {
-      if (!parkingZone.lat || !parkingZone.lng) {
-        return;
-      }
-      const marker = new AdvancedMarkerElement({
-        map: map,
-        position: {
-          lat: parkingZone.lat,
-          lng: parkingZone.lng,
-        },
-        title: parkingZone.name,
-      });
-      // eslint-disable-next-line no-undef
-      new google.maps.InfoWindow({
-        content: parkingZone.name,
-        disableAutoPan: false,
-      });
-      marker.addListener('click', () => {
-        // setDetailFormInfo({ parkingZone: parkingZone, isShow: true });
-      });
-    });
-  }, [JSON.stringify(focusPosition)]);
-  useMemo(() => {
-    if (listFounded.length === 0) return;
-    setFocusPosition({ lat: listFounded[0].lat, lng: listFounded[0].lng });
-  }, [JSON.stringify(listFounded)]);
-  const viewOnThisMapCallback = (parkingZone) => {
-    const marker = new AdvancedMarkerElement({
-      map: map,
-      position: {
-        lat: parkingZone.lat,
-        lng: parkingZone.lng,
-      },
-      title: parkingZone.name,
-    });
-    // eslint-disable-next-line no-undef
-    const infoWindow = new google.maps.InfoWindow({
-      content: parkingZone.name,
-      disableAutoPan: false,
-    });
-    infoWindow.open(map, marker);
-  };
+    initMap(getLocation())
+    return () => {
+      map.remove()
+    }
+  }, [])
+  useEffect(() => {
+    const position = getLocation();
+    map.jumpTo({ zoom: map.getZoom(), center: position });
+    const popup = new goongjs.Popup()
+      .setLngLat(position)
+      .setHTML(`<h1>${selectedLocation.name}</h1>`)
+    centerMarker = new goongjs.Marker({ color: '#C70D0F' })
+      .setLngLat(position)
+      .setPopup(popup)
+      .addTo(map);
+    return (() => {
+      if (centerMarker) centerMarker.remove();
+    })
+
+  }, [JSON.stringify(selectedLocation)])
+
   return (
     <Fragment>
       <div
@@ -80,7 +63,7 @@ const DriverHompage = () => {
           height: '100%',
         }}
       ></div>
-      <FoundedParkingZone viewOnThisMapCallback={viewOnThisMapCallback}></FoundedParkingZone>
+      <FoundedParkingZone map={map}></FoundedParkingZone>
     </Fragment>
   );
 };

@@ -1,6 +1,6 @@
 import Header from '@/layouts/components/Header';
 import AccountProfile from '@/pages/AccountProfile/';
-import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
+import ViewListParkingZone from '@/pages/Homepage/components/Content/ListParkingZone';
 import RegisterParkingZone from '@/pages/RegisterParkingZone';
 import ListAttendant from '@/pages/ListAttendant';
 import ManagerLayout from '../layouts/ManagerLayout';

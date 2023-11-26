@@ -19,6 +19,8 @@ namespace Service.ManagerVPS.Models
         public int TypeId { get; set; }
         public Guid Id { get; set; }
         public string Username { get; set; } = null!;
+        [System.Text.Json.Serialization.JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public string Password { get; set; } = null!;
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;

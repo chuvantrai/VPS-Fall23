@@ -8,6 +8,7 @@ using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.FileManagement;
+using Service.ManagerVPS.DTO.GoongMap;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
@@ -27,13 +28,14 @@ public class ParkingZoneController : VpsController<ParkingZone>
     readonly IParkingTransactionRepository parkingTransactionRepository;
     readonly IUserRepository userRepository;
     private readonly IParkingZoneAbsentRepository _absentRepository;
-
+    readonly ParkingZoneConfig parkingZoneConfig;
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
         IContractRepository contractRepository,
         IParkingTransactionRepository parkingTransactionRepository,
         IUserRepository userRepository,
-        IParkingZoneAbsentRepository absentRepository)
+        IParkingZoneAbsentRepository absentRepository,
+        IOptions<ParkingZoneConfig> pzConfigOption)
         : base(parkingZoneRepository)
     {
         _config = config;
@@ -42,6 +44,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         this.parkingTransactionRepository = parkingTransactionRepository;
         this.userRepository = userRepository;
         _absentRepository = absentRepository;
+        this.parkingZoneConfig = pzConfigOption.Value;
     }
 
     [HttpPost]
@@ -51,7 +54,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         var newParkingZone = new ParkingZone
         {
             Id = Guid.NewGuid(),
-            CommuneId = (Guid)input.CommuneId!,
+            CommuneId = input.CommuneId,
             Name = input.Name,
             CreatedAt = DateTime.Now,
             ModifiedAt = DateTime.Now,
@@ -62,7 +65,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
             Slots = input.Slots,
             WorkFrom = (TimeSpan)input.WorkFrom!,
             WorkTo = (TimeSpan)input.WorkTo!,
-            IsFull = false
+            IsFull = false,
+            Location = input.Location.GetTopologyPoint()
         };
 
         var fileManager =
@@ -110,18 +114,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     ownerId);
             }
 
-            List<ParkingZoneItemOutput> res = new List<ParkingZoneItemOutput>();
-            foreach (ParkingZone item in list)
-            {
-                res.Add(new ParkingZoneItemOutput
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Owner = item.Owner.Email,
-                    Created = item.CreatedAt,
-                    Status = item.IsApprove
-                });
-            }
+
 
             var metadata = new
             {
@@ -131,7 +124,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 list.TotalPages,
                 list.HasNext,
                 list.HasPrev,
-                Data = res
+                Data = list
             };
             return Ok(metadata);
         }
@@ -161,17 +154,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     name, ownerId);
             }
 
-            foreach (ParkingZone item in list)
-            {
-                res.Add(new ParkingZoneItemOutput
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Owner = item.Owner.Email,
-                    Created = item.CreatedAt,
-                    Status = item.IsApprove
-                });
-            }
 
             var metadata = new
             {
@@ -181,7 +163,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 list.TotalPages,
                 list.HasNext,
                 list.HasPrev,
-                Data = res
+                Data = list
             };
             return Ok(metadata);
         }
@@ -247,8 +229,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 PriceOverTimePerHour =
                     string.Format(new CultureInfo("vi-VN"), "{0:C}", item.PriceOverTimePerHour),
                 Slots = item.Slots,
-                Lat = item.Lat,
-                Lng = item.Lng,
+                /*                Lat = item.Lat,
+                                Lng = item.Lng,*/
                 ParkingZoneImages = itemImgs
             });
         }
@@ -493,8 +475,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
             parkingZone.PricePerHour,
             parkingZone.PriceOverTimePerHour,
             parkingZone.Slots,
-            parkingZone.Lat,
-            parkingZone.Lng,
+            /*            parkingZone.Lat,
+                        parkingZone.Lng,*/
             parkingZone.WorkFrom,
             parkingZone.WorkTo,
             parkingZone.IsFull,
@@ -503,7 +485,22 @@ public class ParkingZoneController : VpsController<ParkingZone>
         };
         return Ok(result);
     }
-
+    [HttpPatch()]
+    [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
+    public async Task<ParkingZone> UpdateParkingZoneAddress([FromBody] UpdateParkingZoneAddressInput updateParkingZoneAddressInput)
+    {
+        var parkingZone = ((IParkingZoneRepository)vpsRepository).GetParkingZoneById(updateParkingZoneAddressInput.ParkingZoneId) ?? throw new ServerException(2);
+        if (parkingZone.IsApprove == true)
+        {
+            throw new ServerException("Bãi đỗ xe đã xác thực. Không thể thay đổi thông tin!");
+        }
+        parkingZone.Location = updateParkingZoneAddressInput.Location.GetTopologyPoint();
+        parkingZone.DetailAddress = updateParkingZoneAddressInput.DetailAddress;
+        parkingZone.IsApprove = null;
+        await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
+        await ((IParkingZoneRepository)vpsRepository).SaveChange();
+        return parkingZone;
+    }
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
     public async Task<IActionResult> UpdateParkingZone([FromForm] UpdateParkingZoneInput input)
@@ -526,8 +523,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
         parkingZone.Slots = (int)input.Slots!;
         parkingZone.WorkFrom = input.WorkFrom;
         parkingZone.WorkTo = input.WorkTo;
-        parkingZone.CommuneId = (Guid)input.CommuneId!;
-        parkingZone.DetailAddress = input.DetailAddress;
         parkingZone.IsApprove = null;
         parkingZone.ModifiedAt = DateTime.Now;
 
@@ -603,6 +598,13 @@ public class ParkingZoneController : VpsController<ParkingZone>
             AddressType.City => ((IParkingZoneRepository)vpsRepository).GetByCityId(id),
             _ => throw new ClientException(1002)
         };
+    }
+    [HttpGet]
+    public IEnumerable<ParkingZone> GetNearAround([FromQuery] Position position)
+    {
+
+        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneNearAround(position, parkingZoneConfig.RadiusFindNearAround);
+
     }
 
     [HttpGet("{parkingZoneId}")]

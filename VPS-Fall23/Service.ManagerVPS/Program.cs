@@ -41,11 +41,16 @@ builder.Services.AddOptions();
 builder.Services.Configure<FileManagementConfig>(
     builder.Configuration.GetSection("fileManagementAccessKey"));
 builder.Services.Configure<VnPayConfig>(builder.Configuration.GetSection("vnPay"));
+builder.Services.Configure<GoongMapConfig>(builder.Configuration.GetSection("GoongMap"));
+builder.Services.Configure<ParkingZoneConfig>(builder.Configuration.GetSection("parkingZone"));
 builder.Services.AddOptions();
 
 //Add DBContext
 builder.Services.AddDbContext<FALL23_SWP490_G14Context>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("ConStr")));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("ConStr"), options =>
+    {
+        options.UseNetTopologySuite();
+    }));
 
 //AddSingleton 
 builder.Services.AddSingleton<IGeneralVPS, GeneralVPS>();
@@ -88,9 +93,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
 // {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseHsts();
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseHsts();
 // }
 
 app.UseCors("CorsPolicy");

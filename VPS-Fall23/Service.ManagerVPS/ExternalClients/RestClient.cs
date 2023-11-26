@@ -7,14 +7,14 @@ namespace InvoiceApi.ExternalData
 {
     public class RestClient : HttpClient
     {
-        public RestClient(string baseApiUri)
+        public RestClient(string baseUrl)
         {
-            if (string.IsNullOrEmpty(baseApiUri))
+            if (string.IsNullOrEmpty(baseUrl))
             {
                 throw new ArgumentNullException();
             }
 
-            this.BaseAddress = new Uri(baseApiUri);
+            this.BaseAddress = new Uri(baseUrl);
             this.DefaultRequestHeaders.Accept.Clear();
             this.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));

@@ -11,10 +11,12 @@ public class PromoCodeRepository : VpsRepository<PromoCode>, IPromoCodeRepositor
     {
     }
 
-    public PagedList<PromoCode> GetListPromoCodeByOwnerId(Guid ownerId, QueryStringParameters parameters)
+    public PagedList<PromoCode> GetListPromoCodeByOwnerId(Guid ownerId,
+        QueryStringParameters parameters)
     {
         var promoCodeLst = entities.Where(x => x.OwnerId.Equals(ownerId));
-        return PagedList<PromoCode>.ToPagedList(promoCodeLst, parameters.PageNumber, parameters.PageSize);
+        return PagedList<PromoCode>.ToPagedList(promoCodeLst, parameters.PageNumber,
+            parameters.PageSize);
     }
 
     public PromoCode? GetPromoCodeDetailById(Guid id)
@@ -32,5 +34,9 @@ public class PromoCodeRepository : VpsRepository<PromoCode>, IPromoCodeRepositor
             .Include(x => x.PromoCodeParkingZones)
             .FirstOrDefault(x => x.Id.Equals(id));
         return promoCode;
+    }
+    public async Task<PromoCode?> GetByCode(string promoCode, Guid parkingZoneId)
+    {
+        return await entities.FirstOrDefaultAsync(p => promoCode.Equals(p.Code) && p.PromoCodeParkingZones.Any(pcpz => pcpz.ParkingZoneId == parkingZoneId));
     }
 }
