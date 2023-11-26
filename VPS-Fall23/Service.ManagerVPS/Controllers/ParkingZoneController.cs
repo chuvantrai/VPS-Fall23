@@ -29,6 +29,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     readonly IUserRepository userRepository;
     private readonly IParkingZoneAbsentRepository _absentRepository;
     readonly ParkingZoneConfig parkingZoneConfig;
+
     public ParkingZoneController(IParkingZoneRepository parkingZoneRepository,
         IConfiguration config, IOptions<FileManagementConfig> options,
         IContractRepository contractRepository,
@@ -113,7 +114,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 list = ((IParkingZoneRepository)vpsRepository).GetOwnerParkingZone(parameters,
                     ownerId);
             }
-
 
 
             var metadata = new
@@ -257,12 +257,15 @@ public class ParkingZoneController : VpsController<ParkingZone>
         var list = await parkingTransactionRepository.GetAll();
 
         var customerList = list.GroupBy(x => x.Phone).Select(group => group.Key).ToList();
-        var phonesWithTransactionsThisMonth = list.Where(t => t.CreatedAt.Month == now.Month && t.CreatedAt.Year == now.Year)
+        var phonesWithTransactionsThisMonth = list.Where(t =>
+                t.CreatedAt.Month == now.Month && t.CreatedAt.Year == now.Year)
             .Select(x => x.Phone).Distinct().ToList();
         var phonesWithFirstTimeTransactions = list.GroupBy(t => t.Phone)
-                                        .Where(group => group.Min(t => t.CreatedAt) == group.Min(t => t.CreatedAt)) // Find the earliest transaction for each phone number
-                                        .Select(group => group.Key)
-                                            .ToList();
+            .Where(group =>
+                group.Min(t => t.CreatedAt) ==
+                group.Min(t => t.CreatedAt)) // Find the earliest transaction for each phone number
+            .Select(group => group.Key)
+            .ToList();
         var listOwner = userRepository.GetAllOwnerAccount();
         var listParkingZone = await ((IParkingZoneRepository)vpsRepository).GetAllParkingZone();
 
@@ -286,6 +289,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
             {
                 done++;
             }
+
             if (item.CheckinBy != null && item.CheckoutBy == null)
             {
                 notCheckout++;
@@ -295,28 +299,49 @@ public class ParkingZoneController : VpsController<ParkingZone>
         var customerData = new
         {
             totalCustomer = list.Count,
-            oneHours = list.Where(x => x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
-            oneDay = list.Where(x => x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
-            oneWeek = list.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate).ToList().Count,
-            oneMonth = list.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneHours = list.Where(x =>
+                x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day &&
+                x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneDay = list.Where(x =>
+                x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month &&
+                x.CreatedAt.Year == now.Year).ToList().Count,
+            oneWeek = list.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate).ToList()
+                .Count,
+            oneMonth =
+                list.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year)
+                    .ToList().Count,
             oneYear = list.Where(x => x.CreatedAt.Year == now.Year).ToList().Count,
         };
         var ownerData = new
         {
             totalOwner = listOwner.Count,
-            oneHours = listOwner.Where(x => x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
-            oneDay = listOwner.Where(x => x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
-            oneWeek = listOwner.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate).ToList().Count,
-            oneMonth = listOwner.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneHours = listOwner.Where(x =>
+                x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day &&
+                x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneDay = listOwner.Where(x =>
+                x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month &&
+                x.CreatedAt.Year == now.Year).ToList().Count,
+            oneWeek = listOwner.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate)
+                .ToList().Count,
+            oneMonth = listOwner
+                .Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList()
+                .Count,
             oneYear = listOwner.Where(x => x.CreatedAt.Year == now.Year).ToList().Count,
         };
         var parkingZoneData = new
         {
             totalParkingZone = listParkingZone.Count,
-            oneHours = listParkingZone.Where(x => x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
-            oneDay = listParkingZone.Where(x => x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
-            oneWeek = listParkingZone.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate).ToList().Count,
-            oneMonth = listParkingZone.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneHours = listParkingZone.Where(x =>
+                x.CreatedAt.Hour == now.Hour && x.CreatedAt.Day == now.Day &&
+                x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList().Count,
+            oneDay = listParkingZone.Where(x =>
+                x.CreatedAt.Day == now.Day && x.CreatedAt.Month == now.Month &&
+                x.CreatedAt.Year == now.Year).ToList().Count,
+            oneWeek = listParkingZone.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate)
+                .ToList().Count,
+            oneMonth = listParkingZone
+                .Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).ToList()
+                .Count,
             oneYear = listParkingZone.Where(x => x.CreatedAt.Year == now.Year).ToList().Count,
         };
 
@@ -416,13 +441,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 "Bãi đỗ xe đang chờ duyệt hoặc bị từ chối không thể đóng cửa!");
         }
 
-        var absent = parkingZone.ParkingZoneAbsents.MaxBy(x => x.SubId);
-        if (absent is not null && ((absent.From <= DateTime.Now && DateTime.Now <= absent.To) ||
-                                   (absent.From <= DateTime.Now && absent.To is null)))
-        {
-            throw new ServerException("Bãi đỗ xe đã đóng cửa!");
-        }
-
         var newAbsent = new ParkingZoneAbsent
         {
             Id = Guid.NewGuid(),
@@ -464,9 +482,9 @@ public class ParkingZoneController : VpsController<ParkingZone>
         {
             parkingZone.Id,
             Key = parkingZone.SubId,
-            Commune = parkingZone.Commune.Name,
-            District = parkingZone.Commune.District.Name,
-            City = parkingZone.Commune.District.City.Name,
+            Commune = parkingZone.Commune?.Name,
+            District = parkingZone.Commune?.District.Name,
+            City = parkingZone.Commune?.District.City.Name,
             parkingZone.Name,
             CreatedAt = $"{parkingZone.CreatedAt:dd-MM-yyyy}",
             ModifiedAt = $"{parkingZone.ModifiedAt:dd-MM-yyyy}",
@@ -475,8 +493,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
             parkingZone.PricePerHour,
             parkingZone.PriceOverTimePerHour,
             parkingZone.Slots,
-            /*            parkingZone.Lat,
-                        parkingZone.Lng,*/
             parkingZone.WorkFrom,
             parkingZone.WorkTo,
             parkingZone.IsFull,
@@ -485,15 +501,20 @@ public class ParkingZoneController : VpsController<ParkingZone>
         };
         return Ok(result);
     }
-    [HttpPatch()]
+
+    [HttpPatch]
     [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
-    public async Task<ParkingZone> UpdateParkingZoneAddress([FromBody] UpdateParkingZoneAddressInput updateParkingZoneAddressInput)
+    public async Task<ParkingZone> UpdateParkingZoneAddress(
+        [FromBody] UpdateParkingZoneAddressInput updateParkingZoneAddressInput)
     {
-        var parkingZone = ((IParkingZoneRepository)vpsRepository).GetParkingZoneById(updateParkingZoneAddressInput.ParkingZoneId) ?? throw new ServerException(2);
+        var parkingZone =
+            ((IParkingZoneRepository)vpsRepository).GetParkingZoneById(updateParkingZoneAddressInput
+                .ParkingZoneId) ?? throw new ServerException(2);
         if (parkingZone.IsApprove == true)
         {
             throw new ServerException("Bãi đỗ xe đã xác thực. Không thể thay đổi thông tin!");
         }
+
         parkingZone.Location = updateParkingZoneAddressInput.Location.GetTopologyPoint();
         parkingZone.DetailAddress = updateParkingZoneAddressInput.DetailAddress;
         parkingZone.IsApprove = null;
@@ -501,6 +522,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
         return parkingZone;
     }
+
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.UpdateParkingZone)]
     public async Task<IActionResult> UpdateParkingZone([FromForm] UpdateParkingZoneInput input)
@@ -587,6 +609,32 @@ public class ParkingZoneController : VpsController<ParkingZone>
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 
+    [HttpDelete]
+    [FilterPermission(Action = ActionFilterEnum.DeleteParkingZoneAction)]
+    public async Task<IActionResult> DeleteParkingZoneAction([FromQuery] Guid? parkingZoneId)
+    {
+        if (parkingZoneId is null)
+        {
+            throw new ServerException("Parking Zone Id cannot be null!");
+        }
+
+        var parkingZone = await ((IParkingZoneRepository)vpsRepository).Find(parkingZoneId);
+        if (parkingZone is null)
+        {
+            throw new ServerException(2);
+        }
+
+        if (parkingZone.IsApprove is true)
+        {
+            throw new ServerException("Không thể xóa bãi đỗ xe đã xác thực!");
+        }
+
+        await vpsRepository.Delete(parkingZone);
+        await vpsRepository.SaveChange();
+
+        return Ok(ResponseNotification.DELETE_SUCCESS);
+    }
+
     [HttpGet]
     public IEnumerable<ParkingZone> GetByAddress(Guid id,
         AddressType addressType = AddressType.Commune)
@@ -599,12 +647,12 @@ public class ParkingZoneController : VpsController<ParkingZone>
             _ => throw new ClientException(1002)
         };
     }
+
     [HttpGet]
     public IEnumerable<ParkingZone> GetNearAround([FromQuery] Position position)
     {
-
-        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneNearAround(position, parkingZoneConfig.RadiusFindNearAround);
-
+        return ((IParkingZoneRepository)vpsRepository).GetParkingZoneNearAround(position,
+            parkingZoneConfig.RadiusFindNearAround);
     }
 
     [HttpGet("{parkingZoneId}")]
