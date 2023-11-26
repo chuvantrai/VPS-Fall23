@@ -38,5 +38,6 @@ public enum ActionFilterEnum
     GetReportForAdmin,
     GetTypeReport,
     FilterReport,
-    DeleteParkingZoneAction
+    DeleteParkingZoneAction,
+    CancelAbsent
 }

@@ -3,7 +3,8 @@
     internal class VpsClient
     {
         readonly RestClient restClient;
-        static string DeleteParkingZoneUri = "api/ParkingZone/DeleteParkingZone/{0}";
+        static readonly string DeleteParkingZoneUri = "api/ParkingZone/DeleteParkingZone/{0}";
+        static readonly string CancelBookingTransactionUri = "api/ParkingTransaction/Cancel/{0}";
         public VpsClient(string baseUrl)
         {
             restClient = new RestClient(baseUrl);
@@ -15,6 +16,12 @@
             var response = await this.restClient.Delete(uri);
             return response;
         }
+        public async Task<bool> CancelBookingTransaction(Guid bookingId)
+        {
+            string uri = string.Format(CancelBookingTransactionUri, bookingId);
 
+            var response = await this.restClient.Delete(uri);
+            return response;
+        }
     }
 }

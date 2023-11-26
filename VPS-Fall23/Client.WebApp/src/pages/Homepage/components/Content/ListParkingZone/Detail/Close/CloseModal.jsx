@@ -1,26 +1,26 @@
 import { useForm } from "antd/es/form/Form";
 import { useViewParkingZoneContext } from "../../../../../../../hooks/useContext/viewParkingZone.context";
 import ParkingZoneDetailModal from "../Modal";
-import CloseParkingZoneForm from "./CloseForm";
-import CloseParkingZoneFooterModal from "./FooterModal";
+import CloseParkingZoneTabs from "./CloseTabs";
 
-const CloseParkingZoneModal = ({ parkingZone }) => {
+const CloseParkingZoneModal = () => {
 
-    const { detailInfo } = useViewParkingZoneContext();
+    const { detailInfo, setDetailInfo } = useViewParkingZoneContext();
     const [form] = useForm();
     const modalProps = {
         open: detailInfo.isShow,
         title: "Đóng cửa bãi đỗ xe",
         okText: "Đóng cửa",
         cancelText: "Thoát",
-        footer: <CloseParkingZoneFooterModal form={form} />
+        onCancel: () => setDetailInfo({ isShow: false, parkingZone: null, type: '' }),
+        footer: <></> //<CloseParkingZoneFooterModal form={form} />
     }
 
     return (
         <ParkingZoneDetailModal
             parkingZone={detailInfo.parkingZone}
             modalProps={modalProps}
-            modalContent={<CloseParkingZoneForm form={form} />}
+            modalContent={<CloseParkingZoneTabs form={form} />}
         />
     )
 }
