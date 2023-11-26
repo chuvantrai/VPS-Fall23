@@ -138,5 +138,21 @@
   {
     "code": 5014,
     "message": "Bãi đỗ xe không tồi tại!"
+  },
+  {
+    "code": 5015,
+    "message": "Mã địa chỉ này đã tồi tại!"
+  },
+  {
+    "code": 5016,
+    "message": "Tên địa chỉ này đã tồi tại!"
+  },
+  {
+    "code": 5017,
+    "message": "Kiểu tạo địa chỉ không tồn tại!"
+  },
+  {
+    "code": 5018,
+    "message": "Tên phải chứa Tỉnh/Thành phố!"
   }
 ]

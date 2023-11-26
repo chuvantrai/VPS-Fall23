@@ -2,6 +2,8 @@ import { AutoComplete, Pagination, Select, Table, Tag, Tooltip } from 'antd';
 import { CloseSquareFilled } from '@ant-design/icons';
 import React, { Fragment, useEffect, useState } from 'react';
 import useAddressServices from '@/services/addressServices';
+import CreateAddress from "@/pages/ListAddressManager/components/CreateAddress.jsx";
+import optionsCreateAddressType from "@/helpers/optionsCreateAddressType.js";
 
 function ListAddressManager() {
   const service = useAddressServices();
@@ -13,6 +15,9 @@ function ListAddressManager() {
   const [districtFilter, setDistrictFilter] = useState(undefined);
   const [typeCityOptions, setTypeCityOptions] = useState([]);
   const [typeDistrictOptions, setTypeDistrictOptions] = useState([]);
+  let options = optionsCreateAddressType;
+  const [addressType, setAddressType] = useState(options[0].value);
+
   const pageSize = 10;
 
   const columns = [
@@ -44,14 +49,14 @@ function ListAddressManager() {
           {val.isBlock === false ?
             (
               <Tooltip title='Nhấn để ẩn địa điểm'>
-                <Tag onClick={() => ChangeIsBlock(val.communeId)} color='success'>
+                <Tag onClick={() => ChangeIsBlock(val.isBlock,val.communeId)} color='success'>
                   <a>Hiện thị</a>
                 </Tag>
               </Tooltip>
             ) :
             (
               <Tooltip title='Nhấn để hiện địa điểm'>
-                <Tag onClick={() => ChangeIsBlock(val.communeId)} color='red'>
+                <Tag onClick={() => ChangeIsBlock(val.isBlock,val.communeId)} color='red'>
                   <a>Ẩn</a>
                 </Tag>
               </Tooltip>
@@ -66,7 +71,6 @@ function ListAddressManager() {
     service.getAddressManager(pageNumber, pageSize, cityFilter, districtFilter, textSearch).then((res) => {
       setData(res.data.listAddress);
       setTotalItems(res.data.totalPages);
-      console.log(999, cityFilter, districtFilter, textSearch);
     });
   };
 
@@ -74,8 +78,15 @@ function ListAddressManager() {
     setPageNumber(page);
   };
 
-  const ChangeIsBlock = (communeId) => {
-    console.log(111, communeId);
+  const ChangeIsBlock = (isBlock, communeId) => {
+    service.updateIsBlockCommune(!isBlock, communeId).then((res) => {
+      setData(
+          data.map((val) => ({
+            ...val,
+            isBlock: val.communeId === communeId ? res.data : val.isBlock
+          }))
+      );
+    });
   };
 
   const OnSearchAddress = (event) => {
@@ -125,9 +136,20 @@ function ListAddressManager() {
     });
   };
 
+  const callBackCreateAddress = () => {
+    setPageNumber(1);
+    setTextSearch('');
+    setCityFilter(undefined);
+    setDistrictFilter(undefined);
+  }
+
+  const onChangeAddressType = (val) => {
+    setAddressType(val);
+  };
+
   useEffect(() => {
     loadData();
-  }, [pageNumber, districtFilter, cityFilter]);
+  }, [pageNumber, districtFilter, cityFilter,CreateAddress]);
 
   useEffect(() => {
     loadTypeCityOptions();
@@ -136,35 +158,48 @@ function ListAddressManager() {
   return (
     <>
       <div className='w-[100%]'>
-        <div className='mb-[16px] flex items-center'>
+        <div className='mb-[16px] flex items-center justify-between'>
+          <CreateAddress callBackCreateAddress={callBackCreateAddress}/>
+          <Select
+              className={('min-w-[230px]')}
+              defaultValue={options[2]}
+              style={{width: 120}}
+              options={options}
+              onChange={onChangeAddressType}
+          />
+        </div>
+        <div className='mb-[16px] flex items-center justify-between'>
           <AutoComplete
-            style={{ width: 300 }}
             placeholder='Tìm kiếm tên địa điểm (enter để tìm kiếm)'
-            className='mt-4 mb-4'
+            className='mt-4 mb-4 w-[300px]'
             onSearch={(val) => setTextSearch(val)}
             allowClear={{ clearIcon: <CloseSquareFilled /> }}
+            value={textSearch}
             onKeyDown={OnSearchAddress} />
-          <Select
-            className='w-80'
-            showSearch
-            placeholder='Tỉnh/Thành phố'
-            optionFilterProp='children'
-            allowClear
-            onChange={OnChangeCityFilter}
-            filterOption={OnFilterOption}
-            options={typeCityOptions}
-          />
-          <Select
-            className='w-80'
-            showSearch
-            placeholder='Quận/Huyện'
-            optionFilterProp='children'
-            allowClear
-            onChange={OnChangeDistrictFilter}
-            filterOption={OnFilterOption}
-            options={typeDistrictOptions}
-            value={districtFilter}
-          />
+          <div className={'ttt mr-[10px]'}>
+            <Select
+                className='w-80 mr-[10px]'
+                showSearch
+                placeholder='Tỉnh/Thành phố'
+                optionFilterProp='children'
+                allowClear
+                onChange={OnChangeCityFilter}
+                filterOption={OnFilterOption}
+                options={typeCityOptions}
+                value={cityFilter}
+            />
+            <Select
+                className='w-80'
+                showSearch
+                placeholder='Quận/Huyện'
+                optionFilterProp='children'
+                allowClear
+                onChange={OnChangeDistrictFilter}
+                filterOption={OnFilterOption}
+                options={typeDistrictOptions}
+                value={districtFilter}
+            />
+          </div>
         </div>
 
         <Table columns={columns} dataSource={data} pagination={false} />

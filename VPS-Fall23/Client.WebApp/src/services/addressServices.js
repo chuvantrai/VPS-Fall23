@@ -50,8 +50,32 @@ const useAddressServices = () => {
         return axios.get(addressManager);
     };
 
+    const updateIsBlockCommune = (isBlock, communeId) => {
+        return axios.put(`${COMMUNE_URI}/UpdateIsBlockCommune`, {
+            IsBlock: isBlock,
+            CommuneId: communeId
+        });
+    }
+
+    const createAddress = ({type, name, city, district, code}) => {
+        return axios.post(`${COMMUNE_URI}/CreateAddress`, {
+            Type: type,
+            Name: name,
+            City: city,
+            District: district,
+            Code: code
+        });
+    }
+
     return {
-        getCities, getCommunes, getDistricts, getDistrictById, getCommuneById, getAddressManager
+        getCities,
+        getCommunes,
+        getDistricts,
+        getDistrictById,
+        getCommuneById,
+        getAddressManager,
+        updateIsBlockCommune,
+        createAddress
     }
 
 }
