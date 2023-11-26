@@ -268,8 +268,6 @@ const RegisterParkingZone = () => {
                   onSearch={setLocationSearchValue}
                   onSelect={onAddressSelected}
                   onClear={() => { setSessionToken(uuidv4()) }}
-
-
                 />
               </Space.Compact>
             </Form.Item>

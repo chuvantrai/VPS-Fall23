@@ -6,7 +6,7 @@ using Service.ManagerVPS.Extensions.DbContext;
 
 namespace Service.ManagerVPS.Models
 {
-    public partial class ParkingZone : ISoftDeleteEntity
+    public partial class ParkingZone : SoftDeleteEntity
     {
         public ParkingZone()
         {

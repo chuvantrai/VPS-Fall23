@@ -130,7 +130,7 @@ const useParkingZoneService = () => {
           message: 'Có lỗi xảy ra!',
           description: err.message,
         });
-        return Promise.reject(err)
+        return Promise.reject(err);
       });
   };
 
@@ -169,15 +169,23 @@ const useParkingZoneService = () => {
     return axios.get(`${BASE_URI}/GetNearAround`, {
       params: {
         lat: lat,
-        lng: lng
-      }
-    })
-  }
+        lng: lng,
+      },
+    });
+  };
   const updateParkingZoneAddress = (data) => {
-    return axios.patch(`${BASE_URI}/UpdateParkingZoneAddress`, data)
-  }
+    return axios.patch(`${BASE_URI}/UpdateParkingZoneAddress`, data);
+  };
   const getAdminOverview = () => {
     return axios.get(`${BASE_URI}/GetAdminOverview`);
+  };
+
+  const deleteParkingZone = (parkingZoneId) => {
+    return axios.delete(`${BASE_URI}/DeleteParkingZoneAction`, {
+      params: {
+        parkingZoneId,
+      },
+    });
   };
 
   return {
@@ -198,8 +206,9 @@ const useParkingZoneService = () => {
     GetParkingZonesByParkingZoneIds,
     getApprovedParkingZoneByOwnerId,
     getParkingZoneNearAround,
-    updateParkingZoneAddress
+    updateParkingZoneAddress,
     getAdminOverview,
+    deleteParkingZone,
   };
 };
 

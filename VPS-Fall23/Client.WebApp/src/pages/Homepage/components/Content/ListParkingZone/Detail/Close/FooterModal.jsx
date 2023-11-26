@@ -22,7 +22,7 @@ const CloseParkingZoneFooterModal = ({ form }) => {
             ...values,
             parkingZoneId: detailInfo.parkingZone.id,
             closeFrom: Array.isArray(values.closeTime) === true ? values.closeTime[0] : values.closeTime,
-            closeFrom: Array.isArray(values.closeTime) === true ? values.closeTime[1] : null
+            closeTo: Array.isArray(values.closeTime) === true ? values.closeTime[1] : null
         }
         setPopConfirmOpen(false)
         parkingZoneService.closeParkingZone(input).then(res => setViewValues({ ...viewValues, reload: true }));

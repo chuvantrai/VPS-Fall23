@@ -37,5 +37,6 @@ public enum ActionFilterEnum
     UpdatePromoCode,
     GetReportForAdmin,
     GetTypeReport,
-    FilterReport
+    FilterReport,
+    DeleteParkingZoneAction
 }
