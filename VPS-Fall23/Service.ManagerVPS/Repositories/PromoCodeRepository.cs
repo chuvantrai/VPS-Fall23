@@ -11,7 +11,7 @@ public class PromoCodeRepository : VpsRepository<PromoCode>, IPromoCodeRepositor
     {
     }
 
-    public PagedList<PromoCode> GetListPromoCodeByOwnerId(Guid? ownerId,
+    public PagedList<PromoCode> GetListPromoCodeByOwnerId(Guid ownerId,
         QueryStringParameters parameters)
     {
         var promoCodeLst = entities.Where(x => x.OwnerId.Equals(ownerId));

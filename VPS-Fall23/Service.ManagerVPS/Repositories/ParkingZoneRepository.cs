@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Service.ManagerVPS.Constants.Enums;
-using Service.ManagerVPS.DTO.Exceptions;
-using Service.ManagerVPS.DTO.GoongMap;
+using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Extensions.StaticLogic;
@@ -17,6 +16,11 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
     }
 
+    public async Task<List<ParkingZone>> GetAllParkingZone()
+    {
+        return await entities.ToListAsync();
+    }
+    
     public PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters)
     {
         var parkingZone = entities.Include(o => o.Owner).ThenInclude(o => o.IdNavigation);
@@ -182,8 +186,30 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
                         && pz.IsApprove == true
                         && !pz.ParkingZoneAbsents.Any(pa =>
                             pa.From <= DateTime.Now && pa.To >= DateTime.Now)).AsEnumerable();
+    }
 
-
+    public string GetFreeSlotByAttendantId(Guid attendantId)
+    {
+        var parkingZone = context.ParkingZoneAttendants.Include(parkingZoneAttendant => parkingZoneAttendant.ParkingZone).FirstOrDefault(pza => pza.Id == attendantId)?.ParkingZone;
+        if (parkingZone != null)
+        {
+            var bookedslot = context.ParkingTransactions
+                    .Where(p => p.ParkingZoneId == parkingZone.Id
+                                && p.CheckinAt <= DateTime.Now
+                                && p.CheckoutAt >= DateTime.Now
+                                && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED ||
+                                    p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
+                                && (!p.ParkingTransactionDetails.Any()
+                                    || p.ParkingTransactionDetails.OrderByDescending(pt => pt.CreatedAt).First().To >=
+                                    DateTime.Now
+                                ))
+                    .Count();
+            return $"{parkingZone.Slots - bookedslot}/{parkingZone.Slots}";
+        }
+        else
+        {
+            return ResponseNotification.NO_DATA;
+        }
     }
 
     //public ParkingZone? GetAdminOverview(Guid id)

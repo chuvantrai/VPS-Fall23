@@ -4,6 +4,7 @@
              x:Class="Client.MobileApp.Views.VPS79"
              xmlns:viewmodel="clr-namespace:Client.MobileApp.ViewModels"
              x:DataType="viewmodel:VPS79ViewModel"
+             Shell.NavBarIsVisible="False"
              xmlns:system="clr-namespace:System;assembly=netstandard"
              xmlns:local="clr-namespace:Client.MobileApp">
     <Grid>
@@ -23,7 +24,7 @@
             <Grid.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
             </Grid.GestureRecognizers>
-            
+
             <Border  Grid.ColumnSpan="2"
                  ZIndex="{Binding CameraIndex}"
                  Stroke="Transparent"
@@ -51,11 +52,11 @@
 
                 <Grid IsClippedToBounds="True" 
                   HeightRequest="420" >
-                    
+
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnTapGestureRecognizerTapped"/>
                     </Grid.GestureRecognizers>
-                    
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="90"/>
                         <RowDefinition Height="30"/>
@@ -115,10 +116,9 @@
 
                     <Grid ColumnDefinitions="0.5*,0.5*" Grid.Row="5" Padding="12,0,0,0" VerticalOptions="Start">
                         <HorizontalStackLayout VerticalOptions="Center" Padding="10,0,0,0" >
-                            <CheckBox Color="#83E9EE"/>
+                            <CheckBox x:Name="Remember" Color="#83E9EE"/>
                             <Label  Text="Remember me" FontSize="12" VerticalOptions="Center" />
                         </HorizontalStackLayout>
-                        <Label Text="Forgot password?" Grid.Column="1" TextColor="#83E9EE" HorizontalTextAlignment="Center" Padding="10,0,0,0" FontSize="12" VerticalOptions="Center" />
                     </Grid>
 
                     <Button Text="LOGIN" 

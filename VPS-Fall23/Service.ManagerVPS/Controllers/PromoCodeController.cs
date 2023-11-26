@@ -33,8 +33,11 @@ public class PromoCodeController : VpsController<PromoCode>
     public IActionResult GetListPromoCode([FromQuery] Guid? ownerId,
         [FromQuery] QueryStringParameters parameters)
     {
+        if (ownerId is null)
+            throw new ServerException("ownerId cannot be null!");
         var promoCodePagedLst =
-            ((IPromoCodeRepository)vpsRepository).GetListPromoCodeByOwnerId(ownerId, parameters);
+            ((IPromoCodeRepository)vpsRepository).GetListPromoCodeByOwnerId((Guid)ownerId,
+                parameters);
         var metadata = new
         {
             promoCodePagedLst.TotalCount,
@@ -55,13 +58,14 @@ public class PromoCodeController : VpsController<PromoCode>
         var newPromoCode = new PromoCode
         {
             Id = Guid.NewGuid(),
-            Code = input.Code,
+            Code = input.Code!,
             FromDate = (DateTime)input.FromDate!,
             ToDate = (DateTime)input.ToDate!,
             CreatedAt = DateTime.Now,
             ModifiedAt = DateTime.Now,
             OwnerId = (Guid)input.OwnerId!,
-            Discount = input.Discount
+            Discount = (int)input.Discount!,
+            NumberOfUses = (int)input.NumberOfUses!
         };
         await ((IPromoCodeRepository)vpsRepository).Create(newPromoCode);
 
@@ -125,6 +129,7 @@ public class PromoCodeController : VpsController<PromoCode>
             promoCode.FromDate,
             promoCode.ToDate,
             promoCode.Discount,
+            promoCode.NumberOfUses,
             ParkingZoneLst = promoCode.PromoCodeParkingZones
                 .Select(x => new
                 {
@@ -143,8 +148,9 @@ public class PromoCodeController : VpsController<PromoCode>
             ((IPromoCodeRepository)vpsRepository).GetPromoCodeById((Guid)input.PromoCodeId!)
             ?? throw new ServerException(2);
 
-        promoCode.Code = input.PromoCode;
-        promoCode.Discount = input.Discount;
+        promoCode.Code = input.PromoCode!;
+        promoCode.Discount = (int)input.Discount!;
+        promoCode.NumberOfUses = (int)input.NumberOfUses!;
         promoCode.FromDate = (DateTime)input.FromDate!;
         promoCode.ToDate = (DateTime)input.ToDate!;
         promoCode.ModifiedAt = DateTime.Now;
@@ -189,7 +195,7 @@ public class PromoCodeController : VpsController<PromoCode>
             templateString);
 
         await ((IPromoCodeRepository)vpsRepository).SaveChange();
-        return Ok(promoCode);
+        return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
     [HttpGet("{promoCode}")]
     public async Task<PromoCode> GetPromoCode(string promoCode, Guid parkingZoneId)

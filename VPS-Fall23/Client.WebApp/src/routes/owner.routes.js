@@ -7,6 +7,7 @@ import ManagerLayout from '../layouts/ManagerLayout';
 import guidGenerator from '../helpers/guidGenerator';
 import ListFeedback from '../pages/ListFeedback/ListFeedback';
 import Overview from '../pages/Dashboard/Overview';
+import PromoCode from '../pages/PromoCode/PromoCode';
 
 export const ownerRoutesConfig = {
   header: Header,
@@ -62,13 +63,6 @@ export const ownerRoutesConfig = {
           component: RegisterParkingZone,
           description: 'Điền vào mẫu dưới đây để đăng ký bãi gửi xe mới',
         },
-        {
-          key: guidGenerator(),
-          path: 'feedback',
-          label: 'Feedback',
-          component: ListFeedback,
-          description: 'Danh sách phản hồi từ người dùng',
-        },
       ],
     },
     {
@@ -82,6 +76,27 @@ export const ownerRoutesConfig = {
           label: 'Danh sách nhân viên',
           component: ListAttendant,
           description: 'Toàn bộ danh sách nhân viên hiển thị dưới đây',
+        },
+      ],
+    },
+    {
+      key: guidGenerator(),
+      path: 'utilities',
+      label: 'Tiện ích',
+      children: [
+        {
+          key: guidGenerator(),
+          path: 'feedback',
+          label: 'Feedback',
+          component: ListFeedback,
+          description: 'Danh sách phản hồi từ người dùng',
+        },
+        {
+          key: guidGenerator(),
+          path: 'promo-code',
+          label: 'Mã khuyến mãi',
+          component: PromoCode,
+          description: 'Danh sách mã khuyến mãi',
         },
       ],
     },

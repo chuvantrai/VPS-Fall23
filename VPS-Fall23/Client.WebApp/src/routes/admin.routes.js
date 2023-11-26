@@ -6,6 +6,7 @@ import guidGenerator from '@/helpers/guidGenerator';
 import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
 import AdminOverview from '@/pages/Dashboard/AdminOverview';
 import ViewListParkingZone from '@/pages/Homepage/components/Content/ListParkingZone';
+import ListUserReport from '../pages/ListUserReport';
 
 export const adminRoutesConfig = {
   header: Header,
@@ -58,6 +59,20 @@ export const adminRoutesConfig = {
           label: 'Danh sách yêu cầu',
           description: 'Toàn bộ danh sách yêu cầu bãi gửi xe hiển thị dưới đây',
           component: ViewRequestedParkingZone,
+        },
+      ],
+    },
+    {
+      key: guidGenerator(),
+      path: 'system',
+      label: 'Hệ thống',
+      children: [
+        {
+          key: guidGenerator(),
+          path: '',
+          label: 'Báo cáo',
+          description: 'Toàn bộ báo cáo hiển thị dưới đây',
+          component: ListUserReport,
         },
       ],
     },

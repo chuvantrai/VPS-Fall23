@@ -176,6 +176,10 @@ const useParkingZoneService = () => {
   const updateParkingZoneAddress = (data) => {
     return axios.patch(`${BASE_URI}/UpdateParkingZoneAddress`, data)
   }
+  const getAdminOverview = () => {
+    return axios.get(`${BASE_URI}/GetAdminOverview`);
+  };
+
   return {
     getByAddress,
     register,
@@ -195,6 +199,7 @@ const useParkingZoneService = () => {
     getApprovedParkingZoneByOwnerId,
     getParkingZoneNearAround,
     updateParkingZoneAddress
+    getAdminOverview,
   };
 };
 
