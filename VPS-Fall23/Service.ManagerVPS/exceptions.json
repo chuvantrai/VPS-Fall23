@@ -68,6 +68,14 @@
     "message": "Nhà xe không còn chỗ trống trong khoảng thời gian ra bạn đã chọn, vui lòng chọn khoảng thời gian khác"
   },
   {
+    "code": 1006,
+    "messasge": "Mã giảm giá không hợp lệ"
+  },
+  {
+    "code": 1007,
+    "message":  "Mã giảm giá không khả dụng ở thời điểm hiện tại hoặc đã hết hạn"
+  },
+  {
     "code": 3000,
     "message": "Biển số xe chưa có!"
   },

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using NetTopologySuite.Geometries;
+using Service.ManagerVPS.Extensions.DbContext;
 
 namespace Service.ManagerVPS.Models
 {
-    public partial class ParkingZone
+    public partial class ParkingZone : SoftDeleteEntity
     {
         public ParkingZone()
         {
@@ -16,6 +19,7 @@ namespace Service.ManagerVPS.Models
         }
 
         public Guid Id { get; set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int SubId { get; set; }
         public Guid? CommuneId { get; set; }
         public string Name { get; set; } = null!;
@@ -31,10 +35,11 @@ namespace Service.ManagerVPS.Models
         public TimeSpan WorkFrom { get; set; }
         public TimeSpan WorkTo { get; set; }
         public bool? IsFull { get; set; }
+        public bool IsDelete { get; set; }
+        public Geometry? Location { get; set; }
         public decimal? Lat { get; set; }
         public decimal? Lng { get; set; }
-        public bool IsDelete { get; set; }
-
+        
         public virtual Commune? Commune { get; set; }
         public virtual ParkingZoneOwner Owner { get; set; } = null!;
         public virtual ICollection<Contract> Contracts { get; set; }

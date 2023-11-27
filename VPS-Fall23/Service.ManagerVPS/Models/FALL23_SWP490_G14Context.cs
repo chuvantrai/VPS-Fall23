@@ -40,8 +40,10 @@ namespace Service.ManagerVPS.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid=nghianvho; pwd=Random@11092023#@!;");
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https: //go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer(
+                    "server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!; TrustServerCertificate = True",
+                    x => x.UseNetTopologySuite());
             }
         }
 
@@ -152,7 +154,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Cities)
@@ -196,7 +199,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Communes)
@@ -255,7 +258,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.ParkingZone)
                     .WithMany(p => p.Contracts)
@@ -293,7 +296,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.TypeId).HasColumnName("type_id");
 
@@ -347,7 +350,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.City)
                     .WithMany(p => p.Districts)
@@ -390,7 +393,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.Parent)
                     .WithMany(p => p.InverseParent)
@@ -522,7 +525,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.To)
                     .HasColumnType("datetime")
@@ -560,8 +563,6 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
 
-                entity.Property(e => e.IsDelete).HasColumnName("is_delete");
-
                 entity.Property(e => e.IsFull)
                     .HasColumnName("is_full")
                     .HasDefaultValueSql("((0))");
@@ -573,6 +574,10 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.Lng)
                     .HasColumnType("decimal(18, 0)")
                     .HasColumnName("lng");
+
+                entity.Property(e => e.Location)
+                    .HasColumnType("geometry")
+                    .HasColumnName("location");
 
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
@@ -601,7 +606,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.WorkFrom)
                     .HasColumnName("work_from")
@@ -610,6 +615,10 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.WorkTo)
                     .HasColumnName("work_to")
                     .HasDefaultValueSql("('23:00:00')");
+
+                entity.Property(e => e.IsDeleted)
+                    .HasColumnName("is_delete")
+                    .HasDefaultValueSql("((0))");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
@@ -621,6 +630,8 @@ namespace Service.ManagerVPS.Models
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__parking_z__owner__0D7A0286");
+
+                entity.HasQueryFilter(p => !p.IsDeleted);
             });
 
             modelBuilder.Entity<ParkingZoneAbsent>(entity =>
@@ -649,7 +660,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.To)
                     .HasColumnType("datetime")
@@ -902,7 +913,7 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id");
+                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.Type).HasColumnName("type");
 

@@ -1,11 +1,11 @@
 import Header from '@/layouts/components/Header';
 import AccountProfile from '@/pages/AccountProfile';
-import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
 import ViewRequestedParkingZone from '@/pages/ViewRequestedParkingZones';
-import ManagerLayout from '../layouts/ManagerLayout';
-import guidGenerator from '../helpers/guidGenerator';
+import ManagerLayout from '@/layouts/ManagerLayout';
+import guidGenerator from '@/helpers/guidGenerator';
 import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
-import AdminOverview from '../pages/Dashboard/AdminOverview';
+import AdminOverview from '@/pages/Dashboard/AdminOverview';
+import ViewListParkingZone from '@/pages/Homepage/components/Content/ListParkingZone';
 import ListUserReport from '../pages/ListUserReport';
 import ListAddressManager from '../pages/ListAddressManager/ListAddressManager.jsx';
 

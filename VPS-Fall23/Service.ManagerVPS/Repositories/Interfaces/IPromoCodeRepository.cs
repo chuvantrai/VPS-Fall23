@@ -10,4 +10,5 @@ public interface IPromoCodeRepository : IVpsRepository<PromoCode>
     PromoCode? GetPromoCodeDetailById(Guid id);
 
     PromoCode? GetPromoCodeById(Guid id);
+    Task<PromoCode?> GetByCode(string promoCode, Guid parkingZoneId);
 }

@@ -88,22 +88,25 @@ namespace Service.ManagerVPS.Pages
             paymentTransaction.TransactionStatus = this.Vnp_TransactionStatus;
             paymentTransaction.SecureHashType = this.Vnp_SecureHashType;
             await this.paymentTransactionRepository.Update(paymentTransaction);
-              var parkingTransaction = await parkingTransactionRepository.Find(paymentTransaction.BookingId);
+            var parkingTransaction = await parkingTransactionRepository.Find(paymentTransaction.BookingId);
             if (!isSuccess)
             {
-              
+
                 parkingTransaction.StatusId = (int)ParkingTransactionStatusEnum.BOOKING_PAID_FAILED;
                 await parkingTransactionRepository.Update(parkingTransaction);
             }
+
             await this.paymentTransactionRepository.SaveChange();
-            try
+            if (isSuccess)
             {
-                 await this.parkingTransactionRepository.SendBookedEmail(parkingTransaction, paymentTransaction); 
+                try
+                {
+                    await this.parkingTransactionRepository.SendBookedEmail(parkingTransaction, paymentTransaction);
+                }
+                catch (System.Exception)
+                {
+                }
             }
-            catch (System.Exception)
-            {
-            }
-          
             await paymentHub.Clients.Client(paymentTransaction.ConnectionId).SendAsync("ReceivePaidStatus", JsonConvert.SerializeObject(paymentTransaction, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
 
         }

@@ -48,7 +48,8 @@ namespace Service.ManagerVPS.Repositories
                 .CountAsync();
         }
 
-        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, Guid ownerId, DateTime? checkAt)
+        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, Guid ownerId,
+            DateTime? checkAt)
         {
             if (!checkAt.HasValue)
             {
@@ -360,7 +361,6 @@ namespace Service.ManagerVPS.Repositories
                         bookingSlot.CheckoutAt <= p.CheckoutAt))
                 && !p.ParkingTransactionDetails.Any());
         }
-
         public async Task<dynamic> GetParkingTransactionByIdEmail(Guid id, string email)
         {
             var parkingTransactions = await context.ParkingTransactions
