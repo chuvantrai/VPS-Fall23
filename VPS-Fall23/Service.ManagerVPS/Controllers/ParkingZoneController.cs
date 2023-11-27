@@ -629,6 +629,29 @@ public class ParkingZoneController : VpsController<ParkingZone>
             throw new ServerException("Không thể xóa bãi đỗ xe đã xác thực!");
         }
 
+        var parkingZoneImages = await GetImageLinks(parkingZone.OwnerId, parkingZone.Id);
+        var fileManager =
+            new FileManagementClient(_config.GetValue<string>("fileManagementAccessKey:baseUrl"),
+                _config.GetValue<string>("fileManagementAccessKey:accessKey"),
+                _config.GetValue<string>("fileManagementAccessKey:secretKey"));
+
+        // delete old images
+        if (parkingZoneImages.Count > 0)
+        {
+            var removeObjectsDtos = parkingZoneImages
+                .Select(img => new RemoveObjectsDto
+                {
+                    ObjectName =
+                        img.Replace(
+                            $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}/{_fileManagementConfig.PublicBucket}/",
+                            "")
+                })
+                .ToList();
+            await fileManager.RemoveMultipleObjects(
+                _config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+                removeObjectsDtos);
+        }
+
         await vpsRepository.Delete(parkingZone);
         await vpsRepository.SaveChange();
 
