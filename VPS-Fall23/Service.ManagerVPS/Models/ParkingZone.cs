@@ -35,7 +35,6 @@ namespace Service.ManagerVPS.Models
         public TimeSpan WorkFrom { get; set; }
         public TimeSpan WorkTo { get; set; }
         public bool? IsFull { get; set; }
-        public bool IsDelete { get; set; }
         public Geometry? Location { get; set; }
         public decimal? Lat { get; set; }
         public decimal? Lng { get; set; }
