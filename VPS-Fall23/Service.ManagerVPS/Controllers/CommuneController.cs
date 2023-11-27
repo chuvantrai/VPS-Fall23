@@ -11,8 +11,14 @@ namespace Service.ManagerVPS.Controllers
 {
     public class CommuneController : VpsCRUDController<Commune>
     {
-        public CommuneController(ICommuneRepository communeRepository) : base(communeRepository)
+        private readonly IDistrictRepository _districtRepository;
+        private readonly ICityRepository _cityRepository;
+
+        public CommuneController(ICommuneRepository communeRepository,
+            IDistrictRepository districtRepository, ICityRepository cityRepository) : base(communeRepository)
         {
+            _districtRepository = districtRepository;
+            _cityRepository = cityRepository;
         }
 
         [HttpGet("GetByDistrict/{districtId}")]
@@ -24,37 +30,85 @@ namespace Service.ManagerVPS.Controllers
         [HttpGet("GetAddressListParkingZone")]
         public async Task<IActionResult> GetAddressListParkingZone([FromQuery] GetAddressListParkingZoneRequest request)
         {
-            var dataGetListDistrict = await ((ICommuneRepository)vpsRepository)
-                .GetListAddress(request);
-
-            return Ok(new
+            switch (request.TypeAddress)
             {
-                ListAddress = dataGetListDistrict.Item1.Select(x => new
-                {
-                    CityCode = x.District.City.Code,
-                    CityId = x.District.City.Id,
-                    CityName = x.District.City.Name,
-                    DistrictCode = x.District.Code,
-                    DistrictId = x.District.Id,
-                    DistrictName = x.District.Name,
-                    CommuneCode = x.Code,
-                    CommuneId = x.Id,
-                    CommuneName = x.Name,
-                    x.CreatedAt,
-                    x.ModifiedAt,
-                    IsBlock = x.IsBlock ?? false
-                }).AsEnumerable(),
-                TotalPages = dataGetListDistrict.Item2
-            });
+                case AddressTypeEnum.COMMUNE:
+                    var dataCommune = await ((ICommuneRepository)vpsRepository)
+                        .GetListCommune(request);
+                    return Ok(new
+                    {
+                        ListAddress = dataCommune.Item1.Select(x => new
+                        {
+                            CityCode = x.District.City.Code,
+                            CityId = x.District.City.Id,
+                            CityName = x.District.City.Name,
+                            DistrictCode = x.District.Code,
+                            DistrictId = x.District.Id,
+                            DistrictName = x.District.Name,
+                            CommuneCode = x.Code,
+                            CommuneId = x.Id,
+                            CommuneName = x.Name,
+                            x.CreatedAt,
+                            x.ModifiedAt,
+                            IsBlock = x.IsBlock ?? false
+                        }).AsEnumerable(),
+                        TotalPages = dataCommune.Item2
+                    });
+                case AddressTypeEnum.DISTRICT:
+                    var dataDistrict = await _districtRepository.GetListDistrict(request);
+                    return Ok(new
+                    {
+                        ListAddress = dataDistrict.Item1.Select(x => new
+                        {
+                            CityCode = x.City.Code,
+                            CityId = x.City.Id,
+                            CityName = x.City.Name,
+                            DistrictCode = x.Code,
+                            DistrictId = x.Id,
+                            DistrictName = x.Name,
+                            x.CreatedAt,
+                            x.ModifiedAt,
+                            IsBlock = x.IsBlock ?? false
+                        }).AsEnumerable(),
+                        TotalPages = dataDistrict.Item2
+                    });
+                case AddressTypeEnum.CITY:
+                    var dataCity = await _cityRepository
+                        .GetListCity(request);
+                    return Ok(new
+                    {
+                        ListAddress = dataCity.Item1.Select(x => new
+                        {
+                            CityCode = x.Code,
+                            CityId = x.Id,
+                            CityName = x.Name,
+                            x.CreatedAt,
+                            x.ModifiedAt,
+                            IsBlock = x.IsBlock ?? false
+                        }).AsEnumerable(),
+                        TotalPages = dataCity.Item2
+                    });
+                default:
+                    throw new ClientException(3);
+            }
         }
-        [HttpPut("UpdateIsBlockCommune")]
-        public async Task<IActionResult> UpdateIsBlockCommune(UpdateIsBlockCommuneRequest request)
+
+        [HttpPut("UpdateIsBlockAddress")]
+        public async Task<IActionResult> UpdateIsBlockAddress(UpdateIsBlockAddressRequest request)
         {
-            var isBlockAfterUpdate = await ((ICommuneRepository)vpsRepository)
-                .UpdateIsBlockCommune(request.IsBlock, request.CommuneId);
-            return Ok(isBlockAfterUpdate);
+            return request.TypeAddress switch
+            {
+                AddressTypeEnum.COMMUNE => Ok(
+                    await ((ICommuneRepository)vpsRepository).UpdateIsBlockCommune(request.IsBlock, request.CommuneId)),
+                AddressTypeEnum.DISTRICT => Ok(
+                    await ((ICommuneRepository)vpsRepository).UpdateIsBlockDistrict(request.IsBlock,
+                        request.CommuneId)),
+                AddressTypeEnum.CITY => Ok(
+                    await ((ICommuneRepository)vpsRepository).UpdateIsBlockCity(request.IsBlock, request.CommuneId)),
+                _ => throw new ClientException(3)
+            };
         }
-        
+
         [HttpPost("CreateAddress")]
         public async Task<IActionResult> CreateAddress(CreateAddressRequest request)
         {
@@ -65,6 +119,7 @@ namespace Service.ManagerVPS.Controllers
             {
                 throw new ClientException(checkValidate);
             }
+
             switch (request.Type)
             {
                 case AddressTypeEnum.CITY:
@@ -80,9 +135,9 @@ namespace Service.ManagerVPS.Controllers
                         .CreateCommune(request, Guid.Parse(userToken.UserId));
                     break;
                 default:
-                    throw new ClientException(5017);// Type tạo địa chỉ không tồn tại
+                    throw new ClientException(5017); // Type tạo địa chỉ không tồn tại
             }
-            
+
             return Ok();
         }
     }

@@ -7,9 +7,11 @@ namespace Service.ManagerVPS.Repositories.Interfaces
     {
         Task<IEnumerable<Commune>> GetByDistrict(Guid districtId);
         
-        Task<Tuple<IEnumerable<Commune>, int>> GetListAddress(GetAddressListParkingZoneRequest request);
+        Task<Tuple<IEnumerable<Commune>, int>> GetListCommune(GetAddressListParkingZoneRequest request);
         
         Task<bool> UpdateIsBlockCommune(bool isBlock,Guid communeId);
+        Task<bool> UpdateIsBlockDistrict(bool isBlock,Guid communeId);
+        Task<bool> UpdateIsBlockCity(bool isBlock,Guid communeId);
         
         Task CreateCommune(CreateAddressRequest request, Guid userId);
         Task CreateDistrict(CreateAddressRequest request, Guid userId);

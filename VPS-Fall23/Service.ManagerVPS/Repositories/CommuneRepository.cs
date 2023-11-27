@@ -21,7 +21,7 @@ namespace Service.ManagerVPS.Repositories
             return Task.FromResult(this.entities.Where(c => c.DistrictId == districtId).AsEnumerable());
         }
 
-        public async Task<Tuple<IEnumerable<Commune>, int>> GetListAddress(GetAddressListParkingZoneRequest request)
+        public async Task<Tuple<IEnumerable<Commune>, int>> GetListCommune(GetAddressListParkingZoneRequest request)
         {
             request.PageNumber = request.PageNumber == 0 ? 1 : request.PageNumber;
             Expression<Func<Commune, bool>> whereExpression = x => true;
@@ -41,9 +41,9 @@ namespace Service.ManagerVPS.Repositories
 
             if (!string.IsNullOrEmpty(request.TextAddress))
             {
-                expr1 = expr1.And(x => x.Name.Contains(request.TextAddress) ||
-                                       x.District.Name.Contains(request.TextAddress) ||
-                                       x.District.City.Name.Contains(request.TextAddress)
+                expr1 = expr1.And(x => x.Name.ToLower().Contains(request.TextAddress.ToLower()) ||
+                                       x.District.Name.ToLower().Contains(request.TextAddress.ToLower()) ||
+                                       x.District.City.Name.ToLower().Contains(request.TextAddress.ToLower())
                 );
                 whereExpression = whereExpression.And(expr1);
             }
@@ -59,6 +59,33 @@ namespace Service.ManagerVPS.Repositories
             return new Tuple<IEnumerable<Commune>, int>(data, totalCommunes);
         }
 
+        public async Task<bool> UpdateIsBlockCity(bool isBlock, Guid cityId)
+        {
+            var city = await context.Cities.FirstOrDefaultAsync(x => x.Id.Equals(cityId));
+            if (city == null)
+            {
+                throw new ClientException(3);
+            }
+
+            city.IsBlock = isBlock;
+            city.ModifiedAt = DateTime.Now;
+            await context.SaveChangesAsync();
+            return isBlock;
+        }
+        
+        public async Task<bool> UpdateIsBlockDistrict(bool isBlock, Guid districtId)
+        {
+            var district = await context.Districts.FirstOrDefaultAsync(x => x.Id.Equals(districtId));
+            if (district == null)
+            {
+                throw new ClientException(3);
+            }
+
+            district.IsBlock = isBlock;
+            district.ModifiedAt = DateTime.Now;
+            await context.SaveChangesAsync();
+            return isBlock;
+        }
         public async Task<bool> UpdateIsBlockCommune(bool isBlock, Guid communeId)
         {
             var communes = await context.Communes.FirstOrDefaultAsync(x => x.Id.Equals(communeId));
@@ -100,7 +127,8 @@ namespace Service.ManagerVPS.Repositories
                 CreatedAt = DateTime.Now,
                 ModifiedAt = DateTime.Now,
                 CreatedBy = userId,
-                Name = request.Name
+                Name = request.Name,
+                IsBlock = false
             };
             await context.Districts.AddAsync(district);
             await context.SaveChangesAsync();
@@ -115,7 +143,8 @@ namespace Service.ManagerVPS.Repositories
                 CreatedAt = DateTime.Now,
                 ModifiedAt = DateTime.Now,
                 CreatedBy = userId,
-                Name = request.Name
+                Name = request.Name,
+                IsBlock = false
             };
             await context.Cities.AddAsync(city);
             await context.SaveChangesAsync();

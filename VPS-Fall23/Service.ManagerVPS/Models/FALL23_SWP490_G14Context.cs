@@ -139,6 +139,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 
+                entity.Property(e => e.IsBlock).HasColumnName("is_block");
+
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
@@ -331,6 +333,8 @@ namespace Service.ManagerVPS.Models
                     .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+
+                entity.Property(e => e.IsBlock).HasColumnName("is_block");
 
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
@@ -555,6 +559,8 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("detail_address");
 
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
+
+                entity.Property(e => e.IsDelete).HasColumnName("is_delete");
 
                 entity.Property(e => e.IsFull)
                     .HasColumnName("is_full")

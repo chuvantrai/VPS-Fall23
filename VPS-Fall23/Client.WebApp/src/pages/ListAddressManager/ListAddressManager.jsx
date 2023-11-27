@@ -4,8 +4,136 @@ import React, { Fragment, useEffect, useState } from 'react';
 import useAddressServices from '@/services/addressServices';
 import CreateAddress from '@/pages/ListAddressManager/components/CreateAddress.jsx';
 import optionsCreateAddressType from '@/helpers/optionsCreateAddressType.js';
+import addressTypeEnum from '../../helpers/addressTypeEnum.js';
 
 function ListAddressManager() {
+
+  const columnsTableAddress = {
+    commune: [
+      {
+        title: 'Mã vùng',
+        dataIndex: 'communeCode',
+        key: 'communeCode',
+      },
+      {
+        title: 'Tỉnh/Thành phố',
+        dataIndex: 'cityName',
+        key: 'cityName',
+      },
+      {
+        title: 'Quận/Huyện',
+        dataIndex: 'districtName',
+        key: 'districtName',
+      },
+      {
+        title: 'Phường/Xã',
+        dataIndex: 'communeName',
+        key: 'communeName',
+      },
+      {
+        title: 'Ẩn/Hiện',
+        key: 'isBlock',
+        render: (val) => (
+          <Fragment>
+            {val.isBlock === false ?
+              (
+                <Tooltip title='Nhấn để ẩn địa điểm'>
+                  <Tag onClick={() => ChangeIsBlock(val.isBlock, val.communeId)} color='success'>
+                    <a>Hiện thị</a>
+                  </Tag>
+                </Tooltip>
+              ) :
+              (
+                <Tooltip title='Nhấn để hiện địa điểm'>
+                  <Tag onClick={() => ChangeIsBlock(val.isBlock, val.communeId)} color='red'>
+                    <a>Ẩn</a>
+                  </Tag>
+                </Tooltip>
+              )
+            }
+          </Fragment>
+        ),
+      },
+    ],
+    district: [
+      {
+        title: 'Mã vùng',
+        dataIndex: 'districtCode',
+        key: 'districtCode',
+      },
+      {
+        title: 'Tỉnh/Thành phố',
+        dataIndex: 'cityName',
+        key: 'cityName',
+      },
+      {
+        title: 'Quận/Huyện',
+        dataIndex: 'districtName',
+        key: 'districtName',
+      },
+      {
+        title: 'Ẩn/Hiện',
+        key: 'isBlock',
+        render: (val) => (
+          <Fragment>
+            {val.isBlock === false ?
+              (
+                <Tooltip title='Nhấn để ẩn địa điểm'>
+                  <Tag onClick={() => ChangeIsBlock(val.isBlock, val.districtId)} color='success'>
+                    <a>Hiện thị</a>
+                  </Tag>
+                </Tooltip>
+              ) :
+              (
+                <Tooltip title='Nhấn để hiện địa điểm'>
+                  <Tag onClick={() => ChangeIsBlock(val.isBlock, val.districtId)} color='red'>
+                    <a>Ẩn</a>
+                  </Tag>
+                </Tooltip>
+              )
+            }
+          </Fragment>
+        ),
+      },
+    ],
+    city: [
+      {
+        title: 'Mã vùng',
+        dataIndex: 'cityCode',
+        key: 'cityCode',
+      },
+      {
+        title: 'Tỉnh/Thành phố',
+        dataIndex: 'cityName',
+        key: 'cityName',
+      },
+      {
+        title: 'Ẩn/Hiện',
+        key: 'isBlock',
+        render: (val) => (
+          <Fragment>
+            {val.isBlock === false ?
+              (
+                <Tooltip title='Nhấn để ẩn địa điểm'>
+                  <Tag onClick={() => ChangeIsBlock(val.isBlock, val.cityId)} color='success'>
+                    <a>Hiện thị</a>
+                  </Tag>
+                </Tooltip>
+              ) :
+              (
+                <Tooltip title='Nhấn để hiện địa điểm'>
+                  <Tag onClick={() => ChangeIsBlock(val.isBlock, val.cityId)} color='red'>
+                    <a>Ẩn</a>
+                  </Tag>
+                </Tooltip>
+              )
+            }
+          </Fragment>
+        ),
+      },
+    ],
+  };
+
   const service = useAddressServices();
   const [data, setData] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
@@ -16,59 +144,19 @@ function ListAddressManager() {
   const [typeCityOptions, setTypeCityOptions] = useState([]);
   const [typeDistrictOptions, setTypeDistrictOptions] = useState([]);
   let options = optionsCreateAddressType;
-  const [addressType, setAddressType] = useState(options[0].value);
+  const [addressType, setAddressType] = useState(options[2].value);
 
   const pageSize = 10;
 
-  const columns = [
-    {
-      title: 'Mã vùng',
-      dataIndex: 'communeCode',
-      key: 'communeCode',
-    },
-    {
-      title: 'Tỉnh/Thành phố',
-      dataIndex: 'cityName',
-      key: 'cityName',
-    },
-    {
-      title: 'Quận/Huyện',
-      dataIndex: 'districtName',
-      key: 'districtName',
-    },
-    {
-      title: 'Phường/Xã',
-      dataIndex: 'communeName',
-      key: 'communeName',
-    },
-    {
-      title: 'Ẩn/Hiện',
-      key: 'isBlock',
-      render: (val) => (
-        <Fragment>
-          {val.isBlock === false ?
-            (
-              <Tooltip title='Nhấn để ẩn địa điểm'>
-                <Tag onClick={() => ChangeIsBlock(val.isBlock, val.communeId)} color='success'>
-                  <a>Hiện thị</a>
-                </Tag>
-              </Tooltip>
-            ) :
-            (
-              <Tooltip title='Nhấn để hiện địa điểm'>
-                <Tag onClick={() => ChangeIsBlock(val.isBlock, val.communeId)} color='red'>
-                  <a>Ẩn</a>
-                </Tag>
-              </Tooltip>
-            )
-          }
-        </Fragment>
-      ),
-    },
-  ];
-
   const loadData = () => {
-    service.getAddressManager(pageNumber, pageSize, cityFilter, districtFilter, textSearch).then((res) => {
+    service.getAddressManager(pageNumber, pageSize, cityFilter, districtFilter, textSearch, addressType).then((res) => {
+      setData(res.data.listAddress);
+      setTotalItems(res.data.totalPages);
+    });
+  };
+
+  const loadDataOnChange = (addressTypeLoad) => {
+    service.getAddressManager(pageNumber, pageSize, undefined, undefined, '', addressTypeLoad).then((res) => {
       setData(res.data.listAddress);
       setTotalItems(res.data.totalPages);
     });
@@ -79,16 +167,31 @@ function ListAddressManager() {
   };
 
   const ChangeIsBlock = (isBlock, communeId) => {
-    service.updateIsBlockCommune(!isBlock, communeId).then((res) => {
-      setData(
-        data.map((val) => ({
+    let newData = [];
+    switch (addressType) {
+      case addressTypeEnum.COMMUNE:
+        newData = data.map((val) => ({
           ...val,
-          isBlock: val.communeId === communeId ? res.data : val.isBlock,
-        })),
-      );
+          isBlock: val.communeId === communeId ? !isBlock : val.isBlock,
+        }));
+        break;
+      case addressTypeEnum.DISTRICT:
+        newData = data.map((val) => ({
+          ...val,
+          isBlock: val.districtId === communeId ? !isBlock : val.isBlock,
+        }));
+        break;
+      case addressTypeEnum.CITY:
+        newData = data.map((val) => ({
+          ...val,
+          isBlock: val.cityId === communeId ? !isBlock : val.isBlock,
+        }));
+        break;
+    }
+    service.updateIsBlockAddress(!isBlock, communeId, addressType).then((res) => {
+      setData(newData);
     });
   };
-
   const OnSearchAddress = (event) => {
     if (event.key === 'Enter') {
       loadData();
@@ -145,15 +248,15 @@ function ListAddressManager() {
 
   const onChangeAddressType = (val) => {
     setAddressType(val);
+    setDistrictFilter(undefined);
+    setCityFilter(undefined);
+    setTextSearch('');
+    loadDataOnChange(val);
   };
-
   useEffect(() => {
     loadData();
-  }, [pageNumber, districtFilter, cityFilter, CreateAddress]);
-
-  useEffect(() => {
     loadTypeCityOptions();
-  }, []);
+  }, [pageNumber, districtFilter, cityFilter]);
 
   return (
     <>
@@ -177,32 +280,44 @@ function ListAddressManager() {
             value={textSearch}
             onKeyDown={OnSearchAddress} />
           <div className={'ttt mr-[10px]'}>
-            <Select
-              className='w-80 mr-[10px]'
-              showSearch
-              placeholder='Tỉnh/Thành phố'
-              optionFilterProp='children'
-              allowClear
-              onChange={OnChangeCityFilter}
-              filterOption={OnFilterOption}
-              options={typeCityOptions}
-              value={cityFilter}
-            />
-            <Select
-              className='w-80'
-              showSearch
-              placeholder='Quận/Huyện'
-              optionFilterProp='children'
-              allowClear
-              onChange={OnChangeDistrictFilter}
-              filterOption={OnFilterOption}
-              options={typeDistrictOptions}
-              value={districtFilter}
-            />
+            {addressType === addressTypeEnum.COMMUNE || addressType === addressTypeEnum.DISTRICT ?
+              <Select
+                className='w-80 mr-[10px]'
+                showSearch
+                placeholder='Tỉnh/Thành phố'
+                optionFilterProp='children'
+                allowClear
+                onChange={OnChangeCityFilter}
+                filterOption={OnFilterOption}
+                options={typeCityOptions}
+                value={cityFilter}
+              />
+              : <></>
+            }
+            {addressType === addressTypeEnum.COMMUNE ?
+              <Select
+                className='w-80'
+                showSearch
+                placeholder='Quận/Huyện'
+                optionFilterProp='children'
+                allowClear
+                onChange={OnChangeDistrictFilter}
+                filterOption={OnFilterOption}
+                options={typeDistrictOptions}
+                value={districtFilter}
+              />
+              : <></>
+            }
           </div>
         </div>
 
-        <Table columns={columns} dataSource={data} pagination={false} />
+        {addressType === addressTypeEnum.COMMUNE ?
+          <Table columns={columnsTableAddress.commune} dataSource={data} pagination={false} /> : <></>}
+        {addressType === addressTypeEnum.DISTRICT ?
+          <Table columns={columnsTableAddress.district} dataSource={data} pagination={false} /> : <></>}
+        {addressType === addressTypeEnum.CITY ?
+          <Table columns={columnsTableAddress.city} dataSource={data} pagination={false} /> : <></>}
+
         <div className='py-[16px] flex flex-row-reverse pr-[24px]'>
           <Pagination current={pageNumber} pageSize={pageSize} onChange={handleChangePage} total={totalItems}
                       showSizeChanger={false} />

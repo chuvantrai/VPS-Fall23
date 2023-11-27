@@ -1,4 +1,6 @@
-﻿namespace Service.ManagerVPS.DTO.Input;
+﻿using Service.ManagerVPS.Constants.Enums;
+
+namespace Service.ManagerVPS.DTO.Input;
 
 public class GetAddressListParkingZoneRequest
 {
@@ -7,4 +9,6 @@ public class GetAddressListParkingZoneRequest
     public string TextAddress { get; set; } = "";
     public Guid? CityFilter { get;set; }
     public Guid? DistrictFilter { get;set; }
+
+    public AddressTypeEnum TypeAddress { get; set; } = AddressTypeEnum.COMMUNE;
 }
