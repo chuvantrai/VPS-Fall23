@@ -2,8 +2,8 @@ import { AutoComplete, Pagination, Select, Table, Tag, Tooltip } from 'antd';
 import { CloseSquareFilled } from '@ant-design/icons';
 import React, { Fragment, useEffect, useState } from 'react';
 import useAddressServices from '@/services/addressServices';
-import CreateAddress from "@/pages/ListAddressManager/components/CreateAddress.jsx";
-import optionsCreateAddressType from "@/helpers/optionsCreateAddressType.js";
+import CreateAddress from '@/pages/ListAddressManager/components/CreateAddress.jsx';
+import optionsCreateAddressType from '@/helpers/optionsCreateAddressType.js';
 
 function ListAddressManager() {
   const service = useAddressServices();
@@ -49,14 +49,14 @@ function ListAddressManager() {
           {val.isBlock === false ?
             (
               <Tooltip title='Nhấn để ẩn địa điểm'>
-                <Tag onClick={() => ChangeIsBlock(val.isBlock,val.communeId)} color='success'>
+                <Tag onClick={() => ChangeIsBlock(val.isBlock, val.communeId)} color='success'>
                   <a>Hiện thị</a>
                 </Tag>
               </Tooltip>
             ) :
             (
               <Tooltip title='Nhấn để hiện địa điểm'>
-                <Tag onClick={() => ChangeIsBlock(val.isBlock,val.communeId)} color='red'>
+                <Tag onClick={() => ChangeIsBlock(val.isBlock, val.communeId)} color='red'>
                   <a>Ẩn</a>
                 </Tag>
               </Tooltip>
@@ -81,10 +81,10 @@ function ListAddressManager() {
   const ChangeIsBlock = (isBlock, communeId) => {
     service.updateIsBlockCommune(!isBlock, communeId).then((res) => {
       setData(
-          data.map((val) => ({
-            ...val,
-            isBlock: val.communeId === communeId ? res.data : val.isBlock
-          }))
+        data.map((val) => ({
+          ...val,
+          isBlock: val.communeId === communeId ? res.data : val.isBlock,
+        })),
       );
     });
   };
@@ -141,7 +141,7 @@ function ListAddressManager() {
     setTextSearch('');
     setCityFilter(undefined);
     setDistrictFilter(undefined);
-  }
+  };
 
   const onChangeAddressType = (val) => {
     setAddressType(val);
@@ -149,7 +149,7 @@ function ListAddressManager() {
 
   useEffect(() => {
     loadData();
-  }, [pageNumber, districtFilter, cityFilter,CreateAddress]);
+  }, [pageNumber, districtFilter, cityFilter, CreateAddress]);
 
   useEffect(() => {
     loadTypeCityOptions();
@@ -159,13 +159,13 @@ function ListAddressManager() {
     <>
       <div className='w-[100%]'>
         <div className='mb-[16px] flex items-center justify-between'>
-          <CreateAddress callBackCreateAddress={callBackCreateAddress}/>
+          <CreateAddress callBackCreateAddress={callBackCreateAddress} />
           <Select
-              className={('min-w-[230px]')}
-              defaultValue={options[2]}
-              style={{width: 120}}
-              options={options}
-              onChange={onChangeAddressType}
+            className={('min-w-[230px]')}
+            defaultValue={options[2]}
+            style={{ width: 120 }}
+            options={options}
+            onChange={onChangeAddressType}
           />
         </div>
         <div className='mb-[16px] flex items-center justify-between'>
@@ -178,26 +178,26 @@ function ListAddressManager() {
             onKeyDown={OnSearchAddress} />
           <div className={'ttt mr-[10px]'}>
             <Select
-                className='w-80 mr-[10px]'
-                showSearch
-                placeholder='Tỉnh/Thành phố'
-                optionFilterProp='children'
-                allowClear
-                onChange={OnChangeCityFilter}
-                filterOption={OnFilterOption}
-                options={typeCityOptions}
-                value={cityFilter}
+              className='w-80 mr-[10px]'
+              showSearch
+              placeholder='Tỉnh/Thành phố'
+              optionFilterProp='children'
+              allowClear
+              onChange={OnChangeCityFilter}
+              filterOption={OnFilterOption}
+              options={typeCityOptions}
+              value={cityFilter}
             />
             <Select
-                className='w-80'
-                showSearch
-                placeholder='Quận/Huyện'
-                optionFilterProp='children'
-                allowClear
-                onChange={OnChangeDistrictFilter}
-                filterOption={OnFilterOption}
-                options={typeDistrictOptions}
-                value={districtFilter}
+              className='w-80'
+              showSearch
+              placeholder='Quận/Huyện'
+              optionFilterProp='children'
+              allowClear
+              onChange={OnChangeDistrictFilter}
+              filterOption={OnFilterOption}
+              options={typeDistrictOptions}
+              value={districtFilter}
             />
           </div>
         </div>
