@@ -27,6 +27,8 @@ const CreateAddress = ({ callBackCreateAddress }) => {
     setAddressType(val);
     setDistrictFilter(undefined);
     setCityFilter(undefined);
+    form.setFieldValue('city', undefined);
+    form.setFieldValue('district', undefined);
   };
   const onFinish = (val) => {
     switch (addressType) {
@@ -89,9 +91,9 @@ const CreateAddress = ({ callBackCreateAddress }) => {
   const OnChangeCityFilter = (val) => {
     setCityFilter(val);
     setDistrictFilter(undefined);
+    form.setFieldValue('district', undefined);
     OnLoadDistrictFilter(val);
   };
-
   const OnChangeDistrictFilter = (val) => {
     setDistrictFilter(val);
   };
