@@ -7,6 +7,7 @@ import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewLi
 import AdminOverview from '@/pages/Dashboard/AdminOverview';
 import ViewListParkingZone from '@/pages/Homepage/components/Content/ListParkingZone';
 import ListUserReport from '../pages/ListUserReport';
+import ListAddressManager from '../pages/ListAddressManager/ListAddressManager.jsx';
 
 export const adminRoutesConfig = {
   header: Header,
@@ -74,6 +75,13 @@ export const adminRoutesConfig = {
           description: 'Toàn bộ báo cáo hiển thị dưới đây',
           component: ListUserReport,
         },
+        {
+          key: guidGenerator(),
+          path: 'address-list',
+          label: 'Địa điểm bãi đỗ xe',
+          description: 'Toàn bộ địa điểm bãi đỗ xe hiển thị dưới đây',
+          component: ListAddressManager,
+        }
       ],
     },
   ],
