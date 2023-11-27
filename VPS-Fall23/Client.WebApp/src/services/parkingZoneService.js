@@ -154,7 +154,7 @@ const useParkingZoneService = () => {
   };
 
   const closeParkingZone = (input) => {
-    axios.put(`${BASE_URI}/CloseParkingZone`, input).then((res) => {
+    return axios.put(`${BASE_URI}/CloseParkingZone`, input).then((res) => {
       notification.success({
         message: res?.data,
       });

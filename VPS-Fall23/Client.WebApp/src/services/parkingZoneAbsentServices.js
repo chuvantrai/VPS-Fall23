@@ -12,8 +12,12 @@ const useParkingZoneAbsentServices = () => {
             }
         })
     }
+    const deleteAbsent = (absentId) => {
+        return axios.delete(`${BASE_URI}/DeleteAbsent/${absentId}`);
+    }
     return {
-        getAbsents
+        getAbsents,
+        deleteAbsent
     }
 
 }
