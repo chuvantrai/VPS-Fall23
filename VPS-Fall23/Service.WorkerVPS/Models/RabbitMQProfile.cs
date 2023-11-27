@@ -13,6 +13,8 @@
     {
         public string CreateDeletingPZJobQueueName { get; set; } = null!;
         public string RemoveDeletingPZJobQueueName { get; set; } = null!;
+        public string CreateCancelBookingJobQueueName { get; set; } = null!;
+        public string RemoveCancelBookingJobQueueName { get; set; } = null!;
         public string SmtpQueueName { get; set; } = null!;
     }
 }

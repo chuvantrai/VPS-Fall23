@@ -16,7 +16,8 @@ const ParkingZoneDescriptionModal = () => {
         width: '40vw',
         open: detailInfo.isShow,
         title: "Thông tin bãi đỗ xe",
-        footer: <ParkingZoneDescriptionFooterModal />
+        footer: <ParkingZoneDescriptionFooterModal />,
+        onCancel: () => setDetailInfo({isShow: false, parkingZone: null, type: ''}),
     }
     const [parkingZoneImages, setParkingZoneImages] = useState([])
     useEffect(() => {
