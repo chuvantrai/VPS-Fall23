@@ -39,5 +39,6 @@ public enum ActionFilterEnum
     GetTypeReport,
     FilterReport,
     DeleteParkingZoneAction,
-    CancelAbsent
+    CancelAbsent,
+    DeletePromoCode
 }
