@@ -47,12 +47,10 @@ function ModalDetailCode({ open, promoCodeId, confirmLoading, onUpdate, onCancel
     promoCodeServices.getPromoCodeDetails(promoCodeId)
       .then(res => {
         let promoCodeObj = res.data
-        let parkingZoneLst = promoCodeObj.parkingZoneLst.map(val => (val.parkingZoneId))
+        let parkingZoneLst = promoCodeObj.parkingZoneIdLst
 
         form.setFieldsValue({
-          code: promoCodeObj.code,
           discount: promoCodeObj.discount,
-          numberOfUses: promoCodeObj.numberOfUses,
           parkingZoneIds: parkingZoneLst,
           selectedDate: [dayjs(promoCodeObj.fromDate), dayjs(promoCodeObj.toDate)]
         })
@@ -60,24 +58,7 @@ function ModalDetailCode({ open, promoCodeId, confirmLoading, onUpdate, onCancel
         setParkingZoneIds(parkingZoneLst)
         setSelectedDate([promoCodeObj.fromDate, promoCodeObj.toDate])
       })
-  }, [promoCodeId])
-
-  const makeCode = (length) => {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-  }
-
-  const handleGenerateCode = () => {
-    let code = makeCode(6)
-    form.setFieldValue('code', code)
-  }
+  }, [promoCodeId, open])
 
   const handleChange = (value) => {
     setParkingZoneIds(value);
@@ -118,26 +99,6 @@ function ModalDetailCode({ open, promoCodeId, confirmLoading, onUpdate, onCancel
       }}
     >
       <Form form={form} layout="vertical" name="modalDetailCode" validateMessages={validateMessages}>
-        <Form.Item label="Mã giảm giá">
-          <Row gutter={8}>
-            <Col span={18}>
-              <Form.Item
-                name="code"
-                noStyle
-                rules={[
-                  {
-                    required: true,
-                  },
-                ]}
-              >
-                <Input disabled />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Button onClick={handleGenerateCode}>Tạo mã code</Button>
-            </Col>
-          </Row>
-        </Form.Item>
         <Form.Item
           name='discount'
           label='Giảm giá'
@@ -154,22 +115,6 @@ function ModalDetailCode({ open, promoCodeId, confirmLoading, onUpdate, onCancel
             }}
             min={1}
             max={100}
-          />
-        </Form.Item>
-        <Form.Item
-          name='numberOfUses'
-          label='Số lần sử dụng'
-          rules={[
-            {
-              required: true
-            },
-          ]}
-        >
-          <InputNumber
-            style={{
-              width: '100%',
-            }}
-            min={1}
           />
         </Form.Item>
         <Form.Item

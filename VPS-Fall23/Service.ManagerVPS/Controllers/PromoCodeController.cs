@@ -57,19 +57,6 @@ public class PromoCodeController : VpsController<PromoCode>
     [FilterPermission(Action = ActionFilterEnum.CreateNewPromoCode)]
     public async Task<IActionResult> CreateNewPromoCode([FromBody] NewPromoCodeInput input)
     {
-        var newPromoCodeInfo = new PromoCodeInformation
-        {
-            Id = Guid.NewGuid(),
-            FromDate = (DateTime)input.FromDate!,
-            ToDate = (DateTime)input.ToDate!,
-            CreatedAt = DateTime.Now,
-            ModifiedAt = DateTime.Now,
-            OwnerId = (Guid)input.OwnerId!,
-            Discount = (int)input.Discount!,
-            IsSent = false
-        };
-        await _promoCodeInfoRepository.Create(newPromoCodeInfo);
-
         var transactionLst = _transactionRepository.GetParkingTransactions();
         var promoCodeLst = new List<PromoCode>();
         foreach (var parkingZoneId in input.ParkingZoneIds)
@@ -92,6 +79,25 @@ public class PromoCodeController : VpsController<PromoCode>
             promoCodeLst.AddRange(promoCode);
         }
 
+        if (promoCodeLst.Count == 0)
+        {
+            throw new ServerException(
+                "Hiện chưa có người dùng nào sử dụng bãi đỗ xe. Không thể tạo khuyến mãi!");
+        }
+
+        var newPromoCodeInfo = new PromoCodeInformation
+        {
+            Id = Guid.NewGuid(),
+            FromDate = (DateTime)input.FromDate!,
+            ToDate = (DateTime)input.ToDate!,
+            CreatedAt = DateTime.Now,
+            ModifiedAt = DateTime.Now,
+            OwnerId = (Guid)input.OwnerId!,
+            Discount = (int)input.Discount!,
+            IsSent = false
+        };
+        await _promoCodeInfoRepository.Create(newPromoCodeInfo);
+
         await ((IPromoCodeRepository)vpsRepository).CreateRange(promoCodeLst);
         await vpsRepository.SaveChange();
 
@@ -109,8 +115,19 @@ public class PromoCodeController : VpsController<PromoCode>
 
         var promoCodeInfo = _promoCodeInfoRepository.GetPromoCodeInfoDetailById((Guid)promoCodeId)
                             ?? throw new ServerException(2);
-
-        return Ok(promoCodeInfo);
+        var parkingZoneIdLst = promoCodeInfo.PromoCodes
+            .Select(x => x.ParkingZoneId)
+            .ToList();
+        return Ok(new
+        {
+            promoCodeInfo.Id,
+            promoCodeInfo.FromDate,
+            promoCodeInfo.ToDate,
+            promoCodeInfo.OwnerId,
+            promoCodeInfo.Discount,
+            promoCodeInfo.IsSent,
+            parkingZoneIdLst
+        });
     }
 
     [HttpPut]

@@ -196,7 +196,6 @@ function ViewRequestedParkingZones() {
               </p>
             </div>
           ),
-          rowExpandable: (record) => record.name !== 'Not Expandable',
         }}
         dataSource={dataSrc}
         pagination={false}
