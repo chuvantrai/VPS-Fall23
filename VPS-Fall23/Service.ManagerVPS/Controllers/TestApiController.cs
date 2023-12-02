@@ -6,12 +6,15 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.AppSetting;
+using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.Extensions.Logic;
 using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace Service.ManagerVPS.Controllers;
 
@@ -21,15 +24,20 @@ public class TestApiController : VpsController<Account>
     private readonly IVnPayLibrary _vnPayLibrary;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly FileManagementConfig _fileManagementConfig;
+    private readonly IGeneralVPS _generalVps;
+    private readonly TwilioSettings _twilio;
 
     public TestApiController(IUserRepository userRepository, IConfiguration config,
         IVnPayLibrary vnPayLibrary, IHttpContextAccessor httpContextAccessor,
+        IGeneralVPS generalVps, IOptions<TwilioSettings> twilio,
         IOptions<FileManagementConfig> options) : base(userRepository)
     {
         _config = config;
         _vnPayLibrary = vnPayLibrary;
         _httpContextAccessor = httpContextAccessor;
         _fileManagementConfig = options.Value;
+        _generalVps = generalVps;
+        _twilio = twilio.Value;
     }
 
     [HttpPost]
@@ -178,7 +186,6 @@ public class TestApiController : VpsController<Account>
         {
             ipAddress = _httpContextAccessor.HttpContext?.Request.Headers["X-Forwarded-For"];
 
-
             if (string.IsNullOrEmpty(ipAddress) || (ipAddress.ToLower() == "unknown") || ipAddress.Length > 45)
                 ipAddress = _httpContextAccessor.HttpContext?.Request.Headers["REMOTE_ADDR"];
         }
@@ -186,7 +193,24 @@ public class TestApiController : VpsController<Account>
         {
             ipAddress = "Invalid IP:" + ex.Message;
         }
-
+    
         return ipAddress ?? "::1";
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SendSmsDemo()
+    {
+        // #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
+        // TwilioClient.Init(_twilio.AccountSid, _twilio.AuthToken);
+        // var result = await MessageResource.CreateAsync(
+        //     body: "Traicv test api send sms : số tài khoản không đủ",
+        //     from: new Twilio.Types.PhoneNumber(_twilio.TwilioPhoneNumber),
+        //     to: "+84362351671"
+        // );
+        // #endregion
+        //
+        // if (!string.IsNullOrEmpty(result.ErrorMessage))
+        //     throw new ClientException(3);
+        return Ok();
     }
 }
