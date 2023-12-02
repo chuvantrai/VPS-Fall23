@@ -27,6 +27,7 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(Guid parkingZoneId);
 
         List<ParkingTransaction> GetParkingTransactions();
+        
         Task SendBookedEmail(ParkingTransaction parkingTransaction, PaymentTransaction paymentTransaction);
     }
 }

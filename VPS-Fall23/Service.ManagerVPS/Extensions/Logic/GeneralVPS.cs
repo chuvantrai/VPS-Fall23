@@ -44,6 +44,14 @@ public class GeneralVPS : IGeneralVPS
         }
     }
 
+    public string GenerateRandomCode(int length)
+    {
+        var random = new Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
     public async Task<bool> SendListEmailAsync(IEnumerable<string> recipients, string subject,
         string body)
     {

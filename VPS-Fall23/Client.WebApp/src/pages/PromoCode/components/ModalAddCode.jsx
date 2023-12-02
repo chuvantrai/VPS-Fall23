@@ -34,23 +34,6 @@ function ModalAddCode({ open, confirmLoading, onCreate, onCancel }) {
       })
   }, [])
 
-  const makeCode = (length) => {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-  }
-
-  const handleGenerateCode = () => {
-    let code = makeCode(6)
-    form.setFieldValue('code', code)
-  }
-
   const handleChange = (value) => {
     setParkingZoneIds(value);
   };
@@ -83,26 +66,6 @@ function ModalAddCode({ open, confirmLoading, onCreate, onCancel }) {
       }}
     >
       <Form form={form} layout="vertical" name="modalAddCode" validateMessages={validateMessages}>
-        <Form.Item label="Mã giảm giá">
-          <Row gutter={8}>
-            <Col span={18}>
-              <Form.Item
-                name="code"
-                noStyle
-                rules={[
-                  {
-                    required: true,
-                  },
-                ]}
-              >
-                <Input disabled />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Button onClick={handleGenerateCode}>Tạo mã code</Button>
-            </Col>
-          </Row>
-        </Form.Item>
         <Form.Item
           name='discount'
           label='Giảm giá'
@@ -119,22 +82,6 @@ function ModalAddCode({ open, confirmLoading, onCreate, onCancel }) {
             }}
             min={1}
             max={100}
-          />
-        </Form.Item>
-        <Form.Item
-          name='numberOfUses'
-          label='Số lần sử dụng'
-          rules={[
-            {
-              required: true
-            },
-          ]}
-        >
-          <InputNumber
-            style={{
-              width: '100%',
-            }}
-            min={1}
           />
         </Form.Item>
         <Form.Item

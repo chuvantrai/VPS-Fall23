@@ -195,7 +195,12 @@ public static class ActionFilter
         new ActionModel
         {
             Action = ActionFilterEnum.CancelAbsent,
-            UserRole = new[] {UserRoleEnum.OWNER}
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.DeletePromoCode,
+            UserRole = new[] { UserRoleEnum.OWNER }
         }
     };
 
