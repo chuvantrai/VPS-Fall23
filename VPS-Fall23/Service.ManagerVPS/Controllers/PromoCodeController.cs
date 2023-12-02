@@ -149,8 +149,8 @@ public class PromoCodeController : VpsController<PromoCode>
         if (promoCodeInfo.IsSent)
             throw new ServerException("Mã khuyến mãi đã gửi cho người dùng không thể xóa!");
 
-        await _promoCodeInfoRepository.Delete(promoCodeInfo);
         await ((IPromoCodeRepository)vpsRepository).DeleteRange(promoCodeInfo.PromoCodes.ToList());
+        await _promoCodeInfoRepository.Delete(promoCodeInfo);
         await vpsRepository.SaveChange();
 
         return Ok(ResponseNotification.DELETE_SUCCESS);

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Table, Pagination, Divider, notification } from 'antd';
-import { PlusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Button, Table, Pagination, Divider, Popconfirm, notification } from 'antd';
+import { PlusCircleOutlined, EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 
 import usePromoCodeServices from '@/services/promoCodeServices';
@@ -54,10 +54,22 @@ function PromoCode() {
           >
           </Button>
           <Divider type="vertical" />
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-          ></Button>
+          <Popconfirm
+            title="Xóa ưu đãi"
+            description="Bạn có chắc muốn xóa toàn bộ ưu đãi này?"
+            icon={
+              <QuestionCircleOutlined
+                style={{
+                  color: 'red',
+                }}
+              />
+            }
+            onConfirm={() => {
+              handleDeletePromoCode(record.key)
+            }}
+          >
+            <Button danger icon={<DeleteOutlined />}></Button>
+          </Popconfirm>
         </>
       )
     },
@@ -125,6 +137,16 @@ function PromoCode() {
         getData()
         setConfirmDetailLoading(false)
         setOpenDetailCode(false);
+      })
+  }
+
+  const handleDeletePromoCode = (promoCodeId) => {
+    promoCodeServices.deletePromoCode(promoCodeId)
+      .then(res => {
+        notification.success({
+          message: res.data,
+        });
+        getData()
       })
   }
 
