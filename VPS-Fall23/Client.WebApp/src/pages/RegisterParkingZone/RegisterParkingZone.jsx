@@ -220,7 +220,12 @@ const RegisterParkingZone = () => {
                 },
               ]}
             >
-              <InputNumber style={{ width: "100%" }} prefix="VND" />
+              <InputNumber
+                style={{ width: "100%" }}
+                prefix="VND"
+                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              />
             </Form.Item>
             <Form.Item
               name="priceOverTimePerHour"
@@ -231,7 +236,12 @@ const RegisterParkingZone = () => {
                 },
               ]}
             >
-              <InputNumber style={{ width: "100%" }} prefix="VND" />
+              <InputNumber
+                style={{ width: "100%" }}
+                prefix="VND"
+                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              />
             </Form.Item>
             <Form.Item name="workingTime" label="Thời gian làm việc" required>
               <TimePicker.RangePicker
@@ -249,7 +259,12 @@ const RegisterParkingZone = () => {
                 },
               ]}
             >
-              <InputNumber style={{ width: "100%" }} placeholder="Số slots của parking zone" />
+              <InputNumber
+                style={{ width: "100%" }}
+                placeholder="Số slots của parking zone"
+                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+              />
             </Form.Item>
             <Form.Item name={'detailAddress'} label="Địa chỉ" validateStatus={validateStatus} help={help}>
               <Space.Compact direction='vertical' style={{ width: "100%" }}>

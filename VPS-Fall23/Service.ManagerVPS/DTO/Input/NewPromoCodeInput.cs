@@ -8,14 +8,7 @@ public class NewPromoCodeInput
     public Guid? OwnerId { get; set; }
 
     [Required]
-    [StringLength(6)]
-    public string? Code { get; set; }
-
-    [Required]
     public int? Discount { get; set; }
-
-    [Required]
-    public int? NumberOfUses { get; set; }
 
     [Required] 
     public List<Guid> ParkingZoneIds { get; set; }

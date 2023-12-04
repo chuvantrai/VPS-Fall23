@@ -143,7 +143,7 @@ namespace Service.ManagerVPS.Controllers
                 var promoInfo = await promoCodeRepository.GetByCode(transaction.PromoCode, transaction.ParkingZoneId);
                 if (promoInfo != null)
                 {
-                    totalMoney -= totalMoney * promoInfo.Discount / 100;
+                    totalMoney -= totalMoney * promoInfo.PromoCodeInformation.Discount / 100;
                 }
             }
             totalMoney = decimal.Round(totalMoney, 2);

@@ -25,14 +25,17 @@ namespace Service.ManagerVPS.Models
         public virtual DbSet<Feedback> Feedbacks { get; set; } = null!;
         public virtual DbSet<GlobalStatus> GlobalStatuses { get; set; } = null!;
         public virtual DbSet<ParkingTransaction> ParkingTransactions { get; set; } = null!;
-        public virtual DbSet<ParkingTransactionDetail> ParkingTransactionDetails { get; set; } = null!;
+
+        public virtual DbSet<ParkingTransactionDetail> ParkingTransactionDetails { get; set; } =
+            null!;
+
         public virtual DbSet<ParkingZone> ParkingZones { get; set; } = null!;
         public virtual DbSet<ParkingZoneAbsent> ParkingZoneAbsents { get; set; } = null!;
         public virtual DbSet<ParkingZoneAttendant> ParkingZoneAttendants { get; set; } = null!;
         public virtual DbSet<ParkingZoneOwner> ParkingZoneOwners { get; set; } = null!;
         public virtual DbSet<PaymentTransaction> PaymentTransactions { get; set; } = null!;
         public virtual DbSet<PromoCode> PromoCodes { get; set; } = null!;
-        public virtual DbSet<PromoCodeParkingZone> PromoCodeParkingZones { get; set; } = null!;
+        public virtual DbSet<PromoCodeInformation> PromoCodeInformations { get; set; } = null!;
         public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Type> Types { get; set; } = null!;
 
@@ -154,8 +157,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
-
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Cities)
@@ -199,7 +202,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Communes)
@@ -258,7 +262,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.ParkingZone)
                     .WithMany(p => p.Contracts)
@@ -296,7 +301,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.TypeId).HasColumnName("type_id");
 
@@ -350,7 +356,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.City)
                     .WithMany(p => p.Districts)
@@ -393,7 +400,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.HasOne(d => d.Parent)
                     .WithMany(p => p.InverseParent)
@@ -521,11 +529,13 @@ namespace Service.ManagerVPS.Models
                     .HasColumnType("datetime")
                     .HasColumnName("from");
 
-                entity.Property(e => e.ParkingTransactionId).HasColumnName("parking_transaction_id");
+                entity.Property(e => e.ParkingTransactionId)
+                    .HasColumnName("parking_transaction_id");
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.To)
                     .HasColumnType("datetime")
@@ -562,6 +572,8 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("detail_address");
 
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
+
+                entity.Property(e => e.IsDeleted).HasColumnName("is_delete");
 
                 entity.Property(e => e.IsFull)
                     .HasColumnName("is_full")
@@ -606,7 +618,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.WorkFrom)
                     .HasColumnName("work_from")
@@ -615,10 +628,6 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.WorkTo)
                     .HasColumnName("work_to")
                     .HasDefaultValueSql("('23:00:00')");
-
-                entity.Property(e => e.IsDeleted)
-                    .HasColumnName("is_delete")
-                    .HasDefaultValueSql("((0))");
 
                 entity.HasOne(d => d.Commune)
                     .WithMany(p => p.ParkingZones)
@@ -630,8 +639,6 @@ namespace Service.ManagerVPS.Models
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__parking_z__owner__0D7A0286");
-
-                entity.HasQueryFilter(p => !p.IsDeleted);
             });
 
             modelBuilder.Entity<ParkingZoneAbsent>(entity =>
@@ -660,7 +667,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.To)
                     .HasColumnType("datetime")
@@ -802,7 +810,7 @@ namespace Service.ManagerVPS.Models
 
             modelBuilder.Entity<PromoCode>(entity =>
             {
-                entity.ToTable("promo_code");
+                entity.ToTable("promoCode");
 
                 entity.Property(e => e.Id)
                     .ValueGeneratedNever()
@@ -818,6 +826,54 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.ModifiedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("modified_at")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.NumberOfUses).HasColumnName("number_of_uses");
+
+                entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
+
+                entity.Property(e => e.PromoCodeInformationId)
+                    .HasColumnName("promoCode_information_id");
+
+                entity.Property(e => e.UserEmail)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("user_email");
+
+                entity.Property(e => e.UserPhone)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("user_phone");
+
+                entity.HasOne(d => d.ParkingZone)
+                    .WithMany(p => p.PromoCodes)
+                    .HasForeignKey(d => d.ParkingZoneId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("promoCode_FK_2");
+
+                entity.HasOne(d => d.PromoCodeInformation)
+                    .WithMany(p => p.PromoCodes)
+                    .HasForeignKey(d => d.PromoCodeInformationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("promoCode_FK");
+            });
+
+            modelBuilder.Entity<PromoCodeInformation>(entity =>
+            {
+                entity.ToTable("promoCode_information");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at")
+                    .HasDefaultValueSql("(getdate())");
+
                 entity.Property(e => e.Discount)
                     .HasColumnName("discount")
                     .HasDefaultValueSql("((10))");
@@ -826,14 +882,12 @@ namespace Service.ManagerVPS.Models
                     .HasColumnType("datetime")
                     .HasColumnName("from_date");
 
+                entity.Property(e => e.IsSent).HasColumnName("isSent");
+
                 entity.Property(e => e.ModifiedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("modified_at")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.NumberOfUses)
-                    .HasColumnName("number_of_uses")
-                    .HasDefaultValueSql("((50))");
 
                 entity.Property(e => e.OwnerId).HasColumnName("ownerId");
 
@@ -842,44 +896,10 @@ namespace Service.ManagerVPS.Models
                     .HasColumnName("to_date");
 
                 entity.HasOne(d => d.Owner)
-                    .WithMany(p => p.PromoCodes)
+                    .WithMany(p => p.PromoCodeInformations)
                     .HasForeignKey(d => d.OwnerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("promo_code_FK");
-            });
-
-            modelBuilder.Entity<PromoCodeParkingZone>(entity =>
-            {
-                entity.HasKey(e => new { e.PromoCodeId, e.ParkingZoneId })
-                    .HasName("promoCode_parkingZone_PK");
-
-                entity.ToTable("promoCode_parkingZone");
-
-                entity.Property(e => e.PromoCodeId).HasColumnName("promo_code_id");
-
-                entity.Property(e => e.ParkingZoneId).HasColumnName("parking_zone_id");
-
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.ModifiedAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("modified_at")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.HasOne(d => d.ParkingZone)
-                    .WithMany(p => p.PromoCodeParkingZones)
-                    .HasForeignKey(d => d.ParkingZoneId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("promoCode_parkingZone_FK");
-
-                entity.HasOne(d => d.PromoCode)
-                    .WithMany(p => p.PromoCodeParkingZones)
-                    .HasForeignKey(d => d.PromoCodeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("promoCode_parkingZone_FK_1");
             });
 
             modelBuilder.Entity<Report>(entity =>
@@ -913,7 +933,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.SubId)
                     .ValueGeneratedOnAdd()
-                    .HasColumnName("sub_id").Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                    .HasColumnName("sub_id")
+                    .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
 
                 entity.Property(e => e.Type).HasColumnName("type");
 

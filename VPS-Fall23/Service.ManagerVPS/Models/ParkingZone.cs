@@ -15,7 +15,7 @@ namespace Service.ManagerVPS.Models
             ParkingTransactions = new HashSet<ParkingTransaction>();
             ParkingZoneAbsents = new HashSet<ParkingZoneAbsent>();
             ParkingZoneAttendants = new HashSet<ParkingZoneAttendant>();
-            PromoCodeParkingZones = new HashSet<PromoCodeParkingZone>();
+            PromoCodes = new HashSet<PromoCode>();
         }
 
         public Guid Id { get; set; }
@@ -35,11 +35,10 @@ namespace Service.ManagerVPS.Models
         public TimeSpan WorkFrom { get; set; }
         public TimeSpan WorkTo { get; set; }
         public bool? IsFull { get; set; }
-        public bool IsDelete { get; set; }
         public Geometry? Location { get; set; }
         public decimal? Lat { get; set; }
         public decimal? Lng { get; set; }
-        
+
         public virtual Commune? Commune { get; set; }
         public virtual ParkingZoneOwner Owner { get; set; } = null!;
         public virtual ICollection<Contract> Contracts { get; set; }
@@ -47,6 +46,6 @@ namespace Service.ManagerVPS.Models
         public virtual ICollection<ParkingTransaction> ParkingTransactions { get; set; }
         public virtual ICollection<ParkingZoneAbsent> ParkingZoneAbsents { get; set; }
         public virtual ICollection<ParkingZoneAttendant> ParkingZoneAttendants { get; set; }
-        public virtual ICollection<PromoCodeParkingZone> PromoCodeParkingZones { get; set; }
+        public virtual ICollection<PromoCode> PromoCodes { get; set; }
     }
 }
