@@ -200,17 +200,17 @@ public class TestApiController : VpsController<Account>
     [HttpPost]
     public async Task<IActionResult> SendSmsDemo()
     {
-        // #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
-        // TwilioClient.Init(_twilio.AccountSid, _twilio.AuthToken);
-        // var result = await MessageResource.CreateAsync(
-        //     body: "Traicv test api send sms : số tài khoản không đủ",
-        //     from: new Twilio.Types.PhoneNumber(_twilio.TwilioPhoneNumber),
-        //     to: "+84362351671"
-        // );
-        // #endregion
-        //
-        // if (!string.IsNullOrEmpty(result.ErrorMessage))
-        //     throw new ClientException(3);
+        #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
+        TwilioClient.Init(_twilio.AccountSid, _twilio.AuthToken);
+        var result = await MessageResource.CreateAsync(
+            body: "Traicv test api send sms : số tài khoản không đủ",
+            from: new Twilio.Types.PhoneNumber(_twilio.TwilioPhoneNumber),
+            to: "+84362351671"
+        );
+        #endregion
+        
+        if (!string.IsNullOrEmpty(result.ErrorMessage))
+            throw new ClientException(3);
         return Ok();
     }
 }

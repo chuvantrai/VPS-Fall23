@@ -169,4 +169,10 @@ public class PromoCodeController : VpsController<PromoCode>
 
         return promo;
     }
+
+    // [HttpPost]
+    // public async Task<IActionResult> SendSmsPromoCodeToAllUser()
+    // {
+    //     
+    // }
 }
