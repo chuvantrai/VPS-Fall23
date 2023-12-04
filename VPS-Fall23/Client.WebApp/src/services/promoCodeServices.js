@@ -29,11 +29,20 @@ const usePromoCodeServices = () => {
     return axios.put(`api/PromoCode/UpdatePromoCode`, input);
   };
 
+  const deletePromoCode = (promoCodeId) => {
+    return axios.delete(`api/PromoCode/DeletePromoCode`, {
+      params: {
+        promoCodeId,
+      },
+    });
+  };
+
   return {
     getListPromoCode,
     createNewPromoCode,
     getPromoCodeDetails,
     updatePromoCode,
+    deletePromoCode,
   };
 };
 

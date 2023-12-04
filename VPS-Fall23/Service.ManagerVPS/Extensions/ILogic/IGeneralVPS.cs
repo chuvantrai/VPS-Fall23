@@ -7,6 +7,8 @@ public interface IGeneralVPS
     Task<bool> SendEmailAsync(string recipient, string subject, string body);
 
     int GenerateVerificationCode();
+    
+    string GenerateRandomCode(int length);
 
     Task<bool> SendListEmailAsync(IEnumerable<string> recipients, string subject, string body);
 

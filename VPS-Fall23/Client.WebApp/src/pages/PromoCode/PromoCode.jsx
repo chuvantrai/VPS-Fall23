@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Table, Pagination, notification } from 'antd';
-import { PlusCircleOutlined, EditOutlined } from '@ant-design/icons'
+import { Button, Table, Pagination, Divider, Popconfirm, notification } from 'antd';
+import { PlusCircleOutlined, EditOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { useEffect, useState } from 'react';
 
 import usePromoCodeServices from '@/services/promoCodeServices';
@@ -25,19 +25,9 @@ function PromoCode() {
 
   const columns = [
     {
-      title: 'Code',
-      dataIndex: 'code',
-      key: 'code'
-    },
-    {
-      title: 'Giảm giá (%)',
+      title: 'Mã giảm (%)',
       key: 'discount',
       dataIndex: 'discount'
-    },
-    {
-      title: 'Số lần sử dụng',
-      key: 'numberOfUses',
-      dataIndex: 'numberOfUses'
     },
     {
       title: 'Ngày bắt đầu',
@@ -53,15 +43,34 @@ function PromoCode() {
       title: '',
       key: 'action',
       render: (_, record) => (
-        <a
-          onClick={(e) => {
-            e.preventDefault();
-            setOpenDetailCode(true)
-            setPromoCodeId(record.key)
-          }}
-        >
-          <EditOutlined />
-        </a>
+        <>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              setOpenDetailCode(true)
+              setPromoCodeId(record.key)
+            }}
+            icon={<EditOutlined />}
+          >
+          </Button>
+          <Divider type="vertical" />
+          <Popconfirm
+            title="Xóa ưu đãi"
+            description="Bạn có chắc muốn xóa toàn bộ ưu đãi này?"
+            icon={
+              <QuestionCircleOutlined
+                style={{
+                  color: 'red',
+                }}
+              />
+            }
+            onConfirm={() => {
+              handleDeletePromoCode(record.key)
+            }}
+          >
+            <Button danger icon={<DeleteOutlined />}></Button>
+          </Popconfirm>
+        </>
       )
     },
   ];
@@ -71,11 +80,10 @@ function PromoCode() {
       .then(res => {
         const obj = res.data.data.map(val => ({
           key: val.id,
-          code: val.code,
           fromDate: moment(val.fromDate).format('DD-MM-yyyy'),
           toDate: moment(val.toDate).format('DD-MM-yyyy'),
           discount: val.discount,
-          numberOfUses: val.numberOfUses
+          promoCodes: val.promoCodes
         }))
         setData(obj)
         setTotalItems(res.data.totalCount);
@@ -93,9 +101,7 @@ function PromoCode() {
   const createNewCode = (values) => {
     let input = {
       ownerId: values.ownerId,
-      code: values.code,
       discount: values.discount,
-      numberOfUses: values.numberOfUses,
       parkingZoneIds: values.parkingZoneIds,
       fromDate: values.selectedDate[0],
       toDate: values.selectedDate[1]
@@ -134,6 +140,16 @@ function PromoCode() {
       })
   }
 
+  const handleDeletePromoCode = (promoCodeId) => {
+    promoCodeServices.deletePromoCode(promoCodeId)
+      .then(res => {
+        notification.success({
+          message: res.data,
+        });
+        getData()
+      })
+  }
+
   return (
     <div className="w-[100%]">
       <div className='flex flex-row-reverse mb-[16px]'>
@@ -142,7 +158,27 @@ function PromoCode() {
         </Button>
       </div>
 
-      <Table columns={columns} dataSource={data} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        expandable={{
+          expandedRowRender: (record) => (
+            <>
+              <p className="font-medium">
+                Danh sách Mã giảm giá:
+              </p>
+              <ul>
+                {record.promoCodes?.map(item => (
+                  <li>
+                    {item.code}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ),
+        }}
+      />
       <div className="py-[16px] flex flex-row-reverse pr-[24px]">
         <Pagination current={pageNumber} onChange={handleChangePage} total={totalItems} showSizeChanger={false} />
       </div>
