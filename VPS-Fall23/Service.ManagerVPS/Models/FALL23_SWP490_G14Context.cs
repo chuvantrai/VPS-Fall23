@@ -574,6 +574,7 @@ namespace Service.ManagerVPS.Models
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
 
                 entity.Property(e => e.IsDeleted).HasColumnName("is_delete");
+                entity.HasQueryFilter(e => !e.IsDeleted);
 
                 entity.Property(e => e.IsFull)
                     .HasColumnName("is_full")
