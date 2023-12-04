@@ -26,12 +26,18 @@ namespace Service.ManagerVPS.Repositories
             return addResult.Entity;
         }
 
+        public Task CreateRange(List<T> listEntity)
+        {
+            return Task.Run(() => entities.AddRange(listEntity));
+        }
+
         public async Task Delete<TKeyType>(params TKeyType[] key)
             where TKeyType : struct
         {
             T data = await this.Find(key);
             await this.Delete(data);
         }
+
         public Task Delete(T entity)
         {
             return Task.Run(() => this.entities.Remove(entity));
@@ -41,6 +47,7 @@ namespace Service.ManagerVPS.Repositories
         {
             return Task.Run(() => entities.RemoveRange(listEntity));
         }
+
         public async Task<T> Find(params object[] keys)
         {
             T entity = await this.entities.FindAsync(keys)

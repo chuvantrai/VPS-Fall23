@@ -52,7 +52,7 @@ function BookedOverview({ parkingZoneName }) {
         const chart = {
           datasets: [
             {
-              label: 'Daily Income',
+              label: 'Thu nhập',
               data: [res.data.hourCash, res.data.dayCash, res.data.weekCash, res.data.monthCash, res.data.yearCash],
               borderColor: 'rgba(75, 192, 192, 1)',
               fill: false,

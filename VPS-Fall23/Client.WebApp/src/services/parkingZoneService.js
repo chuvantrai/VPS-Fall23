@@ -68,7 +68,7 @@ const useParkingZoneService = () => {
           message: res?.data,
         });
         setTimeout(() => {
-          navigate('/listParkingZone');
+          navigate('/list-parking-zone');
         }, 1000);
       })
       .catch((err) => {
@@ -123,12 +123,14 @@ const useParkingZoneService = () => {
         notification.success({
           message: res?.data,
         });
+        return Promise.resolve(res);
       })
       .catch((err) => {
         notification.error({
           message: 'Có lỗi xảy ra!',
           description: err.message,
         });
+        return Promise.reject(err);
       });
   };
 
@@ -152,15 +154,38 @@ const useParkingZoneService = () => {
   };
 
   const closeParkingZone = (input) => {
-    axios.put(`${BASE_URI}/CloseParkingZone`, input).then((res) => {
+    return axios.put(`${BASE_URI}/CloseParkingZone`, input).then((res) => {
       notification.success({
         message: res?.data,
       });
+      return Promise.resolve(res);
     });
   };
 
   const GetParkingZonesByParkingZoneIds = (parkingZoneIds) => {
     return axios.post(`${BASE_URI}/GetDataParkingZoneByParkingZoneIds`, parkingZoneIds);
+  };
+  const getParkingZoneNearAround = ({ lat, lng }) => {
+    return axios.get(`${BASE_URI}/GetNearAround`, {
+      params: {
+        lat: lat,
+        lng: lng,
+      },
+    });
+  };
+  const updateParkingZoneAddress = (data) => {
+    return axios.patch(`${BASE_URI}/UpdateParkingZoneAddress`, data);
+  };
+  const getAdminOverview = () => {
+    return axios.get(`${BASE_URI}/GetAdminOverview`);
+  };
+
+  const deleteParkingZone = (parkingZoneId) => {
+    return axios.delete(`${BASE_URI}/DeleteParkingZoneAction`, {
+      params: {
+        parkingZoneId,
+      },
+    });
   };
 
   return {
@@ -180,6 +205,10 @@ const useParkingZoneService = () => {
     closeParkingZone,
     GetParkingZonesByParkingZoneIds,
     getApprovedParkingZoneByOwnerId,
+    getParkingZoneNearAround,
+    updateParkingZoneAddress,
+    getAdminOverview,
+    deleteParkingZone,
   };
 };
 

@@ -6,6 +6,7 @@ namespace Service.ManagerVPS.Repositories.Interfaces;
 
 public interface IUserRepository : IVpsRepository<Account>
 {
+    List<Account> GetAllOwnerAccount();
     bool CheckEmailExists(string email);
 
     bool CheckValidVerification(string email, int code);

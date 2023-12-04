@@ -1,4 +1,5 @@
-﻿using Service.ManagerVPS.DTO.OtherModels;
+﻿using Service.ManagerVPS.DTO.GoongMap;
+using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
 using Service.ManagerVPS.Models;
 
@@ -6,6 +7,7 @@ namespace Service.ManagerVPS.Repositories.Interfaces;
 
 public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
 {
+    Task<List<ParkingZone>> GetAllParkingZone();
     PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters);
 
     PagedList<ParkingZone> GetOwnerParkingZone(QueryStringParameters parameters, Guid id);
@@ -36,5 +38,6 @@ public interface IParkingZoneRepository : IVpsRepository<ParkingZone>
     ParkingZone? GetParkingZoneAndAbsentById(Guid parkingZoneId);
 
     IEnumerable<ParkingZone>? GetParkingZoneByArrayParkingZoneId(Guid[]? parkingZoneIds);
+    IEnumerable<ParkingZone> GetParkingZoneNearAround(Position position, int radiusFindNearAround = 5);
     string GetFreeSlotByAttendantId(Guid attendantId);
 }

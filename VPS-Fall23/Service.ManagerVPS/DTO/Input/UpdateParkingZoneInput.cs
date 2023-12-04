@@ -25,11 +25,9 @@ public class UpdateParkingZoneInput
     [Required]
     public TimeSpan WorkTo { get; set; }
     
-    [Required]
     public Guid? CommuneId { get; set; }
 
-    [Required] 
-    public string DetailAddress { get; set; } = null!;
+    public string? DetailAddress { get; set; }
 
     [Required]
     public IFormFileCollection ParkingZoneImages { get; set; } = null!;

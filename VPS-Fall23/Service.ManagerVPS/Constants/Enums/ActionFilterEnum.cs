@@ -31,7 +31,13 @@ public enum ActionFilterEnum
     BlockUserAccount,
     GetApprovedParkingZoneByOwnerId,
     GetAllParkingZoneOwner,
+    GetListPromoCode,
+    CreateNewPromoCode,
+    GetPromoCodeDetail,
+    UpdatePromoCode,
     GetReportForAdmin,
     GetTypeReport,
-    FilterReport
+    FilterReport,
+    DeleteParkingZoneAction,
+    CancelAbsent
 }

@@ -1,12 +1,13 @@
 import Header from '@/layouts/components/Header';
 import AccountProfile from '@/pages/AccountProfile';
-import ViewListParkingZone from '@/pages/Homepage/components/Content/ViewListParkingZone';
 import ViewRequestedParkingZone from '@/pages/ViewRequestedParkingZones';
-import ManagerLayout from '../layouts/ManagerLayout';
-import guidGenerator from '../helpers/guidGenerator';
+import ManagerLayout from '@/layouts/ManagerLayout';
+import guidGenerator from '@/helpers/guidGenerator';
 import ViewListParkingZoneOwner from '@/pages/Homepage/components/Content/ViewListParkingZoneOwner';
-import AdminOverview from '../pages/Dashboard/AdminOverview';
+import AdminOverview from '@/pages/Dashboard/AdminOverview';
+import ViewListParkingZone from '@/pages/Homepage/components/Content/ListParkingZone';
 import ListUserReport from '../pages/ListUserReport';
+import ListAddressManager from '../pages/ListAddressManager/ListAddressManager.jsx';
 
 export const adminRoutesConfig = {
   header: Header,
@@ -60,6 +61,27 @@ export const adminRoutesConfig = {
           description: 'Toàn bộ danh sách yêu cầu bãi gửi xe hiển thị dưới đây',
           component: ViewRequestedParkingZone,
         },
+      ],
+    },
+    {
+      key: guidGenerator(),
+      path: 'system',
+      label: 'Hệ thống',
+      children: [
+        {
+          key: guidGenerator(),
+          path: '',
+          label: 'Báo cáo',
+          description: 'Toàn bộ báo cáo hiển thị dưới đây',
+          component: ListUserReport,
+        },
+        {
+          key: guidGenerator(),
+          path: 'address-list',
+          label: 'Địa điểm bãi đỗ xe',
+          description: 'Toàn bộ địa điểm bãi đỗ xe hiển thị dưới đây',
+          component: ListAddressManager,
+        }
       ],
     },
     {

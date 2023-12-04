@@ -1,4 +1,7 @@
-﻿namespace Service.ManagerVPS.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace Service.ManagerVPS.Models
 {
     public partial class District
     {
@@ -15,6 +18,7 @@
         public DateTime ModifiedAt { get; set; }
         public Guid CityId { get; set; }
         public Guid CreatedBy { get; set; }
+        public bool? IsBlock { get; set; }
 
         public virtual City City { get; set; } = null!;
         public virtual Account CreatedByNavigation { get; set; } = null!;

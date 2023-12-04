@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.VNPay;
+using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.ExternalClients.VNPay;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.SignalR;
@@ -44,15 +45,21 @@ namespace Service.ManagerVPS.Pages
         readonly IHubContext<PaymentHub> paymentHub;
         readonly IPaymentTransactionRepository paymentTransactionRepository;
         readonly IParkingTransactionRepository parkingTransactionRepository;
+        readonly IPromoCodeRepository promoCodeRepository;
+        readonly IConfiguration configuration;
         public PaidModel(IOptions<VnPayConfig> options,
            IHubContext<PaymentHub> paymentHub,
             IPaymentTransactionRepository paymentTransactionRepository,
-            IParkingTransactionRepository parkingTransactionRepository)
+            IParkingTransactionRepository parkingTransactionRepository,
+            IConfiguration configuration,
+            IPromoCodeRepository promoCodeRepository)
         {
             this.vnPayConfig = options.Value;
             this.paymentHub = paymentHub;
             this.paymentTransactionRepository = paymentTransactionRepository;
             this.parkingTransactionRepository = parkingTransactionRepository;
+            this.configuration = configuration;
+            this.promoCodeRepository = promoCodeRepository;
         }
 
         public async Task OnGet()
@@ -88,22 +95,38 @@ namespace Service.ManagerVPS.Pages
             paymentTransaction.TransactionStatus = this.Vnp_TransactionStatus;
             paymentTransaction.SecureHashType = this.Vnp_SecureHashType;
             await this.paymentTransactionRepository.Update(paymentTransaction);
-              var parkingTransaction = await parkingTransactionRepository.Find(paymentTransaction.BookingId);
+            var parkingTransaction = await parkingTransactionRepository.Find(paymentTransaction.BookingId);
             if (!isSuccess)
             {
-              
+
                 parkingTransaction.StatusId = (int)ParkingTransactionStatusEnum.BOOKING_PAID_FAILED;
                 await parkingTransactionRepository.Update(parkingTransaction);
             }
+            if (!string.IsNullOrEmpty(parkingTransaction.PromoCode))
+            {
+                var promoCode = await this.promoCodeRepository.GetByCode(parkingTransaction.PromoCode, parkingTransaction.ParkingZoneId);
+                if (promoCode != null)
+                {
+                    promoCode.NumberOfUses -= 1;
+                    await this.promoCodeRepository.Update(promoCode);
+                }
+
+            }
+
+
             await this.paymentTransactionRepository.SaveChange();
-            try
+            if (isSuccess)
             {
-                 await this.parkingTransactionRepository.SendBookedEmail(parkingTransaction, paymentTransaction); 
+                try
+                {
+                    await this.parkingTransactionRepository.SendBookedEmail(parkingTransaction, paymentTransaction);
+                }
+                catch (System.Exception)
+                {
+                }
+                var brokerApiClient = new BrokerApiClient(configuration.GetValue<string>("brokerApiBaseUrl"));
+                await brokerApiClient.CreateCancelBookingJob(parkingTransaction.Id, parkingTransaction.CheckinAt.AddMinutes(30));
             }
-            catch (System.Exception)
-            {
-            }
-          
             await paymentHub.Clients.Client(paymentTransaction.ConnectionId).SendAsync("ReceivePaidStatus", JsonConvert.SerializeObject(paymentTransaction, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
 
         }

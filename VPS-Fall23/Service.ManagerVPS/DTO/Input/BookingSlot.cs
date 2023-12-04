@@ -19,5 +19,6 @@ namespace Service.ManagerVPS.DTO.Input
 
         [Required]
         public Guid ParkingZoneId { get; set; }
+        public string? PromoCode { get; set; }
     }
 }

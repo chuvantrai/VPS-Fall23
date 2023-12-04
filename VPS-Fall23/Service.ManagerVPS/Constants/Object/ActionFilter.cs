@@ -154,6 +154,26 @@ public static class ActionFilter
         },
         new ActionModel
         {
+            Action = ActionFilterEnum.GetListPromoCode,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CreateNewPromoCode,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetPromoCodeDetail,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.UpdatePromoCode,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
             Action = ActionFilterEnum.GetReportForAdmin,
             UserRole = new[] { UserRoleEnum.ADMIN }
         },
@@ -166,7 +186,17 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.FilterReport,
             UserRole = new[] { UserRoleEnum.ADMIN }
-        }       
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.DeleteParkingZoneAction,
+            UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CancelAbsent,
+            UserRole = new[] {UserRoleEnum.OWNER}
+        }
     };
 
     public static ActionModel? GetAllActionModel(ActionFilterEnum action)
