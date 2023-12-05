@@ -201,6 +201,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.DeletePromoCode,
             UserRole = new[] { UserRoleEnum.OWNER }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.UpdateStatusReport,
+            UserRole = new[] { UserRoleEnum.ADMIN }
         }
     };
 

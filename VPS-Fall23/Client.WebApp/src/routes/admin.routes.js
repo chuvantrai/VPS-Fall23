@@ -70,7 +70,7 @@ export const adminRoutesConfig = {
       children: [
         {
           key: guidGenerator(),
-          path: '',
+          path: 'user-report',
           label: 'Báo cáo',
           description: 'Toàn bộ báo cáo hiển thị dưới đây',
           component: ListUserReport,
@@ -81,20 +81,6 @@ export const adminRoutesConfig = {
           label: 'Địa điểm bãi đỗ xe',
           description: 'Toàn bộ địa điểm bãi đỗ xe hiển thị dưới đây',
           component: ListAddressManager,
-        }
-      ],
-    },
-    {
-      key: guidGenerator(),
-      path: 'system',
-      label: 'Hệ thống',
-      children: [
-        {
-          key: guidGenerator(),
-          path: '',
-          label: 'Báo cáo',
-          description: 'Toàn bộ báo cáo hiển thị dưới đây',
-          component: ListUserReport,
         },
       ],
     },
