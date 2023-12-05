@@ -4,6 +4,7 @@ using Client.MobileApp.Models;
 using CommunityToolkit.Maui.Core.Platform;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 
 namespace Client.MobileApp.Views;
@@ -118,8 +119,23 @@ public partial class VPS53 : ContentPage
                 CheckBy = Constant.USER
             };
             string autoCheckinResponse = await _viewModel.CheckLicensePLateScan(checkLicensePlate);
-            var checkoutScanConfirm = new Task<string>(() => _viewModel.CheckOutScanConfirm(checkLicensePlate).Result);
-            await HandleResponse(autoCheckinResponse, checkoutScanConfirm);
+            if (autoCheckinResponse != null)
+            {
+                if (autoCheckinResponse.Contains(Constant.OVERTIME_CONFIRM))
+                {
+                    var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.ACCEPT, Constant.CANCEL);
+                    if (confirmAnswer == true)
+                    {
+                        var checkoutScanConfirm = await _viewModel.CheckOutScanConfirm(checkLicensePlate);
+                        await DisplayAlert(Constant.NOTIFICATION, checkoutScanConfirm, Constant.CANCEL);
+                    }
+                }
+                else
+                {
+                    await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.CANCEL);
+                }
+            }
+            Slot.Text = _viewModel.LoadSlot();
         }
         catch (Exception ex)
         {
@@ -130,37 +146,6 @@ public partial class VPS53 : ContentPage
         }
     }
 
-    async Task HandleResponse(string response, Task<string> checkOutScanConfirmTask = null)
-    {
-        switch (response)
-        {
-            case Constant.CHECKOUT_CONFIRM:
-                {
-                    var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, response, Constant.ACCEPT, Constant.CANCEL);
-                    if (confirmAnswer.ToString() == Constant.ACCEPT)
-                        await HandleResponse(Constant.ACCEPT);
-                    break;
-                }
-            case Constant.ACCEPT:
-                {
-                    string checkinByConfirmResponse = await checkOutScanConfirmTask;
-                    await HandleResponse(checkinByConfirmResponse);
-                    break;
-                }
-            default:
-                {
-                    if (response.Contains(Constant.OVERTIME_CONFIRM))
-                    {
-                        var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, response, Constant.ACCEPT, Constant.CANCEL);
-                        if (confirmAnswer.ToString() == Constant.ACCEPT)
-                            await HandleResponse(Constant.ACCEPT);
-                        break;
-                    }
-                    await DisplayAlert(Constant.NOTIFICATION, response, Constant.CANCEL);
-                    break;
-                }
-        }
-    }
 
     private async void OnTapGestureRecognizerTapped(object sender, TappedEventArgs e)
     {
@@ -185,8 +170,23 @@ public partial class VPS53 : ContentPage
                 };
 
                 string autoCheckinResponse = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
-                var checkoutInputConfirm = new Task<string>(() => _viewModel.CheckOutInputConfirm(checkLicensePlate).Result);
-                await HandleResponse(autoCheckinResponse, checkoutInputConfirm);
+                if (autoCheckinResponse != null)
+                {
+                    if (autoCheckinResponse.Contains(Constant.OVERTIME_CONFIRM))
+                    {
+                        var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.ACCEPT, Constant.CANCEL);
+                        var x = confirmAnswer.ToString();
+                        if (confirmAnswer == true)
+                        {
+                            var checkoutInputConfirm = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
+                            await DisplayAlert(Constant.NOTIFICATION, checkoutInputConfirm, Constant.CANCEL);
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.CANCEL);
+                    }
+                }
             }
             else
             {
@@ -195,6 +195,7 @@ public partial class VPS53 : ContentPage
                     Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.INPUT_FAILED, Constant.CANCEL);
                 });
             }
+            Slot.Text = _viewModel.LoadSlot();
         }
         catch (Exception ex)
         {
@@ -232,6 +233,6 @@ public partial class VPS53 : ContentPage
 
     private void SlotLabel_Tapped(object sender, TappedEventArgs e)
     {
-        _viewModel.LoadSlot();
+        Slot.Text = _viewModel.LoadSlot();
     }
-}
+}   

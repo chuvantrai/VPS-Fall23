@@ -40,5 +40,6 @@ public enum ActionFilterEnum
     FilterReport,
     DeleteParkingZoneAction,
     CancelAbsent,
-    DeletePromoCode
+    DeletePromoCode,
+    UpdateStatusReport
 }

@@ -12,4 +12,5 @@ public interface IReportRepository : IVpsRepository<Report>
     PagedList<Report> GetListReportForAdmin(QueryStringParameters parameters);
     List<GlobalStatus> GetTypeReport();
     PagedList<Report> FilterReportForAdmin(QueryStringParameters parameters, int typeId);
+    Task UpdateStatusReportAsync(Guid reportId, int statusId);
 }

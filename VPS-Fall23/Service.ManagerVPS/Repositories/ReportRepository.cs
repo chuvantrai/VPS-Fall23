@@ -47,6 +47,7 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
              .Include(r => r.StatusNavigation)
              .Include(r => r.TypeNavigation)
              .Include(r => r.CreatedByNavigation)
+             .Where(r => r.TypeNavigation.Name.Contains("ERROR"))
              .OrderBy(r => r.SubId);
 
         return PagedList<Report>.ToPagedList(listReport, parameters.PageNumber,
@@ -70,6 +71,17 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
 
         return PagedList<Report>.ToPagedList(listReport, parameters.PageNumber,
             parameters.PageSize);
+    }
+
+    public async Task UpdateStatusReportAsync(Guid reportId, int statusId)
+    {
+        var report = entities.Include(r => r.StatusNavigation).FirstOrDefault(r => r.Id == reportId);
+        if (report != null)
+        {
+            report.Status = statusId;
+            context.Reports.Update(report);
+            await context.SaveChangesAsync();
+        }       
     }
 
     public async Task<int?> CheckPaymentCodeInReport(string paymentCode, int type)

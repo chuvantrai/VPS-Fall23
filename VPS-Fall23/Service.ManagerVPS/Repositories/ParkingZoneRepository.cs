@@ -20,7 +20,7 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
     {
         return await entities.ToListAsync();
     }
-    
+
     public PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters)
     {
         var parkingZone = entities.Include(o => o.Owner).ThenInclude(o => o.IdNavigation);
@@ -195,14 +195,8 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
         {
             var bookedslot = context.ParkingTransactions
                     .Where(p => p.ParkingZoneId == parkingZone.Id
-                                && p.CheckinAt <= DateTime.Now
-                                && p.CheckoutAt >= DateTime.Now
                                 && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED ||
-                                    p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
-                                && (!p.ParkingTransactionDetails.Any()
-                                    || p.ParkingTransactionDetails.OrderByDescending(pt => pt.CreatedAt).First().To >=
-                                    DateTime.Now
-                                ))
+                                    p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT))
                     .Count();
             return $"{parkingZone.Slots - bookedslot}/{parkingZone.Slots}";
         }
