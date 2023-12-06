@@ -22,21 +22,6 @@ const Information = ({ parkingZone }) => {
                 children: parkingZone.detailAddress,
             },
             {
-                key: 2,
-                label: 'Xã/Phường',
-                children: parkingZone.commune.name,
-            },
-            {
-                key: 3,
-                label: 'Quận/Huyện',
-                children: parkingZone.commune.district.name,
-            },
-            {
-                key: 4,
-                label: 'Tỉnh/Thành phố',
-                children: parkingZone.commune.district.city.name,
-            },
-            {
                 key: 5,
                 label: 'Giá thành mỗi giờ (VNĐ)',
                 children: parkingZone.pricePerHour ?? 0,

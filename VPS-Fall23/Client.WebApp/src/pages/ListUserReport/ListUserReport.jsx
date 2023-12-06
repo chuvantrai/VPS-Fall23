@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Table, Button, Pagination, Select, Tooltip } from 'antd';
+import { Table, Button, Pagination, Select, Tooltip, Tag } from 'antd';
 import { QuestionCircleOutlined, FilterOutlined } from '@ant-design/icons';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Fragment } from 'react';
 
 import useReportServices from '@/services/reportServices';
 
@@ -34,6 +34,23 @@ function ListReport() {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
+      render: (value) => (
+        <Fragment>
+          <Tag color={getStatusColor(value)}>
+            <a>{value}</a>
+          </Tag>
+        </Fragment>
+      ),
+    },
+    {
+      title: 'Thay đổi trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      render: (value, record) => (
+        <Select defaultValue={value} onChange={(newValue) => handleStatusChange(record, newValue)}>
+          {getStatusOptions()}
+        </Select>
+      ),
     },
   ];
 
@@ -42,6 +59,11 @@ function ListReport() {
   const [totalItems, setTotalItems] = useState(0);
   const [typeOptions, setTypeOptions] = useState([]);
   const [filterType, setFilterType] = useState('');
+  const staticStatusOptions = [
+    { value: 'CANCEL', label: 'CANCEL', color: 'red', id: 6 },
+    { value: 'DONE', label: 'DONE', color: 'green', id: 5 },
+    { value: 'PROCESSING', label: 'PROCESSING', color: 'yellow', id: 4 },
+  ];
 
   const handleChangePage = (page) => {
     setPageNumber(page);
@@ -67,8 +89,7 @@ function ListReport() {
       loadData();
       return;
     }
-
-    if (filterType === undefined) {
+    if (filterType === undefined || filterType === '') {
       loadData();
     } else {
       handleFilterReport();
@@ -77,12 +98,38 @@ function ListReport() {
 
   useEffect(() => {
     loadTypeOptions();
+    getStatusOptions();
   }, []);
 
+  const getStatusColor = (status) => {
+    const foundStatus = staticStatusOptions.find((s) => s.label === status);
+    return foundStatus ? foundStatus.color : '';
+  };
+
   const handleFilterReport = () => {
-    service.filterReport(pageNumber, 10, filterType).then((res) => {
-      setData(res.data.data);
-      setTotalItems(res.data.totalCount);
+    if (filterType === undefined || filterType === '') {
+      loadData();
+    } else {
+      service.filterReport(pageNumber, 10, filterType).then((res) => {
+        setData(res.data.data);
+        setTotalItems(res.data.totalCount);
+      });
+    }
+  };
+
+  const getStatusOptions = () => {
+    return staticStatusOptions.map((status) => (
+      <Select.Option key={status.value} value={status.value}>
+        {status.label}
+      </Select.Option>
+    ));
+  };
+
+  const handleStatusChange = (record, newValue) => {
+    const selectedStatus = staticStatusOptions.find((status) => status.value === newValue);
+    const selectedId = selectedStatus ? selectedStatus.id : null;
+    service.updateStatusReport(record.id, selectedId).then(() => {
+      loadData();
     });
   };
 

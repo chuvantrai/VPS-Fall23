@@ -193,4 +193,13 @@ public class ReportController : VpsController<Report>
         };
         return Ok(metadata);
     }
+
+    [HttpPost]
+    [FilterPermission(Action = ActionFilterEnum.UpdateStatusReport)]
+    public IActionResult UpdateStatusReport([FromQuery] Guid reportId, [FromQuery] int statusId)
+    {
+        ((IReportRepository)vpsRepository).UpdateStatusReportAsync(reportId, statusId);
+
+        return Ok();
+    }
 }

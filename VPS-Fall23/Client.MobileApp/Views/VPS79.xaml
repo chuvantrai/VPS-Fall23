@@ -76,13 +76,13 @@
 
                         <Label.FormattedText>
                             <FormattedString>
-                                <Span Text="Welcome back" 
+                                <Span Text="CHÀO MỪNG" 
                                   FontSize="32"  
                                   FontAttributes="Bold"/>
 
                                 <Span Text="{x:Static system:Environment.NewLine}"/>
 
-                                <Span Text="Login to your account"
+                                <Span Text="ĐĂNG NHẬP"
                                   FontSize="14"/>
                             </FormattedString>
                         </Label.FormattedText>
@@ -117,11 +117,11 @@
                     <Grid ColumnDefinitions="0.5*,0.5*" Grid.Row="5" Padding="12,0,0,0" VerticalOptions="Start">
                         <HorizontalStackLayout VerticalOptions="Center" Padding="10,0,0,0" >
                             <CheckBox x:Name="Remember" Color="#83E9EE"/>
-                            <Label  Text="Remember me" FontSize="12" VerticalOptions="Center" />
+                            <Label  Text="Nhớ mật khẩu" FontSize="12" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                     </Grid>
 
-                    <Button Text="LOGIN" 
+                    <Button Text="ĐĂNG NHẬP" 
                         Clicked="loginButton_Clicked"
                         x:Name="loginButton" 
                         TextColor="Black"

@@ -37,15 +37,8 @@ namespace Service.ManagerVPS.Repositories
         {
             return await this.entities
                 .Where(p => p.ParkingZoneId == parkingZoneId
-                            && p.CheckinAt <= checkAt
-                            && p.CheckoutAt >= checkAt
                             && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED ||
-                                p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
-                            && (!p.ParkingTransactionDetails.Any()
-                                || p.ParkingTransactionDetails.OrderByDescending(pt => pt.CreatedAt)
-                                    .First().To >=
-                                checkAt
-                            ))
+                                p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT))
                 .CountAsync();
         }
 
@@ -125,7 +118,7 @@ namespace Service.ManagerVPS.Repositories
                             Id = Guid.NewGuid(),
                             LicensePlate = licenseplate,
                             CreatedAt = DateTime.Now,
-                            StatusId = (int)ParkingTransactionStatusEnum.UNPAY,
+                            StatusId = (int)ParkingTransactionStatusEnum.DEPOSIT,
                             ParkingZone = parkingZone,
                             ParkingZoneId = parkingZone.Id,
                             CheckinAt = checkAt,
@@ -163,9 +156,7 @@ namespace Service.ManagerVPS.Repositories
                         transaction = await entities.Include(t => t.ParkingZone)
                             .Include(t => t.ParkingTransactionDetails)
                             .FirstOrDefaultAsync(pt =>
-                                (pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
-                                 || pt.StatusId == (int)ParkingTransactionStatusEnum.UNPAY
-                                 || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
+                                pt.StatusId != (int)ParkingTransactionStatusEnum.PAYED
                                 && pt.LicensePlate.Equals(licenseplate)
                                 && pt.CheckinAt <= checkAt
                                 && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
@@ -175,9 +166,7 @@ namespace Service.ManagerVPS.Repositories
                         transaction = await entities.Include(t => t.ParkingZone)
                             .Include(t => t.ParkingTransactionDetails)
                             .FirstOrDefaultAsync(pt =>
-                                (pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
-                                 || pt.StatusId == (int)ParkingTransactionStatusEnum.UNPAY
-                                 || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
+                                pt.StatusId != (int)ParkingTransactionStatusEnum.PAYED
                                 && pt.LicensePlate.Equals(licenseplate)
                                 && pt.CheckinAt <= checkAt && pt.CheckoutAt >= checkAt
                                 && pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
@@ -206,8 +195,8 @@ namespace Service.ManagerVPS.Repositories
                         transaction.CheckinBy = checkBy;
                         await Update(transaction);
                         await SaveChange();
-                        var brokerApiClient = new BrokerApiClient(configuration.GetValue<string>("brokerApiBaseUrl"));
-                        await brokerApiClient.RemoveCancelBookingJob(transaction.Id);
+                        //var brokerApiClient = new BrokerApiClient(configuration.GetValue<string>("brokerApiBaseUrl"));
+                        //await brokerApiClient.RemoveCancelBookingJob(transaction.Id);
                         return ResponseNotification.CHECKIN_SUCCESS;
                     }
                     else
@@ -237,9 +226,7 @@ namespace Service.ManagerVPS.Repositories
                 var transaction = await entities.Include(t => t.ParkingZone)
                     .Include(t => t.ParkingTransactionDetails)
                     .FirstOrDefaultAsync(pt =>
-                        (pt.StatusId == (int)ParkingTransactionStatusEnum.BOOKED
-                         || pt.StatusId == (int)ParkingTransactionStatusEnum.UNPAY
-                         || pt.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
+                        pt.StatusId != (int)ParkingTransactionStatusEnum.PAYED
                         && pt.LicensePlate.Equals(licenseplate) &&
                         pt.ParkingZone.ParkingZoneAttendants.Any(p => p.Id == checkBy));
 
@@ -249,8 +236,8 @@ namespace Service.ManagerVPS.Repositories
                         .OrderBy(pt => pt.CreatedAt)
                         .FirstOrDefault();
 
-                    if (transactionDetail != null && transaction.StatusId !=
-                        (int)ParkingTransactionStatusEnum.UNPAY)
+                    if (transactionDetail != null && transaction.StatusId ==
+                        (int)ParkingTransactionStatusEnum.BOOKED)
                     {
                         if (transactionDetail.To < checkAt)
                         {
@@ -268,12 +255,21 @@ namespace Service.ManagerVPS.Repositories
 
                             context.ParkingTransactionDetails.Add(newTransactionDetail);
                             transaction.CheckoutBy = checkBy;
-                            transaction.StatusId = (int)ParkingTransactionStatusEnum.PAYED;
+                            transaction.StatusId = (int)ParkingTransactionStatusEnum.UNPAY;
                             await Update(transaction);
 
-                            return ResponseNotification.OVERTIME_CONFIRM +
+                            if(checkAt - transaction.CheckoutAt < TimeSpan.FromMinutes(60))
+                            {
+                                return ResponseNotification.OVERTIME_CONFIRM +
+                                   (double)transactionDetail.UnitPricePerHour + " VNĐ";
+                            }
+                            else
+                            {
+                                return ResponseNotification.OVERTIME_CONFIRM +
                                    (int)((double)newTransactionDetail.UnitPricePerHour *
                                          (checkAt - transactionDetail.To).TotalHours) + " VNĐ";
+                            }
+                            
                         }
                         else
                         {
@@ -289,21 +285,45 @@ namespace Service.ManagerVPS.Repositories
                         return ResponseNotification.CHECKOUT_SUCCESS;
                     }
                     else if (transactionDetail != null && transaction.StatusId ==
-                             (int)ParkingTransactionStatusEnum.UNPAY)
+                             (int)ParkingTransactionStatusEnum.DEPOSIT)
                     {
                         transactionDetail.To = checkAt;
                         transactionDetail.Detail = "CHECK OUT AT " + checkAt;
                         context.ParkingTransactionDetails.Update(transactionDetail);
 
                         transaction.CheckoutBy = checkBy;
-                        transaction.StatusId = (int)ParkingTransactionStatusEnum.PAYED;
+                        transaction.StatusId = (int)ParkingTransactionStatusEnum.UNPAY;
                         transaction.CheckoutAt = checkAt;
                         await Update(transaction);
 
                         await SaveChange();
-                        return ResponseNotification.OVERTIME_CONFIRM +
+
+                        if (checkAt - transactionDetail.From < TimeSpan.FromMinutes(60))
+                        {
+                            return ResponseNotification.OVERTIME_CONFIRM +
+                               (double)transactionDetail.UnitPricePerHour + " VNĐ";
+                        }
+                        else
+                        {
+                            return ResponseNotification.OVERTIME_CONFIRM +
                                (int)((double)transactionDetail.UnitPricePerHour *
                                      (checkAt - transactionDetail.From).TotalHours) + " VNĐ";
+                        }
+                    }
+                    else if (transactionDetail != null && transaction.StatusId ==
+                             (int)ParkingTransactionStatusEnum.UNPAY)
+                    {
+                        if (transactionDetail.To - transactionDetail.From < TimeSpan.FromMinutes(60))
+                        {
+                            return ResponseNotification.OVERTIME_CONFIRM +
+                               (double)transactionDetail.UnitPricePerHour + " VNĐ";
+                        }
+                        else
+                        {
+                            return ResponseNotification.OVERTIME_CONFIRM +
+                               (int)((double)transactionDetail.UnitPricePerHour *
+                                     (transactionDetail.To - transactionDetail.From).TotalHours) + " VNĐ";
+                        }                        
                     }
                     else
                     {

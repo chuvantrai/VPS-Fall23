@@ -25,7 +25,10 @@ namespace Service.ManagerVPS.Models
         public virtual DbSet<Feedback> Feedbacks { get; set; } = null!;
         public virtual DbSet<GlobalStatus> GlobalStatuses { get; set; } = null!;
         public virtual DbSet<ParkingTransaction> ParkingTransactions { get; set; } = null!;
-        public virtual DbSet<ParkingTransactionDetail> ParkingTransactionDetails { get; set; } = null!;
+
+        public virtual DbSet<ParkingTransactionDetail> ParkingTransactionDetails { get; set; } =
+            null!;
+
         public virtual DbSet<ParkingZone> ParkingZones { get; set; } = null!;
         public virtual DbSet<ParkingZoneAbsent> ParkingZoneAbsents { get; set; } = null!;
         public virtual DbSet<ParkingZoneAttendant> ParkingZoneAttendants { get; set; } = null!;
@@ -42,7 +45,7 @@ namespace Service.ManagerVPS.Models
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https: //go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer(
-                    "server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid=nghianvho; pwd=Random@11092023#@!;",
+                    "server = 210.211.127.85,6666; database = FALL23_SWP490_G14; uid = nghianvho; pwd = Random@11092023#@!; TrustServerCertificate = True",
                     x => x.UseNetTopologySuite());
             }
         }
@@ -570,7 +573,8 @@ namespace Service.ManagerVPS.Models
 
                 entity.Property(e => e.IsApprove).HasColumnName("is_approve");
 
-                entity.Property(e => e.IsDelete).HasColumnName("is_delete");
+                entity.Property(e => e.IsDeleted).HasColumnName("is_delete");
+                entity.HasQueryFilter(e => !e.IsDeleted);
 
                 entity.Property(e => e.IsFull)
                     .HasColumnName("is_full")
@@ -844,7 +848,7 @@ namespace Service.ManagerVPS.Models
                     .HasMaxLength(100)
                     .IsUnicode(false)
                     .HasColumnName("user_phone");
-
+                
                 entity.Property(e => e.UserReceivedCode)
                     .HasColumnName("user_received_code");
 

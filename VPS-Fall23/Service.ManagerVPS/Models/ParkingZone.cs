@@ -38,7 +38,6 @@ namespace Service.ManagerVPS.Models
         public Geometry? Location { get; set; }
         public decimal? Lat { get; set; }
         public decimal? Lng { get; set; }
-        public bool IsDelete { get; set; }
 
         public virtual Commune? Commune { get; set; }
         public virtual ParkingZoneOwner Owner { get; set; } = null!;

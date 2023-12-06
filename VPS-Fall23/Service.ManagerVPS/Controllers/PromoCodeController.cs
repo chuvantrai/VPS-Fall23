@@ -58,17 +58,34 @@ public class PromoCodeController : VpsController<PromoCode>
     public async Task<IActionResult> CreateNewPromoCode([FromBody] NewPromoCodeInput input)
     {
         var sendPromoCodeNow = ((DateTime)input.FromDate! - DateTime.Now).TotalHours < 48;
+        var newPromoCodeInfo = new PromoCodeInformation
+        {
+            Id = Guid.NewGuid(),
+            FromDate = (DateTime)input.FromDate!,
+            ToDate = (DateTime)input.ToDate!,
+            CreatedAt = DateTime.Now,
+            ModifiedAt = DateTime.Now,
+            OwnerId = (Guid)input.OwnerId!,
+            Discount = (int)input.Discount!,
+            IsSent = false
+        };
+        await _promoCodeInfoRepository.Create(newPromoCodeInfo);
         var transactionLst = _transactionRepository.GetParkingTransactions();
         var promoCodeLst = new List<PromoCode>();
         foreach (var parkingZoneId in input.ParkingZoneIds)
         {
             var promoCode = transactionLst
                 .Where(x => x.ParkingZoneId.Equals(parkingZoneId))
-                .DistinctBy(x => x.Email)
+                .DistinctBy(x => new
+                {
+                    x.Email,
+                    x.Phone
+                })
                 .Select(x => new PromoCode
                 {
                     Id = Guid.NewGuid(),
                     Code = _generalVps.GenerateRandomCode(6),
+                    PromoCodeInformationId = newPromoCodeInfo.Id,
                     NumberOfUses = 1,
                     UserEmail = x.Email,
                     UserPhone = x.Phone,
@@ -86,19 +103,6 @@ public class PromoCodeController : VpsController<PromoCode>
             throw new ServerException(
                 "Hiện chưa có người dùng nào sử dụng bãi đỗ xe. Không thể tạo khuyến mãi!");
         }
-
-        var newPromoCodeInfo = new PromoCodeInformation
-        {
-            Id = Guid.NewGuid(),
-            FromDate = (DateTime)input.FromDate!,
-            ToDate = (DateTime)input.ToDate!,
-            CreatedAt = DateTime.Now,
-            ModifiedAt = DateTime.Now,
-            OwnerId = (Guid)input.OwnerId!,
-            Discount = (int)input.Discount!,
-            IsSent = false
-        };
-        await _promoCodeInfoRepository.Create(newPromoCodeInfo);
 
         await ((IPromoCodeRepository)vpsRepository).CreateRange(promoCodeLst);
         await vpsRepository.SaveChange();
