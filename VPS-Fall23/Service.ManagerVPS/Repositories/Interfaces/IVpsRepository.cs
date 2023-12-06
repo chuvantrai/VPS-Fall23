@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Service.ManagerVPS.Models;
 
 namespace Service.ManagerVPS.Repositories.Interfaces
 {
@@ -21,6 +22,10 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         Task<TEntity> Update(TEntity entity);
 
         Task<TEntity> Find(params object[] keys);
+
+        Task<IEnumerable<PromoCode>> GetListPromoCodeByListId(IEnumerable<Guid> listPromoCodeId);
+        
+        Task<IEnumerable<PromoCode>?> GetListPromoCodeNeedSendCode();
 
         Task<int> SaveChange();
     }
