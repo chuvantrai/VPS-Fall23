@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
@@ -6,6 +7,8 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Service.ManagerVPS.Controllers
 {
@@ -20,7 +23,37 @@ namespace Service.ManagerVPS.Controllers
             _districtRepository = districtRepository;
             _cityRepository = cityRepository;
         }
+        [HttpGet("FindAddressById/{id}")]
+        public async Task<IActionResult> FindAddressById(Guid id)
+        {
+            try
+            {
+                return Ok(await this.vpsRepository
+                    .Entities
+                    .Include(c => c.District)
+                    .ThenInclude(d => d.City)
+                    .FirstOrDefaultAsync(c => c.Id == id)
+                    ?? throw new Exception());
+            }
+            catch (Exception)
+            {
+                try
+                {
 
+                    return Ok(await this._districtRepository
+                        .Entities
+                        .Include(d => d.City)
+                        .FirstOrDefaultAsync(c => c.Id == id)
+                          ?? throw new Exception());
+
+                }
+                catch (Exception)
+                {
+                    return Ok(await this._cityRepository.Find(id));
+                }
+            }
+
+        }
         [HttpGet("GetByDistrict/{districtId}")]
         public async Task<IEnumerable<Commune>> GetCommuneByDistrict(Guid districtId)
         {
