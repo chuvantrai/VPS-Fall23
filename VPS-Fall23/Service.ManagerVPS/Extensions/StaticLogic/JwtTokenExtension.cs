@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.Constants.KeyValue;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Models;
 
@@ -25,9 +26,9 @@ public static class JwtTokenExtension
             new Claim(nameof(UserTokenHeader.RoleName), userTokenInfo.RoleName),
             new Claim(nameof(UserTokenHeader.Avatar), userTokenInfo.Avatar ?? string.Empty),
             new Claim(nameof(UserTokenHeader.Expires),
-                userTokenInfo.Expires.ToString(CultureInfo.CurrentCulture)),
+                userTokenInfo.Expires.ToString(FormatDate.DATE_KEY_JWT)),
             new Claim(nameof(UserTokenHeader.ModifiedAt),
-                userTokenInfo.ModifiedAt.ToString(CultureInfo.CurrentCulture))
+                userTokenInfo.ModifiedAt.ToString(FormatDate.DATE_KEY_JWT))
         };
 
         var token = new JwtSecurityToken(

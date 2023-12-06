@@ -1,5 +1,7 @@
 import jwt_decode from 'jwt-decode';
 import Cookies from 'js-cookie';
+import { parse } from 'date-fns';
+import keyFormatDate from '@/helpers/keyFormatDate.js';
 
 const getAccountJwtModel = () => {
   const jwt = Cookies.get('ACCESS_TOKEN');
@@ -13,8 +15,8 @@ const getAccountJwtModel = () => {
       RoleId: decodedToken.RoleId,
       RoleName: decodedToken.RoleName,
       Avatar: decodedToken.Avatar,
-      Expires: new Date(decodedToken.Expires),
-      ModifiedAt: new Date(decodedToken.ModifiedAt),
+      Expires: parse(decodedToken.Expires, keyFormatDate.DATE_KEY_JWT, new Date()),
+      ModifiedAt: parse(decodedToken.ModifiedAt, keyFormatDate.DATE_KEY_JWT, new Date()),
     };
   } else {
     return null;
