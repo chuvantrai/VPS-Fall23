@@ -25,7 +25,7 @@ namespace VPS.MinIO.API.Controllers
         }
 
         [HttpPost]
-        public void PutObject(
+        public async Task PutObject(
             IFormFileCollection files,
             string bucketName,
             string? folderPath = null,
@@ -35,8 +35,7 @@ namespace VPS.MinIO.API.Controllers
             {
                 throw new ArgumentNullException(nameof(files), "Please send at least one file");
             }
-
-            files.AsParallel().ForAll(async file =>
+            foreach (var file in files)
             {
                 using Stream stream = file.OpenReadStream();
                 PutObjectArgs putObjectArgs = new PutObjectArgs()
@@ -44,9 +43,8 @@ namespace VPS.MinIO.API.Controllers
                     .WithObject($"{folderPath}/{file.FileName}")
                     .WithObjectSize(file.Length)
                     .WithStreamData(stream);
-                PutObjectResponse putObjectResponse =
-                    await objectRepository.PutObjectAsync(putObjectArgs, cancellationToken);
-            });
+                PutObjectResponse putObjectResponse = await objectRepository.PutObjectAsync(putObjectArgs, cancellationToken);
+            }
         }
 
         [HttpGet]

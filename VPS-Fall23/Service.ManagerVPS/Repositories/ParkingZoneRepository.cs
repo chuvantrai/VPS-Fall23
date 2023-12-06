@@ -4,6 +4,7 @@ using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.Output;
+using Service.ManagerVPS.Extensions;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
@@ -176,16 +177,18 @@ public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRep
 
     public IEnumerable<ParkingZone> GetParkingZoneNearAround(DTO.GoongMap.Position position, int radiusFindNearAround = 5)
     {
-        Point point = position.GetTopologyPoint();
-        return entities
+        Geometry point = position.GetTopologyPoint().ProjectTo(GeometryExtensions.PROJECT_SRID);
+        var data = entities
             .Include(p => p.Owner)
             .Include(p => p.Commune)
             .ThenInclude(c => c.District)
             .ThenInclude(d => d.City)
-            .Where(pz => pz.Location.Distance(point) <= radiusFindNearAround && pz.IsFull == false
+            .Where(pz => pz.IsFull == false
                         && pz.IsApprove == true
                         && !pz.ParkingZoneAbsents.Any(pa =>
                             pa.From <= DateTime.Now && pa.To >= DateTime.Now)).AsEnumerable();
+
+        return data.AsEnumerable().Where(pz => pz.Location.ProjectTo(GeometryExtensions.PROJECT_SRID).Distance(point) <= radiusFindNearAround * 1000);
     }
 
     public string GetFreeSlotByAttendantId(Guid attendantId)
