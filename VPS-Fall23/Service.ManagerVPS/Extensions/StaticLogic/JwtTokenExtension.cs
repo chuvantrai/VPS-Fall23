@@ -26,9 +26,11 @@ public static class JwtTokenExtension
             new Claim(nameof(UserTokenHeader.RoleName), userTokenInfo.RoleName),
             new Claim(nameof(UserTokenHeader.Avatar), userTokenInfo.Avatar ?? string.Empty),
             new Claim(nameof(UserTokenHeader.Expires),
-                userTokenInfo.Expires.ToString(FormatDate.DATE_KEY_JWT)),
+                userTokenInfo.Expires.ToString(FormatDate.DATE_KEY_JWT), 
+                CultureInfo.InvariantCulture.ToString()),
             new Claim(nameof(UserTokenHeader.ModifiedAt),
-                userTokenInfo.ModifiedAt.ToString(FormatDate.DATE_KEY_JWT))
+                userTokenInfo.ModifiedAt.ToString(FormatDate.DATE_KEY_JWT), 
+                CultureInfo.InvariantCulture.ToString())
         };
 
         var token = new JwtSecurityToken(
