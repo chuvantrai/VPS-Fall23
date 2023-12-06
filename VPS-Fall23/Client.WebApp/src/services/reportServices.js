@@ -42,7 +42,15 @@ const reportServices = () => {
       },
     });
   };
-  return { createReport, getReportForAdmin, loadReportType, filterReport };
+  const updateStatusReport = (reportId, statusId) => {
+    return axios.post(`api/Report/UpdateStatusReport`, null, {
+      params: {
+        reportId,
+        statusId,
+      },
+    });
+  };
+  return { createReport, getReportForAdmin, loadReportType, filterReport, updateStatusReport };
 };
 
 export default reportServices;
