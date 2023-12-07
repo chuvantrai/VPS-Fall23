@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Service.ManagerVPS.DTO.AppSetting;
+using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.DTO.VNPay;
 using Service.ManagerVPS.Extensions.DbContext;
 using Service.ManagerVPS.Extensions.ILogic;
@@ -36,14 +37,10 @@ builder.Services.AddSwaggerGen();
 
 //Config appsetting to model
 builder.Services.Configure<FileManagementConfig>(builder.Configuration.GetSection("fileManagementAccessKey"));
-builder.Services.AddOptions();
-
-//Config appsetting to model
-builder.Services.Configure<FileManagementConfig>(
-    builder.Configuration.GetSection("fileManagementAccessKey"));
 builder.Services.Configure<VnPayConfig>(builder.Configuration.GetSection("vnPay"));
 builder.Services.Configure<GoongMapConfig>(builder.Configuration.GetSection("GoongMap"));
 builder.Services.Configure<ParkingZoneConfig>(builder.Configuration.GetSection("parkingZone"));
+builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("TwilioSms"));
 builder.Services.AddOptions();
 
 //Add DBContext

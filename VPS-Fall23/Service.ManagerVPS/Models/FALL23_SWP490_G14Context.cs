@@ -848,6 +848,9 @@ namespace Service.ManagerVPS.Models
                     .HasMaxLength(100)
                     .IsUnicode(false)
                     .HasColumnName("user_phone");
+                
+                entity.Property(e => e.UserReceivedCode)
+                    .HasColumnName("user_received_code");
 
                 entity.HasOne(d => d.ParkingZone)
                     .WithMany(p => p.PromoCodes)

@@ -57,6 +57,7 @@ public class PromoCodeController : VpsController<PromoCode>
     [FilterPermission(Action = ActionFilterEnum.CreateNewPromoCode)]
     public async Task<IActionResult> CreateNewPromoCode([FromBody] NewPromoCodeInput input)
     {
+        var sendPromoCodeNow = ((DateTime)input.FromDate! - DateTime.Now).TotalHours < 48;
         var newPromoCodeInfo = new PromoCodeInformation
         {
             Id = Guid.NewGuid(),
@@ -69,7 +70,6 @@ public class PromoCodeController : VpsController<PromoCode>
             IsSent = false
         };
         await _promoCodeInfoRepository.Create(newPromoCodeInfo);
-
         var transactionLst = _transactionRepository.GetParkingTransactions();
         var promoCodeLst = new List<PromoCode>();
         foreach (var parkingZoneId in input.ParkingZoneIds)
@@ -91,12 +91,13 @@ public class PromoCodeController : VpsController<PromoCode>
                     UserPhone = x.Phone,
                     ParkingZoneId = parkingZoneId,
                     CreatedAt = DateTime.Now,
-                    ModifiedAt = DateTime.Now
+                    ModifiedAt = DateTime.Now,
+                    UserReceivedCode = sendPromoCodeNow
                 })
                 .ToList();
             promoCodeLst.AddRange(promoCode);
         }
-
+        
         if (promoCodeLst.Count == 0)
         {
             throw new ServerException(
@@ -105,7 +106,12 @@ public class PromoCodeController : VpsController<PromoCode>
 
         await ((IPromoCodeRepository)vpsRepository).CreateRange(promoCodeLst);
         await vpsRepository.SaveChange();
-
+        if (sendPromoCodeNow)
+        {
+            // send code for user
+            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x=>x.Id));
+        }
+        
         return Ok(ResponseNotification.ADD_SUCCESS);
     }
 
@@ -173,5 +179,39 @@ public class PromoCodeController : VpsController<PromoCode>
         }
 
         return promo;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> JobSendNotificationPromoCodeToUser()
+    {
+        var listPromoCode = await ((IPromoCodeRepository)vpsRepository)
+            .GetListPromoCodeNeedSendCode();
+        if (listPromoCode != null)
+        {
+            await SendMailPromoCode(listPromoCode);
+        }
+
+        return Ok();
+    }
+
+    private async Task SendNotificationPromoCodeToUser(IEnumerable<Guid> listPromoCodeId)
+    {
+        var listPromoCode = await ((IPromoCodeRepository)vpsRepository)
+            .GetListPromoCodeByListId(listPromoCodeId);
+        await SendMailPromoCode(listPromoCode);
+    }
+
+    public async Task SendMailPromoCode(IEnumerable<PromoCode>? listPromoCode)
+    {
+        if (listPromoCode == null) return;
+        foreach (var promoCode in listPromoCode)
+        {
+            var titleEmail = $"[VPS] khuyến mãi từ bãi đỗ xe {promoCode.ParkingZone} dành riêng cho bạn";
+            var bodyEmail =
+                $"Bạn đã nhận được mã khuyến mãi <strong>{promoCode.Code}</strong> giảm {promoCode.PromoCodeInformation.Discount}% " +
+                $"áp dụng cho email {promoCode.UserEmail} " +
+                $"khi đặt chỗ tại bãi đỗ xe {promoCode.ParkingZone.Name}";
+            await _generalVps.SendEmailAsync(promoCode.UserEmail, titleEmail, bodyEmail);
+        }
     }
 }

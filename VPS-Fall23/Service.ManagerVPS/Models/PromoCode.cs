@@ -14,6 +14,7 @@ namespace Service.ManagerVPS.Models
         public string UserEmail { get; set; } = null!;
         public string UserPhone { get; set; } = null!;
         public Guid ParkingZoneId { get; set; }
+        public bool? UserReceivedCode { get; set; }
 
         public virtual ParkingZone ParkingZone { get; set; } = null!;
         public virtual PromoCodeInformation PromoCodeInformation { get; set; } = null!;
