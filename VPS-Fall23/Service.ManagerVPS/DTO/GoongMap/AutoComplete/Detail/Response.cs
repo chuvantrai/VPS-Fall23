@@ -16,7 +16,7 @@ namespace Service.ManagerVPS.DTO.GoongMap.AutoComplete.Detail
         [JsonPropertyName("formatted_address")]
         public string FormattedAddress { get; set; } = null!;
         [JsonPropertyName("geometry")]
-        public Geometry Geometry { get; set; } = null!;
+        public GeometryDTO Geometry { get; set; } = null!;
         [JsonPropertyName("compound")]
         public Compound Compound { get; set; } = null!;
         [JsonPropertyName("name")]

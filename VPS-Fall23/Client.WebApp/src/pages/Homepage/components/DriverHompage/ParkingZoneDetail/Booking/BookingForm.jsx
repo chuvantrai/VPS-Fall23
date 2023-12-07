@@ -230,7 +230,7 @@ const BookingForm = ({ parkingZone }) => {
       <BookingDescription
         pricePerHour={parkingZone.pricePerHour}
         ioTime={bookingTime}
-        discount={promoCode?.info?.discount ?? 0}
+        discount={promoCode?.info?.promoCodeInformation?.discount ?? 0}
       >
 
       </BookingDescription>
