@@ -16,7 +16,7 @@ namespace Service.ManagerVPS.Controllers
             goongMapConfig = config.Value;
             goongMapRestApiService = new GoongMapRestApiService(goongMapConfig);
         }
-        [HttpGet()]
+        [HttpGet]
         public async Task<List<DTO.GoongMap.AutoComplete.Prediction>> AutoComplete([FromQuery] DTO.GoongMap.AutoComplete.Request request)
         {
             return (await goongMapRestApiService.PlaceAutoComplete(request)).Predictions;
@@ -27,7 +27,7 @@ namespace Service.ManagerVPS.Controllers
             return (await goongMapRestApiService.PlaceDetail(placeId, sessionToken)).Result;
         }
         [HttpGet]
-        public async Task<List<DTO.GoongMap.Geocode.Result>> GetPlaceFromLocation([FromQuery] DTO.GoongMap.Position location)
+        public async Task<List<DTO.GoongMap.Geocode.ResultDTO>> GetPlaceFromLocation([FromQuery] DTO.GoongMap.Position location)
         {
             return (await goongMapRestApiService.GetPlaceFromLocation(location)).Results;
         }

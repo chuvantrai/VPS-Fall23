@@ -35,7 +35,7 @@ const useAddressServices = () => {
   };
 
   const getAddressManager = (pageNumber = 1, pageSize = 10, cityFilter, districtFilter,
-                             textSearch, addressType) => {
+    textSearch, addressType) => {
     let addressManager = COMMUNE_URI + `/GetAddressListParkingZone?`;
     addressManager += `pageNumber=${pageNumber}`;
     addressManager += `&pageSize=${pageSize}`;
@@ -69,7 +69,9 @@ const useAddressServices = () => {
       Code: code,
     });
   };
-
+  const findAddressById = (id) => {
+    return axios.get(`${COMMUNE_URI}/FindAddressById/${id}`)
+  }
   return {
     getCities,
     getCommunes,
@@ -79,6 +81,7 @@ const useAddressServices = () => {
     getAddressManager,
     updateIsBlockAddress,
     createAddress,
+    findAddressById
   };
 
 };
