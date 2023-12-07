@@ -1,10 +1,15 @@
 import { Dropdown, Space } from 'antd';
 import avatarImg from '@/assets/images/AvatarDefault.png';
+import { LogoutOutlined } from '@ant-design/icons';
 
 const items = [
   {
-    label: <a href="/login">Đăng xuất</a>,
+    label: <a href="/change-password">Đổi mật khẩu</a>,
     key: '0',
+  },
+  {
+    label: <a href="/login"><LogoutOutlined /> Đăng xuất</a>,
+    key: '1',
   },
 ];
 
