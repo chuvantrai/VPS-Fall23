@@ -1,0 +1,222 @@
+﻿using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
+using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.Constants.Notifications;
+using Service.ManagerVPS.DTO.OtherModels;
+using Service.ManagerVPS.DTO.Output;
+using Service.ManagerVPS.Extensions;
+using Service.ManagerVPS.Extensions.StaticLogic;
+using Service.ManagerVPS.Models;
+using Service.ManagerVPS.Repositories.Interfaces;
+
+namespace Service.ManagerVPS.Repositories;
+
+public class ParkingZoneRepository : VpsRepository<ParkingZone>, IParkingZoneRepository
+{
+    public ParkingZoneRepository(FALL23_SWP490_G14Context context) : base(context)
+    {
+    }
+
+    public async Task<List<ParkingZone>> GetAllParkingZone()
+    {
+        return await entities.ToListAsync();
+    }
+
+    public PagedList<ParkingZone> GetAllParkingZone(QueryStringParameters parameters)
+    {
+        var parkingZone = entities.Include(o => o.Owner).ThenInclude(o => o.IdNavigation);
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<ParkingZone> GetOwnerParkingZone(QueryStringParameters parameters, Guid id)
+    {
+        var parkingZone = entities.Include(o => o.Owner).ThenInclude(o => o.IdNavigation).Where(x => x.OwnerId == id);
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<ParkingZone> GetOwnerParkingZoneByName(QueryStringParameters parameters,
+        string name, Guid id)
+    {
+        var parkingZone = entities.Include(o => o.Owner)
+            .Where(x => x.Name.Contains(name) && x.OwnerId == id);
+
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<ParkingZone> GetParkingZoneByName(QueryStringParameters parameters,
+        string name)
+    {
+        var parkingZone = entities.Include(o => o.Owner).Where(x => x.Name.Contains(name));
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public PagedList<ParkingZone> GetParkingZoneByOwner(QueryStringParameters parameters,
+        string owner)
+    {
+        var parkingZone = entities.Include(o => o.Owner)
+            .Where(x => x.Owner.Email == owner);
+        return PagedList<ParkingZone>.ToPagedList(parkingZone, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public List<ParkingZone> GetParkingZoneByOwnerId(string ownerId)
+    {
+        var list = entities.Where(x => x.OwnerId.ToString().ToLower().Equals(ownerId)).ToList();
+        return list;
+    }
+
+    public List<ParkingZone> GetApprovedParkingZonesByOwnerId(Guid ownerId)
+    {
+        var parkingZoneLst = entities
+            .Where(x => x.OwnerId.Equals(ownerId) && x.IsApprove == true)
+            .ToList();
+        return parkingZoneLst;
+    }
+
+    public ParkingZone? GetParkingZoneById(Guid id)
+    {
+        var parkingZone = context.ParkingZones
+            .Include(x => x.ParkingZoneAbsents)
+            .Include(x => x.Commune)
+            .ThenInclude(x => x.District)
+            .ThenInclude(x => x.City)
+            .FirstOrDefault(x => x.Id.Equals(id));
+        return parkingZone;
+    }
+
+    public ParkingZoneAndOwnerOutput? GetParkingZoneAndOwnerByParkingZoneId(Guid id)
+    {
+        var parkingZone = context.ParkingZones
+            .Include(x => x.Owner)
+            .FirstOrDefault(x => x.Id.Equals(id));
+        if (parkingZone == null) return null;
+
+        var numberOfParkingZone =
+            context.ParkingZones.Count(x => x.OwnerId.Equals(parkingZone.OwnerId));
+
+        var result = new ParkingZoneAndOwnerOutput
+        {
+            ParkingZone = parkingZone,
+            Owner = parkingZone.Owner,
+            NumberOfParkingZones = numberOfParkingZone
+        };
+
+        return result;
+    }
+
+    public IQueryable<ParkingZone> GetByCityId(Guid cityId)
+    {
+        return entities
+            .Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(p => p.Commune.District.CityId == cityId
+                        && p.IsFull == false
+                        && p.IsApprove == true
+                        && !p.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now));
+    }
+
+    public IQueryable<ParkingZone> GetByCommuneId(Guid communeId)
+    {
+        return entities.Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(p => p.CommuneId == communeId
+                        && p.IsFull == false
+                        && p.IsApprove == true
+                        && !p.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now));
+    }
+
+    public IQueryable<ParkingZone> GetByDistrictId(Guid districtId)
+    {
+        return entities.Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(p => p.Commune.DistrictId == districtId
+                        && p.IsFull == false
+                        && p.IsApprove == true
+                        && !p.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now));
+    }
+
+    public PagedList<ParkingZone> GetRequestedParkingZones(QueryStringParameters parameters)
+    {
+        var requestedParkingZones = entities
+            .Where(p => p.IsApprove == null)
+            .OrderBy(p => p.SubId);
+        return PagedList<ParkingZone>.ToPagedList(requestedParkingZones, parameters.PageNumber,
+            parameters.PageSize);
+    }
+
+    public ParkingZone? GetParkingZoneAndAbsentById(Guid parkingZoneId)
+    {
+        var parkingZone = entities
+            .Include(x => x.ParkingZoneAbsents)
+            .FirstOrDefault(x => x.Id.Equals(parkingZoneId));
+        return parkingZone;
+    }
+
+    public IEnumerable<ParkingZone>? GetParkingZoneByArrayParkingZoneId(Guid[]? parkingZoneIds)
+    {
+        if (parkingZoneIds == null || parkingZoneIds.Length == 0) return null;
+        return context.ParkingZones.Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(p => parkingZoneIds.Contains(p.Id) && p.IsApprove == true);
+    }
+
+    public IEnumerable<ParkingZone> GetParkingZoneNearAround(DTO.GoongMap.Position position, int radiusFindNearAround = 5)
+    {
+        Geometry point = position.GetTopologyPoint().ProjectTo(GeometryExtensions.PROJECT_SRID);
+        var data = entities
+            .Include(p => p.Owner)
+            .Include(p => p.Commune)
+            .ThenInclude(c => c.District)
+            .ThenInclude(d => d.City)
+            .Where(pz => pz.IsFull == false
+                        && pz.IsApprove == true
+                        && !pz.ParkingZoneAbsents.Any(pa =>
+                            pa.From <= DateTime.Now && pa.To >= DateTime.Now)).AsEnumerable();
+
+        return data.AsEnumerable().Where(pz => pz.Location.ProjectTo(GeometryExtensions.PROJECT_SRID).Distance(point) <= radiusFindNearAround * 1000);
+    }
+
+    public string GetFreeSlotByAttendantId(Guid attendantId)
+    {
+        var parkingZone = context.ParkingZoneAttendants.Include(parkingZoneAttendant => parkingZoneAttendant.ParkingZone).FirstOrDefault(pza => pza.Id == attendantId)?.ParkingZone;
+        if (parkingZone != null)
+        {
+            var bookedslot = context.ParkingTransactions
+                    .Where(p => p.ParkingZoneId == parkingZone.Id
+                                && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED ||
+                                    p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT))
+                    .Count();
+            return $"{parkingZone.Slots - bookedslot}/{parkingZone.Slots}";
+        }
+        else
+        {
+            return ResponseNotification.NO_DATA;
+        }
+    }
+
+    //public ParkingZone? GetAdminOverview(Guid id)
+    //{
+    //    var parkingZone = entities.;
+
+    //    var data = new
+    //    {
+
+    //    };
+    //    return parkingZone;
+    //}
+}

@@ -1,4 +1,10 @@
-﻿namespace Service.ManagerVPS.Extensions.StaticLogic;
+﻿using System.Globalization;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
+using Service.ManagerVPS.Constants.KeyValue;
+using Service.ManagerVPS.DTO.OtherModels;
+
+namespace Service.ManagerVPS.Extensions.StaticLogic;
 
 public static class GeneralExtension
 {
@@ -8,5 +14,54 @@ public static class GeneralExtension
         var parentPath = Directory.GetParent(currentPath)!.FullName;
         var targetPath = Path.Combine(parentPath, nameService);
         return targetPath;
+    }
+
+    public static UserTokenHeader? ConvertClaimToUserToken(IEnumerable<Claim> claims)
+    {
+        try
+        {
+            var arrayClaims = claims as Claim[] ?? claims.ToArray();
+            var userToken = new UserTokenHeader()
+            {
+                UserId = arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.UserId))!.Value,
+                FirstName = arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.FirstName))!.Value,
+                LastName = arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.LastName))!.Value,
+                Email = arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.Email))!.Value,
+                RoleId = int.Parse(arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.RoleId))!.Value),
+                RoleName = arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.RoleName))!.Value,
+                Avatar = arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.Avatar))!.Value,
+                Expires = DateTime.ParseExact(arrayClaims.FirstOrDefault(c =>
+                        c.Type == nameof(UserTokenHeader.Expires))!.Value,
+                    FormatDate.DATE_KEY_JWT,
+                    CultureInfo.InvariantCulture),
+                ModifiedAt = DateTime.ParseExact(arrayClaims.FirstOrDefault(c =>
+                        c.Type == nameof(UserTokenHeader.ModifiedAt))!.Value,
+                    FormatDate.DATE_KEY_JWT,
+                    CultureInfo.InvariantCulture)
+            };
+            return userToken;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static bool CheckEqualDateTime(DateTime dateTime1, DateTime dateTime2)
+    {
+        try
+        {
+            return dateTime1.ToString(FormatDate.DATE_KEY_JWT) == dateTime2.ToString(FormatDate.DATE_KEY_JWT);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public static bool IsLicensePlateValid(string licensePlate)
+    {
+        string pattern = @"^[A-Za-z0-9\-\.]+$";
+        return Regex.IsMatch(licensePlate, pattern);
     }
 }

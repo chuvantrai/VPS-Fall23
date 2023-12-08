@@ -1,0 +1,166 @@
+[
+  {
+    "code": 1,
+    "message": "Lỗi hệ thống"
+  },
+  {
+    "code": 2,
+    "message": "Không tìm thấy nội dung yêu cầu"
+  },
+  {
+    "code": 3,
+    "message": "Có lỗi xảy ra, vui lòng kiểm tra lại"
+  },
+  {
+    "code": 4,
+    "message": "Phiên đăng nhập không hợp lệ"
+  },
+  {
+    "code": 5,
+    "message": "Không có quyền truy cập"
+  },
+  {
+    "code": 6,
+    "message": "Email này đã được đăng ký!"
+  },
+  {
+    "code": 2001,
+    "message": "Mã không chính xác! Hãy thử lại!"
+  },
+  {
+    "code": 2002,
+    "message": "Mã đã hết hạn!"
+  },
+  {
+    "code": 2003,
+    "message": "Email của bạn chưa được đăng ký!"
+  },
+  {
+    "code": 2004,
+    "message": "Tên đăng nhập đã tồn tại! Vui lòng chọn tên đăng nhập khác!"
+  },
+  {
+    "code": 2005,
+    "message": "Bãi đỗ xe không tồn tại!"
+  },
+  {
+    "code": 2006,
+    "message": "Bãi đỗ xe đã bị từ chối hoặc đang trong quá trình xử lý không thể thêm tài khoản cho nhân viên!"
+  },
+  {
+    "code": 1001,
+    "message": "Có lỗi khi lấy vị trí bản đồ"
+  },
+  {
+    "code": 1002,
+    "message": "Yêu cầu không hợp lệ, không thể tìm nhà xe"
+  },
+  {
+    "code": 1003,
+    "message": "Biển số này đã được đặt trước đó vào khoảng thời gian này, vui lòng kiểm tra lại"
+  },
+  {
+    "code": 1004,
+    "message": "Nhà xe không còn chỗ trống trong khoảng thời gian vào bạn đã chọn, vui lòng chọn khoảng thời gian khác"
+  },
+  {
+    "code": 1005,
+    "message": "Nhà xe không còn chỗ trống trong khoảng thời gian ra bạn đã chọn, vui lòng chọn khoảng thời gian khác"
+  },
+  {
+    "code": 1006,
+    "message": "Mã giảm giá không hợp lệ"
+  },
+  {
+    "code": 1007,
+    "message":  "Mã giảm giá không khả dụng ở thời điểm hiện tại hoặc đã hết hạn"
+  },
+  {
+    "code": 3000,
+    "message": "Biển số xe chưa có!"
+  },
+  {
+    "code": 3001,
+    "message": "Biển số xe không hợp lệ!"
+  },
+  {
+    "code": 3002,
+    "message": "Không tìm thấy biển số xe!"
+  },
+  {
+    "code": 3003,
+    "message": "Không tìm thấy ảnh biển số xe!"
+  },
+  {
+    "code": 5001,
+    "message": "Tên tài khoản/email sai!"
+  },
+  {
+    "code": 5002,
+    "message": "Tài khoản này đã bị khóa!"
+  },
+  {
+    "code": 5003,
+    "message": "Code xác nhận sai!"
+  },
+  {
+    "code": 5004,
+    "message": "Code xác nhận đã hết hạn!"
+  },
+  {
+    "code": 5005,
+    "message": "Mật khẩu mới không được trùng mật khẩu cũ!"
+  },
+  {
+    "code": 5006,
+    "message": "Mật khẩu sai!"
+  },
+  {
+    "code": 5007,
+    "message": "Email của tài khoản chưa xác nhận!"
+  },
+  {
+    "code": 5008,
+    "message": "Email này chưa từng đặt chỗ ở đây!"
+  },
+  {
+    "code": 5009,
+    "message": "Đánh giá thất bại!"
+  },
+  {
+    "code": 5010,
+    "message": "Email này đã đánh giá!"
+  },
+  {
+    "code": 5011,
+    "message": "Mã giao dịch sai!"
+  },
+  {
+    "code": 5012,
+    "message": "Đã có yêu cầu hoàn tiền của mã giao dịch này!"
+  },
+  {
+    "code": 5013,
+    "message": "Đã có thông báo lỗi của mã giao dịch này!"
+  },
+  {
+    "code": 5014,
+    "message": "Bãi đỗ xe không tồi tại!"
+  },
+  {
+    "code": 5015,
+    "message": "Mã địa chỉ này đã tồi tại!"
+  },
+  {
+    "code": 5016,
+    "message": "Tên địa chỉ này đã tồi tại!"
+  },
+  {
+    "code": 5017,
+    "message": "Kiểu tạo địa chỉ không tồn tại!"
+  },
+  {
+    "code": 5018,
+    "message": "Tên phải chứa Tỉnh/Thành phố!"
+  }
+]
