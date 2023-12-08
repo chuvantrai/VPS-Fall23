@@ -55,6 +55,33 @@ namespace Service.ManagerVPS.Repositories
             return entity;
         }
 
+        public Task<IEnumerable<PromoCode>> GetListPromoCodeByListId(IEnumerable<Guid> listPromoCodeId)
+        {
+            return Task.FromResult<IEnumerable<PromoCode>>(
+                context.PromoCodes
+                    .Include(x => x.ParkingZone)
+                    .Include(x => x.PromoCodeInformation)
+                    .Where(x => listPromoCodeId.Contains(x.Id))
+            );
+        }
+
+        public async Task<IEnumerable<PromoCode>?> GetListPromoCodeNeedSendCode()
+        {
+            var listPromoCode = await context.PromoCodes
+                .Include(x => x.ParkingZone)
+                .Include(x => x.PromoCodeInformation)
+                .Where(x => x.UserReceivedCode == false || x.UserReceivedCode == null).ToListAsync();
+
+            if (listPromoCode.Count == 0) return null;
+            foreach (var promoCode in listPromoCode)
+            {
+                promoCode.UserReceivedCode = true;
+            }
+
+            await context.SaveChangesAsync();
+            return listPromoCode.AsEnumerable();
+        }
+
         public async Task<int> SaveChange()
         {
             using var transaction = context.Database.BeginTransaction();

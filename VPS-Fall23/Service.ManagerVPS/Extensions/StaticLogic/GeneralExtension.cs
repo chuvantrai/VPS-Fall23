@@ -1,5 +1,7 @@
-﻿using System.Security.Claims;
+﻿using System.Globalization;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
+using Service.ManagerVPS.Constants.KeyValue;
 using Service.ManagerVPS.DTO.OtherModels;
 
 namespace Service.ManagerVPS.Extensions.StaticLogic;
@@ -28,10 +30,14 @@ public static class GeneralExtension
                 RoleId = int.Parse(arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.RoleId))!.Value),
                 RoleName = arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.RoleName))!.Value,
                 Avatar = arrayClaims.FirstOrDefault(c => c.Type == nameof(UserTokenHeader.Avatar))!.Value,
-                Expires = DateTime.Parse(arrayClaims.FirstOrDefault(c =>
-                    c.Type == nameof(UserTokenHeader.Expires))!.Value),
-                ModifiedAt = DateTime.Parse(arrayClaims.FirstOrDefault(c =>
-                    c.Type == nameof(UserTokenHeader.ModifiedAt))!.Value)
+                Expires = DateTime.ParseExact(arrayClaims.FirstOrDefault(c =>
+                        c.Type == nameof(UserTokenHeader.Expires))!.Value,
+                    FormatDate.DATE_KEY_JWT,
+                    CultureInfo.InvariantCulture),
+                ModifiedAt = DateTime.ParseExact(arrayClaims.FirstOrDefault(c =>
+                        c.Type == nameof(UserTokenHeader.ModifiedAt))!.Value,
+                    FormatDate.DATE_KEY_JWT,
+                    CultureInfo.InvariantCulture)
             };
             return userToken;
         }
@@ -41,13 +47,13 @@ public static class GeneralExtension
         }
     }
 
-    public static bool CheckEqualDateTime(DateTime dateTime1 ,DateTime dateTime2)
+    public static bool CheckEqualDateTime(DateTime dateTime1, DateTime dateTime2)
     {
         try
         {
-            return dateTime1.ToString("yyyy-MM-dd HH:mm:ss") == dateTime2.ToString("yyyy-MM-dd HH:mm:ss");
+            return dateTime1.ToString(FormatDate.DATE_KEY_JWT) == dateTime2.ToString(FormatDate.DATE_KEY_JWT);
         }
-        catch 
+        catch
         {
             return false;
         }
@@ -58,6 +64,4 @@ public static class GeneralExtension
         string pattern = @"^[A-Za-z0-9\-\.]+$";
         return Regex.IsMatch(licensePlate, pattern);
     }
-
-
 }

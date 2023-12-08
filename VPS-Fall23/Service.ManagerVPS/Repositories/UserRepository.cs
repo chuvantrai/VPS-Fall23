@@ -107,10 +107,12 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
             .FirstOrDefaultAsync(x => x.Id.Equals(request.AccountId));
         if (account == null) return null;
         if (request.PathImage != null) account.Avatar = request.PathImage;
+        request.Address ??= string.Empty;
+        
         account.FirstName = request.FirstName;
         account.LastName = request.LastName;
         account.PhoneNumber = request.PhoneNumber;
-        if (request.Address != null) account.Address = request.Address;
+        account.Address = request.Address;
         if (request.CommuneId is not null) account.CommuneId = request.CommuneId;
         account.ModifiedAt = DateTime.Now;
         await context.SaveChangesAsync();
