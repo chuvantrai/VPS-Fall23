@@ -42,6 +42,10 @@ const AddressCascader = ({ cascaderProps, onCascaderChangeCallback, defaultAddre
       setCities([])
     }
   }, [cities.length])
+  const onCascaderChange = (value, selectedOptions) => {
+    setDefaultAddressId(value);
+    onCascaderChangeCallback(value, selectedOptions)
+  }
   const loadDefaultValue = () => {
     if (!defaultAddress) return;
     addressService.findAddressById(defaultAddress)
@@ -80,9 +84,9 @@ const AddressCascader = ({ cascaderProps, onCascaderChangeCallback, defaultAddre
     <Cascader
       {...cascaderProps}
       options={cities}
-      defaultValue={defaultAddressId}
+      value={defaultAddressId}
       loadData={loadCascaderChildren}
-      onChange={onCascaderChangeCallback}
+      onChange={onCascaderChange}
       fieldNames={fieldNames}
       changeOnSelect
       status=""

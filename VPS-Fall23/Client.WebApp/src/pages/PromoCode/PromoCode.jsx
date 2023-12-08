@@ -129,6 +129,7 @@ function PromoCode() {
       fromDate: values.selectedDate[0],
       toDate: values.selectedDate[1]
     }
+    console.log(input);
     promoCodeServices.updatePromoCode(input)
       .then(res => {
         notification.success({
