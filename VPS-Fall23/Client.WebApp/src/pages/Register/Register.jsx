@@ -175,10 +175,6 @@ function Register() {
                   message: 'Hãy điền số điện thoại của bạn!',
                 },
                 {
-                  max: 10,
-                  message: 'Số điện thoại tối đa chỉ được 10 ký tự',
-                },
-                {
                   pattern: /(0[3|5|7|8|9])+([0-9]{8})\b/g,
                   message: 'Sai định dạng',
                 },
