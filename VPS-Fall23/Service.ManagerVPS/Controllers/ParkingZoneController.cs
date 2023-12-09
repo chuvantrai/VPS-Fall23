@@ -250,7 +250,7 @@ public class ParkingZoneController : VpsController<ParkingZone>
     }
 
     [HttpGet]
-    //[FilterPermission(Action = ActionFilterEnum.ChangeParkingZoneStat)]
+    [FilterPermission(Action = ActionFilterEnum.GetAdminOverview)]
     public async Task<IActionResult> GetAdminOverview()
     {
         var now = DateTime.Now;
@@ -378,25 +378,6 @@ public class ParkingZoneController : VpsController<ParkingZone>
         parkingZone.RejectReason = input.RejectReason;
         parkingZone.ModifiedAt = DateTime.Now;
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
-
-        if (input.IsApprove == true)
-        {
-            var contract = new Contract
-            {
-                Id = Guid.NewGuid(),
-                ParkingZoneId = (Guid)input.Id,
-                ContractCode = $"VPS/{output.Owner.Email}/{output.NumberOfParkingZones}",
-                CreatedAt = DateTime.Now,
-                ModifiedAt = DateTime.Now,
-                Status = 1,
-                PdfSavedAt = DateTime.Now
-            };
-            var contractAddedResult = await _contractRepository.Create(contract);
-            if (contractAddedResult is null)
-            {
-                throw new ServerException(ResponseNotification.ADD_ERROR);
-            }
-        }
 
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
 
