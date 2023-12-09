@@ -206,6 +206,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.UpdateStatusReport,
             UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetAdminOverview,
+            UserRole = new[] { UserRoleEnum.ADMIN }
         }
     };
 
