@@ -41,5 +41,6 @@ public enum ActionFilterEnum
     DeleteParkingZoneAction,
     CancelAbsent,
     DeletePromoCode,
-    UpdateStatusReport
+    UpdateStatusReport,
+    GetAdminOverview
 }
