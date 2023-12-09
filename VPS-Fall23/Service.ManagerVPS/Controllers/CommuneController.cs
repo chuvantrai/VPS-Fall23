@@ -63,6 +63,10 @@ namespace Service.ManagerVPS.Controllers
         [FilterPermission(Action = ActionFilterEnum.GetAddressListParkingZone)]
         public async Task<IActionResult> GetAddressListParkingZone([FromQuery] GetAddressListParkingZoneRequest request)
         {
+            if (!string.IsNullOrEmpty(request.TextAddress))
+            {
+                request.TextAddress = request.TextAddress.Trim();
+            }
             switch (request.TypeAddress)
             {
                 case AddressTypeEnum.COMMUNE:

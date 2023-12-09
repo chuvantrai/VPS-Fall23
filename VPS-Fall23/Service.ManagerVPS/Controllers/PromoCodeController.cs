@@ -113,7 +113,7 @@ public class PromoCodeController : VpsController<PromoCode>
         if (sendPromoCodeNow)
         {
             // send code for user
-            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x=>x.Id));
+            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x=>x.Id),input.ParkingZoneIds);
         }
         
         return Ok(ResponseNotification.ADD_SUCCESS);
@@ -259,16 +259,20 @@ public class PromoCodeController : VpsController<PromoCode>
             .GetListPromoCodeNeedSendCode();
         if (listPromoCode != null)
         {
-            await SendMailPromoCode(listPromoCode);
+            var promoCodes = listPromoCode.ToList();
+            var listParkingZoneIds = promoCodes.Select(x => x.ParkingZoneId).Distinct().ToList();
+            await _promoCodeInfoRepository.UpdateIsSendPromoCode(listParkingZoneIds);
+            await SendMailPromoCode(promoCodes);
         }
 
         return Ok();
     }
 
-    private async Task SendNotificationPromoCodeToUser(IEnumerable<Guid> listPromoCodeId)
+    private async Task SendNotificationPromoCodeToUser(IEnumerable<Guid> listPromoCodeId,List<Guid> parkingZoneIds)
     {
         var listPromoCode = await ((IPromoCodeRepository)vpsRepository)
             .GetListPromoCodeByListId(listPromoCodeId);
+        await _promoCodeInfoRepository.UpdateIsSendPromoCode(parkingZoneIds);
         await SendMailPromoCode(listPromoCode);
     }
 
