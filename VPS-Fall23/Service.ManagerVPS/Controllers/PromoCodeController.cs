@@ -147,7 +147,7 @@ public class PromoCodeController : VpsController<PromoCode>
     }
 
     [HttpPut]
-    //[FilterPermission(Action = ActionFilterEnum.UpdatePromoCode)]
+    [FilterPermission(Action = ActionFilterEnum.UpdatePromoCode)]
     public async Task<IActionResult> UpdatePromoCode([FromBody] UpdatePromoCodeInput input)
     {
         using (var context = new FALL23_SWP490_G14Context())

@@ -44,5 +44,6 @@ public enum ActionFilterEnum
     UpdateStatusReport,
     GetAddressListParkingZone,
     UpdateIsBlockAddress,
-    CreateAddress
+    CreateAddress,
+    GetAdminOverview
 }

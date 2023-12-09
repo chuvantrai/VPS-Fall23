@@ -221,6 +221,11 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.CreateAddress,
             UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetAdminOverview,
+            UserRole = new[] { UserRoleEnum.ADMIN }
         }
     };
 
