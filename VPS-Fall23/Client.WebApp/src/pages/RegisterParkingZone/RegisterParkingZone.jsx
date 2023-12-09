@@ -18,13 +18,13 @@ const layout = {
 };
 
 const validateMessages = {
-  required: '${label} is required!',
+  required: '${label} không được bỏ trống!',
   types: {
-    email: '${label} is not a valid email!',
-    number: '${label} is not a valid number!',
+    email: '${label} không phải email hợp lệ!',
+    number: '${label} không phải số hợp lệ!',
   },
   number: {
-    range: '${label} must be between ${min} and ${max}',
+    range: '${label} cần nằm trong khoảng ${min} và ${max}',
   },
 };
 
@@ -252,7 +252,7 @@ const RegisterParkingZone = () => {
             </Form.Item>
             <Form.Item
               name="slots"
-              label="Slots"
+              label="Số vị trí"
               rules={[
                 {
                   required: true,
@@ -261,7 +261,7 @@ const RegisterParkingZone = () => {
             >
               <InputNumber
                 style={{ width: "100%" }}
-                placeholder="Số slots của parking zone"
+                placeholder="Số vị trí của parking zone"
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
               />
