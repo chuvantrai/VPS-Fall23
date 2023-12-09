@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
@@ -6,14 +7,17 @@ using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
+using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using System.Dynamic;
 
 namespace Service.ManagerVPS.Controllers;
 
 public class PromoCodeController : VpsController<PromoCode>
 {
+
     private readonly IPromoCodeInfoRepository _promoCodeInfoRepository;
     private readonly IParkingTransactionRepository _transactionRepository;
     private readonly IGeneralVPS _generalVps;
@@ -128,6 +132,7 @@ public class PromoCodeController : VpsController<PromoCode>
                             ?? throw new ServerException(2);
         var parkingZoneIdLst = promoCodeInfo.PromoCodes
             .Select(x => x.ParkingZoneId)
+            .Distinct()
             .ToList();
         return Ok(new
         {
@@ -145,6 +150,72 @@ public class PromoCodeController : VpsController<PromoCode>
     [FilterPermission(Action = ActionFilterEnum.UpdatePromoCode)]
     public async Task<IActionResult> UpdatePromoCode([FromBody] UpdatePromoCodeInput input)
     {
+        using (var context = new FALL23_SWP490_G14Context())
+        {
+            List<PromoCode> list = context.PromoCodes.Include(p => p.PromoCodeInformation).Where(x => x.PromoCodeInformationId == input.PromoCodeId).ToList();
+            PromoCodeInformation? info = context.PromoCodeInformations.Where(x => x.Id == input.PromoCodeId).FirstOrDefault();
+            if(list == null)
+            {
+                return BadRequest("Promo code not found");
+            }
+            if(info.IsSent)
+            {
+                return BadRequest("Can't Update");
+            }
+
+            context.PromoCodes.RemoveRange(list);
+            if (info != null)
+            {
+                info.FromDate = input.FromDate;
+                info.ToDate = input.ToDate;
+                info.Discount = input.Discount;
+                info.IsSent = false;
+            }
+            else
+            {
+                return BadRequest("Promo Code Info not exist");
+            }
+
+            var transactionLst = _transactionRepository.GetParkingTransactions();
+            var promoCodeLst = new List<PromoCode>();
+            foreach (var parkingZoneId in input.ParkingZoneIds)
+            {
+                var promoCode = transactionLst
+                    .Where(x => x.ParkingZoneId.Equals(parkingZoneId))
+                    .DistinctBy(x => new
+                    {
+                        x.Email,
+                        x.Phone
+                    })
+                    .Select(x => new PromoCode
+                    {
+                        Id = Guid.NewGuid(),
+                        Code = _generalVps.GenerateRandomCode(6),
+                        PromoCodeInformationId = info.Id,
+                        NumberOfUses = 1,
+                        UserEmail = x.Email,
+                        UserPhone = x.Phone,
+                        ParkingZoneId = parkingZoneId,
+                        CreatedAt = DateTime.Now,
+                        ModifiedAt = DateTime.Now
+                    })
+                    .ToList();
+                promoCodeLst.AddRange(promoCode);
+            }
+
+            if (promoCodeLst.Count == 0)
+            {
+                throw new ServerException(
+                    "Hiện chưa có người dùng nào sử dụng bãi đỗ xe. Không thể tạo khuyến mãi!");
+            }
+
+            await ((IPromoCodeRepository)vpsRepository).CreateRange(promoCodeLst);
+            await vpsRepository.SaveChange();
+            context.SaveChanges();
+        }
+
+        
+
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
 

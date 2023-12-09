@@ -128,88 +128,95 @@ namespace Service.ManagerVPS.Controllers
 
                 DateTime now = DateTime.Now;
                 var list = parkingTransactionRepository.GetBookedSlot(parkingZoneName, ownerId, DateTime.Now);
-                var doneCheckInOut = 0;
-                var notCheckIn = 0;
-                var notCheckOut = 0;
-                decimal hourCash = 0;
-                decimal dayCash = 0;
-                decimal weekCash = 0;
-                decimal monthCash = 0;
-                decimal yearCash = 0;
-                foreach (var item in list)
+                using (var context = new FALL23_SWP490_G14Context())
                 {
-                    if (item.CheckinAt < DateTime.Now && item.CheckoutAt < DateTime.Now)
+                    var doneCheckInOut = 0;
+                    var notCheckIn = 0;
+                    var notCheckOut = 0;
+                    decimal hourCash = 0;
+                    decimal dayCash = 0;
+                    decimal weekCash = 0;
+                    decimal monthCash = 0;
+                    decimal yearCash = 0;
+                    foreach (var item in list)
                     {
-                        doneCheckInOut++;
-                    }
+                        var detail = context.ParkingTransactionDetails.Where(x => x.ParkingTransactionId == item.Id).FirstOrDefault();
 
-                    if (item.CheckinAt > DateTime.Now || item.CheckinAt == null)
-                    {
-                        notCheckIn++;
-                    }
-
-                    if (item.CheckinAt <= DateTime.Now &&
-                        (item.CheckoutAt > DateTime.Now || item.CheckoutAt == null))
-                    {
-                        notCheckOut++;
-                    }
-
-                    TimeSpan timeDifference = (item.CheckoutAt - item.CheckinAt).Value;
-
-                    DayOfWeek
-                        firstDayOfWeek =
-                            DayOfWeek
-                                .Monday; // You can adjust this to your preferred first day of the week
-
-                    DateTime startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)firstDayOfWeek);
-                    DateTime endOfWeek = startOfWeek.AddDays(6);
-
-
-                    if (item.CreatedAt.Year == now.Year)
-                    {
-                        yearCash += item.ParkingZone.PricePerHour *
-                                    (decimal)timeDifference.TotalHours;
-
-                        if (item.CreatedAt.Month == now.Month)
+                        if (detail.From < DateTime.Now && detail.To < DateTime.Now)
                         {
-                            monthCash += item.ParkingZone.PricePerHour *
-                                         (decimal)timeDifference.TotalHours;
+                            doneCheckInOut++;
+                        }
 
-                            if (item.CreatedAt >= startOfWeek && item.CreatedAt <= endOfWeek)
+                        if (detail.From > DateTime.Now || detail.To == null)
+                        {
+                            notCheckIn++;
+                        }
+
+                        if (detail.From <= DateTime.Now &&
+                            (detail.To > DateTime.Now || detail.To == null))
+                        {
+                            notCheckOut++;
+                        }
+
+                        TimeSpan timeDifference = (item.CheckoutAt - item.CheckinAt).Value;
+
+                        DayOfWeek
+                            firstDayOfWeek =
+                                DayOfWeek
+                                    .Monday; // You can adjust this to your preferred first day of the week
+
+                        DateTime startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)firstDayOfWeek);
+                        DateTime endOfWeek = startOfWeek.AddDays(6);
+
+
+                        if (item.CreatedAt.Year == now.Year)
+                        {
+                            yearCash += item.ParkingZone.PricePerHour *
+                                        (decimal)timeDifference.TotalHours;
+
+                            if (item.CreatedAt.Month == now.Month)
                             {
-                                weekCash += item.ParkingZone.PricePerHour *
-                                            (decimal)timeDifference.TotalHours;
+                                monthCash += item.ParkingZone.PricePerHour *
+                                             (decimal)timeDifference.TotalHours;
 
-                                if (item.CreatedAt.Day == now.Day)
+                                if (item.CreatedAt >= startOfWeek && item.CreatedAt <= endOfWeek)
                                 {
-                                    dayCash += item.ParkingZone.PricePerHour *
-                                               (decimal)timeDifference.TotalHours;
+                                    weekCash += item.ParkingZone.PricePerHour *
+                                                (decimal)timeDifference.TotalHours;
 
-                                    if (item.CreatedAt.Hour == now.Hour)
+                                    if (item.CreatedAt.Day == now.Day)
                                     {
-                                        hourCash += item.ParkingZone.PricePerHour *
-                                                    (decimal)timeDifference.TotalHours;
+                                        dayCash += item.ParkingZone.PricePerHour *
+                                                   (decimal)timeDifference.TotalHours;
+
+                                        if (item.CreatedAt.Hour == now.Hour)
+                                        {
+                                            hourCash += item.ParkingZone.PricePerHour *
+                                                        (decimal)timeDifference.TotalHours;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
+
+                    var metadata = new
+                    {
+                        doneCheckInOut = doneCheckInOut,
+                        notCheckIn = notCheckIn,
+                        notCheckOut = notCheckOut,
+                        total = doneCheckInOut + notCheckOut + notCheckIn,
+                        hourCash = hourCash,
+                        dayCash = dayCash,
+                        weekCash = weekCash,
+                        monthCash = monthCash,
+                        yearCash = yearCash,
+                        //Data = list
+                    };
+
+                    return Ok(metadata);
                 }
 
-                var metadata = new
-                {
-                    doneCheckInOut = doneCheckInOut,
-                    notCheckIn = notCheckIn,
-                    notCheckOut = notCheckOut,
-                    total = doneCheckInOut + notCheckOut + notCheckIn,
-                    hourCash = hourCash,
-                    dayCash = dayCash,
-                    weekCash = weekCash,
-                    monthCash = monthCash,
-                    yearCash = yearCash,
-                    //Data = list
-                };
-                return Ok(metadata);
             }
             catch (Exception ex)
             {

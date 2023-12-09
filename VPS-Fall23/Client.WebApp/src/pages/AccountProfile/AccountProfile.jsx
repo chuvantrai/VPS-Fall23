@@ -19,7 +19,8 @@ function AccountProfile() {
     style: { width: '100%' },
     placeholder: 'Chọn địa chỉ',
   };
-  const [stringArray,setstringArray] = useState([]);
+  const [defaultAddressId, setDefaultAddressId] = useState(null);
+  const [stringArray, setstringArray] = useState([]);
   const onCascaderChange = useCallback((value, selectedOptions) => {
     setSelectedAddress(selectedOptions ? selectedOptions[selectedOptions.length - 1] : null);
     setValidateStatus('');
@@ -28,11 +29,11 @@ function AccountProfile() {
   const accountProfile = AccountServices();
 
   const onFinish = (values) => {
-    accountProfile.updateAccountProfile(values,selectedAddress?.id, fileImage);
+    accountProfile.updateAccountProfile(values, selectedAddress?.id, fileImage);
   };
   useEffect(() => {
     const handleLoad = () => {
-      accountProfile.getAccountProfile(form,callbackAddress);
+      accountProfile.getAccountProfile(form, callbackAddress);
     };
     handleLoad();
     window.addEventListener('load', handleLoad);
@@ -41,11 +42,8 @@ function AccountProfile() {
     };
   }, []);
 
-  const callbackAddress = (value,idCommune) => {
-      setstringArray(value);
-      if(idCommune!==''){
-        setSelectedAddress({...selectedAddress,id: idCommune});
-      }
+  const callbackAddress = (value, idCommune) => {
+    setDefaultAddressId(idCommune)
   }
 
   // avartar update
@@ -179,8 +177,8 @@ function AccountProfile() {
                       <AddressCascader
                         cascaderProps={addressCascaderProps}
                         onCascaderChangeCallback={onCascaderChange}
-                        defaultAddress={stringArray}
-                        />
+                        defaultAddress={defaultAddressId}
+                      />
                     </div>
                   </Form.Item>
                 </div>
@@ -217,7 +215,7 @@ function AccountProfile() {
                   </Form.Item>
                 </div>
               </div>
-              {form.getFieldValue('roleId')===2?
+              {form.getFieldValue('roleId') === 2 ?
                 <div className={cx('grid-rows-2 gap-4')}>
                   <div className={cx('row-span-1 ')}>
                     <Form.Item
@@ -228,7 +226,7 @@ function AccountProfile() {
                       <Input value='dateDob' disabled />
                     </Form.Item>
                   </div>
-                </div>:<span></span>
+                </div> : <span></span>
               }
 
             </div>
@@ -238,17 +236,17 @@ function AccountProfile() {
             {/* START Row 1 (IMG)*/}
             <div className={cx('')}>
               {selectedImage ? (
-                  <div className={cx('flex justify-center ')}>
-                    <img
-                      src={selectedImage}
-                      alt='Selected Image'
-                      className={cx('object-cover rounded-[15px] w-3/5 aspect-[1] overflow-hidden')}
-                    />
-                  </div>
-                ) :
                 <div className={cx('flex justify-center ')}>
                   <img
-                      src={form.getFieldValue('avatar') ?? avatarImg}
+                    src={selectedImage}
+                    alt='Selected Image'
+                    className={cx('object-cover rounded-[15px] w-3/5 aspect-[1] overflow-hidden')}
+                  />
+                </div>
+              ) :
+                <div className={cx('flex justify-center ')}>
+                  <img
+                    src={form.getFieldValue('avatar') ?? avatarImg}
                     alt='Selected Image'
                     className={cx('object-cover rounded-[15px] w-3/5 aspect-[1] overflow-hidden')}
                   />
