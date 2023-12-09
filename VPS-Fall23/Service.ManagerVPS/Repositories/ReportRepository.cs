@@ -47,7 +47,7 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
              .Include(r => r.StatusNavigation)
              .Include(r => r.TypeNavigation)
              .Include(r => r.CreatedByNavigation)
-             .Where(r => r.TypeNavigation.Name.Contains("ERROR"))
+             .Where(r => r.TypeNavigation.Description.Contains("Lỗi"))
              .OrderBy(r => r.SubId);
 
         return PagedList<Report>.ToPagedList(listReport, parameters.PageNumber,
@@ -56,18 +56,29 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
 
     public List<GlobalStatus> GetTypeReport()
     {
-        var result = context.GlobalStatuses.Where(gs => gs.Name.Contains("ERROR")).ToList();
+        var result = context.GlobalStatuses.Where(gs => gs.Description.Contains("Lỗi")).ToList();
         return result;
     }
 
-    public PagedList<Report> FilterReportForAdmin(QueryStringParameters parameters, int typeId)
+    public PagedList<Report> FilterReportForAdmin(QueryStringParameters parameters, int? typeId, int? statusId)
     {
-        var listReport = entities
+        IQueryable<Report> listReport = entities
              .Include(r => r.StatusNavigation)
              .Include(r => r.TypeNavigation)
              .Include(r => r.CreatedByNavigation)
-             .Where(r => r.Type == typeId)
-             .OrderBy(r => r.SubId);
+             .Where(r => r.TypeNavigation.Description.Contains("Lỗi"));
+
+        if (typeId.HasValue && typeId != 0)
+        {
+            listReport = listReport.Where(r => r.Type == typeId.Value);
+        }
+
+        if (statusId.HasValue && statusId != 0)
+        {
+            listReport = listReport.Where(r => r.Status == statusId.Value);
+        }
+
+        listReport = listReport.OrderBy(r => r.SubId);
 
         return PagedList<Report>.ToPagedList(listReport, parameters.PageNumber,
             parameters.PageSize);
@@ -81,7 +92,7 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
             report.Status = statusId;
             context.Reports.Update(report);
             await context.SaveChangesAsync();
-        }       
+        }
     }
 
     public async Task<int?> CheckPaymentCodeInReport(string paymentCode, int type)
