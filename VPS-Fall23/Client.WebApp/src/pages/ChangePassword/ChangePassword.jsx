@@ -184,11 +184,11 @@ function ChangePassword() {
                 </Col>
                 <Col span={4} className={'flex justify-center h-[32px] items-center'}>
                   <Link
-                      to={'/login'}
+                      to={'/'}
                       className={cx('text-[rgb(22,119,255)] inline-flex h-6 justify-center items-center gap-2.5 ' +
                           'shrink-0 rounded-sm text-[\'#1677ff\']')}
                   >
-                    Đăng Nhập
+                    Trang chủ
                   </Link>
                 </Col>
               </Row>

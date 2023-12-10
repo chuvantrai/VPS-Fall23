@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
@@ -10,6 +11,8 @@ using Service.ManagerVPS.Extensions.ILogic;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace Service.ManagerVPS.Controllers;
 
@@ -18,15 +21,19 @@ public class PromoCodeController : VpsController<PromoCode>
     private readonly IPromoCodeInfoRepository _promoCodeInfoRepository;
     private readonly IParkingTransactionRepository _transactionRepository;
     private readonly IGeneralVPS _generalVps;
+    private readonly TwilioSettings _twilio;
 
     public PromoCodeController(IPromoCodeRepository promoCodeRepository,
         IPromoCodeInfoRepository promoCodeInfoRepository,
-        IParkingTransactionRepository transactionRepository, IGeneralVPS generalVps)
+        IParkingTransactionRepository transactionRepository, 
+        IGeneralVPS generalVps,
+        IOptions<TwilioSettings> twilio)
         : base(promoCodeRepository)
     {
         _promoCodeInfoRepository = promoCodeInfoRepository;
         _transactionRepository = transactionRepository;
         _generalVps = generalVps;
+        _twilio = twilio.Value;
     }
 
     [HttpGet]
@@ -112,7 +119,7 @@ public class PromoCodeController : VpsController<PromoCode>
         if (sendPromoCodeNow)
         {
             // send code for user
-            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x => x.Id));
+            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x=>x.Id),input.ParkingZoneIds);
         }
 
         return Ok(ResponseNotification.ADD_SUCCESS);
@@ -260,31 +267,60 @@ public class PromoCodeController : VpsController<PromoCode>
             .GetListPromoCodeNeedSendCode();
         if (listPromoCode != null)
         {
-            await SendMailPromoCode(listPromoCode);
+            var promoCodes = listPromoCode.ToList();
+            var listParkingZoneIds = promoCodes.Select(x => x.ParkingZoneId).Distinct().ToList();
+            await _promoCodeInfoRepository.UpdateIsSendPromoCode(listParkingZoneIds);
+            await SendMailPromoCode(promoCodes);
         }
 
         return Ok();
     }
 
-    private async Task SendNotificationPromoCodeToUser(IEnumerable<Guid> listPromoCodeId)
+    private async Task SendNotificationPromoCodeToUser(IEnumerable<Guid> listPromoCodeId,List<Guid> parkingZoneIds)
     {
         var listPromoCode = await ((IPromoCodeRepository)vpsRepository)
             .GetListPromoCodeByListId(listPromoCodeId);
+        await _promoCodeInfoRepository.UpdateIsSendPromoCode(parkingZoneIds);
         await SendMailPromoCode(listPromoCode);
     }
 
     public async Task SendMailPromoCode(IEnumerable<PromoCode>? listPromoCode)
     {
         if (listPromoCode == null) return;
-        foreach (var promoCode in listPromoCode)
+        var promoCodes = listPromoCode.ToList();
+        promoCodes = promoCodes.OrderByDescending(x => x.CreatedAt).ToList();
+        foreach (var promoCode in promoCodes)
         {
-            var titleEmail =
-                $"[VPS] khuyến mãi từ bãi đỗ xe {promoCode.ParkingZone} dành riêng cho bạn";
+            var titleEmail = $"[VPS] khuyến mãi từ bãi đỗ xe {promoCode.ParkingZone.Name} dành riêng cho bạn";
             var bodyEmail =
-                $"Bạn đã nhận được mã khuyến mãi <strong>{promoCode.Code}</strong> giảm {promoCode.PromoCodeInformation.Discount}% " +
+                $"Bạn đã nhận được mã khuyến mãi <strong>{promoCode.Code}</strong> " +
+                $"giảm {promoCode.PromoCodeInformation.Discount}% " +
                 $"áp dụng cho email {promoCode.UserEmail} " +
-                $"khi đặt chỗ tại bãi đỗ xe {promoCode.ParkingZone.Name}";
+                $"<p> khi đặt chỗ tại bãi đỗ xe {promoCode.ParkingZone.Name} </p>" +
+                $"<p> Địa chỉ: {promoCode.ParkingZone.DetailAddress}</p>";
             await _generalVps.SendEmailAsync(promoCode.UserEmail, titleEmail, bodyEmail);
+            
+            #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
+            if (promoCode.Id.Equals(promoCodes.FirstOrDefault()!.Id) &&
+                !string.IsNullOrEmpty(promoCode.UserPhone) && 
+                promoCode.UserPhone.StartsWith("0") && 
+                promoCode.UserPhone.Length == 10)
+            {
+                var bodySms = titleEmail + " " + bodyEmail.Replace("<p>", "")
+                    .Replace("</p>", "")
+                    .Replace("<p>", "")
+                    .Replace("<strong>", "")
+                    .Replace("</strong>", "");
+                
+                promoCode.UserPhone = "+84" + promoCode.UserPhone[1..];
+                TwilioClient.Init(_twilio.AccountSid, _twilio.AuthToken);
+                var result = await MessageResource.CreateAsync(
+                    body: bodySms,
+                    from: new Twilio.Types.PhoneNumber(_twilio.TwilioPhoneNumber),
+                    to: promoCode.UserPhone
+                );
+            }
+            #endregion
         }
     }
 }
