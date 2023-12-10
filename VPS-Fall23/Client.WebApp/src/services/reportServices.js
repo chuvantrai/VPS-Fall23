@@ -33,12 +33,13 @@ const reportServices = () => {
     return axios.get(`api/Report/GetTypeReport`);
   };
 
-  const filterReport = (pageNumber, pageSize, typeId) => {
+  const filterReport = (pageNumber, pageSize, typeId, statusId) => {
     return axios.get(`api/Report/FilterReport`, {
       params: {
         pageNumber,
         pageSize,
         typeId,
+        statusId,
       },
     });
   };

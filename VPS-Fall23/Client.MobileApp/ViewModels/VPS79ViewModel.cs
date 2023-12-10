@@ -75,7 +75,7 @@ namespace Client.MobileApp.ViewModels
                     Constant.USER = token.UserData.UserId;
                     if(isRemember == true)
                     {
-                       SecureStorage.SetAsync("UserToken", token.AccessToken);
+                       await SecureStorage.SetAsync("UserToken", token.AccessToken);
                     }
                     return Constant.LOGIN_SUCCESS;
                 }

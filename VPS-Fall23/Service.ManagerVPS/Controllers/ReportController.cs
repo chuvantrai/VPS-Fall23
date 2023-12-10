@@ -129,11 +129,12 @@ public class ReportController : VpsController<Report>
                 Key = index + 1,
                 x.SubId,
                 x.Id,
-                TypeName = x.TypeNavigation.Name,
+                TypeName = x.TypeNavigation.Description,
                 x.Email,
+                x.Phone,
                 CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
                 x.Content,
-                Status = x.StatusNavigation.Name,
+                Status = x.StatusNavigation.Description,
             }).ToList();
 
         var metadata = new
@@ -155,18 +156,18 @@ public class ReportController : VpsController<Report>
     {
         var listType =
             ((IReportRepository)vpsRepository).GetTypeReport();
-        var result = listType.Select(lt => new { Value = lt.Id, Label = lt.Name }).ToList();
+        var result = listType.Select(lt => new { Value = lt.Id, Label = lt.Description }).ToList();
 
         return Ok(result);
     }
 
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.FilterReport)]
-    public IActionResult FilterReport([FromQuery] QueryStringParameters parameters, [FromQuery] int typeId)
+    public IActionResult FilterReport([FromQuery] QueryStringParameters parameters, [FromQuery] int typeId, [FromQuery] int statusId)
     {
 
         var listReport =
-            ((IReportRepository)vpsRepository).FilterReportForAdmin(parameters, typeId);
+            ((IReportRepository)vpsRepository).FilterReportForAdmin(parameters, typeId, statusId);
 
         var result = listReport
             .Select((x, index) => new
@@ -174,11 +175,12 @@ public class ReportController : VpsController<Report>
                 Key = index + 1,
                 x.SubId,
                 x.Id,
-                TypeName = x.TypeNavigation.Name,
+                TypeName = x.TypeNavigation.Description,
                 x.Email,
+                x.Phone,
                 CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
                 x.Content,
-                Status = x.StatusNavigation.Name,
+                Status = x.StatusNavigation.Description,
             }).ToList();
 
         var metadata = new

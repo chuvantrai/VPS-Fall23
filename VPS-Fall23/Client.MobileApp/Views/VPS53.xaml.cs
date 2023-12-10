@@ -33,11 +33,6 @@ public partial class VPS53 : ContentPage
         Slot.Text = _viewModel.LoadSlot();
     }
 
-    public void Load()
-    {
-        InitializeComponent();
-    }
-
     Task LoadCanvasSurface()
     {
         return Task.Run(() =>
@@ -156,54 +151,44 @@ public partial class VPS53 : ContentPage
 
     private async void OkButton_Clicked(object sender, EventArgs e)
     {
-        try
+        string licensePlate = new string(LicensePlateEntry.Text.Where(c => Char.IsLetterOrDigit(c)).ToArray());
+
+        if (!String.IsNullOrEmpty(licensePlate))
         {
-            string licensePlate = new string(LicensePlateEntry.Text.Where(c => Char.IsLetterOrDigit(c)).ToArray());
-
-            if (!String.IsNullOrEmpty(licensePlate))
+            var checkLicensePlate = new LicensePlateInput
             {
-                var checkLicensePlate = new LicensePlateInput
-                {
-                    LicensePlate = licensePlate.ToUpper(),
-                    CheckAt = DateTime.Now,
-                    CheckBy = Constant.USER
-                };
+                LicensePlate = licensePlate.ToUpper(),
+                CheckAt = DateTime.Now,
+                CheckBy = Constant.USER
+            };
 
-                string autoCheckinResponse = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
-                if (autoCheckinResponse != null)
+            string autoCheckinResponse = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
+            if (autoCheckinResponse != null)
+            {
+                if (autoCheckinResponse.Contains(Constant.OVERTIME_CONFIRM))
                 {
-                    if (autoCheckinResponse.Contains(Constant.OVERTIME_CONFIRM))
+                    var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.ACCEPT, Constant.CANCEL);
+                    var x = confirmAnswer.ToString();
+                    if (confirmAnswer == true)
                     {
-                        var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.ACCEPT, Constant.CANCEL);
-                        var x = confirmAnswer.ToString();
-                        if (confirmAnswer == true)
-                        {
-                            var checkoutInputConfirm = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
-                            await DisplayAlert(Constant.NOTIFICATION, checkoutInputConfirm, Constant.CANCEL);
-                        }
-                    }
-                    else
-                    {
-                        await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.CANCEL);
+                        var checkoutInputConfirm = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
+                        await DisplayAlert(Constant.NOTIFICATION, checkoutInputConfirm, Constant.CANCEL);
                     }
                 }
-            }
-            else
-            {
-                MainThread.BeginInvokeOnMainThread(async () =>
+                else
                 {
-                    Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.INPUT_FAILED, Constant.CANCEL);
-                });
+                    await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.CANCEL);
+                }
             }
-            Slot.Text = _viewModel.LoadSlot();
         }
-        catch (Exception ex)
+        else
         {
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
+                Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.INPUT_FAILED, Constant.CANCEL);
             });
         }
+        Slot.Text = _viewModel.LoadSlot();
     }
 
     private void ChangePlateType(object sender, EventArgs e)
@@ -235,4 +220,4 @@ public partial class VPS53 : ContentPage
     {
         Slot.Text = _viewModel.LoadSlot();
     }
-}   
+}

@@ -18,7 +18,6 @@ namespace Service.ManagerVPS.Controllers;
 
 public class PromoCodeController : VpsController<PromoCode>
 {
-
     private readonly IPromoCodeInfoRepository _promoCodeInfoRepository;
     private readonly IParkingTransactionRepository _transactionRepository;
     private readonly IGeneralVPS _generalVps;
@@ -84,7 +83,9 @@ public class PromoCodeController : VpsController<PromoCode>
         foreach (var parkingZoneId in input.ParkingZoneIds)
         {
             var promoCode = transactionLst
-                .Where(x => x.ParkingZoneId.Equals(parkingZoneId))
+                .Where(x =>
+                    x.ParkingZoneId.Equals(parkingZoneId) &&
+                    x is { Email: not null, Phone: not null })
                 .DistinctBy(x => new
                 {
                     x.Email,
@@ -96,8 +97,8 @@ public class PromoCodeController : VpsController<PromoCode>
                     Code = _generalVps.GenerateRandomCode(6),
                     PromoCodeInformationId = newPromoCodeInfo.Id,
                     NumberOfUses = 1,
-                    UserEmail = x.Email,
-                    UserPhone = x.Phone,
+                    UserEmail = x.Email!,
+                    UserPhone = x.Phone!,
                     ParkingZoneId = parkingZoneId,
                     CreatedAt = DateTime.Now,
                     ModifiedAt = DateTime.Now,
@@ -106,7 +107,7 @@ public class PromoCodeController : VpsController<PromoCode>
                 .ToList();
             promoCodeLst.AddRange(promoCode);
         }
-        
+
         if (promoCodeLst.Count == 0)
         {
             throw new ServerException(
@@ -120,7 +121,7 @@ public class PromoCodeController : VpsController<PromoCode>
             // send code for user
             await SendNotificationPromoCodeToUser(promoCodeLst.Select(x=>x.Id),input.ParkingZoneIds);
         }
-        
+
         return Ok(ResponseNotification.ADD_SUCCESS);
     }
 
@@ -157,13 +158,16 @@ public class PromoCodeController : VpsController<PromoCode>
     {
         using (var context = new FALL23_SWP490_G14Context())
         {
-            List<PromoCode> list = context.PromoCodes.Include(p => p.PromoCodeInformation).Where(x => x.PromoCodeInformationId == input.PromoCodeId).ToList();
-            PromoCodeInformation? info = context.PromoCodeInformations.Where(x => x.Id == input.PromoCodeId).FirstOrDefault();
-            if(list == null)
+            List<PromoCode> list = context.PromoCodes.Include(p => p.PromoCodeInformation)
+                .Where(x => x.PromoCodeInformationId == input.PromoCodeId).ToList();
+            PromoCodeInformation? info = context.PromoCodeInformations
+                .Where(x => x.Id == input.PromoCodeId).FirstOrDefault();
+            if (list == null)
             {
                 return BadRequest("Promo code not found");
             }
-            if(info.IsSent)
+
+            if (info.IsSent)
             {
                 return BadRequest("Can't Update");
             }
@@ -219,7 +223,6 @@ public class PromoCodeController : VpsController<PromoCode>
             context.SaveChanges();
         }
 
-        
 
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
