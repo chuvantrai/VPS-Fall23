@@ -7,17 +7,14 @@ using Service.ManagerVPS.DTO.Exceptions;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Extensions.ILogic;
-using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
-using System.Dynamic;
 
 namespace Service.ManagerVPS.Controllers;
 
 public class PromoCodeController : VpsController<PromoCode>
 {
-
     private readonly IPromoCodeInfoRepository _promoCodeInfoRepository;
     private readonly IParkingTransactionRepository _transactionRepository;
     private readonly IGeneralVPS _generalVps;
@@ -79,7 +76,9 @@ public class PromoCodeController : VpsController<PromoCode>
         foreach (var parkingZoneId in input.ParkingZoneIds)
         {
             var promoCode = transactionLst
-                .Where(x => x.ParkingZoneId.Equals(parkingZoneId))
+                .Where(x =>
+                    x.ParkingZoneId.Equals(parkingZoneId) &&
+                    x is { Email: not null, Phone: not null })
                 .DistinctBy(x => new
                 {
                     x.Email,
@@ -91,8 +90,8 @@ public class PromoCodeController : VpsController<PromoCode>
                     Code = _generalVps.GenerateRandomCode(6),
                     PromoCodeInformationId = newPromoCodeInfo.Id,
                     NumberOfUses = 1,
-                    UserEmail = x.Email,
-                    UserPhone = x.Phone,
+                    UserEmail = x.Email!,
+                    UserPhone = x.Phone!,
                     ParkingZoneId = parkingZoneId,
                     CreatedAt = DateTime.Now,
                     ModifiedAt = DateTime.Now,
@@ -101,7 +100,7 @@ public class PromoCodeController : VpsController<PromoCode>
                 .ToList();
             promoCodeLst.AddRange(promoCode);
         }
-        
+
         if (promoCodeLst.Count == 0)
         {
             throw new ServerException(
@@ -113,9 +112,9 @@ public class PromoCodeController : VpsController<PromoCode>
         if (sendPromoCodeNow)
         {
             // send code for user
-            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x=>x.Id));
+            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x => x.Id));
         }
-        
+
         return Ok(ResponseNotification.ADD_SUCCESS);
     }
 
@@ -152,13 +151,16 @@ public class PromoCodeController : VpsController<PromoCode>
     {
         using (var context = new FALL23_SWP490_G14Context())
         {
-            List<PromoCode> list = context.PromoCodes.Include(p => p.PromoCodeInformation).Where(x => x.PromoCodeInformationId == input.PromoCodeId).ToList();
-            PromoCodeInformation? info = context.PromoCodeInformations.Where(x => x.Id == input.PromoCodeId).FirstOrDefault();
-            if(list == null)
+            List<PromoCode> list = context.PromoCodes.Include(p => p.PromoCodeInformation)
+                .Where(x => x.PromoCodeInformationId == input.PromoCodeId).ToList();
+            PromoCodeInformation? info = context.PromoCodeInformations
+                .Where(x => x.Id == input.PromoCodeId).FirstOrDefault();
+            if (list == null)
             {
                 return BadRequest("Promo code not found");
             }
-            if(info.IsSent)
+
+            if (info.IsSent)
             {
                 return BadRequest("Can't Update");
             }
@@ -214,7 +216,6 @@ public class PromoCodeController : VpsController<PromoCode>
             context.SaveChanges();
         }
 
-        
 
         return Ok(ResponseNotification.UPDATE_SUCCESS);
     }
@@ -277,7 +278,8 @@ public class PromoCodeController : VpsController<PromoCode>
         if (listPromoCode == null) return;
         foreach (var promoCode in listPromoCode)
         {
-            var titleEmail = $"[VPS] khuyến mãi từ bãi đỗ xe {promoCode.ParkingZone} dành riêng cho bạn";
+            var titleEmail =
+                $"[VPS] khuyến mãi từ bãi đỗ xe {promoCode.ParkingZone} dành riêng cho bạn";
             var bodyEmail =
                 $"Bạn đã nhận được mã khuyến mãi <strong>{promoCode.Code}</strong> giảm {promoCode.PromoCodeInformation.Discount}% " +
                 $"áp dụng cho email {promoCode.UserEmail} " +
