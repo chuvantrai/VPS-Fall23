@@ -35,6 +35,7 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
             type="primary"
             onClick={() => {
                 form.validateFields().then((values) => {
+                    console.log(values);
                     const formData = new FormData();
                     formData.append('parkingZoneId', detailInfo.parkingZone.id);
                     formData.append('parkingZoneName', values.name);
@@ -43,16 +44,22 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
                     formData.append('slots', values.slots);
                     formData.append('workFrom', dayjs(values.workingTime[0]).format("HH:mm:ss"));
                     formData.append('workTo', dayjs(values.workingTime[1]).format("HH:mm:ss"));
-                    values.parkingZoneImages.fileList.forEach((item) => {
-                        formData.append('parkingZoneImages', item.originFileObj);
-                    });
+                    if (values.parkingZoneImages) {
+                        values.parkingZoneImages.fileList.forEach((item) => {
+                            formData.append('parkingZoneImages', item.originFileObj);
+                        });
+                    }
 
-                    parkingZoneService.updateParkingZone(formData);
-                });
+
+                    parkingZoneService.updateParkingZone(formData).then((res) => {
+                        setViewValues({ ...viewValues, reload: true })
+                        handleCancel();
+                    });
+                }).catch(err => console.log(err));
             }}
         >
             Lưu
         </Button>
-    </Space>)
+    </Space >)
 }
 export default UpdateParkingZoneFooterModal
