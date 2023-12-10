@@ -20,6 +20,11 @@ function ListReport() {
       key: 'email',
     },
     {
+      title: 'SĐT',
+      dataIndex: 'phone',
+      key: 'phone',
+    },
+    {
       title: 'Thời gian tạo',
       dataIndex: 'createdAt',
       key: 'createdAt',
@@ -58,11 +63,13 @@ function ListReport() {
   const [pageNumber, setPageNumber] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [typeOptions, setTypeOptions] = useState([]);
+  const [statusOptions, setStatusOptions] = useState([]);
   const [filterType, setFilterType] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
   const staticStatusOptions = [
-    { value: 'CANCEL', label: 'CANCEL', color: 'red', id: 6 },
-    { value: 'DONE', label: 'DONE', color: 'green', id: 5 },
-    { value: 'PROCESSING', label: 'PROCESSING', color: 'yellow', id: 4 },
+    { value: 'Hủy', label: 'Hủy', color: 'red', id: 6 },
+    { value: 'Hoàn thành', label: 'Hoàn thành', color: 'green', id: 5 },
+    { value: 'Đang xử lý', label: 'Đang xử lý', color: 'yellow', id: 4 },
   ];
 
   const handleChangePage = (page) => {
@@ -82,6 +89,17 @@ function ListReport() {
     });
   };
 
+  const loadStatusOptions = () => {
+    setStatusOptions(getStatusOptionsFromStatic());
+  };
+
+  const getStatusOptionsFromStatic = () => {
+    return staticStatusOptions.map((status) => ({
+      value: status.value,
+      label: status.label,
+    }));
+  };
+
   const firstUpdate = useRef(true);
   useEffect(() => {
     if (firstUpdate.current) {
@@ -89,7 +107,7 @@ function ListReport() {
       loadData();
       return;
     }
-    if (filterType === undefined || filterType === '') {
+    if ((filterType === undefined || filterType === '') && (filterStatus === undefined || filterStatus === '')) {
       loadData();
     } else {
       handleFilterReport();
@@ -98,6 +116,7 @@ function ListReport() {
 
   useEffect(() => {
     loadTypeOptions();
+    loadStatusOptions();
     getStatusOptions();
   }, []);
 
@@ -106,11 +125,18 @@ function ListReport() {
     return foundStatus ? foundStatus.color : '';
   };
 
+  const getStatusValue = (status) => {
+    const foundStatus = staticStatusOptions.find((s) => s.label === status);
+    return foundStatus ? foundStatus.id : '';
+  };
+
   const handleFilterReport = () => {
-    if (filterType === undefined || filterType === '') {
+    if ((filterType === undefined || filterType === '') && (filterStatus === undefined || filterStatus === '')) {
       loadData();
     } else {
-      service.filterReport(pageNumber, 10, filterType).then((res) => {
+      const id = getStatusValue(filterStatus) ? getStatusValue(filterStatus) : 0;
+      const type = filterType ? filterType : 0;
+      service.filterReport(pageNumber, 10, type, id).then((res) => {
         setData(res.data.data);
         setTotalItems(res.data.totalCount);
       });
@@ -128,6 +154,10 @@ function ListReport() {
   const handleStatusChange = (record, newValue) => {
     const selectedStatus = staticStatusOptions.find((status) => status.value === newValue);
     const selectedId = selectedStatus ? selectedStatus.id : null;
+
+    setFilterType('');
+    setFilterStatus('');
+
     service.updateStatusReport(record.id, selectedId).then(() => {
       loadData();
     });
@@ -137,6 +167,10 @@ function ListReport() {
     setFilterType(value);
   };
 
+  const onChangeStatus = (value) => {
+    setFilterStatus(value);
+  };
+
   const filterOption = (input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
   return (
@@ -144,7 +178,7 @@ function ListReport() {
       <div className="mb-[16px] flex items-center">
         <p className="mr-[16px]">
           Lọc{' '}
-          <Tooltip title="Lọc theo trạng thái báo cáo">
+          <Tooltip title="Lọc theo kiểu và trạng thái báo cáo">
             <QuestionCircleOutlined />
           </Tooltip>{' '}
           :
@@ -159,6 +193,18 @@ function ListReport() {
           filterOption={filterOption}
           options={typeOptions}
         />
+
+        <Select
+          className="w-80 ml-[10px]"
+          showSearch
+          placeholder="trạng thái báo cáo"
+          optionFilterProp="children"
+          allowClear
+          onChange={onChangeStatus}
+          filterOption={filterOption}
+          options={statusOptions}
+        />
+
         <Button className="ml-[10px]" type="primary" icon={<FilterOutlined />} onClick={handleFilterReport}>
           Áp dụng
         </Button>

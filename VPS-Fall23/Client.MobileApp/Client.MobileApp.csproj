@@ -12,7 +12,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<!-- Display name -->
-		<ApplicationTitle>Client.MobileApp</ApplicationTitle>
+		<ApplicationTitle>VPS Parking</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.client.mobileapp</ApplicationId>
@@ -30,9 +30,24 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-android|AnyCPU'">
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
+		<PublishTrimmed>False</PublishTrimmed>
+		<RunAOTCompilation>False</RunAOTCompilation>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="$(TargetFramework.Contains('-android')) and '$(Configuration)' == 'Release'">
+		<PublishTrimmed>False</PublishTrimmed>
+		<RunAOTCompilation>False</RunAOTCompilation>
+		<AndroidKeyStore>True</AndroidKeyStore>
+		<AndroidSigningKeyStore>vps.app.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyAlias>key</AndroidSigningKeyAlias>
+		<AndroidSigningKeyPass>123456</AndroidSigningKeyPass>
+		<AndroidSigningStorePass>123456</AndroidSigningStorePass>
+	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+		<MauiIcon Include="Resources\AppIcon\vpsicon.svg" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\vps_splash.svg" Color="#FFFFFF" BaseSize="128,256" />
@@ -68,54 +83,54 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\VPS79.xaml.cs">
-	    <DependentUpon>VPS79.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\VPS53.xaml.cs">
-	    <DependentUpon>VPS53.xaml</DependentUpon>
-	  </Compile>
+		<Compile Update="Views\VPS79.xaml.cs">
+			<DependentUpon>VPS79.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\VPS53.xaml.cs">
+			<DependentUpon>VPS53.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\VPS79.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\VPS53.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
+		<MauiXaml Update="Views\VPS79.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\VPS53.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\Raw\googleKey.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="training\Letter_detect.yaml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="training\Letter_detection.ipynb">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="training\LP_detection.yaml">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	  <None Update="training\Plate_detection.ipynb">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+		<None Update="Resources\Raw\googleKey.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="training\Letter_detect.yaml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="training\Letter_detection.ipynb">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="training\LP_detection.yaml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="training\Plate_detection.ipynb">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x86\leptonica-1.82.0.dll" />
+		<None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x86\leptonica-1.82.0.dll" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x86\tesseract50.dll" />
+		<None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x86\tesseract50.dll" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x64\leptonica-1.82.0.dll" />
+		<None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x64\leptonica-1.82.0.dll" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x64\tesseract50.dll" />
+		<None Remove="C:\Users\trank\.nuget\packages\tesseract\5.2.0\build\\..\x64\tesseract50.dll" />
 	</ItemGroup>
 </Project>

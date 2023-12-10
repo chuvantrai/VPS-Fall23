@@ -11,6 +11,6 @@ public interface IReportRepository : IVpsRepository<Report>
     Task<int?> CheckPaymentCodeInReport(string paymentCode,int type);
     PagedList<Report> GetListReportForAdmin(QueryStringParameters parameters);
     List<GlobalStatus> GetTypeReport();
-    PagedList<Report> FilterReportForAdmin(QueryStringParameters parameters, int typeId);
+    PagedList<Report> FilterReportForAdmin(QueryStringParameters parameters, int? typeId, int? statusId);
     Task UpdateStatusReportAsync(Guid reportId, int statusId);
 }

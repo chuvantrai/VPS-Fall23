@@ -1,7 +1,6 @@
 ﻿using Client.MobileApp.Models;
 using System.Net.Http.Json;
 using Client.MobileApp.Constants;
-using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Client.MobileApp.ViewModels
 {
