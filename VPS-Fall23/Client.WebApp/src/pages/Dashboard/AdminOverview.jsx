@@ -81,10 +81,7 @@ function AdminOverview() {
                     label: (context) => {
                         const label = context.dataset.label || '';
                         if (label) {
-                            return `${label}: ${context.parsed.y.toLocaleString('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND',
-                            })}`;
+                            return `${label}: ${context.parsed.y.toLocaleString('vi-VN')}`;
                         }
                         return null;
                     },

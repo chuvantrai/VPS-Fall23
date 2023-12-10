@@ -8,8 +8,6 @@ import useParkingZoneService from '@/services/parkingZoneService';
 import useParkingTransactionService from '@/services/parkingTransactionSerivce';
 
 function IncomeDashboard({ selectedParkingZone, ParkingZoneData }) {
-
-
   const parkingZoneService = useParkingZoneService();
   const parkingTransactionService = useParkingTransactionService();
   const { RangePicker } = DatePicker;
@@ -45,7 +43,7 @@ function IncomeDashboard({ selectedParkingZone, ParkingZoneData }) {
     parkingZoneService
       .getAllParkingZoneByOwnerId(account.UserId)
       .then((response) => {
-        setParkingZoneOptions(response.data);
+        // setParkingZoneOptions(response.data);
       })
       .catch((error) => {
         console.error('Error fetching parking zones:', error);

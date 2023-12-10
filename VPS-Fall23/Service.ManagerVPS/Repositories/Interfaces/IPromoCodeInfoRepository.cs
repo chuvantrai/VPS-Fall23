@@ -9,4 +9,6 @@ public interface IPromoCodeInfoRepository : IVpsRepository<PromoCodeInformation>
         QueryStringParameters parameters);
 
     PromoCodeInformation? GetPromoCodeInfoDetailById(Guid infoId);
+    
+    Task UpdateIsSendPromoCode(List<Guid> parkingZoneIds);
 }

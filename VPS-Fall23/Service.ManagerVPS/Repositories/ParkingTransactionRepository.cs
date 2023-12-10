@@ -50,7 +50,7 @@ namespace Service.ManagerVPS.Repositories
                 checkAt = DateTime.Now;
             }
 
-            if (parkingZoneName == null || parkingZoneName.Trim() == "")
+            if (parkingZoneName == null || parkingZoneName.Trim() == "" || parkingZoneName.ToLower().Trim() == "all")
             {
                 return this.entities
                     .Include(p => p.ParkingZone)
@@ -124,8 +124,8 @@ namespace Service.ManagerVPS.Repositories
                             CheckinAt = checkAt,
                             CheckoutAt = checkAt,
                             CheckinBy = checkBy,
-                            Email = licenseplate,
-                            Phone = licenseplate
+                            Email = null,
+                            Phone = null
                         };
 
                         await this.Create(parkingTransaction);
@@ -204,7 +204,7 @@ namespace Service.ManagerVPS.Repositories
                         transaction.StatusId = (int)ParkingTransactionStatusEnum.PARKINGCANCEL;
                         await Update(transaction);
                         await SaveChange();
-                        return ResponseNotification.CHECKIN_ERROR;
+                        return ResponseNotification.OVERTIME_ERROR;
                     }
                 }
                 else
