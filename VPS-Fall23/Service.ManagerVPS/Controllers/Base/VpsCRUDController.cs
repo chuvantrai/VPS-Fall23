@@ -11,12 +11,12 @@ namespace Service.ManagerVPS.Controllers.Base
             : base(repository) { }
 
         [HttpGet]
-        public IEnumerable<T> GetList()
+        public virtual IEnumerable<T> GetList()
         {
             return this.vpsRepository.Entities.AsEnumerable();
         }
         [HttpGet("{id}")]
-        public async Task<T> GetById(Guid id)
+        public virtual async Task<T> GetById(Guid id)
         {
             return await this.vpsRepository.Find(id);
         }

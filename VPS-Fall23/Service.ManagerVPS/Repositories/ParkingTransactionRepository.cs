@@ -50,7 +50,7 @@ namespace Service.ManagerVPS.Repositories
                 checkAt = DateTime.Now;
             }
 
-            if (parkingZoneName == null || parkingZoneName.Trim() == "")
+            if (parkingZoneName == null || parkingZoneName.Trim() == "" || parkingZoneName.ToLower().Trim() == "all")
             {
                 return this.entities
                     .Include(p => p.ParkingZone)

@@ -16,7 +16,7 @@ namespace Service.ManagerVPS.Repositories
 
         public Task<IEnumerable<District>> GetByCity(Guid cityId)
         {
-            return Task.FromResult(entities.Where(d => d.CityId == cityId).AsEnumerable());
+            return Task.FromResult(entities.Where(d => d.CityId == cityId && (d.IsBlock ?? true) == false).OrderBy(d => d.Name).AsEnumerable());
         }
 
         public async Task<Tuple<IEnumerable<District>, int>> GetListDistrict(GetAddressListParkingZoneRequest request)

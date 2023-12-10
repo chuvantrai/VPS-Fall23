@@ -8,6 +8,7 @@ using Service.WorkerVPS.Brokers.ParkingZoneJobBrokers;
 using Service.WorkerVPS.Brokers.SmtpBrokers;
 using Service.WorkerVPS.HostingBackgroundServices.ParkingZone;
 using Service.WorkerVPS.Models;
+using Service.WorkerVPS.Services.RepeatingService;
 using Service.WorkerVPS.Services.Smtp;
 
 IHost host = Host.CreateDefaultBuilder(args)
@@ -20,6 +21,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddHostedService<RemoveCancelBookingJobBackgroundService>();
         services.AddHostedService<RemoveDeletingPZJobBackGroundService>();
         services.AddHostedService<SmtpBackgroundService>();
+        services.AddHostedService<SendPromoCode>();
         services.AddSingleton<IJobFactory, JobFactory>();
         services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
         services.AddSingleton<ISmtpService, SmtpServices>();

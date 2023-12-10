@@ -108,12 +108,12 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         if (account == null) return null;
         if (request.PathImage != null) account.Avatar = request.PathImage;
         request.Address ??= string.Empty;
+        account.Address = request.CommuneId is null ? string.Empty : request.Address;
         
         account.FirstName = request.FirstName;
         account.LastName = request.LastName;
         account.PhoneNumber = request.PhoneNumber;
-        account.Address = request.Address;
-        if (request.CommuneId is not null) account.CommuneId = request.CommuneId;
+        account.CommuneId = request.CommuneId;
         account.ModifiedAt = DateTime.Now;
         await context.SaveChangesAsync();
         return account;

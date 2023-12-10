@@ -10,7 +10,7 @@ namespace Service.ManagerVPS.Repositories
         public CityRepository(FALL23_SWP490_G14Context fall23Swp490G14Context)
             : base(fall23Swp490G14Context)
         {
-        }
+        } 
 
         public async Task<Tuple<IEnumerable<City>, int>> GetListCity(GetAddressListParkingZoneRequest request)
         {

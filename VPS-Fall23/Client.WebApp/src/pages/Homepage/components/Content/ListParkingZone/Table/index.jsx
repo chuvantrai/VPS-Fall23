@@ -25,8 +25,8 @@ const ParkingZonesTable = ({ parkingZones }) => {
     },
     {
       title: 'Ngày tạo',
-      dataIndex: 'created',
-      key: 'created',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       render: (val) => dayjs(val).format(' HH:mm DD/MM/YYYY'),
     },
     {

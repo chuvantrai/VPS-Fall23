@@ -289,8 +289,7 @@ public class AuthController : VpsController<Account>
 
     [HttpPut]
     [FilterPermission(Action = ActionFilterEnum.UpdateProfileAccount)]
-    public async Task<IActionResult> UpdateProfileAccount(
-        [FromForm] UpdateProfileAccountRequest request)
+    public async Task<IActionResult> UpdateProfileAccount([FromForm] UpdateProfileAccountRequest request)
     {
         var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
         var userToken = JwtTokenExtension.ReadToken(accessToken)!;

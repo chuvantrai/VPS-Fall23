@@ -20,13 +20,13 @@ namespace Service.ManagerVPS.Repositories
 
         public DbSet<T> Entities => entities;
 
-        public async Task<T> Create(T entity)
+        public virtual async Task<T> Create(T entity)
         {
             var addResult = await this.entities.AddAsync(entity);
             return addResult.Entity;
         }
 
-        public Task CreateRange(List<T> listEntity)
+        public virtual Task CreateRange(List<T> listEntity)
         {
             return Task.Run(() => entities.AddRange(listEntity));
         }
@@ -38,24 +38,24 @@ namespace Service.ManagerVPS.Repositories
             await this.Delete(data);
         }
 
-        public Task Delete(T entity)
+        public virtual Task Delete(T entity)
         {
             return Task.Run(() => this.entities.Remove(entity));
         }
 
-        public Task DeleteRange(List<T> listEntity)
+        public virtual Task DeleteRange(List<T> listEntity)
         {
             return Task.Run(() => entities.RemoveRange(listEntity));
         }
 
-        public async Task<T> Find(params object[] keys)
+        public virtual async Task<T> Find(params object[] keys)
         {
             T entity = await this.entities.FindAsync(keys)
                        ?? throw new ClientException(ResponseNotification.NOT_FOUND);
             return entity;
         }
 
-        public Task<IEnumerable<PromoCode>> GetListPromoCodeByListId(IEnumerable<Guid> listPromoCodeId)
+        public  Task<IEnumerable<PromoCode>> GetListPromoCodeByListId(IEnumerable<Guid> listPromoCodeId)
         {
             return Task.FromResult<IEnumerable<PromoCode>>(
                 context.PromoCodes
@@ -67,10 +67,12 @@ namespace Service.ManagerVPS.Repositories
 
         public async Task<IEnumerable<PromoCode>?> GetListPromoCodeNeedSendCode()
         {
+            var now = DateTime.Now;
             var listPromoCode = await context.PromoCodes
                 .Include(x => x.ParkingZone)
                 .Include(x => x.PromoCodeInformation)
-                .Where(x => x.UserReceivedCode == false || x.UserReceivedCode == null).ToListAsync();
+                .Where(x => (x.UserReceivedCode == false || x.UserReceivedCode == null) &&
+                            now.AddHours(48) > x.PromoCodeInformation.FromDate).ToListAsync();
 
             if (listPromoCode.Count == 0) return null;
             foreach (var promoCode in listPromoCode)
@@ -82,7 +84,7 @@ namespace Service.ManagerVPS.Repositories
             return listPromoCode.AsEnumerable();
         }
 
-        public async Task<int> SaveChange()
+        public virtual async Task<int> SaveChange()
         {
             using var transaction = context.Database.BeginTransaction();
             try
@@ -102,7 +104,7 @@ namespace Service.ManagerVPS.Repositories
             }
         }
 
-        public Task<T> Update(T entity)
+        public virtual Task<T> Update(T entity)
         {
             T updatedEntity = entities.Update(entity).Entity;
             return Task.FromResult(updatedEntity);
