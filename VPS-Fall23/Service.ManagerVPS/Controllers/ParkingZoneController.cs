@@ -553,16 +553,20 @@ public class ParkingZoneController : VpsController<ParkingZone>
         }
 
         // add new images
-        var parkingZoneImgs = new MultipartFormDataContent();
-        for (var i = 0; i < input.ParkingZoneImages.Count; i++)
+        if (input.ParkingZoneImages is not null)
         {
-            var streamContent = new StreamContent(input.ParkingZoneImages[i].OpenReadStream());
-            parkingZoneImgs.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
-                $"{parkingZone.Id}-{i}.{Path.GetExtension(input.ParkingZoneImages[i].FileName)}");
+            var parkingZoneImgs = new MultipartFormDataContent();
+            for (var i = 0; i < input.ParkingZoneImages.Count; i++)
+            {
+                var streamContent = new StreamContent(input.ParkingZoneImages[i].OpenReadStream());
+                parkingZoneImgs.Add(streamContent, FileManagementClient.MULTIPART_FORM_PARAM_NAME,
+                    $"{parkingZone.Id}-{i}.{Path.GetExtension(input.ParkingZoneImages[i].FileName)}");
+            }
+
+            await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+                $"parking-zone-images/{parkingZone.OwnerId}/{parkingZone.Id}", parkingZoneImgs);
         }
 
-        await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
-            $"parking-zone-images/{parkingZone.OwnerId}/{parkingZone.Id}", parkingZoneImgs);
 
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
         await ((IParkingZoneRepository)vpsRepository).SaveChange();

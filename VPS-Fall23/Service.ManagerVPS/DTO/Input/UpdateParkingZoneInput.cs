@@ -28,7 +28,5 @@ public class UpdateParkingZoneInput
     public Guid? CommuneId { get; set; }
 
     public string? DetailAddress { get; set; }
-
-    [Required]
-    public IFormFileCollection ParkingZoneImages { get; set; } = null!;
+    public IFormFileCollection? ParkingZoneImages { get; set; } 
 }
