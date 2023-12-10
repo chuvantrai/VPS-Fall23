@@ -42,6 +42,11 @@ public partial class VPS53 : ContentPage
         });
     }
 
+    public bool IsConnected()
+    {
+        return Connectivity.NetworkAccess == NetworkAccess.Internet;
+    }
+
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
@@ -89,7 +94,7 @@ public partial class VPS53 : ContentPage
 
     private async void CameraButton_Clicked(object sender, EventArgs e)
     {
-        try
+        if (IsConnected())
         {
             string licensePlate = String.Empty;
             string path = String.Empty;
@@ -132,12 +137,9 @@ public partial class VPS53 : ContentPage
             }
             Slot.Text = _viewModel.LoadSlot();
         }
-        catch (Exception ex)
+        else
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                await Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
-            });
+            await Navigation.PushAsync(new VPS79());
         }
     }
 
@@ -151,44 +153,51 @@ public partial class VPS53 : ContentPage
 
     private async void OkButton_Clicked(object sender, EventArgs e)
     {
-        string licensePlate = new string(LicensePlateEntry.Text.Where(c => Char.IsLetterOrDigit(c)).ToArray());
-
-        if (!String.IsNullOrEmpty(licensePlate))
+        if (IsConnected())
         {
-            var checkLicensePlate = new LicensePlateInput
-            {
-                LicensePlate = licensePlate.ToUpper(),
-                CheckAt = DateTime.Now,
-                CheckBy = Constant.USER
-            };
+            string licensePlate = new string(LicensePlateEntry.Text.Where(c => Char.IsLetterOrDigit(c)).ToArray());
 
-            string autoCheckinResponse = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
-            if (autoCheckinResponse != null)
+            if (!String.IsNullOrEmpty(licensePlate))
             {
-                if (autoCheckinResponse.Contains(Constant.OVERTIME_CONFIRM))
+                var checkLicensePlate = new LicensePlateInput
                 {
-                    var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.ACCEPT, Constant.CANCEL);
-                    var x = confirmAnswer.ToString();
-                    if (confirmAnswer == true)
+                    LicensePlate = licensePlate.ToUpper(),
+                    CheckAt = DateTime.Now,
+                    CheckBy = Constant.USER
+                };
+
+                string autoCheckinResponse = await _viewModel.CheckLicensePLateInput(checkLicensePlate);
+                if (autoCheckinResponse != null)
+                {
+                    if (autoCheckinResponse.Contains(Constant.OVERTIME_CONFIRM))
                     {
-                        var checkoutInputConfirm = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
-                        await DisplayAlert(Constant.NOTIFICATION, checkoutInputConfirm, Constant.CANCEL);
+                        var confirmAnswer = await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.ACCEPT, Constant.CANCEL);
+                        var x = confirmAnswer.ToString();
+                        if (confirmAnswer == true)
+                        {
+                            var checkoutInputConfirm = await _viewModel.CheckOutInputConfirm(checkLicensePlate);
+                            await DisplayAlert(Constant.NOTIFICATION, checkoutInputConfirm, Constant.CANCEL);
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.CANCEL);
                     }
                 }
-                else
-                {
-                    await DisplayAlert(Constant.NOTIFICATION, autoCheckinResponse, Constant.CANCEL);
-                }
             }
+            else
+            {
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.INPUT_FAILED, Constant.CANCEL);
+                });
+            }
+            Slot.Text = _viewModel.LoadSlot();
         }
         else
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                Application.Current.MainPage.DisplayAlert(Constant.ALERT, Constant.INPUT_FAILED, Constant.CANCEL);
-            });
+            await Navigation.PushAsync(new VPS79());
         }
-        Slot.Text = _viewModel.LoadSlot();
     }
 
     private void ChangePlateType(object sender, EventArgs e)

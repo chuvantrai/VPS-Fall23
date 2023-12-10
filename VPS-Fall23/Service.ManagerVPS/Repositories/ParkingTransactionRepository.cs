@@ -195,8 +195,8 @@ namespace Service.ManagerVPS.Repositories
                         transaction.CheckinBy = checkBy;
                         await Update(transaction);
                         await SaveChange();
-                        //var brokerApiClient = new BrokerApiClient(configuration.GetValue<string>("brokerApiBaseUrl"));
-                        //await brokerApiClient.RemoveCancelBookingJob(transaction.Id);
+                        var brokerApiClient = new BrokerApiClient(configuration.GetValue<string>("brokerApiBaseUrl"));
+                        await brokerApiClient.RemoveCancelBookingJob(transaction.Id);
                         return ResponseNotification.CHECKIN_SUCCESS;
                     }
                     else
