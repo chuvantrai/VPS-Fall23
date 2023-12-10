@@ -30,6 +30,7 @@ public static class ResponseNotification
      */
     public const string CHECKIN_SUCCESS = "Checkin thành công";
     public const string CHECKIN_ERROR = "Checkin thất bại";
+    public const string OVERTIME_ERROR = "Bạn đã đến muộn hơn 15p, chúng tôi sẽ tiến hành đăng kí vé mới cho bạn!";
     public const string ATTENDANT_ERROR = "Bảo vệ chưa đăng kí bãi đỗ xe";
     public const string CHECKOUT_SUCCESS = "Checkout thành công";
     public const string CHECKOUT_ERROR = "Checkout thất bại";
