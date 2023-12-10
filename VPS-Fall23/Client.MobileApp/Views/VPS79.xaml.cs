@@ -55,35 +55,42 @@ public partial class VPS79 : ContentPage
 
     private async void loginButton_Clicked(object sender, EventArgs e)
     {
-        string response = String.Empty;
-        if (!String.IsNullOrEmpty(UserName.Text) && !String.IsNullOrEmpty(Password.Text))
+        if (Connectivity.NetworkAccess == NetworkAccess.Internet)
         {
-            LoginRequest loginRequest = new() { Username = UserName.Text, Password = Password.Text };
+            string response = String.Empty;
+            if (!String.IsNullOrEmpty(UserName.Text) && !String.IsNullOrEmpty(Password.Text))
+            {
+                LoginRequest loginRequest = new() { Username = UserName.Text, Password = Password.Text };
 
-            if (Remember.IsChecked == true)
-            {
-                response = await _viewModel.CheckAccount(loginRequest, true);
-            }
-            else
-            {
-                response = await _viewModel.CheckAccount(loginRequest, false);
-            }
-
-            if (response != null)
-            {
-                if (response.Equals(Constant.LOGIN_SUCCESS))
+                if (Remember.IsChecked == true)
                 {
-                    await Shell.Current.GoToAsync(nameof(VPS53));
+                    response = await _viewModel.CheckAccount(loginRequest, true);
                 }
                 else
                 {
-                    await DisplayAlert(Constant.ALERT, response, Constant.CANCEL);
+                    response = await _viewModel.CheckAccount(loginRequest, false);
                 }
+
+                if (response != null)
+                {
+                    if (response.Equals(Constant.LOGIN_SUCCESS))
+                    {
+                        await Shell.Current.GoToAsync(nameof(VPS53));
+                    }
+                    else
+                    {
+                        await DisplayAlert(Constant.ALERT, response, Constant.CANCEL);
+                    }
+                }
+            }
+            else
+            {
+                await DisplayAlert(Constant.ALERT, Constant.LOGIN_FAILED, Constant.CANCEL);
             }
         }
         else
         {
-            await DisplayAlert(Constant.ALERT, Constant.LOGIN_FAILED, Constant.CANCEL);
+            await DisplayAlert(Constant.ALERT, Constant.NETWORK_ERROR, Constant.CANCEL);
         }
     }
 }
