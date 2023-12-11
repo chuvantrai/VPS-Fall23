@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.FileManagement;
@@ -17,6 +16,7 @@ using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using System.Globalization;
 
 namespace Service.ManagerVPS.Controllers;
 
@@ -566,7 +566,10 @@ public class ParkingZoneController : VpsController<ParkingZone>
             await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
                 $"parking-zone-images/{parkingZone.OwnerId}/{parkingZone.Id}", parkingZoneImgs);
         }
-
+        else
+        {
+            throw new ServerException("Ảnh bãi đỗ xe không thể để trống!");
+        }
 
         await ((IParkingZoneRepository)vpsRepository).Update(parkingZone);
         await ((IParkingZoneRepository)vpsRepository).SaveChange();
