@@ -301,6 +301,7 @@ public class PromoCodeController : VpsController<PromoCode>
             await _generalVps.SendEmailAsync(promoCode.UserEmail, titleEmail, bodyEmail);
             
             // #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
+            // // code này đang gửi đến account order gần nhất 
             // if (promoCode.Id.Equals(promoCodes.FirstOrDefault()!.Id) &&
             //     !string.IsNullOrEmpty(promoCode.UserPhone) && 
             //     promoCode.UserPhone.StartsWith("0") && 

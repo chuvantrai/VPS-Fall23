@@ -38,6 +38,7 @@ const UpdateParkingZoneForm = ({ form, parkingZone }) => {
             })
             Promise.all(imageFilePromises).then((res) => {
                 setImages(res);
+                form.setFieldValue("parkingZoneImages", { fileList: res })
             });
 
         });

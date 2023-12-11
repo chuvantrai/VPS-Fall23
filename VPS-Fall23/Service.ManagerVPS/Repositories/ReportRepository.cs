@@ -47,7 +47,7 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
              .Include(r => r.StatusNavigation)
              .Include(r => r.TypeNavigation)
              .Include(r => r.CreatedByNavigation)
-             .Where(r => r.TypeNavigation.Description.Contains("Lỗi"))
+             .Where(r => r.TypeNavigation.Name.Contains("REPORT"))
              .OrderBy(r => r.SubId);
 
         return PagedList<Report>.ToPagedList(listReport, parameters.PageNumber,
@@ -56,7 +56,7 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
 
     public List<GlobalStatus> GetTypeReport()
     {
-        var result = context.GlobalStatuses.Where(gs => gs.Description.Contains("Lỗi")).ToList();
+        var result = context.GlobalStatuses.Where(gs => gs.Name.Contains("REPORT")).ToList();
         return result;
     }
 
@@ -66,7 +66,7 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
              .Include(r => r.StatusNavigation)
              .Include(r => r.TypeNavigation)
              .Include(r => r.CreatedByNavigation)
-             .Where(r => r.TypeNavigation.Description.Contains("Lỗi"));
+             .Where(r => r.TypeNavigation.Name.Contains("REPORT"));
 
         if (typeId.HasValue && typeId != 0)
         {
@@ -103,9 +103,9 @@ public class ReportRepository : VpsRepository<Report>, IReportRepository
         {
             switch (type)
             {
-                case (int)ReportTypeEnum.REQUEST_TRANSACTION_REFUND:
+                case (int)ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND:
                     return 5012;
-                case (int)ReportTypeEnum.TRANSACTION_ERROR:
+                case (int)ReportTypeEnum.REPORT_TRANSACTION:
                     return 5013;
             }
         }

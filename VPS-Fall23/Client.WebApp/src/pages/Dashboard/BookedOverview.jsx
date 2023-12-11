@@ -2,9 +2,7 @@ import { Fragment, useEffect } from 'react';
 import { Progress, Card, Typography } from 'antd';
 import useParkingZoneService from '@/services/parkingZoneOwnerService.js';
 import { useState } from 'react';
-import {
-  Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend,
-} from 'chart.js';
+import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
 const { Text } = Typography;
@@ -39,7 +37,7 @@ function BookedOverview({ parkingZoneName }) {
   });
 
   useEffect(() => {
-    console.log(parkingZoneName)
+    console.log(parkingZoneName);
     getBookedData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parkingZoneName]);
@@ -97,8 +95,7 @@ function BookedOverview({ parkingZoneName }) {
           },
         },
       },
-
-    }
+    },
   };
 
   return (
@@ -129,13 +126,21 @@ function BookedOverview({ parkingZoneName }) {
             <Card title="Chưa Check In" className="ml-5" bordered={true} style={{ width: 200 }}>
               <div className="flex justify-between items-center">
                 {bookedData.notCheckIn}
-                <Progress type="circle" percent={((bookedData.notCheckIn / bookedData.total) * 100).toFixed(1)} size={60} />
+                <Progress
+                  type="circle"
+                  percent={((bookedData.notCheckIn / bookedData.total) * 100).toFixed(1)}
+                  size={60}
+                />
               </div>
             </Card>
             <Card title="Chưa Check Out" className="ml-5" bordered={true} style={{ width: 200 }}>
               <div className="flex justify-between items-center">
                 {bookedData.notCheckOut}
-                <Progress type="circle" percent={((bookedData.notCheckOut / bookedData.total) * 100).toFixed(1)} size={60} />
+                <Progress
+                  type="circle"
+                  percent={((bookedData.notCheckOut / bookedData.total) * 100).toFixed(1)}
+                  size={60}
+                />
               </div>
             </Card>
           </div>
@@ -143,9 +148,8 @@ function BookedOverview({ parkingZoneName }) {
             <Line data={chartData} options={options} />
           </div>
         </div>
-      )
-      }
-    </Fragment >
+      )}
+    </Fragment>
   );
 }
 
