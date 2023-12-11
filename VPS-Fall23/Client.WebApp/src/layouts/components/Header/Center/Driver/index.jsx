@@ -30,6 +30,7 @@ const DriverCenterHeader = () => {
 
     };
     useEffect(() => {
+        if (!selectedAddress || !inputDebouneValue) return;
         onSearch(inputDebouneValue);
     }, [JSON.stringify(selectedAddress)])
 
