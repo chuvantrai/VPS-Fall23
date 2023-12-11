@@ -34,12 +34,12 @@ public class ReportController : VpsController<Report>
         }
 
         if ((request.UserId is null && request.Email == null && request.Phone == null)
-            || (string.IsNullOrEmpty(request.PaymentCode) && request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND))
+            || (string.IsNullOrEmpty(request.PaymentCode) && request.Type == ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND))
         {
             throw new ClientException();
         }
 
-        if (request.Type is ReportTypeEnum.REQUEST_TRANSACTION_REFUND or ReportTypeEnum.TRANSACTION_ERROR)
+        if (request.Type is ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND or ReportTypeEnum.REPORT_TRANSACTION)
         {
             var checkPaymentCode = await ((IReportRepository)vpsRepository)
                 .CheckPaymentCodeInReport(request.PaymentCode!, (int)request.Type);
@@ -95,11 +95,11 @@ public class ReportController : VpsController<Report>
             new KeyValue()
             {
                 Key = KeyHtmlEmail.CSS_PAYMENTCODE,
-                Value = request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND ? "" : "display: none;"
+                Value = request.Type == ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND ? "" : "display: none;"
             }
         };
 
-        if (request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND)
+        if (request.Type == ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND)
         {
             keyValuesTemplate.Add(new KeyValue()
             {
