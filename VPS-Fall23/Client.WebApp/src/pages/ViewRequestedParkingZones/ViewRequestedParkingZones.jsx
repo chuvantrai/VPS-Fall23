@@ -19,7 +19,7 @@ function ViewRequestedParkingZones() {
       key: 'detailAddress',
     },
     {
-      title: 'Slots',
+      title: 'Số chỗ',
       dataIndex: 'slots',
       key: 'slots',
     },
@@ -29,7 +29,7 @@ function ViewRequestedParkingZones() {
       key: 'createdAt',
     },
     {
-      title: 'Action',
+      title: '',
       dataIndex: '',
       key: 'x',
       render: (_, record) => (
@@ -42,7 +42,7 @@ function ViewRequestedParkingZones() {
               handleApprove(record.id);
             }}
           >
-            Approve
+            Chấp nhận
           </Button>
           <Divider type="vertical" />
           <Button
@@ -53,7 +53,7 @@ function ViewRequestedParkingZones() {
               handleReject(record.id);
             }}
           >
-            Reject
+            Từ chối
           </Button>
         </>
       ),
