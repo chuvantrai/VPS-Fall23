@@ -81,22 +81,24 @@ namespace Service.ManagerVPS.Controllers
                 var userToken = JwtTokenExtension.ReadToken(accessToken)!;
                 var list =
                     ((IParkingZoneOwnerRepository)vpsRepository).GetOwnerByEmail(parameters, email);
-                List<ParkingZoneOwner> res = new List<ParkingZoneOwner>();
 
                 if (userToken.RoleId == 3 || userToken.RoleId == 2) return NotFound();
 
-                foreach (ParkingZoneOwner item in list)
-                {
-                    res.Add(new ParkingZoneOwner
-                    {
-                        Id = item.Id,
-                        ModifiedAt = item.ModifiedAt,
-                        CreatedAt = item.CreatedAt,
-                        Phone = item.Phone,
-                        Email = item.Email,
-                        Dob = item.Dob,
-                    });
-                }
+                var result = list
+                   .Select(x => new
+                   {
+                       x.Id,
+                       x.Email,
+                       x.Phone,
+                       x.Dob,
+                       x.CreatedAt,
+                       x.ModifiedAt,
+                       x.IdNavigation.Username,
+                       FullName = x.IdNavigation.FirstName + " " + x.IdNavigation.LastName,
+                       x.IdNavigation.Address,
+                       x.IdNavigation.IsBlock
+                   })
+                   .ToList();
 
                 var metadata = new
                 {
@@ -106,7 +108,7 @@ namespace Service.ManagerVPS.Controllers
                     list.TotalPages,
                     list.HasNext,
                     list.HasPrev,
-                    Data = res
+                    Data = result
                 };
                 return Ok(metadata);
             }
