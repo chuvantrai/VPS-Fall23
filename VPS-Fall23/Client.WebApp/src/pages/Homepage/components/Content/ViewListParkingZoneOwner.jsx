@@ -172,6 +172,7 @@ function ViewListParkingZoneOwner() {
             dob: moment(val.dob).format('DD/MM/YYYY'),
             created: moment(val.createdAt).format('DD/MM/YYYY HH:mm:ss'),
             modified: moment(val.modifiedAt).format('DD/MM/YYYY HH:mm:ss'),
+            isBlock: val.isBlock
           }));
           setData(obj);
           setTotalItems(res?.data.totalCount);
