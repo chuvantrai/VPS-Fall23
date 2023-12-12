@@ -12,7 +12,7 @@ function Overview() {
 
     const { Option } = Select;
     const [selectedParkingZone, setSelectedParkingZone] = useState('');
-    const [parkingZoneName, setParkingZoneName] = useState('');
+    const [parkingZoneId, setParkingZoneId] = useState('');
     const [ParkingZoneOptions, setParkingZoneOptions] = useState([]);
 
     useEffect(() => {
@@ -20,23 +20,23 @@ function Overview() {
             .getAllParkingZoneByOwnerId(account.UserId)
             .then((response) => {
                 setParkingZoneOptions(response.data);
+                console.log(response.data);
             })
             .catch((error) => {
                 console.error('Error fetching parking zones:', error);
             });
     }, []);
 
-    const handleSelectChange = (value, label) => {
+    const handleSelectChange = (value) => {
         setSelectedParkingZone(value);
-        setParkingZoneName(label.children)
-        console.log(value);
+        setParkingZoneId(value);
     };
 
     return (
         <Fragment>
             <div>
                 <Select className='mb-5' value={selectedParkingZone} onChange={handleSelectChange} style={{ width: "200px" }}>
-                    <Option value="" disabled={selectedParkingZone !== ''}>
+                    <Option value="">
                         Tất cả bãi đỗ xe
                     </Option>
                     {ParkingZoneOptions.map((option) => (
@@ -45,8 +45,8 @@ function Overview() {
                         </Option>
                     ))}
                 </Select>
-                <BookedOverview parkingZoneName={parkingZoneName}></BookedOverview>
-                <IncomeDashboard selectedParkingZone={selectedParkingZone} ParkingZoneData={ParkingZoneOptions}></IncomeDashboard>
+                <BookedOverview parkingZoneId={parkingZoneId}></BookedOverview>
+                <IncomeDashboard selectedParkingZone={selectedParkingZone}></IncomeDashboard>
             </div>
         </Fragment>
     )

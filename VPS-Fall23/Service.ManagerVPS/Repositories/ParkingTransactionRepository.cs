@@ -42,7 +42,7 @@ namespace Service.ManagerVPS.Repositories
                 .CountAsync();
         }
 
-        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, Guid ownerId,
+        public List<ParkingTransaction> GetBookedSlot(string? parkingZoneId,
             DateTime? checkAt)
         {
             if (!checkAt.HasValue)
@@ -50,20 +50,20 @@ namespace Service.ManagerVPS.Repositories
                 checkAt = DateTime.Now;
             }
 
-            if (parkingZoneName == null || parkingZoneName.Trim() == "" || parkingZoneName.ToLower().Trim() == "all")
+            if (parkingZoneId == null || parkingZoneId.Trim() == "")
             {
                 return this.entities
                     .Include(p => p.ParkingZone)
                     .Include(o => o.ParkingZone.Owner)
                     .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED)
                                 && (!p.ParkingTransactionDetails.Any())
-                                && (p.ParkingZone.OwnerId == ownerId)
+                                && (p.ParkingZone.Id.ToString().Equals(parkingZoneId))
                     ).ToList();
             }
 
             return this.entities
                 .Include(p => p.ParkingZone)
-                .Where(p => p.ParkingZone.Name == parkingZoneName
+                .Where(p => p.ParkingZone.Id.ToString().Equals(parkingZoneId)
                             && (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED)
                             && (!p.ParkingTransactionDetails.Any())
                 ).ToList();

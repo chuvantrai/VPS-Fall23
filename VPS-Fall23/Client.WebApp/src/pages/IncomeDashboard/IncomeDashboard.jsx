@@ -7,7 +7,7 @@ import { getAccountJwtModel } from '@/helpers';
 import useParkingZoneService from '@/services/parkingZoneService';
 import useParkingTransactionService from '@/services/parkingTransactionSerivce';
 
-function IncomeDashboard({ selectedParkingZone, ParkingZoneData }) {
+function IncomeDashboard({ selectedParkingZone }) {
   const parkingZoneService = useParkingZoneService();
   const parkingTransactionService = useParkingTransactionService();
   const { RangePicker } = DatePicker;
@@ -19,7 +19,7 @@ function IncomeDashboard({ selectedParkingZone, ParkingZoneData }) {
   const [dateRange, setDateRange] = useState('all');
   const [data, setData] = useState([]);
   // const [ParkingZoneOptions, setParkingZoneOptions] = useState([]);
-  // const [ParkingZoneData, setParkingZoneData] = useState([]);
+  const [ParkingZoneData, setParkingZoneData] = useState([]);
 
   const handleDateRangeChange = (value) => {
     setDateRange(value);
@@ -40,13 +40,14 @@ function IncomeDashboard({ selectedParkingZone, ParkingZoneData }) {
 
   useEffect(() => {
     const filteredData = ParkingZoneData.filter((item) => item.parkingZoneId === selectedParkingZone);
-    parkingZoneService
-      .getAllParkingZoneByOwnerId(account.UserId)
+    parkingTransactionService
+      .getAllIncome(selectedParkingZone)
       .then((response) => {
-        // setParkingZoneOptions(response.data);
+        setData(response.data);
+        setParkingZoneData(response.data);
       })
       .catch((error) => {
-        console.error('Error fetching parking zones:', error);
+        console.error('Error fetching data:', error);
       });
 
     if (dateRange === 'month') {
@@ -94,7 +95,7 @@ function IncomeDashboard({ selectedParkingZone, ParkingZoneData }) {
     setTotalIncome(totalIncome);
     setAverageMonthlyIncome(averageMonthlyIncome);
     setAverageYearlyIncome(averageYearlyIncome);
-  }, [dateRange, selectedParkingZone, ParkingZoneData]);
+  }, [dateRange, selectedParkingZone]);
 
   return (
     <Fragment>
