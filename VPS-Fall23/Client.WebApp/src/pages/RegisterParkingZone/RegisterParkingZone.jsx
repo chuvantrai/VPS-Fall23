@@ -7,6 +7,7 @@ import useParkingZoneService from '@/services/parkingZoneService';
 import { getAccountJwtModel } from '@/helpers';
 import useGoongMapService from '@/services/goongMapServices';
 import { useDebounce } from '@uidotdev/usehooks';
+import { useSelector } from 'react-redux';
 
 const layout = {
   labelCol: {
@@ -16,7 +17,6 @@ const layout = {
     span: 18,
   },
 };
-
 const validateMessages = {
   required: '${label} không được bỏ trống!',
   types: {
@@ -62,6 +62,8 @@ const defaulLocation = {
 };
 
 const RegisterParkingZone = () => {
+
+  const { isLoading } = useSelector((state) => state.global);
   const parkingZoneService = useParkingZoneService();
   const account = getAccountJwtModel();
 
@@ -81,9 +83,11 @@ const RegisterParkingZone = () => {
     placeholder: 'Chọn địa chỉ',
   };
   const onCascaderChange = useCallback((value, selectedOptions) => {
+    console.log(selectedOptions);
     setSelectedAddress(selectedOptions ?? []);
     setValidateStatus('');
     setHelp('');
+
   }, []);
   //END cascader
   //goong map
@@ -93,18 +97,25 @@ const RegisterParkingZone = () => {
   const [locationSearchValue, setLocationSearchValue] = useState(null);
   const locationSearchValueDebound = useDebounce(locationSearchValue, 600);
   const [selectedLocationDetail, setSelectedLocationDetail] = useState(null);
-
+  const [selectedLocationValue, setSelectedLocationValue] = useState(null);
   const goongMapService = useGoongMapService();
   function onDragEnd() {
     var lngLat = marker.getLngLat();
     setPointedLocation({ lng: lngLat.lng, lat: lngLat.lat });
   }
+  useEffect(() => {
+    onLocationSearch(locationSearchValueDebound);
+  }, [JSON.stringify(selectedAddress)])
 
   const onLocationSearch = (value) => {
-    const addressCombine = [value, ...selectedAddress.reverse().map((a) => a.name)].join(', ');
+    console.log(selectedAddress);
+    const addressCombine = [value, ...JSON.parse(JSON.stringify(selectedAddress)).reverse().map((a) => a.name)].filter(v => v).join(', ');
     if (!addressCombine) return;
-    goongMapService.placeAutoComplete(addressCombine, sessionToken).then((res) => setPlacesFromLocation(res.data));
+    goongMapService.placeAutoComplete(addressCombine, sessionToken).then((res) => {
+      setPlacesFromLocation(res.data)
+    });
   };
+
   const onAddressSelected = (placeId) => {
     goongMapService.getPlaceDetail(placeId, sessionToken).then((res) => {
       map.jumpTo({ zoom: map.getZoom(), center: res.data.geometry.position });
@@ -113,6 +124,18 @@ const RegisterParkingZone = () => {
       setSessionToken(uuidv4());
     });
   };
+
+  useEffect(() => {
+    if (placesFromLocation.length <= 0) return;
+    setSelectedLocationValue(placesFromLocation[0])
+  }, [JSON.stringify(placesFromLocation)])
+
+  useEffect(() => {
+    setSelectedLocationDetail(null);
+    if (!selectedLocationValue) return;
+    onAddressSelected(selectedLocationValue.placeId)
+  }, [selectedLocationValue])
+
   useEffect(() => {
     setSessionToken(uuidv4());
     initMap(defaulLocation.geometry.position);
@@ -159,7 +182,7 @@ const RegisterParkingZone = () => {
     setWorkingTime(timeString);
   };
   const onFinish = (values) => {
-    if (!selectedAddress) {
+    if (!selectedLocationDetail) {
       setValidateStatus('error');
       setHelp('Vui lòng chọn địa chỉ của bãi đỗ xe');
     } else {
@@ -179,7 +202,7 @@ const RegisterParkingZone = () => {
       formData.append('workTo', workingTime[1]);
       formData.append('location.lat', selectedLocationDetail.geometry.position.lat);
       formData.append('location.lng', selectedLocationDetail.geometry.position.lng);
-
+      console.log(formData);
       parkingZoneService.register(formData);
     }
   };
@@ -263,27 +286,39 @@ const RegisterParkingZone = () => {
                 parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
               />
             </Form.Item>
-            <Form.Item name={'detailAddress'} label="Địa chỉ" validateStatus={validateStatus} help={help}>
-              <Space.Compact direction="vertical" style={{ width: '100%' }}>
-                <AddressCascader cascaderProps={addressCascaderProps} onCascaderChangeCallback={onCascaderChange} />
-                <Select
-                  showSearch
-                  allowClear
-                  filterOption={() => true}
-                  options={placesFromLocation.map((p) => {
-                    return {
-                      value: p.placeId,
-                      label: p.description ?? p.formattedAddress,
-                    };
-                  })}
-                  placeholder="Địa chỉ cụ thể"
-                  onSearch={setLocationSearchValue}
-                  onSelect={onAddressSelected}
-                  onClear={() => {
-                    setSessionToken(uuidv4());
-                  }}
-                />
-              </Space.Compact>
+            <Form.Item label="Địa chỉ" >
+              <AddressCascader cascaderProps={addressCascaderProps} onCascaderChangeCallback={onCascaderChange} />
+
+            </Form.Item>
+            <Form.Item
+              name='detailAddress' label="Địa chỉ chi tiết"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng tìm kiếm và chọn một địa chỉ"
+                },
+              ]}
+            >
+              <Select
+
+                showSearch
+                allowClear
+                filterOption={() => true}
+                options={placesFromLocation.map((p) => {
+                  return {
+                    value: p.placeId,
+                    label: p.description ?? p.formattedAddress,
+                  };
+                })}
+                value={selectedLocationValue?.placeId}
+                placeholder="Địa chỉ cụ thể"
+                loading={isLoading}
+                onSearch={setLocationSearchValue}
+                onSelect={(v, option) => { setSelectedLocationValue({ placeId: option.value, description: option.label }) }}
+                onClear={() => {
+                  setSessionToken(uuidv4());
+                }}
+              />
             </Form.Item>
 
             <Form.Item

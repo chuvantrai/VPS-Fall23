@@ -19,6 +19,7 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
         };
         parkingZoneService.changeParkingZoneFullStatus(params);
         setSwitchChecked(!switchChecked)
+        setViewValues({ ...viewValues, reload: true })
     }
 
     return (<Space>

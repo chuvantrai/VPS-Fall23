@@ -166,11 +166,33 @@ function ViewListParkingZoneOwner() {
         .then((res) => {
           const obj = res.data.data.map((val) => ({
             key: val.id,
+            fullName: val.fullName,
             email: val.email,
             phone: val.phone,
             dob: moment(val.dob).format('DD/MM/YYYY'),
             created: moment(val.createdAt).format('DD/MM/YYYY HH:mm:ss'),
             modified: moment(val.modifiedAt).format('DD/MM/YYYY HH:mm:ss'),
+            isBlock: val.isBlock
+          }));
+          setData(obj);
+          setTotalItems(res?.data.totalCount);
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error);
+        });
+    }
+    else {
+      await ownerSerivce
+        .getAllOwner({ pageNumber: currentPage, pageSize: pageSize })
+        .then((res) => {
+          const obj = res.data.data.map((val) => ({
+            key: val.id,
+            fullName: val.fullName,
+            email: val.email,
+            phone: val.phone,
+            dob: moment(val.dob).format('DD/MM/YYYY'),
+            created: moment(val.createdAt).format('DD/MM/YYYY'),
+            isBlock: val.isBlock
           }));
           setData(obj);
           setTotalItems(res?.data.totalCount);
