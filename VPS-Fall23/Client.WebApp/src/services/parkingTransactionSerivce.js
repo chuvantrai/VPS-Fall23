@@ -13,10 +13,13 @@ const useParkingTransactionService = () => {
   const getPaymentUrl = (parkingTransactionId) => {
     return axios.get(GET_PAY_URL + '/' + parkingTransactionId);
   };
-  const getAllIncome = (parkingZoneId) => {
-    return axios.get(GET_ALL_INCOME + '/' + parkingZoneId);
-  };
 
+  const getAllIncome = (parkingZoneId, ownerId) => {
+    console.log(ownerId);
+    return axios.get(GET_ALL_INCOME, {
+      params: { parkingZoneId, ownerId },
+    });
+  };
   return {
     bookingSlot,
     getPaymentUrl,

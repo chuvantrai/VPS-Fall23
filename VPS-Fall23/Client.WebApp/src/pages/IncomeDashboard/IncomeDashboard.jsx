@@ -22,6 +22,53 @@ function IncomeDashboard({ selectedParkingZone }) {
   const [ParkingZoneData, setParkingZoneData] = useState([]);
 
   const handleDateRangeChange = (value) => {
+    let temporaryData = [];
+
+    if (value === 'month') {
+      const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const filteredDataForDay = ParkingZoneData.filter((item) => new Date(item.incomeDate).getDate() === day);
+        console.log(filteredDataForDay);
+        const totalIncomeForDay = filteredDataForDay.reduce((total, item) => total + item.income, 0);
+
+        temporaryData.push({
+          name: `Ngày ${day}`,
+          income: totalIncomeForDay,
+        });
+      }
+    } else if (value === 'year') {
+      for (let month = 1; month <= 12; month++) {
+        const filteredDataForMonth = ParkingZoneData.filter(
+          (item) => new Date(item.incomeDate).getMonth() === month - 1,
+        );
+
+        const totalIncomeForMonth = filteredDataForMonth.reduce((total, item) => total + item.income, 0);
+
+        temporaryData.push({
+          name: `Tháng ${month}`,
+          income: totalIncomeForMonth,
+        });
+      }
+    } else if (value === 'all') {
+      const groupedData = {};
+      ParkingZoneData.forEach((item) => {
+        const incomeYear = new Date(item.incomeDate).getFullYear();
+        if (!groupedData[incomeYear]) {
+          groupedData[incomeYear] = 0;
+        }
+        groupedData[incomeYear] += item.income;
+      });
+
+      for (const year in groupedData) {
+        temporaryData.push({
+          name: year,
+          income: groupedData[year],
+        });
+      }
+    }
+    console.log(temporaryData);
+    setData(temporaryData);
     setDateRange(value);
   };
 
@@ -37,64 +84,103 @@ function IncomeDashboard({ selectedParkingZone }) {
   //       console.error('Error fetching data:', error);
   //     });
   // };
+  const calculateStatistics = (data) => {
+    if (!data || data.length === 0) {
+      setTotalIncome(0);
+      setAverageMonthlyIncome(0);
+      setAverageYearlyIncome(0);
+      return;
+    }
+
+    const totalIncome = data.reduce((total, entry) => total + entry.income, 0);
+    const roundedTotalIncome = Math.round(totalIncome / 10000) * 10000;
+
+    const averageMonthlyIncome = totalIncome / 12;
+    const roundedAverageMonthlyIncome = Math.round(averageMonthlyIncome / 10000) * 10000;
+
+    const averageYearlyIncome = totalIncome / data.length;
+    const roundedAverageYearlyIncome = Math.round(averageYearlyIncome / 10000) * 10000;
+
+    setTotalIncome(roundedTotalIncome);
+    setAverageMonthlyIncome(roundedAverageMonthlyIncome);
+    setAverageYearlyIncome(roundedAverageYearlyIncome);
+  };
 
   useEffect(() => {
-    const filteredData = ParkingZoneData.filter((item) => item.parkingZoneId === selectedParkingZone);
+    calculateStatistics();
+  }, [dateRange, selectedParkingZone]);
+
+  useEffect(() => {
     parkingTransactionService
-      .getAllIncome(selectedParkingZone)
+      .getAllIncome(selectedParkingZone, account.UserId)
       .then((response) => {
         setData(response.data);
         setParkingZoneData(response.data);
+        calculateStatistics(response.data);
+        const filteredData = response.data;
+        let temporaryData = [];
+
+        if (dateRange === 'month') {
+          const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+
+          for (let day = 1; day <= daysInMonth; day++) {
+            const filteredDataForDay = filteredData.filter((item) => new Date(item.incomeDate).getDate() === day);
+            console.log(filteredDataForDay);
+            const totalIncomeForDay = filteredDataForDay.reduce((total, item) => total + item.income, 0);
+
+            temporaryData.push({
+              name: `Ngày ${day}`,
+              income: totalIncomeForDay,
+            });
+          }
+        } else if (dateRange === 'year') {
+          for (let month = 1; month <= 12; month++) {
+            const filteredDataForMonth = filteredData.filter(
+              (item) => new Date(item.incomeDate).getMonth() === month - 1,
+            );
+
+            const totalIncomeForMonth = filteredDataForMonth.reduce((total, item) => total + item.income, 0);
+
+            temporaryData.push({
+              name: `Tháng ${month}`,
+              income: totalIncomeForMonth,
+            });
+          }
+        } else if (dateRange === 'all') {
+          const groupedData = {};
+          filteredData.forEach((item) => {
+            const incomeYear = new Date(item.incomeDate).getFullYear();
+            if (!groupedData[incomeYear]) {
+              groupedData[incomeYear] = 0;
+            }
+            groupedData[incomeYear] += item.income;
+          });
+
+          for (const year in groupedData) {
+            temporaryData.push({
+              name: year,
+              income: groupedData[year],
+            });
+          }
+        }
+        setData(temporaryData);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
 
-    if (dateRange === 'month') {
-      const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-      const thisMonthData = Array.from({ length: daysInMonth }, (_, i) => ({
-        name: `Ngày ${i + 1}`,
-        income: filteredData.find((item) => new Date(item.incomeDate).getDate() === i + 1)?.income || 0,
-      }));
-      setData(thisMonthData);
-    } else if (dateRange === 'year') {
-      const thisYearData = Array.from({ length: 12 }, (_, i) => ({
-        name: `Tháng ${i + 1}`,
-        income: filteredData
-          .filter((item) => new Date(item.incomeDate).getMonth() === i)
-          .reduce((total, item) => total + item.income, 0),
-      }));
-      setData(thisYearData);
-    } else if (dateRange === 'all') {
-      const allTimeData = [];
-      const groupedData = {};
-      filteredData.forEach((item) => {
-        const incomeYear = new Date(item.incomeDate).getFullYear();
-        if (!groupedData[incomeYear]) {
-          groupedData[incomeYear] = 0;
-        }
-        groupedData[incomeYear] += item.income;
-      });
-
-      for (const year in groupedData) {
-        allTimeData.push({
-          name: year,
-          income: groupedData[year],
-        });
-      }
-
-      setData(allTimeData);
-    }
-
     const totalIncome = data.reduce((total, entry) => total + entry.income, 0);
+    const roundedTotalIncome = Math.round(totalIncome / 10000) * 10000;
 
-    const averageMonthlyIncome = data.reduce((total, entry) => total + entry.income, 0) / 12;
+    const averageMonthlyIncome = totalIncome / 12;
+    const roundedAverageMonthlyIncome = Math.round(averageMonthlyIncome / 10000) * 10000;
 
-    const averageYearlyIncome = data.length > 0 ? totalIncome / data.length : 0;
+    const averageYearlyIncome = totalIncome / data.length;
+    const roundedAverageYearlyIncome = Math.round(averageYearlyIncome / 10000) * 10000;
 
-    setTotalIncome(totalIncome);
-    setAverageMonthlyIncome(averageMonthlyIncome);
-    setAverageYearlyIncome(averageYearlyIncome);
+    setTotalIncome(roundedTotalIncome);
+    setAverageMonthlyIncome(roundedAverageMonthlyIncome);
+    setAverageYearlyIncome(roundedAverageYearlyIncome);
   }, [dateRange, selectedParkingZone]);
 
   return (
@@ -135,7 +221,7 @@ function IncomeDashboard({ selectedParkingZone }) {
         {data.length === 0 ? (
           <Empty description="No data available" />
         ) : (
-          <BarChart className={styles.chart} width={1000} height={300} data={data}>
+          <BarChart className={styles.chart} width={1200} height={300} data={data}>
             <XAxis dataKey="name" />
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
