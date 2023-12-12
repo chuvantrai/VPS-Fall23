@@ -7,7 +7,7 @@ public class UpdateParkingZoneInput
     [Required]
     public Guid? ParkingZoneId { get; set; }
 
-    [Required] 
+    [Required]
     public string ParkingZoneName { get; set; } = null!;
 
     [Required]
@@ -21,12 +21,13 @@ public class UpdateParkingZoneInput
 
     [Required]
     public TimeSpan WorkFrom { get; set; }
-    
+
     [Required]
     public TimeSpan WorkTo { get; set; }
-    
+
     public Guid? CommuneId { get; set; }
 
     public string? DetailAddress { get; set; }
-    public IFormFileCollection? ParkingZoneImages { get; set; } 
+
+    public IFormFileCollection? ParkingZoneImages { get; set; }
 }

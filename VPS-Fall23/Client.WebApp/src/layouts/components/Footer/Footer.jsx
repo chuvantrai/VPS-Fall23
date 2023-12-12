@@ -9,13 +9,15 @@ const contentBtnReport = (
 );
 const Footer = () => {
   return (
-    <AntdFooter className={'py-[2.3rem]'}>
-      <div className={'grid grid-cols-3 gap-4'}>
-        <div className={''}></div>
-        <div className={'text-center'}>VPS ©2023 Created by SEP490-G14</div>
-        <div className={'flex justify-end'}><ModalReport contentBtn={contentBtnReport} /></div>
-      </div>
-    </AntdFooter>
+      <>
+          <AntdFooter className={'py-[2.3rem]'}>
+              <div className={'grid grid-cols-3 gap-4'}>
+                  <div className={''}></div>
+                  <div className={'text-center'}>VPS ©2023 Created by SEP490-G14</div>
+                  <div className={'flex justify-end'}><ModalReport contentBtn={contentBtnReport} /></div>
+              </div>
+          </AntdFooter>
+      </>
   );
 };
 export default Footer;
