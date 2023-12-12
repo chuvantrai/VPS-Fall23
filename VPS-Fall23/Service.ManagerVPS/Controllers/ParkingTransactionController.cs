@@ -91,10 +91,6 @@ namespace Service.ManagerVPS.Controllers
             {
                 throw new ClientException(3003);
             }
-            string savePath = @"C:\Users\trank\OneDrive\Desktop";
-            string imagePath = Path.Combine(savePath, "saved_image.jpg");
-
-            System.IO.File.WriteAllBytes(imagePath, licensePlateScan.Image);
 
             var image = Image.FromBytes(licensePlateScan.Image) ?? throw new ClientException(3003);
 
