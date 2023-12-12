@@ -284,7 +284,7 @@ public class PromoCodeController : VpsController<PromoCode>
         await SendMailPromoCode(listPromoCode);
     }
 
-    public async Task SendMailPromoCode(IEnumerable<PromoCode>? listPromoCode)
+    private async Task SendMailPromoCode(IEnumerable<PromoCode>? listPromoCode)
     {
         if (listPromoCode == null) return;
         var promoCodes = listPromoCode.ToList();
