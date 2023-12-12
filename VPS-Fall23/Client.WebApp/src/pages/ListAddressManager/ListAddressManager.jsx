@@ -194,6 +194,7 @@ function ListAddressManager() {
   };
   const OnSearchAddress = (event) => {
     if (event.key === 'Enter') {
+      setPageNumber(1);
       loadData();
     }
   };
@@ -201,10 +202,12 @@ function ListAddressManager() {
   const OnChangeCityFilter = (val) => {
     setCityFilter(val);
     setDistrictFilter(undefined);
+    setPageNumber(1);
     OnLoadDistrictFilter(val);
   };
 
   const OnChangeDistrictFilter = (val) => {
+    setPageNumber(1);
     setDistrictFilter(val);
   };
 
@@ -251,6 +254,7 @@ function ListAddressManager() {
     setDistrictFilter(undefined);
     setCityFilter(undefined);
     setTextSearch('');
+    setPageNumber(1);
     loadDataOnChange(val);
   };
   useEffect(() => {
