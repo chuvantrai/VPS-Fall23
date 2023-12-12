@@ -46,7 +46,7 @@ function Overview() {
                     ))}
                 </Select>
                 <BookedOverview parkingZoneId={parkingZoneId}></BookedOverview>
-                <IncomeDashboard selectedParkingZone={selectedParkingZone} ParkingZoneData={ParkingZoneOptions}></IncomeDashboard>
+                <IncomeDashboard selectedParkingZone={selectedParkingZone}></IncomeDashboard>
             </div>
         </Fragment>
     )
