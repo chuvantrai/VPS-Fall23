@@ -139,7 +139,7 @@ function BookedOverview({ parkingZoneId }) {
                   {bookedData.booked}
                   <Progress
                     type="circle"
-                    percent={((bookedData.deposit / bookedData.total) * 100).toFixed(1)}
+                    percent={((bookedData.booked / bookedData.total) * 100).toFixed(1)}
                     size={60}
                   />
                 </div>
