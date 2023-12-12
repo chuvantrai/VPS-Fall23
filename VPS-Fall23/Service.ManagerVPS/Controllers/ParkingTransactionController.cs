@@ -200,10 +200,10 @@ namespace Service.ManagerVPS.Controllers
             return await ((IParkingTransactionRepository)vpsRepository).CheckOutConfirm(licensePlate, licensePlateScan.CheckAt, licensePlateScan.CheckBy) ?? throw new ClientException(3002);
         }
 
-        [HttpGet("{parkingZoneId}")]
-        public async Task<List<IncomeParkingZoneResponse>> GetAllIncome(Guid parkingZoneId)
+        [HttpGet]
+        public async Task<List<IncomeParkingZoneResponse>> GetAllIncome([FromQuery] Guid? parkingZoneId, [FromQuery] Guid? ownerId)
         {
-            var transaction = await ((IParkingTransactionRepository)vpsRepository).GetAllIncomeByParkingZoneId(parkingZoneId);
+            var transaction = await ((IParkingTransactionRepository)vpsRepository).GetAllIncome(parkingZoneId, ownerId);
             return transaction;
         }
     }

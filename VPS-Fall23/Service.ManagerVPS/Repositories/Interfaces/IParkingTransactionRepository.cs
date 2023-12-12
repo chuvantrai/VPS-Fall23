@@ -24,7 +24,7 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         
         Task<bool> IsAlreadyBooking(BookingSlot bookingSlot);
         
-        Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(Guid parkingZoneId);
+        Task<List<IncomeParkingZoneResponse>> GetAllIncome(Guid? parkingZoneId, Guid? ownerId);
 
         List<ParkingTransaction> GetParkingTransactions();
         

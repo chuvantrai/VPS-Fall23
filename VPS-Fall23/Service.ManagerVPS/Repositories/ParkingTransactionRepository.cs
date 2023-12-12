@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using NetTopologySuite.Index.HPRtree;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.DTO.Input;
@@ -258,7 +259,7 @@ namespace Service.ManagerVPS.Repositories
                             transaction.StatusId = (int)ParkingTransactionStatusEnum.UNPAY;
                             await Update(transaction);
 
-                            if(checkAt - transaction.CheckoutAt < TimeSpan.FromMinutes(60))
+                            if (checkAt - transaction.CheckoutAt < TimeSpan.FromMinutes(60))
                             {
                                 return ResponseNotification.OVERTIME_CONFIRM +
                                    (double)transactionDetail.UnitPricePerHour + " VNĐ";
@@ -269,7 +270,7 @@ namespace Service.ManagerVPS.Repositories
                                    (int)((double)newTransactionDetail.UnitPricePerHour *
                                          (checkAt - transactionDetail.To).TotalHours) + " VNĐ";
                             }
-                            
+
                         }
                         else
                         {
@@ -323,7 +324,7 @@ namespace Service.ManagerVPS.Repositories
                             return ResponseNotification.OVERTIME_CONFIRM +
                                (int)((double)transactionDetail.UnitPricePerHour *
                                      (transactionDetail.To - transactionDetail.From).TotalHours) + " VNĐ";
-                        }                        
+                        }
                     }
                     else
                     {
@@ -418,38 +419,86 @@ namespace Service.ManagerVPS.Repositories
             };
         }
 
-        public async Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(
-            Guid parkingZoneId)
+        public async Task<List<IncomeParkingZoneResponse>> GetAllIncome(
+            Guid? parkingZoneId, Guid? ownerId)
         {
             var result = new List<IncomeParkingZoneResponse>();
-            var parkingTransactions = await entities.Include(pt => pt.ParkingTransactionDetails)
-                .Where(pt =>
-                    pt.ParkingZoneId == parkingZoneId && pt.CheckoutBy != null &&
-                    pt.CheckinBy != null).ToListAsync();
-            foreach (var parkingTransaction in parkingTransactions)
+
+            var parkingZones = context.ParkingZones.Where(pz => pz.OwnerId.Equals(ownerId)).ToList();
+            if (parkingZoneId == null)
             {
-                decimal totalCost = 0;
-
-                foreach (var parkingTransactionDetail in parkingTransaction
-                             .ParkingTransactionDetails)
+                foreach (var item in parkingZones)
                 {
-                    var duration = parkingTransactionDetail.To - parkingTransactionDetail.From;
-                    var totalHours = duration.TotalHours;
 
-                    decimal costForDetail =
-                        (decimal)totalHours * parkingTransactionDetail.UnitPricePerHour;
-                    totalCost += costForDetail;
+                    var parkingTransactions = await entities.Include(pt => pt.ParkingTransactionDetails)
+                        .Where(pt =>
+                            pt.ParkingZoneId == item.Id && pt.CheckoutBy != null &&
+                            pt.CheckinBy != null).ToListAsync();
+                    foreach (var parkingTransaction in parkingTransactions)
+                    {
+                        decimal totalCost = 0;
+
+                        foreach (var parkingTransactionDetail in parkingTransaction
+                                     .ParkingTransactionDetails)
+                        {
+                            var duration = parkingTransactionDetail.To - parkingTransactionDetail.From;
+                            var totalHours = duration.TotalHours;
+
+                            if (totalHours < 1)
+                            {
+                                totalHours = 1;
+                            }
+                            double costForDetail = totalHours * (double)parkingTransactionDetail.UnitPricePerHour;
+
+                            totalCost += (decimal)Math.Round(costForDetail);
+                        }
+
+                        var incomeParkingZoneResponse = new IncomeParkingZoneResponse()
+                        {
+                            Income = totalCost,
+                            IncomeDate = parkingTransaction.CheckinAt.Date
+                        };
+
+                        result.Add(incomeParkingZoneResponse);
+                    }
+
                 }
-
-                var incomeParkingZoneResponse = new IncomeParkingZoneResponse()
-                {
-                    Income = totalCost,
-                    IncomeDate = parkingTransaction.CheckinAt.Date
-                };
-
-                result.Add(incomeParkingZoneResponse);
             }
+            else
+            {
+                var parkingTransactions = await entities.Include(pt => pt.ParkingTransactionDetails)
+                                       .Where(pt =>
+                                           pt.ParkingZoneId == parkingZoneId && pt.CheckoutBy != null &&
+                                           pt.CheckinBy != null).ToListAsync();
+                foreach (var parkingTransaction in parkingTransactions)
+                {
+                    decimal totalCost = 0;
 
+                    foreach (var parkingTransactionDetail in parkingTransaction
+                                 .ParkingTransactionDetails)
+                    {
+                        var duration = parkingTransactionDetail.To - parkingTransactionDetail.From;
+                        var totalHours = duration.TotalHours;
+
+                        if (totalHours < 1)
+                        {
+                            totalHours = 1;
+                        }
+                        decimal costForDetail =
+                            (decimal)totalHours * parkingTransactionDetail.UnitPricePerHour;
+
+                        totalCost += (decimal)Math.Round(costForDetail);
+                    }
+
+                    var incomeParkingZoneResponse = new IncomeParkingZoneResponse()
+                    {
+                        Income = totalCost,
+                        IncomeDate = parkingTransaction.CheckinAt.Date
+                    };
+
+                    result.Add(incomeParkingZoneResponse);
+                }
+            }
             return result;
         }
 
