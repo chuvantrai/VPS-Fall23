@@ -67,10 +67,12 @@ namespace Service.ManagerVPS.Repositories
 
         public async Task<IEnumerable<PromoCode>?> GetListPromoCodeNeedSendCode()
         {
+            var now = DateTime.Now;
             var listPromoCode = await context.PromoCodes
                 .Include(x => x.ParkingZone)
                 .Include(x => x.PromoCodeInformation)
-                .Where(x => x.UserReceivedCode == false || x.UserReceivedCode == null).ToListAsync();
+                .Where(x => (x.UserReceivedCode == false || x.UserReceivedCode == null) &&
+                            now.AddHours(48) > x.PromoCodeInformation.FromDate).ToListAsync();
 
             if (listPromoCode.Count == 0) return null;
             foreach (var promoCode in listPromoCode)

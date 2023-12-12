@@ -53,8 +53,7 @@ namespace Client.MobileApp.ViewModels
         {
             _client = new HttpClient
             {
-                BaseAddress = new Uri("http://10.0.2.2:5001")
-                //BaseAddress = new Uri("http://localhost:5001")
+                BaseAddress = new Uri("http://103.82.133.210:5011")
             };
         }
 
@@ -76,7 +75,7 @@ namespace Client.MobileApp.ViewModels
                     Constant.USER = token.UserData.UserId;
                     if(isRemember == true)
                     {
-                       SecureStorage.SetAsync("UserToken", token.AccessToken);
+                       await SecureStorage.SetAsync("UserToken", token.AccessToken);
                     }
                     return Constant.LOGIN_SUCCESS;
                 }

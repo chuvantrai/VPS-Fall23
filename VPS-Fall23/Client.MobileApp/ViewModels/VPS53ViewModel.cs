@@ -1,7 +1,6 @@
 ﻿using Client.MobileApp.Models;
 using System.Net.Http.Json;
 using Client.MobileApp.Constants;
-using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Client.MobileApp.ViewModels
 {
@@ -61,8 +60,7 @@ namespace Client.MobileApp.ViewModels
         {
             _client = new HttpClient
             {
-                BaseAddress = new Uri("http://10.0.2.2:5001")
-                //BaseAddress = new Uri("http://localhost:5001")
+                BaseAddress = new Uri("http://103.82.133.210:5011")
             };
         }
         public async Task<string> CheckLicensePLateScan(LicensePlateScan checkLicensePlate)

@@ -26,7 +26,15 @@ const usePromoCodeServices = () => {
   };
 
   const updatePromoCode = (input) => {
-    return axios.put(`api/PromoCode/UpdatePromoCode`, input);
+    return axios.put(`api/PromoCode/UpdatePromoCode`, {
+      promoCodeId: input.promoCodeId,
+      promoCode: 'string',
+      discount: input.discount,
+      numberOfUses: 0,
+      fromDate: input.fromDate,
+      toDate: input.toDate,
+      parkingZoneIds: input.parkingZoneIds,
+    });
   };
 
   const deletePromoCode = (promoCodeId) => {

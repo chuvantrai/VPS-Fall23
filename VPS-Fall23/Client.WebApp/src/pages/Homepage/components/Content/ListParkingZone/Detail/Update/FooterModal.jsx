@@ -9,7 +9,6 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
     const { detailInfo, setDetailInfo, viewValues, setViewValues } = useViewParkingZoneContext();
     const [switchChecked, setSwitchChecked] = useState(detailInfo.parkingZone.isFull)
 
-
     const handleCancel = () => {
         setDetailInfo({ isShow: false, parkingZone: null, type: '' })
     };
@@ -18,15 +17,14 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
             parkingZoneId: detailInfo.parkingZone.id,
             isFull: checked,
         };
-        parkingZoneService.changeParkingZoneFullStatus(params).then(res => setViewValues({ ...viewValues, reload: true }));
+        parkingZoneService.changeParkingZoneFullStatus(params);
         setSwitchChecked(!switchChecked)
     }
 
-
     return (<Space>
         <Switch
-            checkedChildren="Full"
-            unCheckedChildren="Available"
+            checkedChildren="Hết chỗ"
+            unCheckedChildren="Còn chỗ"
             onChange={onSwitchChange}
             checked={switchChecked}
         />
@@ -34,7 +32,7 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
             Đóng
         </Button>
         <Button
-            className="bg-[#1677ff] text-white"
+            type="primary"
             onClick={() => {
                 form.validateFields().then((values) => {
                     const formData = new FormData();

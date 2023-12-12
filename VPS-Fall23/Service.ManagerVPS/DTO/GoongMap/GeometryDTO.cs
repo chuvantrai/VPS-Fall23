@@ -1,8 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿
+using System.Text.Json.Serialization;
 
 namespace Service.ManagerVPS.DTO.GoongMap
 {
-    public class Geometry
+    public class GeometryDTO
     {
         [JsonPropertyName("location")]
         public Position Position { get; set; } = null!;

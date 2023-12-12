@@ -5,18 +5,18 @@ namespace Service.ManagerVPS.DTO.GoongMap.Geocode
     public class Response
     {
         [JsonPropertyName("results")]
-        public List<Result> Results { get; set; } = null!;
+        public List<ResultDTO> Results { get; set; } = null!;
         [JsonPropertyName("status")]
         public string Status { get; set; } = null!;
     }
-    public class Result
+    public class ResultDTO
     {
         [JsonPropertyName("address_components")]
         public List<AddressComponent> AddressComponents { get; set; } = null!;
         [JsonPropertyName("formatted_address")]
         public string FormattedAddress { get; set; } = null!;
         [JsonPropertyName("geometry")]
-        public Geometry Geometry { get; set; } = null!;
+        public GeometryDTO Geometry { get; set; } = null!;
         [JsonPropertyName("place_id")]
         public string PlaceId { get; set; } = null!;
         [JsonPropertyName("reference")]

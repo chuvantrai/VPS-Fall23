@@ -8,6 +8,7 @@ import AdminOverview from '@/pages/Dashboard/AdminOverview';
 import ViewListParkingZone from '@/pages/Homepage/components/Content/ListParkingZone';
 import ListUserReport from '../pages/ListUserReport';
 import ListAddressManager from '../pages/ListAddressManager/ListAddressManager.jsx';
+import ChangePassword from "@/pages/ChangePassword/index.js";
 
 export const adminRoutesConfig = {
   header: Header,
@@ -32,7 +33,7 @@ export const adminRoutesConfig = {
           label: 'Thông tin cá nhân',
           component: AccountProfile,
           description: 'Mọi thông tin về tài khoản được hiển thị dưới đây',
-        },
+        }
       ],
     },
     {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
@@ -6,6 +7,7 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
+using Service.ManagerVPS.FilterPermissions;
 
 namespace Service.ManagerVPS.Controllers
 {
@@ -20,7 +22,37 @@ namespace Service.ManagerVPS.Controllers
             _districtRepository = districtRepository;
             _cityRepository = cityRepository;
         }
+        [HttpGet("FindAddressById/{id}")]
+        public async Task<IActionResult> FindAddressById(Guid id)
+        {
+            try
+            {
+                return Ok(await this.vpsRepository
+                    .Entities
+                    .Include(c => c.District)
+                    .ThenInclude(d => d.City)
+                    .FirstOrDefaultAsync(c => c.Id == id)
+                    ?? throw new Exception());
+            }
+            catch (Exception)
+            {
+                try
+                {
 
+                    return Ok(await this._districtRepository
+                        .Entities
+                        .Include(d => d.City)
+                        .FirstOrDefaultAsync(c => c.Id == id)
+                          ?? throw new Exception());
+
+                }
+                catch (Exception)
+                {
+                    return Ok(await this._cityRepository.Find(id));
+                }
+            }
+
+        }
         [HttpGet("GetByDistrict/{districtId}")]
         public async Task<IEnumerable<Commune>> GetCommuneByDistrict(Guid districtId)
         {
@@ -28,8 +60,13 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpGet("GetAddressListParkingZone")]
+        [FilterPermission(Action = ActionFilterEnum.GetAddressListParkingZone)]
         public async Task<IActionResult> GetAddressListParkingZone([FromQuery] GetAddressListParkingZoneRequest request)
         {
+            if (!string.IsNullOrEmpty(request.TextAddress))
+            {
+                request.TextAddress = request.TextAddress.Trim();
+            }
             switch (request.TypeAddress)
             {
                 case AddressTypeEnum.COMMUNE:
@@ -94,6 +131,7 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPut("UpdateIsBlockAddress")]
+        [FilterPermission(Action = ActionFilterEnum.UpdateIsBlockAddress)]
         public async Task<IActionResult> UpdateIsBlockAddress(UpdateIsBlockAddressRequest request)
         {
             return request.TypeAddress switch
@@ -110,6 +148,7 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPost("CreateAddress")]
+        [FilterPermission(Action = ActionFilterEnum.CreateAddress)]
         public async Task<IActionResult> CreateAddress(CreateAddressRequest request)
         {
             var accessToken = Request.Cookies["ACCESS_TOKEN"]!;

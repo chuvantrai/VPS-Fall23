@@ -8,19 +8,13 @@ public class UpdatePromoCodeInput
     public Guid? PromoCodeId { get; set; }
 
     [Required]
-    public string? PromoCode { get; set; }
+    public int Discount { get; set; }
 
     [Required]
-    public int? Discount { get; set; }
+    public DateTime FromDate { get; set; }
 
     [Required]
-    public int? NumberOfUses { get; set; }
-
-    [Required]
-    public DateTime? FromDate { get; set; }
-
-    [Required]
-    public DateTime? ToDate { get; set; }
+    public DateTime ToDate { get; set; }
 
     [Required] 
     public List<Guid> ParkingZoneIds { get; set; }
