@@ -8,6 +8,7 @@ import Cookies from 'js-cookie';
 import { convertAccountDataToCode, keyNameCookies } from '@/helpers/index.js';
 import logo from '@/assets/logo/logo.png';
 import bgImg from '@/assets/bg.svg';
+import {useState} from "react";
 
 const cx = classNames.bind(styles);
 const formItemLayout = {
@@ -34,7 +35,8 @@ function Login() {
   Cookies.set(keyNameCookies.ACCESS_TOKEN, '');
   Cookies.set(keyNameCookies.ACCOUNT_DATA, '');
   const navigate = useNavigate();
-  let rememberPassword = false;
+  // let rememberPassword = false;
+  const [rememberPassword, setRememberPassword] = useState(true);
   const [form] = Form.useForm();
   const axios = useAxios();
   const onFinish = (values) => {
@@ -44,10 +46,6 @@ function Login() {
           if (rememberPassword) {
             Cookies.set(keyNameCookies.ACCOUNT_DATA, convertAccountDataToCode(values.username, values.password));
           }
-          // let accountJwtModel = getAccountJwtModel();
-          // accountJwtModel.Expires = null;
-          // accountJwtModel.ModifiedAt = null;
-          // store.dispatch(setAccountDataJwt({ accountDataJwt: accountJwtModel }));
           window.location.href = '/';
         })
         .catch(err => {
@@ -56,7 +54,7 @@ function Login() {
   };
 
   const onRememberPassword = (e) => {
-    rememberPassword = e.target.checked;
+    setRememberPassword(e.target.checked);
   };
 
   const onClickLogo = () => {
@@ -131,7 +129,7 @@ function Login() {
               </Form.Item>
               <Row className={'mb-[24px]'}>
                 <Col span={12}>
-                  <Checkbox onChange={onRememberPassword}>Nhớ tài khoản</Checkbox>
+                  <Checkbox checked={rememberPassword} onChange={onRememberPassword}>Nhớ tài khoản</Checkbox>
                 </Col>
                 <Col span={4}>
                   <Link

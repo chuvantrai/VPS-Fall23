@@ -216,7 +216,7 @@ function ForgotPassword() {
                         htmlType='submit'
                         block
                     >
-                      Quên mật khẩu
+                      Lưu
                     </Button>
                   </Form.Item>
                 </Col>
