@@ -137,7 +137,7 @@ function ForgotPassword() {
                     rules={[
                       {
                         required: true,
-                        message: 'Hãy code xác nhận!',
+                        message: 'Hãy nhập code xác nhận!',
                       },
                       {
                         min: 6,
