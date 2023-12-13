@@ -131,7 +131,7 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPut("UpdateIsBlockAddress")]
-        [FilterPermission(Action = ActionFilterEnum.UpdateIsBlockAddress)]
+        // [FilterPermission(Action = ActionFilterEnum.UpdateIsBlockAddress)]
         public async Task<IActionResult> UpdateIsBlockAddress(UpdateIsBlockAddressRequest request)
         {
             return request.TypeAddress switch
