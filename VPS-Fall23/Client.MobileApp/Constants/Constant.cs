@@ -22,7 +22,7 @@
         public const string ALERT_ERROR = "Hãy đưa biển số xe vào đúng khu vực quét !!!";
         public const string NETWORK_ERROR = "Không có kết nối mạng. Hãy kết nối mạng!";
         public const string LOGIN_SUCCESS = "Đăng nhập thành công !";
-        public const string INPUT_FAILED = "Chưa nhập biển số xe vào chỗ trống !";
+        public const string INPUT_FAILED = "Chưa nhập biển số xe!";
         public const string LOGIN_FAILED = "Mật khẩu hoặc tài khoản chưa chính xác !";
         public const string CHECKOUT_CONFIRM = "Chưa trả tiền xe";
         public const string OVERTIME_CONFIRM = "Số tiền bạn phải trả là : ";

@@ -139,7 +139,7 @@ public partial class VPS53 : ContentPage
         }
         else
         {
-            await Navigation.PushAsync(new VPS79());
+            await DisplayAlert(Constant.ALERT, Constant.NETWORK_ERROR, Constant.CANCEL);
         }
     }
 
@@ -196,7 +196,7 @@ public partial class VPS53 : ContentPage
         }
         else
         {
-            await Navigation.PushAsync(new VPS79());
+            await DisplayAlert(Constant.ALERT, Constant.NETWORK_ERROR, Constant.CANCEL);
         }
     }
 
@@ -227,6 +227,13 @@ public partial class VPS53 : ContentPage
 
     private void SlotLabel_Tapped(object sender, TappedEventArgs e)
     {
-        Slot.Text = _viewModel.LoadSlot();
+        if (IsConnected())
+        {
+            Slot.Text = _viewModel.LoadSlot();
+        }
+        else
+        {
+            DisplayAlert(Constant.ALERT, Constant.NETWORK_ERROR, Constant.CANCEL);
+        }
     }
 }
