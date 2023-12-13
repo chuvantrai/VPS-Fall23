@@ -129,7 +129,6 @@ const BookingForm = ({ parkingZone }) => {
   };
 
   const getPaymentResultProps = () => {
-    console.log(paymentResult);
     const success = paymentResult?.paymentTransaction.ResponseCode == 0 && paymentResult?.paymentTransaction.TransactionStatus == 0;
     return {
       status: (success) ? 'success' : 'error',
@@ -138,7 +137,13 @@ const BookingForm = ({ parkingZone }) => {
         <p>Số đơn hàng: {paymentResult?.paymentTransaction.TxnRef}</p>
         <p>Mã giao dịch: {paymentResult?.paymentTransaction.TransactionNo}</p>
         <p>Nội dung giao dịch: {paymentResult?.paymentTransaction.OrderInfo}</p>
-        <Button onClick={() => setPaymentResult(defaultPaymentResult)}>OK</Button>
+        <Button onClick={() => {
+          form.resetFields();
+          setPaymentResult(defaultPaymentResult);
+          setBookingTime([null, null]);
+          setPromoCode({ info: null, message: null })
+          disableSubmitBtn(false);
+        }}>OK</Button>
       </>),
     };
   };
