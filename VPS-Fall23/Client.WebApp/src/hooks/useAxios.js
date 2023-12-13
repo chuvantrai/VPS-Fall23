@@ -21,26 +21,35 @@ const useAxios = () => {
      *
      */
     const account = getAccountJwtModel();
-    if (error.request?.status === 401 && account !== null && isAfter(account.Expires, new Date())) {
+    const accountLogin = getAccountDataByCookie();
+    if (error.request?.status === 401 &&
+        account !== null &&
+        isAfter(new Date(), account.Expires) &&
+        accountLogin !== null) {
       // token hết hạn
       const _axios = axios.create({
         baseURL: import.meta.env.VITE_API_GATEWAY,
         xsrfHeaderName: 'RequestVerificationToken',
       });
-      const accountLogin = getAccountDataByCookie();
       _axios
-        .post('/api/Auth/AuthLogin', accountLogin)
-        .then((response) => {
-          Cookies.set('ACCESS_TOKEN', response.data.accessToken);
-          notification.error({
-            message: 'Lỗi',
-            description: `Có lỗi xảy ra vui lòng thử lại`,
-            placement: 'topRight',
+          .post('/api/Auth/AuthLogin', accountLogin)
+          .then((response) => {
+            Cookies.set('ACCESS_TOKEN', response.data.accessToken);
+            notification.warning({
+              message: 'Phiên đăng nhập hết hạn',
+              description: `Token tài khoản vừa được làm mới hãy thử lại!`,
+              placement: 'topRight',
+            });
+          })
+          .catch(() => {
+            app.notification.error({
+              message: 'Lỗi',
+              description: error.response?.data?.message,
+              placement: 'topRight',
+            });
+            navigate('/login');
           });
-        })
-        .catch(() => {
-          navigate('/login');
-        });
+      return;
     } else if (error.request?.status === 401) {
       app.notification.error({
         message: 'Lỗi',
