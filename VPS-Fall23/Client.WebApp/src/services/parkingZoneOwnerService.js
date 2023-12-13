@@ -24,15 +24,13 @@ const useParkingZoneService = () => {
     });
   };
 
-  const getBookedOverview = async ({ parkingZoneName }) => {
-    if (parkingZoneName === null || parkingZoneName === undefined || parkingZoneName === '') {
-      parkingZoneName = 'all';
-    }
-
-    if (parkingZoneName !== null && parkingZoneName !== undefined && parkingZoneName !== '') {
-      console.log(parkingZoneName);
-      return axios.get(`${BASE_URI}/GetBookedOverview?parkingZoneName="${parkingZoneName}"`);
-    }
+  const getBookedOverview = async ({ parkingZoneId }) => {
+    console.log(parkingZoneId);
+    return axios.get(`${BASE_URI}/GetBookedOverview`, {
+      params: {
+        parkingZoneId: parkingZoneId,
+      },
+    });
   };
 
   return {

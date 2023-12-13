@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Controllers.Base;
@@ -119,100 +120,149 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpGet("GetBookedOverview")]
-        public IActionResult GetBookedOverview([FromQuery] string? parkingZoneName)
+        public IActionResult GetBookedOverview([FromQuery] string? parkingZoneId)
         {
             try
             {
                 var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
                 var userToken = JwtTokenExtension.ReadToken(accessToken)!;
 
-                Guid ownerId = new Guid(userToken.UserId);
+                var ownerId = userToken.UserId;
 
                 DateTime now = DateTime.Now;
-                var list = parkingTransactionRepository.GetBookedSlot(parkingZoneName, ownerId, DateTime.Now);
+                var list = parkingTransactionRepository.GetBookedSlot(parkingZoneId, DateTime.Now);
                 using (var context = new FALL23_SWP490_G14Context())
                 {
-                    var doneCheckInOut = 0;
-                    var notCheckIn = 0;
-                    var notCheckOut = 0;
-                    decimal hourCash = 0;
-                    decimal dayCash = 0;
-                    decimal weekCash = 0;
-                    decimal monthCash = 0;
-                    decimal yearCash = 0;
-                    foreach (var item in list)
-                    {
-                        var detail = context.ParkingTransactionDetails.Where(x => x.ParkingTransactionId == item.Id).FirstOrDefault();
+                    var test = context.ParkingTransactions.Where(p => (p.ParkingZone.Id.ToString().Equals(parkingZoneId))).ToList();
 
-                        if (detail.From < DateTime.Now && detail.To < DateTime.Now)
-                        {
-                            doneCheckInOut++;
-                        }
+                    var bookedList = context.ParkingTransactions
+                                        .Include(x => x.ParkingZone)
+                                        .Include(o => o.ParkingZone.Owner)
+                                        .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKED)
+                                            && (string.IsNullOrEmpty(parkingZoneId) || p.ParkingZone.Id.ToString().Equals(parkingZoneId))
+                                            && (p.ParkingZone.OwnerId.ToString().Equals(ownerId)))
+                                        .ToList();
+                    var depositList = context.ParkingTransactions
+                                        .Include(x => x.ParkingZone)
+                                        .Include(o => o.ParkingZone.Owner)
+                                        .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.DEPOSIT)
+                                            && (string.IsNullOrEmpty(parkingZoneId) || p.ParkingZone.Id.ToString().Equals(parkingZoneId))
+                                            && (p.ParkingZone.OwnerId.ToString().Equals(ownerId)))
+                                        .ToList();
+                    var unPayList = context.ParkingTransactions
+                                        .Include(x => x.ParkingZone)
+                                        .Include(o => o.ParkingZone.Owner)
+                                        .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.UNPAY)
+                                            && (string.IsNullOrEmpty(parkingZoneId) || p.ParkingZone.Id.ToString().Equals(parkingZoneId))
+                                            && (p.ParkingZone.OwnerId.ToString().Equals(ownerId)))
+                                        .ToList();
+                    var userCancelList = context.ParkingTransactions
+                                        .Include(x => x.ParkingZone)
+                                        .Include(o => o.ParkingZone.Owner)
+                                        .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.USERCANCEL)
+                                            && (string.IsNullOrEmpty(parkingZoneId) || p.ParkingZone.Id.ToString().Equals(parkingZoneId))
+                                            && (p.ParkingZone.OwnerId.ToString().Equals(ownerId)))
+                                        .ToList();
+                    var parkingCancelList = context.ParkingTransactions
+                                        .Include(x => x.ParkingZone)
+                                        .Include(o => o.ParkingZone.Owner)
+                                        .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.PARKINGCANCEL)
+                                            && (string.IsNullOrEmpty(parkingZoneId) || p.ParkingZone.Id.ToString().Equals(parkingZoneId))
+                                            && (p.ParkingZone.OwnerId.ToString().Equals(ownerId)))
+                                        .ToList();
+                    var payedList = context.ParkingTransactions
+                                        .Include(x => x.ParkingZone)
+                                        .Include(o => o.ParkingZone.Owner)
+                                        .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.PAYED)
+                                            && (string.IsNullOrEmpty(parkingZoneId) || p.ParkingZone.Id.ToString().Equals(parkingZoneId))
+                                            && (p.ParkingZone.OwnerId.ToString().Equals(ownerId)))
+                                        .ToList();
+                    var payedFailedList = context.ParkingTransactions
+                                        .Include(x => x.ParkingZone)
+                                        .Include(o => o.ParkingZone.Owner)
+                                        .Where(p => (p.StatusId == (int)ParkingTransactionStatusEnum.BOOKING_PAID_FAILED)
+                                            && (string.IsNullOrEmpty(parkingZoneId) || p.ParkingZone.Id.ToString().Equals(parkingZoneId))
+                                            && (p.ParkingZone.OwnerId.ToString().Equals(ownerId)))
+                                        .ToList();
 
-                        if (detail.From > DateTime.Now || detail.To == null)
-                        {
-                            notCheckIn++;
-                        }
-
-                        if (detail.From <= DateTime.Now &&
-                            (detail.To > DateTime.Now || detail.To == null))
-                        {
-                            notCheckOut++;
-                        }
-
-                        TimeSpan timeDifference = (item.CheckoutAt - item.CheckinAt).Value;
-
-                        DayOfWeek
+                    DayOfWeek
                             firstDayOfWeek =
                                 DayOfWeek
                                     .Monday; // You can adjust this to your preferred first day of the week
 
-                        DateTime startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)firstDayOfWeek);
-                        DateTime endOfWeek = startOfWeek.AddDays(6);
+                    DateTime startOfWeek = now.AddDays(-(int)now.DayOfWeek + (int)firstDayOfWeek);
+                    DateTime endOfWeek = startOfWeek.AddDays(6);
 
+                    var booked = bookedList.Count();
+                    var deposit = depositList.Count();
+                    var unPay = unPayList.Count(); 
+                    var payed = payedList.Count();
+                    var userCancel = userCancelList.Count();
+                    var parkingCancel = parkingCancelList.Count();
+                    var payedFailed = payedFailedList.Count();
+                    var total = booked + deposit + unPay + payed + userCancel + payedFailed + parkingCancel;
 
-                        if (item.CreatedAt.Year == now.Year)
-                        {
-                            yearCash += item.ParkingZone.PricePerHour *
-                                        (decimal)timeDifference.TotalHours;
+                    var bookedWeek = bookedList.Where(x => x.CreatedAt >= startOfWeek && x.CreatedAt <= endOfWeek).Count();
+                    var depositWeek = depositList.Where(x => x.CreatedAt >= startOfWeek && x.CreatedAt <= endOfWeek).Count();
+                    var unPayWeek = unPayList.Where(x => x.CreatedAt >= startOfWeek && x.CreatedAt <= endOfWeek).Count();
+                    var payedWeek = payedList.Where(x => x.CreatedAt >= startOfWeek && x.CreatedAt <= endOfWeek).Count();
+                    var userCancelWeek = userCancelList.Where(x => x.CreatedAt >= startOfWeek && x.CreatedAt <= endOfWeek).Count();
+                    var parkingCancelWeek = parkingCancelList.Where(x => x.CreatedAt >= startOfWeek && x.CreatedAt <= endOfWeek).Count();
+                    var payedFailedWeek = payedFailedList.Where(x => x.CreatedAt >= startOfWeek && x.CreatedAt <= endOfWeek).Count();
+                    var totalWeek = bookedWeek + depositWeek + unPayWeek + payedWeek + userCancelWeek + payedFailedWeek + parkingCancelWeek;
 
-                            if (item.CreatedAt.Month == now.Month)
-                            {
-                                monthCash += item.ParkingZone.PricePerHour *
-                                             (decimal)timeDifference.TotalHours;
+                    var bookedMonth = bookedList.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).Count();
+                    var depositMonth = depositList.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).Count();
+                    var unPayMonth = unPayList.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).Count();
+                    var payedMonth = payedList.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).Count();
+                    var userCancelMonth = userCancelList.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).Count();
+                    var parkingCancelMonth = parkingCancelList.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).Count();
+                    var payedFailedMonth = payedFailedList.Where(x => x.CreatedAt.Month == now.Month && x.CreatedAt.Year == now.Year).Count();
+                    var totalMonth = bookedMonth + depositMonth + unPayMonth + payedMonth + userCancelMonth + payedFailedMonth + parkingCancelMonth;
 
-                                if (item.CreatedAt >= startOfWeek && item.CreatedAt <= endOfWeek)
-                                {
-                                    weekCash += item.ParkingZone.PricePerHour *
-                                                (decimal)timeDifference.TotalHours;
-
-                                    if (item.CreatedAt.Day == now.Day)
-                                    {
-                                        dayCash += item.ParkingZone.PricePerHour *
-                                                   (decimal)timeDifference.TotalHours;
-
-                                        if (item.CreatedAt.Hour == now.Hour)
-                                        {
-                                            hourCash += item.ParkingZone.PricePerHour *
-                                                        (decimal)timeDifference.TotalHours;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    var bookedYear = bookedList.Where(x => x.CreatedAt.Year == now.Year).Count();
+                    var depositYear = depositList.Where(x => x.CreatedAt.Year == now.Year).Count();
+                    var unPayYear = unPayList.Where(x => x.CreatedAt.Year == now.Year).Count();
+                    var payedYear = payedList.Where(x => x.CreatedAt.Year == now.Year).Count();
+                    var userCancelYear = userCancelList.Where(x => x.CreatedAt.Year == now.Year).Count();
+                    var parkingCancelYear = parkingCancelList.Where(x => x.CreatedAt.Year == now.Year).Count();
+                    var payedFailedYear = payedFailedList.Where(x => x.CreatedAt.Year == now.Year).Count();
+                    var totalYear = bookedYear + depositYear + unPayYear + payedYear + userCancelYear + payedFailedYear + parkingCancelYear;
 
                     var metadata = new
                     {
-                        doneCheckInOut = doneCheckInOut,
-                        notCheckIn = notCheckIn,
-                        notCheckOut = notCheckOut,
-                        total = doneCheckInOut + notCheckOut + notCheckIn,
-                        hourCash = hourCash,
-                        dayCash = dayCash,
-                        weekCash = weekCash,
-                        monthCash = monthCash,
-                        yearCash = yearCash,
+                        booked = booked,
+                        deposit = deposit,
+                        unPay = unPay,
+                        payed = payed,
+                        userCancel = userCancel,
+                        parkingCancel = parkingCancel,
+                        payedFailed = payedFailed,
+                        total = total,
+                        bookedWeek = bookedWeek,
+                        depositWeek = depositWeek,
+                        unPayWeek = unPayWeek,
+                        payedWeek = payedWeek,
+                        userCanceWeekl = userCancelWeek,
+                        parkingCancelWeek = parkingCancelWeek,
+                        payedFailedWeek = payedFailedWeek,
+                        totalWeek = totalWeek,
+                        bookedMonth = bookedMonth,
+                        depositMonth = depositMonth,
+                        unPayMonth = unPayMonth,
+                        payedMonth = payedMonth,
+                        userCancelMonth = userCancelMonth,
+                        parkingCancelMonth = parkingCancelMonth,
+                        payedFailedMonth = payedFailedMonth,
+                        totalMonth = totalMonth,
+                        bookedYear = bookedYear,
+                        depositYear = depositYear,
+                        unPayYear = unPayYear,
+                        payedYear = payedYear,
+                        userCancelYear = userCancelYear,
+                        parkingCancelYear = parkingCancelYear,
+                        payedFailedYear = payedFailedYear,
+                        totalYear = totalYear,
                         //Data = list
                     };
 
