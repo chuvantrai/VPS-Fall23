@@ -19,6 +19,7 @@ public class PromoCodeInfoRepository : VpsRepository<PromoCodeInformation>,
     {
         var lstPromoCodeInfo = entities
             .Include(x => x.PromoCodes)
+            .ThenInclude(x => x.ParkingZone)
             .Where(x => x.OwnerId.Equals(ownerId));
         return PagedList<PromoCodeInformation>.ToPagedList(lstPromoCodeInfo, parameters.PageNumber,
             parameters.PageSize);
