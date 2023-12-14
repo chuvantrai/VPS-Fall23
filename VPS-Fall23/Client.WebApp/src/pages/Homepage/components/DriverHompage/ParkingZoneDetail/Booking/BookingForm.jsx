@@ -1,4 +1,4 @@
-import { Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag, Typography } from 'antd';
+import { Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag, Typography, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import useParkingTransactionService from '@/services/parkingTransactionSerivce';
@@ -31,6 +31,10 @@ const BookingForm = ({ parkingZone }) => {
   const parkingZoneAbsentService = useParkingZoneAbsentServices();
   const promoService = usePromoService();
   const searchPromo = (promoCode) => {
+    if (!promoCode) {
+      notification.error({ message: "Vui lòng nhập mã giảm giá", description: "Vui lòng nhập mã giảm giá" });
+      return;
+    }
     promoService
       .getByCode(promoCode, parkingZone.id)
       .then(res => {
