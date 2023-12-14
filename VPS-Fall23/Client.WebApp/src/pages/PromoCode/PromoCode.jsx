@@ -40,6 +40,23 @@ function PromoCode() {
       key: 'toDate',
     },
     {
+      title: 'Danh sách bãi đỗ xe được áp dụng',
+      dataIndex: 'parkingZones',
+      key: 'parkingZones',
+      render: (_, record) => {
+        let arr = record.parkingZones;
+        return arr?.map((item, index) => {
+          if (arr.length === 1) {
+            return item.name;
+          } else if (arr.length > 1 && arr.length <= 3) {
+            return index < arr.length - 1 ? item.name + ', ' : item.name;
+          } else if (arr.length > 3) {
+            return index < 2 ? item.name + ', ' : index === 2 ? item.name + ', ...' : '';
+          }
+        })
+      }
+    },
+    {
       title: '',
       key: 'action',
       render: (_, record) => (
@@ -82,6 +99,7 @@ function PromoCode() {
         toDate: moment(val.toDate).format('DD-MM-yyyy'),
         discount: val.discount,
         promoCodes: val.promoCodes,
+        parkingZones: val.parkingZones
       }));
       setData(obj);
       setTotalItems(res.data.totalCount);
@@ -137,7 +155,11 @@ function PromoCode() {
       getData();
       setConfirmDetailLoading(false);
       setOpenDetailCode(false);
-    });
+    })
+      .catch(err => {
+        setConfirmDetailLoading(false);
+        setOpenDetailCode(false);
+      });
   };
 
   const handleDeletePromoCode = (promoCodeId) => {
@@ -171,11 +193,13 @@ function PromoCode() {
           expandedRowRender: (record) => (
             <>
               <p className="font-medium">Danh sách Mã giảm giá:</p>
-              <ul>
-                {record.promoCodes?.map((item) => (
-                  <li>{item.code}</li>
-                ))}
-              </ul>
+              {record.promoCodes?.map((item, index) => {
+                if (record.promoCodes?.length === index + 1) {
+                  return `${item.code}`
+                } else {
+                  return `${item.code} - `
+                }
+              })}
             </>
           ),
         }}
