@@ -16,10 +16,13 @@ namespace Service.ManagerVPS.Controllers;
 public class ReportController : VpsController<Report>
 {
     private readonly IGeneralVPS _generalVps;
-
-    public ReportController(IReportRepository reportRepository, IGeneralVPS generalVps) : base(reportRepository)
+    private readonly IUserRepository _userRepository;
+    
+    public ReportController(IReportRepository reportRepository, IGeneralVPS generalVps, IUserRepository userRepository) 
+        : base(reportRepository)
     {
         _generalVps = generalVps;
+        _userRepository = userRepository;
     }
 
     [HttpPost]
@@ -109,9 +112,13 @@ public class ReportController : VpsController<Report>
         }
 
         var templateEmail = _generalVps.CreateTemplateEmail(keyValuesTemplate);
-        var toEmail = new[] { "traicvhe153014@fpt.edu.vn", "0362351671trai@gmail.com" };
-        var titleEmail = $"Thông báo người dùng gửi báo cáo về {report.TypeNavigation.Description}";
-        await _generalVps.SendListEmailAsync(toEmail, titleEmail, templateEmail);
+        var listAccountAdmin = await _userRepository.GetAccountByRoleId(UserRoleEnum.ADMIN);
+        if (listAccountAdmin != null)
+        {
+            var toEmail = listAccountAdmin.Select(x=>x.Email);
+            var titleEmail = $"Thông báo người dùng gửi báo cáo về {report.TypeNavigation.Description}";
+            await _generalVps.SendListEmailAsync(toEmail, titleEmail, templateEmail);
+        }
 
         return Ok();
     }

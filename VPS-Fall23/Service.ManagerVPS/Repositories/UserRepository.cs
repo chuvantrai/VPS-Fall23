@@ -169,4 +169,11 @@ public class UserRepository : VpsRepository<Account>, IUserRepository
         var accounts = entities.Where(a => a.TypeId == 2).ToList();
         return accounts;
     }
+
+    public async Task<List<Account>?> GetAccountByRoleId(UserRoleEnum userRoleEnum)
+    {
+        var listAccount = await context.Accounts
+            .Where(x => x.TypeId == (int)userRoleEnum && !x.IsBlock && x.IsVerified == true).ToListAsync();
+        return listAccount;
+    }
 }
