@@ -7,17 +7,9 @@ const useAuthService = () => {
   const axios = useAxios();
 
   const register = (values, callBack) => {
-    axios
-      .post('/api/Auth/Register', values)
-      .then((res) => {
-        if (res.status === 200) callBack(values);
-      })
-      .catch((err) => {
-        notification.error({
-          message: 'Có lỗi xảy ra',
-          description: err,
-        });
-      });
+    axios.post('/api/Auth/Register', values).then((res) => {
+      if (res.status === 200) callBack(values);
+    });
   };
 
   const verifyAccount = (values, callBack) => {

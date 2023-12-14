@@ -132,8 +132,8 @@ function BookedOverview({ parkingZoneId }) {
     <Fragment>
       {(bookedData !== null || bookedData !== undefined) && (
         <div className="block">
-          <div >
-            <div className="flex">
+          <div className=''>
+            <div className="flex justify-center">
               <Card title="Đã Đặt Lịch" className="ml-5" bordered={true} style={{ width: 200 }}>
                 <div className="flex justify-between items-center">
                   {bookedData.booked}
@@ -166,7 +166,7 @@ function BookedOverview({ parkingZoneId }) {
               </Card>
 
             </div>
-            <div className="flex">
+            <div className="flex justify-center">
               <Card title="Đã Trả Tiền" className="ml-5" bordered={true} style={{ width: 200 }}>
                 <div className="flex justify-between items-center">
                   {bookedData.payed}
@@ -201,7 +201,7 @@ function BookedOverview({ parkingZoneId }) {
 
           </div>
 
-          <div className="mt-5">
+          <div className="mt-5 flex justify-center">
             <Line data={chartData} options={options} />
           </div>
         </div>

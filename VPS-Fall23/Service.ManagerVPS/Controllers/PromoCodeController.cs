@@ -25,7 +25,7 @@ public class PromoCodeController : VpsController<PromoCode>
 
     public PromoCodeController(IPromoCodeRepository promoCodeRepository,
         IPromoCodeInfoRepository promoCodeInfoRepository,
-        IParkingTransactionRepository transactionRepository, 
+        IParkingTransactionRepository transactionRepository,
         IGeneralVPS generalVps,
         IOptions<TwilioSettings> twilio)
         : base(promoCodeRepository)
@@ -46,6 +46,25 @@ public class PromoCodeController : VpsController<PromoCode>
 
         var promoCodePagedLst =
             _promoCodeInfoRepository.GetListPromoCodeByOwnerId((Guid)ownerId, parameters);
+        var result = promoCodePagedLst
+            .Select(x => new
+            {
+                x.Id,
+                x.FromDate,
+                x.ToDate,
+                x.Discount,
+                PromoCodes = x.PromoCodes.Select(y => new
+                {
+                    y.Id,
+                    y.Code
+                }),
+                ParkingZones = x.PromoCodes.Select(y => new
+                {
+                    y.ParkingZoneId,
+                    y.ParkingZone.Name
+                }).DistinctBy(arg => arg.ParkingZoneId).ToList()
+            })
+            .ToList();
 
         var metadata = new
         {
@@ -55,7 +74,7 @@ public class PromoCodeController : VpsController<PromoCode>
             promoCodePagedLst.TotalPages,
             promoCodePagedLst.HasNext,
             promoCodePagedLst.HasPrev,
-            Data = promoCodePagedLst
+            Data = result
         };
 
         return Ok(metadata);
@@ -119,7 +138,8 @@ public class PromoCodeController : VpsController<PromoCode>
         if (sendPromoCodeNow)
         {
             // send code for user
-            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x=>x.Id),input.ParkingZoneIds);
+            await SendNotificationPromoCodeToUser(promoCodeLst.Select(x => x.Id),
+                input.ParkingZoneIds);
         }
 
         return Ok(ResponseNotification.ADD_SUCCESS);
@@ -164,12 +184,12 @@ public class PromoCodeController : VpsController<PromoCode>
                 .Where(x => x.Id == input.PromoCodeId).FirstOrDefault();
             if (list == null)
             {
-                return BadRequest("Promo code not found");
+                throw new ServerException("Không tìm thấy mã giảm giá nào!");
             }
 
             if (info.IsSent)
             {
-                return BadRequest("Can't Update");
+                throw new ServerException("Mã đã gửi không thể cập nhật!");
             }
 
             context.PromoCodes.RemoveRange(list);
@@ -182,7 +202,7 @@ public class PromoCodeController : VpsController<PromoCode>
             }
             else
             {
-                return BadRequest("Promo Code Info not exist");
+                throw new ServerException("Thông tin mã giảm giá không tồn tại!");
             }
 
             var transactionLst = _transactionRepository.GetParkingTransactions();
@@ -276,7 +296,8 @@ public class PromoCodeController : VpsController<PromoCode>
         return Ok();
     }
 
-    private async Task SendNotificationPromoCodeToUser(IEnumerable<Guid> listPromoCodeId,List<Guid> parkingZoneIds)
+    private async Task SendNotificationPromoCodeToUser(IEnumerable<Guid> listPromoCodeId,
+        List<Guid> parkingZoneIds)
     {
         var listPromoCode = await ((IPromoCodeRepository)vpsRepository)
             .GetListPromoCodeByListId(listPromoCodeId);
@@ -291,7 +312,8 @@ public class PromoCodeController : VpsController<PromoCode>
         promoCodes = promoCodes.OrderByDescending(x => x.CreatedAt).ToList();
         foreach (var promoCode in promoCodes)
         {
-            var titleEmail = $"[VPS] khuyến mãi từ bãi đỗ xe {promoCode.ParkingZone.Name} dành riêng cho bạn";
+            var titleEmail =
+                $"[VPS] khuyến mãi từ bãi đỗ xe {promoCode.ParkingZone.Name} dành riêng cho bạn";
             var bodyEmail =
                 $"Bạn đã nhận được mã khuyến mãi <strong>{promoCode.Code}</strong> " +
                 $"giảm {promoCode.PromoCodeInformation.Discount}% " +
@@ -299,7 +321,7 @@ public class PromoCodeController : VpsController<PromoCode>
                 $"<p> khi đặt chỗ tại bãi đỗ xe {promoCode.ParkingZone.Name} </p>" +
                 $"<p> Địa chỉ: {promoCode.ParkingZone.DetailAddress}</p>";
             await _generalVps.SendEmailAsync(promoCode.UserEmail, titleEmail, bodyEmail);
-            
+
             // #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
             // // code này đang gửi đến account order gần nhất 
             // if (promoCode.Id.Equals(promoCodes.FirstOrDefault()!.Id) &&
