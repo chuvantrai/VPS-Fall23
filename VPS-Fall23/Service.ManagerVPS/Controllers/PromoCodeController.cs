@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
+using Service.ManagerVPS.Constants.KeyValue;
 using Service.ManagerVPS.Constants.Notifications;
 using Service.ManagerVPS.Controllers.Base;
 using Service.ManagerVPS.DTO.Exceptions;
@@ -13,6 +15,7 @@ using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace Service.ManagerVPS.Controllers;
 
@@ -318,30 +321,40 @@ public class PromoCodeController : VpsController<PromoCode>
                 $"Bạn đã nhận được mã khuyến mãi <strong>{promoCode.Code}</strong> " +
                 $"giảm {promoCode.PromoCodeInformation.Discount}% " +
                 $"áp dụng cho email {promoCode.UserEmail} " +
-                $"<p> khi đặt chỗ tại bãi đỗ xe {promoCode.ParkingZone.Name} </p>" +
+                $"<p> Thời gian áp dụng mã giảm giá từ " +
+                $" {promoCode.PromoCodeInformation.FromDate:dd/MM/yyyy} đến " +
+                $" {promoCode.PromoCodeInformation.ToDate:dd/MM/yyyy} </p>" +
+                $"<p> Khi đặt chỗ tại bãi đỗ xe {promoCode.ParkingZone.Name} </p>" +
                 $"<p> Địa chỉ: {promoCode.ParkingZone.DetailAddress}</p>";
             await _generalVps.SendEmailAsync(promoCode.UserEmail, titleEmail, bodyEmail);
-
+            
             // #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
-            // // code này đang gửi đến account order gần nhất 
-            // if (promoCode.Id.Equals(promoCodes.FirstOrDefault()!.Id) &&
-            //     !string.IsNullOrEmpty(promoCode.UserPhone) && 
-            //     promoCode.UserPhone.StartsWith("0") && 
-            //     promoCode.UserPhone.Length == 10)
+            // try
             // {
-            //     var bodySms = titleEmail + " " + bodyEmail.Replace("<p>", "")
-            //         .Replace("</p>", "")
-            //         .Replace("<p>", "")
-            //         .Replace("<strong>", "")
-            //         .Replace("</strong>", "");
-            //     
-            //     promoCode.UserPhone = "+84" + promoCode.UserPhone[1..];
-            //     TwilioClient.Init(_twilio.AccountSid, _twilio.AuthToken);
-            //     var result = await MessageResource.CreateAsync(
-            //         body: bodySms,
-            //         from: new Twilio.Types.PhoneNumber(_twilio.TwilioPhoneNumber),
-            //         to: promoCode.UserPhone
-            //     );
+            //     // code này đang gửi đến account order gần nhất 
+            //     if (promoCode.Id.Equals(promoCodes.FirstOrDefault()!.Id) &&
+            //         !string.IsNullOrEmpty(promoCode.UserPhone) &&
+            //         promoCode.UserPhone.StartsWith("0") &&
+            //         promoCode.UserPhone.Length == 10)
+            //     {
+            //         var bodySms = titleEmail + " " + bodyEmail.Replace("<p>", "")
+            //             .Replace("</p>", "")
+            //             .Replace("<p>", "")
+            //             .Replace("<strong>", "")
+            //             .Replace("</strong>", "");
+            //
+            //         promoCode.UserPhone = "+84" + promoCode.UserPhone[1..];
+            //         TwilioClient.Init(_twilio.AccountSid, _twilio.AuthToken);
+            //         var result = await MessageResource.CreateAsync(
+            //             body: bodySms,
+            //             from: new PhoneNumber(_twilio.TwilioPhoneNumber),
+            //             to: promoCode.UserPhone
+            //         );
+            //     }
+            // }
+            // catch
+            // {
+            //     // ignored
             // }
             // #endregion
         }
