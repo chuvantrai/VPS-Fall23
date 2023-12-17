@@ -30,7 +30,7 @@ const DriverCenterHeader = () => {
 
     };
     useEffect(() => {
-        if (!selectedAddress || !inputDebouneValue) return;
+        if ((!selectedAddress || selectedAddress.length === 0) && !inputDebouneValue) return;
         onSearch(inputDebouneValue);
     }, [JSON.stringify(selectedAddress)])
 
@@ -43,6 +43,7 @@ const DriverCenterHeader = () => {
         }
     }, [JSON.stringify(placeAutoCompleteData)])
     useEffect(() => {
+        if (!selectedPlace?.placeId) return;
         onPlaceSelect(selectedPlace?.placeId)
     }, [JSON.stringify(selectedPlace)])
     const onCascaderChange = useCallback((value, selectedOptions) => {
