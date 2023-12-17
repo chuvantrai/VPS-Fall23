@@ -37,7 +37,7 @@ function Header() {
           {
               account?.RoleId === userRoleEnum.OWNER ?
                   <div className={'flex justify-center fixed text-[#646464] w-[27px] h-[27px] items-center ' +
-                      'shadow-[1px_1px_5px_rgba(0,0,0,0.3)] pt-[2px] rounded-[50%] right-[22px] bottom-[30px]'}>
+                      'shadow-[1px_1px_5px_rgba(0,0,0,0.3)] pt-[2px] rounded-[50%] right-[22px] bottom-[30px] z-[5]'}>
                       <ModalReport contentBtn={contentBtnReport}/>
                   </div>
                   : <></>
