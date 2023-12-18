@@ -137,8 +137,12 @@ public class ReportController : VpsController<Report>
                 x.SubId,
                 x.Id,
                 TypeName = x.TypeNavigation.Description,
-                x.Email,
-                x.Phone,
+                Email = string.IsNullOrEmpty(x.Email) && x.CreatedByNavigation != null
+                    ? x.CreatedByNavigation.Email
+                    : x.Email,
+                Phone = string.IsNullOrEmpty(x.Phone) && x.CreatedByNavigation != null
+                    ? x.CreatedByNavigation.PhoneNumber
+                    : x.Phone,
                 CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
                 x.Content,
                 Status = x.StatusNavigation.Description,
