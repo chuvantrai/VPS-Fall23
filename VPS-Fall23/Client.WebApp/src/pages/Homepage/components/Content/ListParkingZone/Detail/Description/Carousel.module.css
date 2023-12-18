@@ -1,0 +1,12 @@
+.Description-Carousel{
+    min-height: 350px;
+}
+
+.Description-Carousel img{
+    height: 320px !important;
+}
+
+.Description-Carousel .slick-track .slick-slide{
+    display: flex;
+    justify-content: center;
+}
