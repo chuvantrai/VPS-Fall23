@@ -528,8 +528,8 @@ namespace Service.ManagerVPS.Repositories
                 .Replace("@{parkingZoneName}", parkingTransaction.ParkingZone.Name)
                 .Replace("@{transactionCode}", paymentTransaction.TxnRef)
                 .Replace("@{Vnp_Amount}", paymentTransaction.Amount.ToString())
-                .Replace("@{from}", parkingTransaction.CheckinAt.ToString("hh:mm:ss dd/MM/yyyy"))
-                .Replace("@{to}", parkingTransaction.CheckoutAt?.ToString("hh:mm:ss dd/MM/yyyy"))
+                .Replace("@{from}", parkingTransaction.CheckinAt.ToString("HH:mm:ss dd/MM/yyyy"))
+                .Replace("@{to}", parkingTransaction.CheckoutAt?.ToString("HH:mm:ss dd/MM/yyyy"))
                 .Replace("@{Vnp_OrderInfo}", paymentTransaction.OrderInfo);
             string subject = "Đăng ký gửi xe thành công";
             BrokerApiClient brokerApiClient =

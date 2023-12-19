@@ -10,9 +10,4 @@ public class QuartzServices
     {
         Scheduler = schedulerFactory.GetScheduler().Result;
     }
-
-    public async Task Start()
-    {
-        await Scheduler.Start();
-    }
 }
