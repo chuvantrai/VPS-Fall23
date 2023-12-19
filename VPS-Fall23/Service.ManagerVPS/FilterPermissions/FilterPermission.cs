@@ -25,7 +25,7 @@ public class FilterPermission : ActionFilterAttribute
                 if (userToken != null && DateTime.Now < userToken.Expires)
                 {
                     // get account in db
-                    using var context = new FALL23_SWP490_G14Context();
+                    using var context = actionContext.HttpContext.RequestServices.GetService<FALL23_SWP490_G14Context>();
                     var account =
                         context.Accounts.FirstOrDefault(x => x.Id.ToString().Equals(userToken.UserId.ToUpper()));
                     if (account != null &&
