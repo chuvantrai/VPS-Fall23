@@ -70,7 +70,7 @@ const BookingForm = ({ parkingZone }) => {
         let endTime = Number(parkingZone?.workTo.split(':')[0]) ?? 23
         var hour = dayjs().hour()
         if (startTime <= hour && (date && date <= dayjs().endOf('day')) && partial == 'start') startTime = hour
-        return [...range(0, startTime), ...range(endTime, 24)]
+        return [...range(0, startTime), dayjs().hour(), ...range(endTime, 24)]
       },
     }
   }

@@ -146,7 +146,7 @@ function ViewListParkingZoneOwner() {
             fullName: val.fullName,
             email: val.email,
             phone: val.phone,
-            dob: moment(val.dob).format('DD/MM/YYYY'),
+            dob: (val.dob == null) ? "Chưa cập nhật" : moment(val.dob).format('DD/MM/YYYY'),
             created: moment(val.createdAt).format('DD/MM/YYYY'),
             isBlock: val.isBlock
           }));
@@ -169,11 +169,12 @@ function ViewListParkingZoneOwner() {
             fullName: val.fullName,
             email: val.email,
             phone: val.phone,
-            dob: moment(val.dob).format('DD/MM/YYYY'),
+            dob: (val.dob == null) ? "Chưa cập nhật" : moment(val.dob).format('DD/MM/YYYY'),
             created: moment(val.createdAt).format('DD/MM/YYYY HH:mm:ss'),
             modified: moment(val.modifiedAt).format('DD/MM/YYYY HH:mm:ss'),
             isBlock: val.isBlock
           }));
+          console.log(obj);
           setData(obj);
           setTotalItems(res?.data.totalCount);
         })
@@ -190,10 +191,11 @@ function ViewListParkingZoneOwner() {
             fullName: val.fullName,
             email: val.email,
             phone: val.phone,
-            dob: moment(val.dob).format('DD/MM/YYYY'),
+            dob: (val.dob == null) ? "Chưa cập nhật" : moment(val.dob).format('DD/MM/YYYY'),
             created: moment(val.createdAt).format('DD/MM/YYYY'),
             isBlock: val.isBlock
           }));
+          console.log(obj);
           setData(obj);
           setTotalItems(res?.data.totalCount);
         })

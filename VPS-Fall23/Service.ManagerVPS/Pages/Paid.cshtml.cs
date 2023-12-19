@@ -124,8 +124,7 @@ namespace Service.ManagerVPS.Pages
                 catch (System.Exception)
                 {
                 }
-                var brokerApiClient = new BrokerApiClient(configuration.GetValue<string>("brokerApiBaseUrl"));
-                await brokerApiClient.CreateCancelBookingJob(parkingTransaction.Id, parkingTransaction.CheckinAt.AddMinutes(30));
+               
             }
             await paymentHub.Clients.Client(paymentTransaction.ConnectionId).SendAsync("ReceivePaidStatus", JsonConvert.SerializeObject(paymentTransaction, Formatting.Indented, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
 
