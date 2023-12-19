@@ -56,8 +56,7 @@ namespace Service.ManagerVPS.Controllers
 
                 var parkingZone = this.parkingZoneRepository.Find(parkingTransaction.ParkingZoneId);
                 parkingTransaction.StatusId = (int)ParkingTransactionStatusEnum.PARKINGCANCEL;
-                await vpsRepository.Update(parkingTransaction);
-                await vpsRepository.SaveChange();
+
                 if (string.IsNullOrEmpty( parkingTransaction.Email)) return;
                 var fileName = $"cancel-booking-info.html";
                 fileName = Path.Combine(Directory.GetCurrentDirectory(), "Constants", "FileHtml",
@@ -73,7 +72,8 @@ namespace Service.ManagerVPS.Controllers
                     new BrokerApiClient(this._configuration.GetValue<string>("brokerApiBaseUrl"));
                 await brokerApiClient.SendMail(new string[1] { parkingTransaction.Email }, subject,
                     templateString);
-              
+                await vpsRepository.Update(parkingTransaction);
+                await vpsRepository.SaveChange();
             }
             catch (Exception)
             {
