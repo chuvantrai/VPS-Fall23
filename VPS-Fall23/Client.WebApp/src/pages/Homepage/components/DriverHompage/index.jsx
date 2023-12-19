@@ -9,7 +9,7 @@ async function initMap(focusPosition) {
     container: 'map', // container id
     style: 'https://tiles.goong.io/assets/goong_map_web.json', // stylesheet location
     center: focusPosition, // starting position [lng, lat]
-    zoom: 18
+    zoom: 13
   });
 }
 const defaultSelectedLocation = {
