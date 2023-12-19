@@ -1,8 +1,16 @@
-﻿namespace Service.WorkerVPS.Services.RepeatingService;
+﻿using Service.WorkerVPS.ExternalClients;
+
+namespace Service.WorkerVPS.Services.RepeatingService;
 
 public class SendPromoCode : BackgroundService
 {
-    private readonly PeriodicTimer _timer = new(TimeSpan.FromMilliseconds(1000)); // 1s
+    private readonly PeriodicTimer _timer = new(TimeSpan.FromMilliseconds(1000 * 60)); // 1phut
+    private readonly VpsClient _vpsClient;
+
+    public SendPromoCode(IConfiguration configuration)
+    {
+        _vpsClient = new(configuration.GetValue<string>("VpsClientBaseUrl"));
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -12,12 +20,11 @@ public class SendPromoCode : BackgroundService
         }
     }
 
-    private static async Task SendPromoCodeForUser()
+    private async Task SendPromoCodeForUser()
     {
-        if (DateTime.Now.Minute == 10 && DateTime.Now.Millisecond < 5)
+        if (DateTime.Now.Minute == 10) // phut thu 10 se chay
         {
-            
-            // await Task.Delay(3600000); // 1h
+            await _vpsClient.SendNotificationPromoCodeToUser();
         }
     }
 }
