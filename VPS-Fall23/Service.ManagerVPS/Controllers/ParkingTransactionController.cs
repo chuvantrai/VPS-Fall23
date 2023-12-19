@@ -1,4 +1,4 @@
-using Google.Cloud.Vision.V1;
+﻿using Google.Cloud.Vision.V1;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Controllers.Base;
@@ -13,6 +13,7 @@ using Service.ManagerVPS.Repositories.Interfaces;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.AppSetting;
 using Service.ManagerVPS.DTO.Output;
+using Microsoft.Extensions.Configuration;
 
 namespace Service.ManagerVPS.Controllers
 {
@@ -44,6 +45,37 @@ namespace Service.ManagerVPS.Controllers
             _configuration = configuration;
             this.promoCodeRepository = promoCodeRepository;
         }
+        [HttpPost("{id}")]
+        public async Task Cancel(Guid id)
+        {
+            try
+            {
+                var parkingTransaction = await vpsRepository.Find(id);
+                parkingTransaction.StatusId = (int)ParkingTransactionStatusEnum.PARKINGCANCEL;
+                await vpsRepository.Update(parkingTransaction);
+                await vpsRepository.SaveChange();
+                var parkingZone = this.parkingZoneRepository.Find(parkingTransaction.ParkingZoneId);
+                var fileName = $"cancel-booking-info.html";
+                fileName = Path.Combine(Directory.GetCurrentDirectory(), "Constants", "FileHtml",
+                    fileName);
+                var templateString = await System.IO.File.ReadAllTextAsync(fileName);
+                templateString = templateString
+                    .Replace("@{parkingZoneName}", parkingTransaction.ParkingZone.Name)
+                    .Replace("@{from}", parkingTransaction.CheckinAt.ToString("hh:mm:ss dd/MM/yyyy"))
+                    .Replace("@{to}", parkingTransaction.CheckoutAt?.ToString("hh:mm:ss dd/MM/yyyy"));
+                string subject = "Thông báo hủy lượt đăng ký gửi xe";
+                BrokerApiClient brokerApiClient =
+                    new BrokerApiClient(this._configuration.GetValue<string>("brokerApiBaseUrl"));
+                await brokerApiClient.SendMail(new string[1] { parkingTransaction.Email }, subject,
+                    templateString);
+              
+            }
+            catch (Exception)
+            {
+            }
+           
+
+        }
         [HttpPost]
         public async Task<ParkingTransaction> Booking(BookingSlot bookingSlot)
         {
@@ -73,13 +105,22 @@ namespace Service.ManagerVPS.Controllers
                 Email = bookingSlot.Email,
                 StatusId = (int)ParkingTransactionStatusEnum.BOOKED,
                 Phone = bookingSlot.Phone,
-                LicensePlate = bookingSlot.LicensePlate,
+                LicensePlate = new string(bookingSlot.LicensePlate.Where(c => Char.IsLetterOrDigit(c)).ToArray()),
                 PromoCode = bookingSlot.PromoCode,
             };
             parkingTransaction.Id = Guid.NewGuid();
             parkingTransaction.CreatedAt = DateTime.Now;
             ParkingTransaction response = await vpsRepository.Create(parkingTransaction);
             _ = await vpsRepository.SaveChange();
+            try
+            {
+                var brokerApiClient = new BrokerApiClient(_configuration.GetValue<string>("brokerApiBaseUrl"));
+                var cancelAfter = _configuration.GetValue<int>("cancelBookingAfter");
+                await brokerApiClient.CreateCancelBookingJob(parkingTransaction.Id, parkingTransaction.CheckinAt.AddMinutes(cancelAfter));
+            }
+            catch (Exception)
+            { 
+            }
             return response;
         }
 
