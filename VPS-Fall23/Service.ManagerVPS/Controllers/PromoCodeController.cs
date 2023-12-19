@@ -328,35 +328,35 @@ public class PromoCodeController : VpsController<PromoCode>
                 $"<p> Địa chỉ: {promoCode.ParkingZone.DetailAddress}</p>";
             await _generalVps.SendEmailAsync(promoCode.UserEmail, titleEmail, bodyEmail);
             
-            // #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
-            // try
-            // {
-            //     // code này đang gửi đến account order gần nhất 
-            //     if (promoCode.Id.Equals(promoCodes.FirstOrDefault()!.Id) &&
-            //         !string.IsNullOrEmpty(promoCode.UserPhone) &&
-            //         promoCode.UserPhone.StartsWith("0") &&
-            //         promoCode.UserPhone.Length == 10)
-            //     {
-            //         var bodySms = titleEmail + " " + bodyEmail.Replace("<p>", "")
-            //             .Replace("</p>", "")
-            //             .Replace("<p>", "")
-            //             .Replace("<strong>", "")
-            //             .Replace("</strong>", "");
-            //
-            //         promoCode.UserPhone = "+84" + promoCode.UserPhone[1..];
-            //         TwilioClient.Init(_twilio.AccountSid, _twilio.AuthToken);
-            //         var result = await MessageResource.CreateAsync(
-            //             body: bodySms,
-            //             from: new PhoneNumber(_twilio.TwilioPhoneNumber),
-            //             to: promoCode.UserPhone
-            //         );
-            //     }
-            // }
-            // catch
-            // {
-            //     // ignored
-            // }
-            // #endregion
+            #region SenSmsByTwilio (mỗi lần gửi mất 1,15$ tạo mới acc đc free 15,5$ -> 1 acc = 13 lần gửi)
+            try
+            {
+                // code này đang gửi đến account order gần nhất 
+                if (
+                    !string.IsNullOrEmpty(promoCode.UserPhone) &&
+                    promoCode.UserPhone.StartsWith("0") &&
+                    promoCode.UserPhone.Length == 10)
+                {
+                    var bodySms = titleEmail + " " + bodyEmail.Replace("<p>", "")
+                        .Replace("</p>", "")
+                        .Replace("<p>", "")
+                        .Replace("<strong>", "")
+                        .Replace("</strong>", "");
+            
+                    promoCode.UserPhone = "+84" + promoCode.UserPhone[1..];
+                    TwilioClient.Init(_twilio.AccountSid, _twilio.AuthToken);
+                    var result = await MessageResource.CreateAsync(
+                        body: bodySms,
+                        from: new PhoneNumber(_twilio.TwilioPhoneNumber),
+                        to: promoCode.UserPhone
+                    );
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+            #endregion
         }
     }
 }
