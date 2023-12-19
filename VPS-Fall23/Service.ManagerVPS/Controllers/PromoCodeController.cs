@@ -283,7 +283,7 @@ public class PromoCodeController : VpsController<PromoCode>
         return promo;
     }
 
-    [HttpPost]
+    [HttpGet]
     public async Task<IActionResult> JobSendNotificationPromoCodeToUser()
     {
         var listPromoCode = await ((IPromoCodeRepository)vpsRepository)
@@ -296,7 +296,7 @@ public class PromoCodeController : VpsController<PromoCode>
             await SendMailPromoCode(promoCodes);
         }
 
-        return Ok();
+        return Ok(true);
     }
 
     private async Task SendNotificationPromoCodeToUser(IEnumerable<Guid> listPromoCodeId,
