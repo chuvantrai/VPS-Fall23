@@ -7,6 +7,7 @@ import useParkingZoneService from '@/services/parkingZoneService';
 import { getAccountJwtModel } from '@/helpers';
 import useGoongMapService from '@/services/goongMapServices';
 import { useDebounce } from '@uidotdev/usehooks';
+import { useSelector } from 'react-redux';
 
 const layout = {
   labelCol: {
@@ -16,15 +17,14 @@ const layout = {
     span: 18,
   },
 };
-
 const validateMessages = {
-  required: '${label} is required!',
+  required: '${label} không được bỏ trống!',
   types: {
-    email: '${label} is not a valid email!',
-    number: '${label} is not a valid number!',
+    email: '${label} không phải email hợp lệ!',
+    number: '${label} không phải số hợp lệ!',
   },
   number: {
-    range: '${label} must be between ${min} and ${max}',
+    range: '${label} cần nằm trong khoảng ${min} và ${max}',
   },
 };
 
@@ -44,10 +44,10 @@ async function initMap(focusPosition) {
     container: 'register-pz-map', // container id
     style: 'https://tiles.goong.io/assets/goong_map_web.json', // stylesheet location
     center: position, // starting position [lng, lat]
-    zoom: 12 // starting zoom
+    zoom: 12, // starting zoom
   });
   marker = new goongjs.Marker({
-    draggable: true
+    draggable: true,
   })
     .setLngLat(defaulLocation.geometry.position)
     .addTo(map);
@@ -56,13 +56,14 @@ const defaulLocation = {
   geometry: {
     position: {
       lat: 20.98257,
-      lng: 105.844949
-    }
-  }
-}
-
+      lng: 105.844949,
+    },
+  },
+};
 
 const RegisterParkingZone = () => {
+
+  const { isLoading } = useSelector((state) => state.global);
   const parkingZoneService = useParkingZoneService();
   const account = getAccountJwtModel();
 
@@ -82,62 +83,75 @@ const RegisterParkingZone = () => {
     placeholder: 'Chọn địa chỉ',
   };
   const onCascaderChange = useCallback((value, selectedOptions) => {
+    console.log(selectedOptions);
     setSelectedAddress(selectedOptions ?? []);
     setValidateStatus('');
     setHelp('');
+
   }, []);
   //END cascader
   //goong map
   const [pointedLocation, setPointedLocation] = useState(null);
   const [placesFromLocation, setPlacesFromLocation] = useState([]);
   const [sessionToken, setSessionToken] = useState(null);
-  const [locationSearchValue, setLocationSearchValue] = useState(null)
-  const locationSearchValueDebound = useDebounce(locationSearchValue, 600)
+  const [locationSearchValue, setLocationSearchValue] = useState(null);
+  const locationSearchValueDebound = useDebounce(locationSearchValue, 600);
   const [selectedLocationDetail, setSelectedLocationDetail] = useState(null);
-
-
+  const [selectedLocationValue, setSelectedLocationValue] = useState(null);
   const goongMapService = useGoongMapService();
   function onDragEnd() {
     var lngLat = marker.getLngLat();
-    setPointedLocation({ lng: lngLat.lng, lat: lngLat.lat })
-  }
-
-  const onLocationSearch = (value) => {
-    const addressCombine = [value, ...selectedAddress.reverse().map((a) => a.name)].join(', ')
-    if (!addressCombine) return;
-    goongMapService.placeAutoComplete(addressCombine, sessionToken)
-      .then(res => setPlacesFromLocation(res.data))
-  }
-  const onAddressSelected = (placeId) => {
-    goongMapService
-      .getPlaceDetail(placeId, sessionToken)
-      .then(res => {
-        map.jumpTo({ zoom: map.getZoom(), center: res.data.geometry.position })
-        marker.setLngLat(res.data.geometry.position)
-        setSelectedLocationDetail(res.data);
-        setSessionToken(uuidv4())
-      })
+    setPointedLocation({ lng: lngLat.lng, lat: lngLat.lat });
   }
   useEffect(() => {
-    setSessionToken(uuidv4())
-    initMap(defaulLocation.geometry.position)
-    marker.on("dragend", onDragEnd)
-    return () => {
-      marker.remove()
-      map.remove()
+    onLocationSearch(locationSearchValueDebound);
+  }, [JSON.stringify(selectedAddress)])
 
-    }
-  }, [])
+  const onLocationSearch = (value) => {
+    console.log(selectedAddress);
+    const addressCombine = [value, ...JSON.parse(JSON.stringify(selectedAddress)).reverse().map((a) => a.name)].filter(v => v).join(', ');
+    if (!addressCombine) return;
+    goongMapService.placeAutoComplete(addressCombine, sessionToken).then((res) => {
+      setPlacesFromLocation(res.data)
+    });
+  };
+
+  const onAddressSelected = (placeId) => {
+    goongMapService.getPlaceDetail(placeId, sessionToken).then((res) => {
+      map.jumpTo({ zoom: map.getZoom(), center: res.data.geometry.position });
+      marker.setLngLat(res.data.geometry.position);
+      setSelectedLocationDetail(res.data);
+      setSessionToken(uuidv4());
+    });
+  };
+
+  useEffect(() => {
+    if (placesFromLocation.length <= 0) return;
+    setSelectedLocationValue(placesFromLocation[0])
+  }, [JSON.stringify(placesFromLocation)])
+
+  useEffect(() => {
+    setSelectedLocationDetail(null);
+    if (!selectedLocationValue) return;
+    onAddressSelected(selectedLocationValue.placeId)
+  }, [selectedLocationValue])
+
+  useEffect(() => {
+    setSessionToken(uuidv4());
+    initMap(defaulLocation.geometry.position);
+    marker.on('dragend', onDragEnd);
+    return () => {
+      marker.remove();
+      map.remove();
+    };
+  }, []);
   useMemo(() => {
     if (!pointedLocation?.lng || !pointedLocation?.lat) return;
-    goongMapService
-      .getPlaceFromLocation(pointedLocation)
-      .then(res => setPlacesFromLocation(res.data));
-  }, [JSON.stringify(pointedLocation)])
+    goongMapService.getPlaceFromLocation(pointedLocation).then((res) => setPlacesFromLocation(res.data));
+  }, [JSON.stringify(pointedLocation)]);
   useMemo(() => {
-    onLocationSearch(locationSearchValueDebound)
-  }, [locationSearchValueDebound])
-
+    onLocationSearch(locationSearchValueDebound);
+  }, [locationSearchValueDebound]);
 
   //end goong map
 
@@ -154,7 +168,6 @@ const RegisterParkingZone = () => {
     </div>
   );
 
-
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -169,7 +182,7 @@ const RegisterParkingZone = () => {
     setWorkingTime(timeString);
   };
   const onFinish = (values) => {
-    if (!selectedAddress) {
+    if (!selectedLocationDetail) {
       setValidateStatus('error');
       setHelp('Vui lòng chọn địa chỉ của bãi đỗ xe');
     } else {
@@ -189,7 +202,7 @@ const RegisterParkingZone = () => {
       formData.append('workTo', workingTime[1]);
       formData.append('location.lat', selectedLocationDetail.geometry.position.lat);
       formData.append('location.lng', selectedLocationDetail.geometry.position.lng);
-
+      console.log(formData);
       parkingZoneService.register(formData);
     }
   };
@@ -198,7 +211,6 @@ const RegisterParkingZone = () => {
     <div className="w-full">
       <Row gutter={8}>
         <Col span={12}>
-
           <Form {...layout} name="nest-messages" onFinish={onFinish} validateMessages={validateMessages}>
             <Form.Item
               name="name"
@@ -221,7 +233,7 @@ const RegisterParkingZone = () => {
               ]}
             >
               <InputNumber
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 prefix="VND"
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
@@ -237,22 +249,30 @@ const RegisterParkingZone = () => {
               ]}
             >
               <InputNumber
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 prefix="VND"
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
               />
             </Form.Item>
-            <Form.Item name="workingTime" label="Thời gian làm việc" required>
+            <Form.Item
+              name="workingTime"
+              label="Thời gian làm việc"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
               <TimePicker.RangePicker
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 onChange={handelChangeTime}
-                placeholder={["Giờ mở cửa", "Giờ đóng cửa"]}
+                placeholder={['Giờ mở cửa', 'Giờ đóng cửa']}
               />
             </Form.Item>
             <Form.Item
               name="slots"
-              label="Slots"
+              label="Số chỗ"
               rules={[
                 {
                   required: true,
@@ -260,31 +280,45 @@ const RegisterParkingZone = () => {
               ]}
             >
               <InputNumber
-                style={{ width: "100%" }}
-                placeholder="Số slots của parking zone"
+                style={{ width: '100%' }}
+                placeholder="Số chỗ của parking zone"
                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                 parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
               />
             </Form.Item>
-            <Form.Item name={'detailAddress'} label="Địa chỉ" validateStatus={validateStatus} help={help}>
-              <Space.Compact direction='vertical' style={{ width: "100%" }}>
-                <AddressCascader cascaderProps={addressCascaderProps} onCascaderChangeCallback={onCascaderChange} />
-                <Select
-                  showSearch
-                  allowClear
-                  filterOption={() => true}
-                  options={placesFromLocation.map((p) => {
-                    return {
-                      value: p.placeId,
-                      label: p.description ?? p.formattedAddress
-                    }
-                  })}
-                  placeholder="Địa chỉ cụ thể"
-                  onSearch={setLocationSearchValue}
-                  onSelect={onAddressSelected}
-                  onClear={() => { setSessionToken(uuidv4()) }}
-                />
-              </Space.Compact>
+            <Form.Item label="Địa chỉ" >
+              <AddressCascader cascaderProps={addressCascaderProps} onCascaderChangeCallback={onCascaderChange} />
+
+            </Form.Item>
+            <Form.Item
+              name='detailAddress' label="Địa chỉ chi tiết"
+              rules={[
+                {
+                  required: true,
+                  message: "Vui lòng tìm kiếm và chọn một địa chỉ"
+                },
+              ]}
+            >
+              <Select
+
+                showSearch
+                allowClear
+                filterOption={() => true}
+                options={placesFromLocation.map((p) => {
+                  return {
+                    value: p.placeId,
+                    label: p.description ?? p.formattedAddress,
+                  };
+                })}
+                value={selectedLocationValue?.placeId}
+                placeholder="Địa chỉ cụ thể"
+                loading={isLoading}
+                onSearch={setLocationSearchValue}
+                onSelect={(v, option) => { setSelectedLocationValue({ placeId: option.value, description: option.label }) }}
+                onClear={() => {
+                  setSessionToken(uuidv4());
+                }}
+              />
             </Form.Item>
 
             <Form.Item
@@ -310,11 +344,9 @@ const RegisterParkingZone = () => {
                 </Upload>
               </div>
             </Form.Item>
-            <Form.Item
-              className={('flex justify-center m-0')}
-            >
+            <Form.Item className={'flex justify-center m-0'}>
               <Button className="bg-[#1677ff]" type="primary" htmlType="submit">
-                Submit
+                Gửi
               </Button>
             </Form.Item>
           </Form>
@@ -329,13 +361,13 @@ const RegisterParkingZone = () => {
           </Modal>
         </Col>
         <Col span={12} style={{ position: 'relative' }}>
-
-          <div id='register-pz-map' style={{ position: "absolute", left: 0, top: 0, width: '100%', height: '100%' }}>
-            <h4 style={{ right: 0, textAlign: "end" }}><i>***Chọn một điểm để xác định vị trí chính xác của nhà xe</i></h4>
+          <div id="register-pz-map" style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }}>
+            <h4 style={{ right: 0, textAlign: 'end' }}>
+              <i>***Chọn một điểm để xác định vị trí chính xác của nhà xe</i>
+            </h4>
           </div>
         </Col>
       </Row>
-
     </div>
   );
 };

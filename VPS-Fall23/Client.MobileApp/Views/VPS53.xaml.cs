@@ -33,11 +33,6 @@ public partial class VPS53 : ContentPage
         Slot.Text = _viewModel.LoadSlot();
     }
 
-    public void Load()
-    {
-        InitializeComponent();
-    }
-
     Task LoadCanvasSurface()
     {
         return Task.Run(() =>
@@ -45,6 +40,11 @@ public partial class VPS53 : ContentPage
             canvasView.InvalidateSurface();
             canvasView.PaintSurface += OnPaintSurface;
         });
+    }
+
+    public bool IsConnected()
+    {
+        return Connectivity.NetworkAccess == NetworkAccess.Internet;
     }
 
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
@@ -94,7 +94,7 @@ public partial class VPS53 : ContentPage
 
     private async void CameraButton_Clicked(object sender, EventArgs e)
     {
-        try
+        if (IsConnected())
         {
             string licensePlate = String.Empty;
             string path = String.Empty;
@@ -137,12 +137,9 @@ public partial class VPS53 : ContentPage
             }
             Slot.Text = _viewModel.LoadSlot();
         }
-        catch (Exception ex)
+        else
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                await Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
-            });
+            await DisplayAlert(Constant.ALERT, Constant.NETWORK_ERROR, Constant.CANCEL);
         }
     }
 
@@ -156,7 +153,7 @@ public partial class VPS53 : ContentPage
 
     private async void OkButton_Clicked(object sender, EventArgs e)
     {
-        try
+        if (IsConnected())
         {
             string licensePlate = new string(LicensePlateEntry.Text.Where(c => Char.IsLetterOrDigit(c)).ToArray());
 
@@ -197,12 +194,9 @@ public partial class VPS53 : ContentPage
             }
             Slot.Text = _viewModel.LoadSlot();
         }
-        catch (Exception ex)
+        else
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                Application.Current.MainPage.DisplayAlert(Constant.ALERT, ex.Message, Constant.CANCEL);
-            });
+            await DisplayAlert(Constant.ALERT, Constant.NETWORK_ERROR, Constant.CANCEL);
         }
     }
 
@@ -233,6 +227,13 @@ public partial class VPS53 : ContentPage
 
     private void SlotLabel_Tapped(object sender, TappedEventArgs e)
     {
-        Slot.Text = _viewModel.LoadSlot();
+        if (IsConnected())
+        {
+            Slot.Text = _viewModel.LoadSlot();
+        }
+        else
+        {
+            DisplayAlert(Constant.ALERT, Constant.NETWORK_ERROR, Constant.CANCEL);
+        }
     }
-}   
+}

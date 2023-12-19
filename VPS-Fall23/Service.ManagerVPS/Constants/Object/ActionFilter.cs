@@ -206,6 +206,26 @@ public static class ActionFilter
         {
             Action = ActionFilterEnum.UpdateStatusReport,
             UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetAddressListParkingZone,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.UpdateIsBlockAddress,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.CreateAddress,
+            UserRole = new[] { UserRoleEnum.ADMIN }
+        },
+        new ActionModel
+        {
+            Action = ActionFilterEnum.GetAdminOverview,
+            UserRole = new[] { UserRoleEnum.ADMIN }
         }
     };
 

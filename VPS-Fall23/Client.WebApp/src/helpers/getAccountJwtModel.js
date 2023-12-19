@@ -12,7 +12,7 @@ const getAccountJwtModel = () => {
       FirstName: decodedToken.FirstName,
       LastName: decodedToken.LastName,
       Email: decodedToken.Email,
-      RoleId: decodedToken.RoleId,
+      RoleId: parseInt(decodedToken.RoleId),
       RoleName: decodedToken.RoleName,
       Avatar: decodedToken.Avatar,
       Expires: parse(decodedToken.Expires, keyFormatDate.DATE_KEY_JWT, new Date()),

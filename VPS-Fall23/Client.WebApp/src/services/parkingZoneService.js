@@ -135,12 +135,13 @@ const useParkingZoneService = () => {
   };
 
   const updateParkingZone = (params) => {
-    axios
+    return axios
       .put(`${BASE_URI}/UpdateParkingZone`, params)
       .then((res) => {
         notification.success({
           message: res?.data,
         });
+        return Promise.resolve(res);
       })
       .catch((err) => {
         notification.error({

@@ -38,6 +38,7 @@ const BookingDescription = ({ pricePerHour, ioTime, discount = 0 }) => {
         size='small'
         column={1}
         title='Tổng cộng'
+        style={{ marginBottom: 10 }}
     >
 
     </Descriptions>)

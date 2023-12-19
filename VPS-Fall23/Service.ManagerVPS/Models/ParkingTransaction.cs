@@ -20,8 +20,8 @@ namespace Service.ManagerVPS.Models
         public Guid? CheckinBy { get; set; }
         public Guid? CheckoutBy { get; set; }
         public int? StatusId { get; set; }
-        public string Email { get; set; } = null!;
-        public string Phone { get; set; } = null!;
+        public string? Email { get; set; } = null!;
+        public string? Phone { get; set; } = null!;
         public string? PromoCode { get; set; }
 
         public virtual Account? CheckinByNavigation { get; set; }

@@ -79,7 +79,10 @@ const ModalReport = ({ contentBtn }) => {
   let options = optionsReportType;
   const account = GetAccountJwtModel();
   if (account?.RoleId === userRoleEnum.OWNER) {
-    options = options.filter(option => option.value !== reportTypeEnum.REPORT_PARKING_ZONE);
+      options = options.filter(option =>
+          option.value !== reportTypeEnum.REQUEST_TRANSACTION_REFUND &&
+          option.value !== reportTypeEnum.TRANSACTION_ERROR &&
+          option.value !== reportTypeEnum.REPORT_PARKING_ZONE);
   }
   if (account === null) {
     options = options.filter(option =>

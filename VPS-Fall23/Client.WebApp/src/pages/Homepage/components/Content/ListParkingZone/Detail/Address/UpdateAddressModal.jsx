@@ -111,6 +111,7 @@ const UpdateAddressModal = () => {
             .then(res => {
                 notification.success({ description: "Cập nhật thành công" })
                 setViewValues({ ...viewValues, reload: true })
+                onCloseModal();
             })
     }
     const modalProps = {

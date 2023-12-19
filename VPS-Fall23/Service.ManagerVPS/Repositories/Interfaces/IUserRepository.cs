@@ -1,3 +1,4 @@
+using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.DTO.OtherModels;
 using Service.ManagerVPS.Models;
@@ -35,4 +36,6 @@ public interface IUserRepository : IVpsRepository<Account>
 
     PagedList<Account> SearchAttendantByName(Guid ownerId, string attendantName,
         QueryStringParameters parameters);
+
+    Task<List<Account>?> GetAccountByRoleId(UserRoleEnum userRoleEnum);
 }

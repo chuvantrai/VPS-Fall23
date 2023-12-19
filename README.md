@@ -36,4 +36,9 @@ Idea From Project Lecturer [AnNV](https://)
 
 [OCR library for C#](https://ironsoftware.com/csharp/ocr/)
 
+## cofig
+"vnp_ReturnUrl": "http://103.82.133.210:5011/Paid",
+
+"vnp_ReturnUrl": "http://localhost:5001/Paid",
+
 

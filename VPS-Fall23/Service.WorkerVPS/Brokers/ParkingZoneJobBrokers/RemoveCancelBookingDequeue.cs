@@ -21,6 +21,7 @@ namespace Service.WorkerVPS.Brokers.ParkingZoneJobBrokers
         public override async Task DequeueHandle(Guid parkingTransactionId)
         {
             await quartzServices.Scheduler.DeleteJob(new Quartz.JobKey(parkingTransactionId.ToString(), Extensions.Constant.ParkingTransactionJobGroupName));
+            Console.WriteLine("Deleted auto cancel booking job");
         }
     }
 }

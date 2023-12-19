@@ -69,14 +69,24 @@ function ForgotPassword() {
   };
 
   const SendCodeVerify = () => {
+    console.log(123)
     const usernameValue = form.getFieldValue('username');
-    axios.put('/api/Auth/ResendVerificationCode', { userName: usernameValue })
+    if (!usernameValue) {
+      app.notification.error({
+        message: `Lỗi`,
+        description: `Chưa nhập tài khoản/email`,
+        placement: 'topRight',
+      });
+    } else {
+      axios.put('/api/Auth/ResendVerificationCode', { userName: usernameValue })
         .then((res) => {
           app.notification.success({
             message: `Kiểm tra email ${convertEmailToStars(res.data)} của bạn để lấy mã xác thực!`,
             placement: 'topRight',
           });
         });
+    }
+
   };
 
   return (
@@ -127,7 +137,7 @@ function ForgotPassword() {
                     rules={[
                       {
                         required: true,
-                        message: 'Hãy code xác nhận!',
+                        message: 'Hãy nhập code xác nhận!',
                       },
                       {
                         min: 6,
@@ -206,7 +216,7 @@ function ForgotPassword() {
                         htmlType='submit'
                         block
                     >
-                      Quên mật khẩu
+                      Lưu
                     </Button>
                   </Form.Item>
                 </Col>

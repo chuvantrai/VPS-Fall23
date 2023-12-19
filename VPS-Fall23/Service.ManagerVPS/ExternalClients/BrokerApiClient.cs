@@ -9,8 +9,8 @@ namespace Service.ManagerVPS.ExternalClients
         private readonly RestClient restClient;
         const string CreateDeletingPZJobUri = "api/parking-zone/create-deleting-parking-zone-job";
         const string RemoveDeletingPZJobUri = "api/parking-zone/{0}/remove-deleting-parking-zone-job";
-        const string RemoveCancelBookingJobUri = "api/parking-transaction/create-auto-cancel-job";
-        const string CreateCancelBookingJobUri = "api/parking-transaction/{0}/remove-auto-cancel-job";
+        const string CreateCancelBookingJobUri = "api/parking-transaction/create-auto-cancel-job";
+        const string RemoveCancelBookingJobUri = "api/parking-transaction/{0}/remove-auto-cancel-job";
         const string SendMailUri = "api/smtp/send-mail";
 
         public BrokerApiClient(string baseUrl)

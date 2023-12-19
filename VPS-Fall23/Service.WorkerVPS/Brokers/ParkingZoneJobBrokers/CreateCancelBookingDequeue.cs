@@ -37,7 +37,8 @@ namespace Service.WorkerVPS.Brokers.ParkingZoneJobBrokers
                 .StartAt(autoCancelBookingDto.CancelAt)
                 .Build();
             // Lên lịch công việc
-            await quartzServices.Scheduler.ScheduleJob(job, trigger);
+          var result=  await quartzServices.Scheduler.ScheduleJob(job, trigger);
+            Console.WriteLine($"Created quartz job with time offset: {result.ToString("yyyy/MM/dd HH:mm:ss")}");
 
         }
     }

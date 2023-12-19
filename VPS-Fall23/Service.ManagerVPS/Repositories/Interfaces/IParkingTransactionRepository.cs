@@ -10,7 +10,7 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         // Task<string> CanLicensePlateCheckout(string licenseplate, DateTime checkAt, Guid checkBy);
         // Task<int> GetBookedSlot(Guid parkingZoneId);
         Task<List<ParkingTransaction>> GetAll();
-        List<ParkingTransaction> GetBookedSlot(string? parkingZoneName, Guid ownerId,DateTime? checkAt);
+        List<ParkingTransaction> GetBookedSlot(string? parkingZoneId, DateTime? checkAt);
         Task<int> GetBookedSlot(Guid parkingZoneId, DateTime checkAt);
 
         // Task<int> GetRemainingSlot(Guid parkingZoneId);
@@ -24,7 +24,7 @@ namespace Service.ManagerVPS.Repositories.Interfaces
         
         Task<bool> IsAlreadyBooking(BookingSlot bookingSlot);
         
-        Task<List<IncomeParkingZoneResponse>> GetAllIncomeByParkingZoneId(Guid parkingZoneId);
+        Task<List<IncomeParkingZoneResponse>> GetAllIncome(Guid? parkingZoneId, Guid? ownerId);
 
         List<ParkingTransaction> GetParkingTransactions();
         

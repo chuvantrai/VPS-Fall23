@@ -2,9 +2,10 @@
 import { Form, Input, Modal, Row, Col, Button, InputNumber, Select, DatePicker } from 'antd';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
 
 import { getAccountJwtModel } from '@/helpers';
-import useParkingZoneService from '@/services/parkingZoneService'
+import useParkingZoneService from '@/services/parkingZoneService';
 
 const validateMessages = {
   required: '${label} không được để trống!',
@@ -21,26 +22,30 @@ const { RangePicker } = DatePicker;
 function ModalAddCode({ open, confirmLoading, onCreate, onCancel }) {
   const [form] = Form.useForm();
   const account = getAccountJwtModel();
-  const parkingZoneServices = useParkingZoneService()
+  const parkingZoneServices = useParkingZoneService();
 
   const [options, setOptions] = useState([]);
   const [parkingZoneIds, setParkingZoneIds] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
 
   useEffect(() => {
-    parkingZoneServices.getApprovedParkingZoneByOwnerId(account.UserId)
-      .then(res => {
-        setOptions(res.data)
-      })
-  }, [])
+    parkingZoneServices.getApprovedParkingZoneByOwnerId(account.UserId).then((res) => {
+      setOptions(res.data);
+    });
+  }, []);
 
   const handleChange = (value) => {
     setParkingZoneIds(value);
   };
 
   const handleChangeDate = (_, dateString) => {
-    setSelectedDate(dateString)
-  }
+    setSelectedDate(dateString);
+  };
+
+  const disabledDate = (current) => {
+    // Can not select days before today and today
+    return current && current < dayjs().endOf('day');
+  };
 
   return (
     <Modal
@@ -50,14 +55,19 @@ function ModalAddCode({ open, confirmLoading, onCreate, onCancel }) {
       okText="Tạo"
       cancelText="Hủy"
       onCancel={() => {
-        form.resetFields()
-        onCancel()
+        form.resetFields();
+        onCancel();
       }}
       onOk={() => {
         form
           .validateFields()
           .then(async (values) => {
-            await onCreate({ ...values, ownerId: account.UserId, parkingZoneIds: parkingZoneIds, selectedDate: selectedDate });
+            await onCreate({
+              ...values,
+              ownerId: account.UserId,
+              parkingZoneIds: parkingZoneIds,
+              selectedDate: selectedDate,
+            });
             form.resetFields();
           })
           .catch((info) => {
@@ -67,16 +77,16 @@ function ModalAddCode({ open, confirmLoading, onCreate, onCancel }) {
     >
       <Form form={form} layout="vertical" name="modalAddCode" validateMessages={validateMessages}>
         <Form.Item
-          name='discount'
-          label='Giảm giá'
+          name="discount"
+          label="Giảm giá"
           rules={[
             {
-              required: true
-            }
+              required: true,
+            },
           ]}
         >
           <InputNumber
-            addonAfter='%'
+            addonAfter="%"
             style={{
               width: '100%',
             }}
@@ -85,11 +95,11 @@ function ModalAddCode({ open, confirmLoading, onCreate, onCancel }) {
           />
         </Form.Item>
         <Form.Item
-          name='parkingZoneIds'
-          label='Danh sách bãi đỗ xe được áp dụng'
+          name="parkingZoneIds"
+          label="Danh sách bãi đỗ xe được áp dụng"
           rules={[
             {
-              required: true
+              required: true,
             },
           ]}
         >
@@ -104,15 +114,15 @@ function ModalAddCode({ open, confirmLoading, onCreate, onCancel }) {
           />
         </Form.Item>
         <Form.Item
-          name='selectedDate'
-          label='Thời gian sử dụng'
+          name="selectedDate"
+          label="Thời gian sử dụng"
           rules={[
             {
-              required: true
+              required: true,
             },
           ]}
         >
-          <RangePicker className='w-[100%]' onChange={handleChangeDate} />
+          <RangePicker className="w-[100%]" onChange={handleChangeDate} disabledDate={disabledDate} />
         </Form.Item>
       </Form>
     </Modal>

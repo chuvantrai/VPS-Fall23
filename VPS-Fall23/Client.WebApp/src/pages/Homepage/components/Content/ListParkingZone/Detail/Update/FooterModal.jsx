@@ -9,7 +9,6 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
     const { detailInfo, setDetailInfo, viewValues, setViewValues } = useViewParkingZoneContext();
     const [switchChecked, setSwitchChecked] = useState(detailInfo.parkingZone.isFull)
 
-
     const handleCancel = () => {
         setDetailInfo({ isShow: false, parkingZone: null, type: '' })
     };
@@ -18,15 +17,15 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
             parkingZoneId: detailInfo.parkingZone.id,
             isFull: checked,
         };
-        parkingZoneService.changeParkingZoneFullStatus(params).then(res => setViewValues({ ...viewValues, reload: true }));
+        parkingZoneService.changeParkingZoneFullStatus(params);
         setSwitchChecked(!switchChecked)
+        setViewValues({ ...viewValues, reload: true })
     }
-
 
     return (<Space>
         <Switch
-            checkedChildren="Full"
-            unCheckedChildren="Available"
+            checkedChildren="Hết chỗ"
+            unCheckedChildren="Còn chỗ"
             onChange={onSwitchChange}
             checked={switchChecked}
         />
@@ -34,9 +33,10 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
             Đóng
         </Button>
         <Button
-            className="bg-[#1677ff] text-white"
+            type="primary"
             onClick={() => {
                 form.validateFields().then((values) => {
+                    console.log(values);
                     const formData = new FormData();
                     formData.append('parkingZoneId', detailInfo.parkingZone.id);
                     formData.append('parkingZoneName', values.name);
@@ -45,16 +45,22 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
                     formData.append('slots', values.slots);
                     formData.append('workFrom', dayjs(values.workingTime[0]).format("HH:mm:ss"));
                     formData.append('workTo', dayjs(values.workingTime[1]).format("HH:mm:ss"));
-                    values.parkingZoneImages.fileList.forEach((item) => {
-                        formData.append('parkingZoneImages', item.originFileObj);
-                    });
+                    if (values.parkingZoneImages) {
+                        values.parkingZoneImages.fileList.forEach((item) => {
+                            formData.append('parkingZoneImages', item.originFileObj);
+                        });
+                    }
 
-                    parkingZoneService.updateParkingZone(formData);
-                });
+
+                    parkingZoneService.updateParkingZone(formData).then((res) => {
+                        setViewValues({ ...viewValues, reload: true })
+                        handleCancel();
+                    });
+                }).catch(err => console.log(err));
             }}
         >
             Lưu
         </Button>
-    </Space>)
+    </Space >)
 }
 export default UpdateParkingZoneFooterModal

@@ -1,4 +1,4 @@
-import { Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag, Typography } from 'antd';
+import { Button, DatePicker, Divider, Form, Input, Result, Slider, Space, Statistic, Tag, Typography, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import useParkingTransactionService from '@/services/parkingTransactionSerivce';
@@ -31,6 +31,10 @@ const BookingForm = ({ parkingZone }) => {
   const parkingZoneAbsentService = useParkingZoneAbsentServices();
   const promoService = usePromoService();
   const searchPromo = (promoCode) => {
+    if (!promoCode) {
+      notification.error({ message: "Vui lòng nhập mã giảm giá", description: "Vui lòng nhập mã giảm giá" });
+      return;
+    }
     promoService
       .getByCode(promoCode, parkingZone.id)
       .then(res => {
@@ -66,7 +70,7 @@ const BookingForm = ({ parkingZone }) => {
         let endTime = Number(parkingZone?.workTo.split(':')[0]) ?? 23
         var hour = dayjs().hour()
         if (startTime <= hour && (date && date <= dayjs().endOf('day')) && partial == 'start') startTime = hour
-        return [...range(0, startTime), ...range(endTime, 24)]
+        return [...range(0, startTime), dayjs().hour(), ...range(endTime, 24)]
       },
     }
   }
@@ -129,7 +133,6 @@ const BookingForm = ({ parkingZone }) => {
   };
 
   const getPaymentResultProps = () => {
-    console.log(paymentResult);
     const success = paymentResult?.paymentTransaction.ResponseCode == 0 && paymentResult?.paymentTransaction.TransactionStatus == 0;
     return {
       status: (success) ? 'success' : 'error',
@@ -138,7 +141,13 @@ const BookingForm = ({ parkingZone }) => {
         <p>Số đơn hàng: {paymentResult?.paymentTransaction.TxnRef}</p>
         <p>Mã giao dịch: {paymentResult?.paymentTransaction.TransactionNo}</p>
         <p>Nội dung giao dịch: {paymentResult?.paymentTransaction.OrderInfo}</p>
-        <Button onClick={() => setPaymentResult(defaultPaymentResult)}>OK</Button>
+        <Button onClick={() => {
+          form.resetFields();
+          setPaymentResult(defaultPaymentResult);
+          setBookingTime([null, null]);
+          setPromoCode({ info: null, message: null })
+          disableSubmitBtn(false);
+        }}>OK</Button>
       </>),
     };
   };

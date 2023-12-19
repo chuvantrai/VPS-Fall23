@@ -16,10 +16,13 @@ namespace Service.ManagerVPS.Controllers;
 public class ReportController : VpsController<Report>
 {
     private readonly IGeneralVPS _generalVps;
-
-    public ReportController(IReportRepository reportRepository, IGeneralVPS generalVps) : base(reportRepository)
+    private readonly IUserRepository _userRepository;
+    
+    public ReportController(IReportRepository reportRepository, IGeneralVPS generalVps, IUserRepository userRepository) 
+        : base(reportRepository)
     {
         _generalVps = generalVps;
+        _userRepository = userRepository;
     }
 
     [HttpPost]
@@ -34,12 +37,12 @@ public class ReportController : VpsController<Report>
         }
 
         if ((request.UserId is null && request.Email == null && request.Phone == null)
-            || (string.IsNullOrEmpty(request.PaymentCode) && request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND))
+            || (string.IsNullOrEmpty(request.PaymentCode) && request.Type == ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND))
         {
             throw new ClientException();
         }
 
-        if (request.Type is ReportTypeEnum.REQUEST_TRANSACTION_REFUND or ReportTypeEnum.TRANSACTION_ERROR)
+        if (request.Type is ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND or ReportTypeEnum.REPORT_TRANSACTION)
         {
             var checkPaymentCode = await ((IReportRepository)vpsRepository)
                 .CheckPaymentCodeInReport(request.PaymentCode!, (int)request.Type);
@@ -95,11 +98,11 @@ public class ReportController : VpsController<Report>
             new KeyValue()
             {
                 Key = KeyHtmlEmail.CSS_PAYMENTCODE,
-                Value = request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND ? "" : "display: none;"
+                Value = request.Type == ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND ? "" : "display: none;"
             }
         };
 
-        if (request.Type == ReportTypeEnum.REQUEST_TRANSACTION_REFUND)
+        if (request.Type == ReportTypeEnum.REPORT_REQUEST_TRANSACTION_REFUND)
         {
             keyValuesTemplate.Add(new KeyValue()
             {
@@ -109,9 +112,13 @@ public class ReportController : VpsController<Report>
         }
 
         var templateEmail = _generalVps.CreateTemplateEmail(keyValuesTemplate);
-        var toEmail = new[] { "traicvhe153014@fpt.edu.vn", "0362351671trai@gmail.com" };
-        var titleEmail = $"Thông báo người dùng gửi báo cáo về {report.TypeNavigation.Description}";
-        await _generalVps.SendListEmailAsync(toEmail, titleEmail, templateEmail);
+        var listAccountAdmin = await _userRepository.GetAccountByRoleId(UserRoleEnum.ADMIN);
+        if (listAccountAdmin != null)
+        {
+            var toEmail = listAccountAdmin.Select(x=>x.Email);
+            var titleEmail = $"Thông báo người dùng gửi báo cáo về {report.TypeNavigation.Description}";
+            await _generalVps.SendListEmailAsync(toEmail, titleEmail, templateEmail);
+        }
 
         return Ok();
     }
@@ -129,11 +136,16 @@ public class ReportController : VpsController<Report>
                 Key = index + 1,
                 x.SubId,
                 x.Id,
-                TypeName = x.TypeNavigation.Name,
-                x.Email,
+                TypeName = x.TypeNavigation.Description,
+                Email = string.IsNullOrEmpty(x.Email) && x.CreatedByNavigation != null
+                    ? x.CreatedByNavigation.Email
+                    : x.Email,
+                Phone = string.IsNullOrEmpty(x.Phone) && x.CreatedByNavigation != null
+                    ? x.CreatedByNavigation.PhoneNumber
+                    : x.Phone,
                 CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
                 x.Content,
-                Status = x.StatusNavigation.Name,
+                Status = x.StatusNavigation.Description,
             }).ToList();
 
         var metadata = new
@@ -155,18 +167,18 @@ public class ReportController : VpsController<Report>
     {
         var listType =
             ((IReportRepository)vpsRepository).GetTypeReport();
-        var result = listType.Select(lt => new { Value = lt.Id, Label = lt.Name }).ToList();
+        var result = listType.Select(lt => new { Value = lt.Id, Label = lt.Description }).ToList();
 
         return Ok(result);
     }
 
     [HttpGet]
     [FilterPermission(Action = ActionFilterEnum.FilterReport)]
-    public IActionResult FilterReport([FromQuery] QueryStringParameters parameters, [FromQuery] int typeId)
+    public IActionResult FilterReport([FromQuery] QueryStringParameters parameters, [FromQuery] int typeId, [FromQuery] int statusId)
     {
 
         var listReport =
-            ((IReportRepository)vpsRepository).FilterReportForAdmin(parameters, typeId);
+            ((IReportRepository)vpsRepository).FilterReportForAdmin(parameters, typeId, statusId);
 
         var result = listReport
             .Select((x, index) => new
@@ -174,11 +186,12 @@ public class ReportController : VpsController<Report>
                 Key = index + 1,
                 x.SubId,
                 x.Id,
-                TypeName = x.TypeNavigation.Name,
+                TypeName = x.TypeNavigation.Description,
                 x.Email,
+                x.Phone,
                 CreatedAt = $"{x.CreatedAt:dd-MM-yyyy}",
                 x.Content,
-                Status = x.StatusNavigation.Name,
+                Status = x.StatusNavigation.Description,
             }).ToList();
 
         var metadata = new

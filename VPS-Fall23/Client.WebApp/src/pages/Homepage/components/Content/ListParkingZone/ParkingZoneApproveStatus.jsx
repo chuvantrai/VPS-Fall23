@@ -1,7 +1,7 @@
 import { Tag } from "antd"
 const approveStatuses = [
     {
-        label: "Đang duyệt",
+        label: "Chờ duyệt",
         color: "processing",
         value: null
     },

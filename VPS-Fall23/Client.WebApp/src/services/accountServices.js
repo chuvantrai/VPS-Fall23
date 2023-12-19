@@ -55,12 +55,6 @@ const AccountServices = () => {
           window.location.reload();
         }
       })
-      .catch((error) => {
-        notification.error({
-          message: 'Lỗi',
-          description: error.message,
-        });
-      });
   };
 
   const blockAccount = (input) => {

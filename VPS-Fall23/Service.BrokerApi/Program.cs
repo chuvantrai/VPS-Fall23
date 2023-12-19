@@ -13,10 +13,10 @@ builder.Services.AddScoped<IRabbitMQClient, RabbitMQClient>();
 builder.Services.Configure<RabbitMQProfile>(builder.Configuration.GetSection("RabbitMQ"));
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenLocalhost(7002, listenOptions =>
-    {
-        listenOptions.UseHttps();
-    });
+    // serverOptions.ListenLocalhost(7002, listenOptions =>
+    // {
+    //     listenOptions.UseHttps();
+    // });
     serverOptions.ListenLocalhost(5109);
 });
 

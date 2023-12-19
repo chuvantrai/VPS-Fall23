@@ -5,6 +5,7 @@ import useParkingZoneService from '@/services/parkingZoneService.js';
 import FoundedParkingZonePopover from './Popover/FoundedParkingZonePopover';
 import BookmarkParkingZonePopover from './Popover/BookmarkParkingZonePopover';
 import { ParkingZoneDetailContext } from '@/hooks/useContext/driver.parkingZoneDetail.context';
+import { notification } from 'antd';
 
 let markerList = []
 const FoundedParkingZone = ({ map }) => {
@@ -18,6 +19,13 @@ const FoundedParkingZone = ({ map }) => {
     const position = { lng: selectedLocation.geometry.position.lng, lat: selectedLocation.geometry.position.lat }
     parkingZoneService.getParkingZoneNearAround(position)
       .then(res => {
+
+        const number = res?.data?.length ?? 0;
+        let message = "Không tìm thấy nhà xe nào gần địa chỉ bạn đã chọn";
+        if (number > 0) {
+          message = `Tìm thấy ${number} nhà xe gần địa chỉ bạn đã chọn. Nhấp vào nút phía góc trái bản đồ để xem danh sách nhà xe đã tìm được.`
+        }
+        notification.info({ message: "Kết quả tìm kiếm", description: message })
         setParkingZones(res.data);
         res.data.map((parkingZone) => {
           if (!parkingZone.location?.x || !parkingZone.location?.y) {

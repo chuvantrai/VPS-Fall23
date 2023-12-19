@@ -18,7 +18,7 @@ namespace Service.ManagerVPS.Repositories
 
         public Task<IEnumerable<Commune>> GetByDistrict(Guid districtId)
         {
-            return Task.FromResult(this.entities.Where(c => c.DistrictId == districtId).AsEnumerable());
+            return Task.FromResult(this.entities.Where(c => c.DistrictId == districtId && (c.IsBlock ?? true) == false).OrderBy(d => d.Name).AsEnumerable());
         }
 
         public async Task<Tuple<IEnumerable<Commune>, int>> GetListCommune(GetAddressListParkingZoneRequest request)
@@ -72,7 +72,7 @@ namespace Service.ManagerVPS.Repositories
             await context.SaveChangesAsync();
             return isBlock;
         }
-        
+
         public async Task<bool> UpdateIsBlockDistrict(bool isBlock, Guid districtId)
         {
             var district = await context.Districts.FirstOrDefaultAsync(x => x.Id.Equals(districtId));

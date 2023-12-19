@@ -8,6 +8,7 @@ import AdminOverview from '@/pages/Dashboard/AdminOverview';
 import ViewListParkingZone from '@/pages/Homepage/components/Content/ListParkingZone';
 import ListUserReport from '../pages/ListUserReport';
 import ListAddressManager from '../pages/ListAddressManager/ListAddressManager.jsx';
+import ChangePassword from '@/pages/ChangePassword/index.js';
 
 export const adminRoutesConfig = {
   header: Header,
@@ -40,13 +41,13 @@ export const adminRoutesConfig = {
       path: 'parking-zone',
       label: 'Bãi đỗ xe',
       children: [
-        {
-          key: guidGenerator(),
-          path: '',
-          label: 'Danh sách bãi đỗ xe',
-          description: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
-          component: ViewListParkingZone,
-        },
+        // {
+        //   key: guidGenerator(),
+        //   path: '',
+        //   label: 'Danh sách bãi đỗ xe',
+        //   description: 'Toàn bộ danh sách bãi gửi xe hiển thị dưới đây',
+        //   component: ViewListParkingZone,
+        // },
         {
           key: guidGenerator(),
           path: 'parking-zone-owner',

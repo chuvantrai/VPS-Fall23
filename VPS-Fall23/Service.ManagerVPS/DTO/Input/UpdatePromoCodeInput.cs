@@ -8,13 +8,7 @@ public class UpdatePromoCodeInput
     public Guid? PromoCodeId { get; set; }
 
     [Required]
-    public string? PromoCode { get; set; }
-
-    [Required]
     public int Discount { get; set; }
-
-    [Required]
-    public int? NumberOfUses { get; set; }
 
     [Required]
     public DateTime FromDate { get; set; }

@@ -13,6 +13,8 @@ const DriverCenterHeader = () => {
     const [input, setInput] = useState("");
     const [sessionToken, setSessionToken] = useState()
     const [placeAutoCompleteData, setPlaceAutoCompleteData] = useState([]);
+    const [selectedPlace, setSelectedPlace] = useState(null);
+
     const goongMapService = useGoongMapService();
     const inputDebouneValue = useDebounce(input, 600);
     useEffect(() => {
@@ -28,13 +30,27 @@ const DriverCenterHeader = () => {
 
     };
     useEffect(() => {
+        if ((!selectedAddress || selectedAddress.length === 0) && !inputDebouneValue) return;
+        onSearch(inputDebouneValue);
+    }, [JSON.stringify(selectedAddress)])
+
+    useEffect(() => {
         setSessionToken(uuidv4())
     }, [])
+    useEffect(() => {
+        if (Array.isArray(placeAutoCompleteData) && placeAutoCompleteData.length > 0) {
+            setSelectedPlace(placeAutoCompleteData[0]);
+        }
+    }, [JSON.stringify(placeAutoCompleteData)])
+    useEffect(() => {
+        if (!selectedPlace?.placeId) return;
+        onPlaceSelect(selectedPlace?.placeId)
+    }, [JSON.stringify(selectedPlace)])
     const onCascaderChange = useCallback((value, selectedOptions) => {
         setSelectedAddress(selectedOptions ?? []);
     }, []);
     const onSearch = (input) => {
-        let inputCombine = [input, ...selectedAddress.reverse().map((address) => {
+        let inputCombine = [input, ...JSON.parse(JSON.stringify(selectedAddress)).reverse().map((address) => {
             return address.name
         })].join(', ')
         if (!inputCombine.trim()) {
@@ -63,11 +79,12 @@ const DriverCenterHeader = () => {
             <AddressCascader cascaderProps={addressCascaderProps} onCascaderChangeCallback={onCascaderChange} />
             <Select
                 showSearch
-                options={placeAutoCompleteData.map((p) => ({ label: p.description, value: p.placeId }))}
+                options={placeAutoCompleteData.map((p) => ({ label: p.description ?? p.formattedAddress, value: p.placeId }))}
                 style={{ width: "60%" }}
                 dropdownAlign={'end'}
                 onSearch={(value) => { setInput(value); return true; }}
-                onSelect={(value) => onPlaceSelect(value)}
+                onSelect={(value, option) => setSelectedPlace({ placeId: option.value, description: option.label })}
+                value={selectedPlace?.placeId}
                 onClear={() => { setSessionToken(uuidv4()) }}
                 filterOption={() => true}
                 allowClear

@@ -38,6 +38,7 @@ const UpdateParkingZoneForm = ({ form, parkingZone }) => {
             })
             Promise.all(imageFilePromises).then((res) => {
                 setImages(res);
+                form.setFieldValue("parkingZoneImages", { fileList: res })
             });
 
         });
@@ -65,21 +66,35 @@ const UpdateParkingZoneForm = ({ form, parkingZone }) => {
                 label="Giá tiền (mỗi giờ)"
                 rules={[notEmptyRule]}
             >
-                <InputNumber className="w-[100%]" prefix="VND" />
+                <InputNumber
+                    className="w-[100%]"
+                    prefix="VND"
+                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                />
             </Form.Item>
             <Form.Item
                 name="priceOverTimePerHour"
                 label="Giá tiền quá giờ (mỗi giờ)"
                 rules={[notEmptyRule]}
             >
-                <InputNumber className="w-[100%]" prefix="VND" />
+                <InputNumber
+                    className="w-[100%]"
+                    prefix="VND"
+                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                />
             </Form.Item>
             <Form.Item
                 name="slots"
                 label="Số chỗ"
                 rules={[notEmptyRule]}
             >
-                <InputNumber className="w-[100%]" />
+                <InputNumber
+                    className="w-[100%]"
+                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                />
             </Form.Item>
             <Form.Item
                 name="workingTime"
@@ -103,7 +118,6 @@ const UpdateParkingZoneForm = ({ form, parkingZone }) => {
                     listType="picture-card"
                     fileList={images}
                     onChange={(info) => {
-
                         setImages(info.fileList.filter((im) => im.size <= fileLimit.maxSize))
                     }}
                     multiple={true}

@@ -7,8 +7,7 @@ using Service.ManagerVPS.DTO.Input;
 using Service.ManagerVPS.Extensions.StaticLogic;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
-using System.Text.Json;
-using System.Text.Json.Nodes;
+using Service.ManagerVPS.FilterPermissions;
 
 namespace Service.ManagerVPS.Controllers
 {
@@ -61,8 +60,13 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpGet("GetAddressListParkingZone")]
+        [FilterPermission(Action = ActionFilterEnum.GetAddressListParkingZone)]
         public async Task<IActionResult> GetAddressListParkingZone([FromQuery] GetAddressListParkingZoneRequest request)
         {
+            if (!string.IsNullOrEmpty(request.TextAddress))
+            {
+                request.TextAddress = request.TextAddress.Trim();
+            }
             switch (request.TypeAddress)
             {
                 case AddressTypeEnum.COMMUNE:
@@ -127,6 +131,7 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPut("UpdateIsBlockAddress")]
+        // [FilterPermission(Action = ActionFilterEnum.UpdateIsBlockAddress)]
         public async Task<IActionResult> UpdateIsBlockAddress(UpdateIsBlockAddressRequest request)
         {
             return request.TypeAddress switch
@@ -143,6 +148,7 @@ namespace Service.ManagerVPS.Controllers
         }
 
         [HttpPost("CreateAddress")]
+        [FilterPermission(Action = ActionFilterEnum.CreateAddress)]
         public async Task<IActionResult> CreateAddress(CreateAddressRequest request)
         {
             var accessToken = Request.Cookies["ACCESS_TOKEN"]!;
