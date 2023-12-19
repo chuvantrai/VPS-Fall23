@@ -54,6 +54,7 @@ namespace Service.ManagerVPS.Controllers
                 parkingTransaction.StatusId = (int)ParkingTransactionStatusEnum.PARKINGCANCEL;
                 await vpsRepository.Update(parkingTransaction);
                 await vpsRepository.SaveChange();
+                if (string.IsNullOrEmpty( parkingTransaction.Email)) return;
                 var parkingZone = this.parkingZoneRepository.Find(parkingTransaction.ParkingZoneId);
                 var fileName = $"cancel-booking-info.html";
                 fileName = Path.Combine(Directory.GetCurrentDirectory(), "Constants", "FileHtml",
@@ -61,6 +62,7 @@ namespace Service.ManagerVPS.Controllers
                 var templateString = await System.IO.File.ReadAllTextAsync(fileName);
                 templateString = templateString
                     .Replace("@{parkingZoneName}", parkingTransaction.ParkingZone.Name)
+                    .Replace("@{licensePlate}", parkingTransaction.LicensePlate)
                     .Replace("@{from}", parkingTransaction.CheckinAt.ToString("hh:mm:ss dd/MM/yyyy"))
                     .Replace("@{to}", parkingTransaction.CheckoutAt?.ToString("hh:mm:ss dd/MM/yyyy"));
                 string subject = "Thông báo hủy lượt đăng ký gửi xe";
