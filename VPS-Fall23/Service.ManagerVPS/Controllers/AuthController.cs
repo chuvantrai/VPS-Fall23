@@ -422,11 +422,6 @@ public class AuthController : VpsController<Account>
             throw new ServerException(2);
         }
 
-        if (input is { IsBlock: true, BlockReason: null })
-        {
-            throw new ServerException("Không thể khóa tài khoản mà không có lý do!");
-        }
-
         account.IsBlock = (bool)input.IsBlock!;
         account.BlockReason = input.BlockReason;
 

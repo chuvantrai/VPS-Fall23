@@ -98,18 +98,17 @@ function ViewListParkingZoneOwner() {
   const [blockAccountId, setBlockAccountId] = useState('');
 
   const handleOpenBlockModal = (record) => {
-    setBlockOpen(true)
-    setBlockAccountId(record.key)
-  }
-  const onBlock = (values) => {
-    accountService.blockAccount(values)
+    let input = {
+      accountId: record.key,
+      isBlock: true
+    }
+    accountService.blockAccount(input)
       .then(res => {
         notification.success({
           message: res.data
         })
         getData()
       })
-    setBlockOpen(false)
   }
 
   const handleUnblockAccount = (record) => {
@@ -228,15 +227,6 @@ function ViewListParkingZoneOwner() {
           </Fragment>
         )}
       </div>
-
-      <ModalBlockReason
-        open={blockOpen}
-        accountId={blockAccountId}
-        onBlock={onBlock}
-        onCancel={() => {
-          setBlockOpen(false);
-        }}
-      />
     </Fragment>
   );
 }
