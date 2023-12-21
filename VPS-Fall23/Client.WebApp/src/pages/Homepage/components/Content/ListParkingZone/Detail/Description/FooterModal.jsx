@@ -18,9 +18,11 @@ const ParkingZoneDescriptionFooterModal = () => {
             parkingZoneId: detailInfo.parkingZone.id,
             isFull: checked,
         };
-        parkingZoneService.changeParkingZoneFullStatus(params);
-        setSwitchChecked(!switchChecked)
-        setViewValues({ ...viewValues, reload: true })
+        parkingZoneService.changeParkingZoneFullStatus(params).then(res => {
+            setViewValues({ ...viewValues, reload: true })
+            setSwitchChecked(checked)
+        });
+
     }
     useEffect(() => {
         setAccount(getAccountJwtModel())

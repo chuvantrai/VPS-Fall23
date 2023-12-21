@@ -117,7 +117,7 @@ const useParkingZoneService = () => {
   };
 
   const changeParkingZoneFullStatus = (params) => {
-    axios
+    return axios
       .put(`${BASE_URI}/ChangeParkingZoneFullStatus`, params)
       .then((res) => {
         notification.success({
