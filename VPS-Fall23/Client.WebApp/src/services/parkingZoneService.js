@@ -135,20 +135,12 @@ const useParkingZoneService = () => {
   };
 
   const updateParkingZone = (params) => {
-    return axios
-      .put(`${BASE_URI}/UpdateParkingZone`, params)
-      .then((res) => {
-        notification.success({
-          message: res?.data,
-        });
-        return Promise.resolve(res);
-      })
-      .catch((err) => {
-        notification.error({
-          message: 'Có lỗi xảy ra!',
-          description: err.message,
-        });
+    return axios.put(`${BASE_URI}/UpdateParkingZone`, params).then((res) => {
+      notification.success({
+        message: res?.data,
       });
+      return Promise.resolve(res);
+    });
   };
   const getBookedSlot = (parkingZoneId) => {
     return axios.get(`${BASE_URI}/GetBookedSlot/${parkingZoneId}`);

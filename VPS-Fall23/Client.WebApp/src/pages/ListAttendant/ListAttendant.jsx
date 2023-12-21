@@ -177,7 +177,11 @@ function ListAttendant() {
       getData()
       setConfirmLoading(false)
       setOpen(false);
-    });
+    })
+      .catch(err => {
+        setConfirmLoading(false)
+        setOpen(false);
+      });
   };
 
   return (
