@@ -30,7 +30,7 @@ public class ReportController : VpsController<Report>
     public async Task<IActionResult> CreateReport(CreateReportRequest request)
     {
         var accessToken = Request.Cookies["ACCESS_TOKEN"];
-        if (accessToken != null)
+        if (!string.IsNullOrEmpty(accessToken))
         {
             var userToken = JwtTokenExtension.ReadToken(accessToken)!;
             request.UserId = Guid.Parse(userToken.UserId);
