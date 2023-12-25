@@ -4,7 +4,7 @@ import useParkingZoneService from '@/services/parkingZoneService';
 import { useEffect, useState } from "react";
 import getAccountJwtModel from "@/helpers/getAccountJwtModel";
 const ParkingZoneDescriptionFooterModal = () => {
-    const { detailInfo, setDetailInfo } = useViewParkingZoneContext();
+    const { detailInfo, setDetailInfo, viewValues, setViewValues } = useViewParkingZoneContext();
     const parkingZoneService = useParkingZoneService();
 
     const [switchChecked, setSwitchChecked] = useState(detailInfo.parkingZone.isFull)
@@ -18,21 +18,22 @@ const ParkingZoneDescriptionFooterModal = () => {
             parkingZoneId: detailInfo.parkingZone.id,
             isFull: checked,
         };
-        parkingZoneService.changeParkingZoneFullStatus(params);
-        setSwitchChecked(!switchChecked)
+        parkingZoneService.changeParkingZoneFullStatus(params).then(res => {
+            setViewValues({ ...viewValues, reload: true })
+            setSwitchChecked(checked)
+        });
+
     }
     useEffect(() => {
         setAccount(getAccountJwtModel())
     }, [])
     return (<Space>
-        {account?.RoleId === '2' && (
-            <Switch
-                checkedChildren="Hết chỗ"
-                unCheckedChildren="Còn chỗ"
-                onChange={onSwitchChange}
-                checked={switchChecked}
-            />
-        )}
+        <Switch
+            checkedChildren="Hết chỗ"
+            unCheckedChildren="Còn chỗ"
+            onChange={onSwitchChange}
+            checked={switchChecked}
+        />
         <Button type="dashed" onClick={handleCancel}>
             Đóng
         </Button>

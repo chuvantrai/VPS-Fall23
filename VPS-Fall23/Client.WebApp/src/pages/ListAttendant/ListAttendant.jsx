@@ -103,18 +103,17 @@ function ListAttendant() {
   ];
 
   const handleOpenBlockModal = (record) => {
-    setBlockOpen(true)
-    setBlockAccountId(record.id)
-  }
-  const onBlock = (values) => {
-    accountService.blockAccount(values)
+    let input = {
+      accountId: record.id,
+      isBlock: true
+    }
+    accountService.blockAccount(input)
       .then(res => {
         notification.success({
           message: res.data
         })
         getData()
       })
-    setBlockOpen(false)
   }
 
   const handleUnblockAccount = (record) => {
@@ -177,7 +176,11 @@ function ListAttendant() {
       getData()
       setConfirmLoading(false)
       setOpen(false);
-    });
+    })
+      .catch(err => {
+        setConfirmLoading(false)
+        setOpen(false);
+      });
   };
 
   return (
@@ -215,15 +218,6 @@ function ListAttendant() {
         onCreate={onCreate}
         onCancel={() => {
           setOpen(false);
-        }}
-      />
-
-      <ModalBlockReason
-        open={blockOpen}
-        accountId={blockAccountId}
-        onBlock={onBlock}
-        onCancel={() => {
-          setBlockOpen(false);
         }}
       />
     </div>
