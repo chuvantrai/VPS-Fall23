@@ -1,4 +1,4 @@
-import { Button, Space, Switch } from "antd";
+import { Button, Space, Switch, notification } from "antd";
 import { useState } from "react";
 import useParkingZoneService from '@/services/parkingZoneService';
 import { useViewParkingZoneContext } from "@/hooks/useContext/viewParkingZone.context";
@@ -17,9 +17,13 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
             parkingZoneId: detailInfo.parkingZone.id,
             isFull: checked,
         };
-        parkingZoneService.changeParkingZoneFullStatus(params);
-        setSwitchChecked(!switchChecked)
-        setViewValues({ ...viewValues, reload: true })
+        parkingZoneService.changeParkingZoneFullStatus(params).then(res => {
+            setViewValues({ ...viewValues, reload: true })
+
+            setSwitchChecked(checked)
+        });
+
+
     }
 
     return (<Space>
@@ -45,10 +49,13 @@ const UpdateParkingZoneFooterModal = ({ form }) => {
                     formData.append('slots', values.slots);
                     formData.append('workFrom', dayjs(values.workingTime[0]).format("HH:mm:ss"));
                     formData.append('workTo', dayjs(values.workingTime[1]).format("HH:mm:ss"));
-                    if (values.parkingZoneImages) {
+                    if (values.parkingZoneImages?.fileList?.length ?? 0 > 0) {
                         values.parkingZoneImages.fileList.forEach((item) => {
                             formData.append('parkingZoneImages', item.originFileObj);
                         });
+                    } else {
+                        notification.error({ message: "Lỗi", description: "Vui lòng chọn ảnh nhà xe" });
+                        return;
                     }
 
 

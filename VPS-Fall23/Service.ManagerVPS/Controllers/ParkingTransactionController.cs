@@ -45,17 +45,19 @@ namespace Service.ManagerVPS.Controllers
             _configuration = configuration;
             this.promoCodeRepository = promoCodeRepository;
         }
-        [HttpPost("{id}")]
+        [HttpDelete("{id}")]
         public async Task Cancel(Guid id)
         {
             try
             {
+                Console.WriteLine("Receive cancel request");
+
                 var parkingTransaction = await vpsRepository.Find(id);
-                parkingTransaction.StatusId = (int)ParkingTransactionStatusEnum.PARKINGCANCEL;
-                await vpsRepository.Update(parkingTransaction);
-                await vpsRepository.SaveChange();
-                if (string.IsNullOrEmpty( parkingTransaction.Email)) return;
+
                 var parkingZone = this.parkingZoneRepository.Find(parkingTransaction.ParkingZoneId);
+                parkingTransaction.StatusId = (int)ParkingTransactionStatusEnum.PARKINGCANCEL;
+
+                if (string.IsNullOrEmpty( parkingTransaction.Email)) return;
                 var fileName = $"cancel-booking-info.html";
                 fileName = Path.Combine(Directory.GetCurrentDirectory(), "Constants", "FileHtml",
                     fileName);
@@ -63,14 +65,15 @@ namespace Service.ManagerVPS.Controllers
                 templateString = templateString
                     .Replace("@{parkingZoneName}", parkingTransaction.ParkingZone.Name)
                     .Replace("@{licensePlate}", parkingTransaction.LicensePlate)
-                    .Replace("@{from}", parkingTransaction.CheckinAt.ToString("hh:mm:ss dd/MM/yyyy"))
-                    .Replace("@{to}", parkingTransaction.CheckoutAt?.ToString("hh:mm:ss dd/MM/yyyy"));
+                    .Replace("@{from}", parkingTransaction.CheckinAt.ToString("HH:mm:ss dd/MM/yyyy"))
+                    .Replace("@{to}", parkingTransaction.CheckoutAt?.ToString("HH:mm:ss dd/MM/yyyy"));
                 string subject = "Thông báo hủy lượt đăng ký gửi xe";
                 BrokerApiClient brokerApiClient =
                     new BrokerApiClient(this._configuration.GetValue<string>("brokerApiBaseUrl"));
                 await brokerApiClient.SendMail(new string[1] { parkingTransaction.Email }, subject,
                     templateString);
-              
+                await vpsRepository.Update(parkingTransaction);
+                await vpsRepository.SaveChange();
             }
             catch (Exception)
             {

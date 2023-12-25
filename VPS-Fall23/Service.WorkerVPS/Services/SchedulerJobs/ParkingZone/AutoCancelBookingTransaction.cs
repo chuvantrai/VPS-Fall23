@@ -20,7 +20,9 @@ namespace Service.WorkerVPS.Services.SchedulerJobs.ParkingZone
         public async Task Execute(IJobExecutionContext context)
         {
             var parkingTransactionId = context.MergedJobDataMap.GetGuid("parkingTransactionId");
+            Console.WriteLine(parkingTransactionId);
             await vpsClient.CancelBookingTransaction(parkingTransactionId);
+            Console.WriteLine("Canceled booking transaction");
         }
     }
 }

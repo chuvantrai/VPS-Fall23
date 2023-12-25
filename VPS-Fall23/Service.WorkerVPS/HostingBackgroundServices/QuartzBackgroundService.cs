@@ -19,7 +19,6 @@ namespace Service.WorkerVPS.BackgroundServices
         }
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            await quartzServices.Start();
             _logger.Log(LogLevel.Information, "Quartz service started");
             await base.StartAsync(cancellationToken);
         }

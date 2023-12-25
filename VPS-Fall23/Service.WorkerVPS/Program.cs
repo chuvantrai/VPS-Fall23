@@ -16,14 +16,18 @@ IHost host = Host.CreateDefaultBuilder(args)
     {
         services.Configure<RabbitMQProfile>(context.Configuration.GetSection("RabbitMQ"));
         services.Configure<HostEmailProfile>(context.Configuration.GetSection("HostEmail"));
+        services.AddQuartz(q =>
+        {
+            q.UseMicrosoftDependencyInjectionJobFactory();
+        });
+        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
         services.AddHostedService<CreateDeletingPZJobBackgroundService>();
         services.AddHostedService<CreateCancelBookingJobBackgroundService>();
         services.AddHostedService<RemoveCancelBookingJobBackgroundService>();
         services.AddHostedService<RemoveDeletingPZJobBackGroundService>();
         services.AddHostedService<SmtpBackgroundService>();
         services.AddHostedService<SendPromoCode>();
-        services.AddSingleton<IJobFactory, JobFactory>();
-        services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
         services.AddSingleton<ISmtpService, SmtpServices>();
         services.AddSingleton<QuartzServices>();
         services.AddSingleton<CreateDeletingPZJobDequeue>();
@@ -31,7 +35,10 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<CreateCancelBookingDequeue>();
         services.AddSingleton<RemoveCancelBookingDequeue>();
         services.AddSingleton<SendMailDequeue>();
+
     })
     .Build();
-
+var schedulerFactory = host.Services.GetRequiredService< ISchedulerFactory > ();
+var scheduler = await schedulerFactory.GetScheduler();
+await scheduler.Start ();
 await host.RunAsync();

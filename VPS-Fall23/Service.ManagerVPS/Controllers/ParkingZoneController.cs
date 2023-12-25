@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.ManagerVPS.Constants.Enums;
 using Service.ManagerVPS.Constants.FileManagement;
@@ -16,7 +17,6 @@ using Service.ManagerVPS.ExternalClients;
 using Service.ManagerVPS.FilterPermissions;
 using Service.ManagerVPS.Models;
 using Service.ManagerVPS.Repositories.Interfaces;
-using System.Globalization;
 
 namespace Service.ManagerVPS.Controllers;
 
@@ -535,26 +535,26 @@ public class ParkingZoneController : VpsController<ParkingZone>
                 _config.GetValue<string>("fileManagementAccessKey:accessKey"),
                 _config.GetValue<string>("fileManagementAccessKey:secretKey"));
 
-        // delete old images
-        if (parkingZoneImages.Count > 0)
-        {
-            var removeObjectsDtos = parkingZoneImages
-                .Select(img => new RemoveObjectsDto
-                {
-                    ObjectName =
-                        img.Replace(
-                            $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}/{_fileManagementConfig.PublicBucket}/",
-                            "")
-                })
-                .ToList();
-            await fileManager.RemoveMultipleObjects(
-                _config.GetValue<string>("fileManagementAccessKey:publicBucket"),
-                removeObjectsDtos);
-        }
-
-        // add new images
         if (input.ParkingZoneImages is not null)
         {
+            // delete old images
+            if (parkingZoneImages.Count > 0)
+            {
+                var removeObjectsDtos = parkingZoneImages
+                    .Select(img => new RemoveObjectsDto
+                    {
+                        ObjectName =
+                            img.Replace(
+                                $"{_fileManagementConfig.EndPointServer}:{_fileManagementConfig.EndPointPort.Api}/{_fileManagementConfig.PublicBucket}/",
+                                "")
+                    })
+                    .ToList();
+                await fileManager.RemoveMultipleObjects(
+                    _config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+                    removeObjectsDtos);
+            }
+
+            // add new images
             var parkingZoneImgs = new MultipartFormDataContent();
             for (var i = 0; i < input.ParkingZoneImages.Count; i++)
             {
@@ -563,7 +563,8 @@ public class ParkingZoneController : VpsController<ParkingZone>
                     $"{parkingZone.Id}-{i}.{Path.GetExtension(input.ParkingZoneImages[i].FileName)}");
             }
 
-            await fileManager.Upload(_config.GetValue<string>("fileManagementAccessKey:publicBucket"),
+            await fileManager.Upload(
+                _config.GetValue<string>("fileManagementAccessKey:publicBucket"),
                 $"parking-zone-images/{parkingZone.OwnerId}/{parkingZone.Id}", parkingZoneImgs);
         }
         else
